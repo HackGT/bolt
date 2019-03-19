@@ -1,25 +1,17 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+import {AnchorButton, Button, H1, H2} from "@blueprintjs/core";
+import {Navigation} from "./components/Navigation";
+import Footer from "./components/Footer";
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+          <Navigation/>
+          <H1>Welcome to Bolt!</H1>
+          <H2>Hardware checkout, reimagined</H2>
+          <Footer/>
       </div>
     );
   }
