@@ -1,24 +1,28 @@
-import React, { Component } from 'react';
-import './App.css';
-import {AnchorButton, Button, H1, H2} from "@blueprintjs/core";
+import React, {Component} from 'react';
 import {Navigation} from "./components/Navigation";
 import Footer from "./components/Footer";
-import {Login} from "./components/auth/Login";
+import HardwareList from "./components/inventory/HardwareList";
+import {ToastProvider} from 'react-toast-notifications';
 
 class App extends Component {
   render() {
     return (
-      <div className="App"
-      style={{
+        <div style={{
           width: '100%',
           maxWidth: 960,
           margin: '0 auto'
       }}>
-          <Navigation/>
-          <H1>Welcome to Bolt!</H1>
-          <H2>Hardware checkout, reimagined</H2>
-          <Login />
-          <Footer/>
+            <ToastProvider placement="top-center"
+            >
+                <Navigation/>
+                <div style={{
+                    textAlign: 'left'
+                }}>
+                    <HardwareList requestsEnabled={true}>
+                    </HardwareList>
+                </div>
+                <Footer/>
+            </ToastProvider>
       </div>
     );
   }

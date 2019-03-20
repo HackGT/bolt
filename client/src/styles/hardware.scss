@@ -1,0 +1,19 @@
+.hw-list {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  width: 100%;
+
+  > .hw-card {
+    width: 100%;
+    max-width: 500px;
+    margin: 5px;
+  }
+}
+
+.hw-image > img {
+  -webkit-user-drag: none;
+  -ms-user-drag: none;
+  -moz-user-drag: none;
+  user-drag: none;
+}
