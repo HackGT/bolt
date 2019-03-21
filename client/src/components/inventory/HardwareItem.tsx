@@ -1,6 +1,7 @@
 import React, {ChangeEvent} from 'react';
 import {Form, Input, Item, Label} from "semantic-ui-react";
 import {withToastManager} from "react-toast-notifications";
+import {RequestItem, ItemStatus} from "./HardwareList";
 
 interface HardwareItemProps {
     name: string, // name of this item
@@ -10,7 +11,8 @@ interface HardwareItemProps {
     qtyRemaining: number, // # of this item remaining in our stock
     totalQty: number,
     maxReqQty: number, // max number of a specific item you can request at once
-    category: string
+    category: string,
+    addRequestedItem: (requestItem: RequestItem) => void
 }
 
 interface HardwareItemState {
@@ -45,18 +47,24 @@ class HardwareItemBase extends React.Component<HardwareItemProps, HardwareItemSt
         if (updatedQtyRemaining < 0) {
             updatedQtyRemaining = 0;
         }
+        let requestItem: RequestItem = {
+            item: this.props.name,
+            quantity: this.state.qtyRequested,
+            status: ItemStatus.Submitted
+        }
         this.setState({
             loading: false,
             qtyRequested: 1,
             qtyRemaining: updatedQtyRemaining
         });
+
+        this.props.addRequestedItem(requestItem);
     }
 
     handleItemRequest() {
         this.setState({
             loading: true
         });
-
         setTimeout(this.finishedLoading, 3000);
     }
 

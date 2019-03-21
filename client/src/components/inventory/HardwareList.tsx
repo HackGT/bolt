@@ -4,14 +4,105 @@ import {Grid, Header, Icon, Item, Message} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
 import RequestsList from "../requests/RequestsList";
 
-export class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean }> {
+const sampleData = [
+    {
+        name: "Arduino Uno",
+        description: "Potato potato let's call the whole thing off",
+        qtyRemaining: 20,
+        totalQty: 30,
+        maxReqQty: 1,
+        returnRequired: true,
+        owner: "The Hive",
+        category: "Microcontrollers",
+        id: "541"
+    },
+    {
+        name: "Mango",
+        description: "The one and only Hardware Queen(TM)",
+        qtyRemaining: 0,
+        totalQty: 1,
+        maxReqQty: 1,
+        returnRequired: true,
+        owner: "Mango",
+        category: "People?",
+        id: "3432"
+    },
+    {
+        name: "Raspberry Pi 3",
+        description: "We heard you like fruit so we put a fruit in ya computer",
+        qtyRemaining: 20,
+        totalQty: 30,
+        maxReqQty: 1,
+        returnRequired: true,
+        owner: "HackGT",
+        category: "Microcontrollers",
+        id: "4642"
+    },
+    {
+        name: "10 Ohm Resistors",
+        description: "Not 9, not 11, 10 Ohms.  The perfect amount",
+        qtyRemaining: 1000,
+        totalQty: 1000,
+        maxReqQty: 10,
+        returnRequired: false,
+        owner: "",
+        category: "Resistors",
+        id: "46234"
+    },
+];
+
+
+export enum ItemStatus {
+    Submitted = "yellow",
+    Approved = "orange",
+    Declined = "red",
+    Abandoned = "red",
+    Ready = "green",
+    Fulfilled = "blue",
+    Returned = "green",
+    Lost = "red",
+    Damaged = "red"
+}
+
+export interface RequestItem {
+    item: String,
+    quantity: Number,
+    status: ItemStatus,
+}
+
+export class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean , requestedItems: Array<RequestItem> }> {
     constructor(props: { requestsEnabled: boolean }) {
         super(props);
         this.state = {
-            loading: true
+            loading: true,
+            requestedItems: []
         };
-
         this.dataCallback = this.dataCallback.bind(this);
+        this.addRequestedItem = this.addRequestedItem.bind(this);
+        this.removeRequestedItem = this.removeRequestedItem.bind(this);
+    }
+
+    addRequestedItem(requestedItem: RequestItem) {
+        let itemList = this.state.requestedItems;
+        itemList.push(requestedItem);
+        this.setState({
+            requestedItems: itemList
+        })
+    }
+
+    removeRequestedItem(requestedItem: RequestItem) {
+        let itemIndex = 0;
+        for (let i = 0; i < this.state.requestedItems.length; i++) {
+            if (this.state.requestedItems[i].item == requestedItem.item) {
+                itemIndex = i;
+                break;
+            }
+        }
+        let itemList = this.state.requestedItems;
+        itemList.splice(itemIndex, 1);
+        this.setState({
+            requestedItems: itemList
+        })
     }
 
     dataCallback() {
@@ -26,53 +117,6 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean }, 
 
 
     render() {
-        const sampleData = [
-            {
-                name: "Arduino Uno",
-                description: "Potato potato let's call the whole thing off",
-                qtyRemaining: 20,
-                totalQty: 30,
-                maxReqQty: 1,
-                returnRequired: true,
-                owner: "The Hive",
-                category: "Microcontrollers",
-                id: "541"
-            },
-            {
-                name: "Mango",
-                description: "The one and only Hardware Queen(TM)",
-                qtyRemaining: 0,
-                totalQty: 1,
-                maxReqQty: 1,
-                returnRequired: true,
-                owner: "Mango",
-                category: "People?",
-                id: "3432"
-            },
-            {
-                name: "Raspberry Pi 3",
-                description: "We heard you like fruit so we put a fruit in ya computer",
-                qtyRemaining: 20,
-                totalQty: 30,
-                maxReqQty: 1,
-                returnRequired: true,
-                owner: "HackGT",
-                category: "Microcontrollers",
-                id: "4642"
-            },
-            {
-                name: "10 Ohm Resistors",
-                description: "Not 9, not 11, 10 Ohms.  The perfect amount",
-                qtyRemaining: 1000,
-                totalQty: 1000,
-                maxReqQty: 10,
-                returnRequired: false,
-                owner: "",
-                category: "Resistors",
-                id: "46234"
-            },
-        ];
-
 
         const noRequestsMessage = !this.props.requestsEnabled ? (<Message
             title="View-only inventory"
@@ -95,6 +139,7 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean }, 
                               maxReqQty={item.maxReqQty}
                               category={item.category}
                               key={item.id}
+                              addRequestedItem={this.addRequestedItem}
                 />))}
         </Item.Group>);
         const loading = (<Item.Group>
@@ -113,7 +158,7 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean }, 
                     </Grid.Column>
                     <Grid.Column>
                         <h2>My Requests</h2>
-                        <RequestsList/>
+                        <RequestsList requestedItems={this.state.requestedItems} removeRequestedItem={this.removeRequestedItem}/>
                     </Grid.Column>
                 </Grid.Row>
             </Grid>
