@@ -1,10 +1,9 @@
 import React from 'react';
 import HardwareItem from "./HardwareItem";
-import {Grid, Header, Icon, Item, Message} from "semantic-ui-react";
+import {Icon, Item, Message} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
-import RequestsList from "../requests/RequestsList";
 
-export class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean }> {
+class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean }> {
     constructor(props: { requestsEnabled: boolean }) {
         super(props);
         this.state = {
@@ -63,9 +62,9 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean }, 
             {
                 name: "10 Ohm Resistors",
                 description: "Not 9, not 11, 10 Ohms.  The perfect amount",
-                qtyRemaining: 1000,
-                totalQty: 1000,
-                maxReqQty: 10,
+                qtyRemaining: 18,
+                totalQty: 20,
+                maxReqQty: 12,
                 returnRequired: false,
                 owner: "",
                 category: "Resistors",
@@ -103,20 +102,11 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean }, 
             <PlaceholderItem/>
         </Item.Group>);
 
-        return (
-            <Grid columns={2}>
-                <Grid.Row>
-                    <Grid.Column>
-                        <Header>Inventory</Header>
-                        {noRequestsMessage}
-                        {this.state.loading ? loading : normalContent}
-                    </Grid.Column>
-                    <Grid.Column>
-                        <h2>My Requests</h2>
-                        <RequestsList/>
-                    </Grid.Column>
-                </Grid.Row>
-            </Grid>
+        return (<div>
+                <h1>Inventory</h1>
+                {noRequestsMessage}
+                {this.state.loading ? loading : normalContent}
+            </div>
         );
     }
 }

@@ -1,16 +1,16 @@
 import React from "react";
-import {Menu} from 'semantic-ui-react'
+import {Icon, Menu} from 'semantic-ui-react'
+import {Link} from "react-router-dom";
 
 export class Navigation extends React.Component {
     render() {
 
         return (
-            <Menu>
-                <Menu.Item header>HackGT Hardware Checkout</Menu.Item>
-                <Menu.Item
-                    name='inventory'
-                    icon="home"
-                />
+            <Menu stackable>
+                <Menu.Item header>HackGT Hardware</Menu.Item>
+                <Menu.Item name="inventory">
+                    <Icon name="home"/><Link to="/">Inventory</Link>
+                </Menu.Item>
             </Menu>
         )
     }
