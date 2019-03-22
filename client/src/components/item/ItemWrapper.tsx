@@ -6,7 +6,6 @@ class ItemWrapper extends Component<{ match: match }> {
     render() {
         return (
             <div>
-                <h1>Edit Item</h1>
                 <Route path={`${this.props.match.url}/:itemId`} component={ItemEdit}/>
             </div>
         );
