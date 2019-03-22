@@ -1,31 +1,33 @@
 import React, {Component} from 'react';
 import {Navigation} from "./components/Navigation";
 import Footer from "./components/Footer";
-import HardwareList from "./components/inventory/HardwareList";
 import {ToastProvider} from 'react-toast-notifications';
+import HomeContainer from "./components/HomeContainer";
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import ItemWrapper from "./components/item/ItemWrapper";
 
 class App extends Component {
-  render() {
-    return (
-        <div style={{
-          width: '100%',
-          maxWidth: 960,
-          margin: '0 auto'
-      }}>
-            <ToastProvider placement="top-center"
-            >
-                <Navigation/>
-                <div style={{
-                    textAlign: 'left'
-                }}>
-                    <HardwareList requestsEnabled={true}>
-                    </HardwareList>
-                </div>
-                <Footer/>
-            </ToastProvider>
-      </div>
-    );
-  }
+    render() {
+        return (
+            <div style={{
+                width: '100%',
+                maxWidth: 960,
+                margin: '0 auto'
+            }}>
+                <Router>
+                    <ToastProvider placement="top-center">
+                        <Navigation/>
+                        <Switch>
+                            <Route path="/" exact component={HomeContainer}/>
+                            <Route path="/item" component={ItemWrapper}/>
+                            <Route component={HomeContainer}/>
+                        </Switch>
+                        <Footer/>
+                    </ToastProvider>
+                </Router>
+            </div>
+        );
+    }
 }
 
 export default App;

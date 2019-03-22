@@ -1,9 +1,9 @@
 import React from 'react';
 import HardwareItem from "./HardwareItem";
-import {Grid, Header, Icon, Item, Message} from "semantic-ui-react";
+import {Icon, Item, Message} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
-import RequestsList from "../requests/RequestsList";
 
+<<<<<<< HEAD
 const sampleData = [
     {
         name: "Arduino Uno",
@@ -71,6 +71,9 @@ export interface RequestItem {
 }
 
 export class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean , requestedItems: Array<RequestItem> }> {
+=======
+class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean }> {
+>>>>>>> de19262d020e91835117a430c86a1364576e368b
     constructor(props: { requestsEnabled: boolean }) {
         super(props);
         this.state = {
@@ -117,6 +120,56 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean }, 
 
 
     render() {
+<<<<<<< HEAD
+=======
+        const sampleData = [
+            {
+                name: "Arduino Uno",
+                description: "Potato potato let's call the whole thing off",
+                qtyRemaining: 20,
+                totalQty: 30,
+                maxReqQty: 1,
+                returnRequired: true,
+                owner: "The Hive",
+                category: "Microcontrollers",
+                id: "541"
+            },
+            {
+                name: "Mango",
+                description: "The one and only Hardware Queen(TM)",
+                qtyRemaining: 0,
+                totalQty: 1,
+                maxReqQty: 1,
+                returnRequired: true,
+                owner: "Mango",
+                category: "People?",
+                id: "3432"
+            },
+            {
+                name: "Raspberry Pi 3",
+                description: "We heard you like fruit so we put a fruit in ya computer",
+                qtyRemaining: 20,
+                totalQty: 30,
+                maxReqQty: 1,
+                returnRequired: true,
+                owner: "HackGT",
+                category: "Microcontrollers",
+                id: "4642"
+            },
+            {
+                name: "10 Ohm Resistors",
+                description: "Not 9, not 11, 10 Ohms.  The perfect amount",
+                qtyRemaining: 18,
+                totalQty: 20,
+                maxReqQty: 12,
+                returnRequired: false,
+                owner: "",
+                category: "Resistors",
+                id: "46234"
+            },
+        ];
+
+>>>>>>> de19262d020e91835117a430c86a1364576e368b
 
         const noRequestsMessage = !this.props.requestsEnabled ? (<Message
             title="View-only inventory"
@@ -148,6 +201,7 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean }, 
             <PlaceholderItem/>
         </Item.Group>);
 
+<<<<<<< HEAD
         return (
             <Grid columns={2}>
                 <Grid.Row>
@@ -162,6 +216,13 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean }, 
                     </Grid.Column>
                 </Grid.Row>
             </Grid>
+=======
+        return (<div>
+                <h1>Inventory</h1>
+                {noRequestsMessage}
+                {this.state.loading ? loading : normalContent}
+            </div>
+>>>>>>> de19262d020e91835117a430c86a1364576e368b
         );
     }
 }
