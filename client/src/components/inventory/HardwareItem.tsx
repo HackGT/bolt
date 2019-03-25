@@ -1,11 +1,8 @@
 import React, {ChangeEvent} from 'react';
 import {Button, Form, Icon, Input, Item, Label, Popup} from "semantic-ui-react";
 import {withToastManager} from "react-toast-notifications";
-<<<<<<< HEAD
 import {RequestItem, ItemStatus} from "./HardwareList";
-=======
 import {Link} from "react-router-dom";
->>>>>>> de19262d020e91835117a430c86a1364576e368b
 
 export interface Item {
     id: number,
@@ -14,9 +11,7 @@ export interface Item {
     totalQty: number,
     maxReqQty: number, // max number of a specific item you can request at once
     category: string,
-<<<<<<< HEAD
     addRequestedItem: (requestItem: RequestItem) => void
-=======
     imageUrl: string
 }
 
@@ -24,7 +19,6 @@ interface HardwareItem {
     qtyRemaining: number, // # of this item remaining in our stock
     requestsEnabled: boolean, // whether hardware requests can be made at this time
     toastManager: any, // for making toast notifications
->>>>>>> de19262d020e91835117a430c86a1364576e368b
 }
 
 interface HardwareItemState {
@@ -74,6 +68,18 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
         });
 
         this.props.addRequestedItem(requestItem);
+    }
+
+    incrementQty() {
+        this.setState({
+            qtyRequested: this.state.qtyRequested + 1
+        });
+    }
+
+    decrementQty() {
+        this.setState({
+            qtyRequested: this.state.qtyRequested - 1
+        });
     }
 
     incrementQty() {

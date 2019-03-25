@@ -3,7 +3,6 @@ import HardwareItem from "./HardwareItem";
 import {Icon, Item, Message} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
 
-<<<<<<< HEAD
 const sampleData = [
     {
         name: "Arduino Uno",
@@ -70,10 +69,8 @@ export interface RequestItem {
     status: ItemStatus,
 }
 
-export class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean , requestedItems: Array<RequestItem> }> {
-=======
-class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean }> {
->>>>>>> de19262d020e91835117a430c86a1364576e368b
+export class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean , requestedItems: Array<RequestItem> }> {class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean }> {
+
     constructor(props: { requestsEnabled: boolean }) {
         super(props);
         this.state = {
@@ -120,57 +117,6 @@ class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loadi
 
 
     render() {
-<<<<<<< HEAD
-=======
-        const sampleData = [
-            {
-                name: "Arduino Uno",
-                description: "Potato potato let's call the whole thing off",
-                qtyRemaining: 20,
-                totalQty: 30,
-                maxReqQty: 1,
-                returnRequired: true,
-                owner: "The Hive",
-                category: "Microcontrollers",
-                id: "541"
-            },
-            {
-                name: "Mango",
-                description: "The one and only Hardware Queen(TM)",
-                qtyRemaining: 0,
-                totalQty: 1,
-                maxReqQty: 1,
-                returnRequired: true,
-                owner: "Mango",
-                category: "People?",
-                id: "3432"
-            },
-            {
-                name: "Raspberry Pi 3",
-                description: "We heard you like fruit so we put a fruit in ya computer",
-                qtyRemaining: 20,
-                totalQty: 30,
-                maxReqQty: 1,
-                returnRequired: true,
-                owner: "HackGT",
-                category: "Microcontrollers",
-                id: "4642"
-            },
-            {
-                name: "10 Ohm Resistors",
-                description: "Not 9, not 11, 10 Ohms.  The perfect amount",
-                qtyRemaining: 18,
-                totalQty: 20,
-                maxReqQty: 12,
-                returnRequired: false,
-                owner: "",
-                category: "Resistors",
-                id: "46234"
-            },
-        ];
-
->>>>>>> de19262d020e91835117a430c86a1364576e368b
-
         const noRequestsMessage = !this.props.requestsEnabled ? (<Message
             title="View-only inventory"
             warning icon>
@@ -192,11 +138,8 @@ class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loadi
                               maxReqQty={item.maxReqQty}
                               category={item.category}
                               key={item.id}
-<<<<<<< HEAD
                               addRequestedItem={this.addRequestedItem}
-=======
                               id={item.id}
->>>>>>> 8c20a713db851fc772fd4dd5d4592d24b5d001e4
                 />))}
         </Item.Group>);
         const loading = (<Item.Group>
@@ -205,7 +148,6 @@ class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loadi
             <PlaceholderItem/>
         </Item.Group>);
 
-<<<<<<< HEAD
         return (
             <Grid columns={2}>
                 <Grid.Row>
@@ -220,13 +162,11 @@ class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loadi
                     </Grid.Column>
                 </Grid.Row>
             </Grid>
-=======
         return (<div>
                 <h1>Inventory</h1>
                 {noRequestsMessage}
                 {this.state.loading ? loading : normalContent}
             </div>
->>>>>>> de19262d020e91835117a430c86a1364576e368b
         );
     }
 }
