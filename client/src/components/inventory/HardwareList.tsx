@@ -192,7 +192,11 @@ class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loadi
                               maxReqQty={item.maxReqQty}
                               category={item.category}
                               key={item.id}
+<<<<<<< HEAD
                               addRequestedItem={this.addRequestedItem}
+=======
+                              id={item.id}
+>>>>>>> 8c20a713db851fc772fd4dd5d4592d24b5d001e4
                 />))}
         </Item.Group>);
         const loading = (<Item.Group>

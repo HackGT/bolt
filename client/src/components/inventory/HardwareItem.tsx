@@ -8,6 +8,7 @@ import {Link} from "react-router-dom";
 >>>>>>> de19262d020e91835117a430c86a1364576e368b
 
 export interface Item {
+    id: number,
     name: string, // name of this item
     description: string, // brief description
     totalQty: number,
@@ -192,7 +193,7 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
                 <Item.Content>
                     <Item.Header>{this.props.name} <Button size="mini" basic primary={true} icon labelPosition='left'>
                         <Icon name='pencil'/>
-                        <Link to={"/items/" + this.props.name}>Edit</Link>
+                        <Link to={"/item/" + this.props.id}>Edit</Link>
                     </Button></Item.Header>
                     <Item.Meta>{!this.state.qtyRemaining ? "Out of stock" : `${this.state.qtyRemaining} of ${this.props.totalQty} available`}</Item.Meta>
                     <Item.Meta>{maxPerRequest}</Item.Meta>
