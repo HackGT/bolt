@@ -1,16 +1,22 @@
 import React, {ChangeEvent} from 'react';
-import {Form, Input, Item, Label} from "semantic-ui-react";
+import {Button, Form, Icon, Input, Item, Label, Popup} from "semantic-ui-react";
 import {withToastManager} from "react-toast-notifications";
+import {Link} from "react-router-dom";
 
-interface HardwareItemProps {
+export interface Item {
+    id: number,
     name: string, // name of this item
     description: string, // brief description
-    requestsEnabled: boolean, // whether hardware requests can be made at this time
-    toastManager: any, // for making toast notifications
-    qtyRemaining: number, // # of this item remaining in our stock
     totalQty: number,
     maxReqQty: number, // max number of a specific item you can request at once
-    category: string
+    category: string,
+    imageUrl: string
+}
+
+interface HardwareItem {
+    qtyRemaining: number, // # of this item remaining in our stock
+    requestsEnabled: boolean, // whether hardware requests can be made at this time
+    toastManager: any, // for making toast notifications
 }
 
 interface HardwareItemState {
@@ -20,12 +26,15 @@ interface HardwareItemState {
 }
 
 
-class HardwareItemBase extends React.Component<HardwareItemProps, HardwareItemState> {
-    constructor(props: HardwareItemProps) {
+class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItemState> {
+    constructor(props: Item & HardwareItem) {
         super(props);
         this.handleItemRequest = this.handleItemRequest.bind(this);
         this.handleQtyUpdate = this.handleQtyUpdate.bind(this);
         this.finishedLoading = this.finishedLoading.bind(this);
+        this.incrementQty = this.incrementQty.bind(this);
+        this.decrementQty = this.decrementQty.bind(this);
+        this.updateQtyRequested = this.updateQtyRequested.bind(this);
         this.state = {
             qtyRequested: 1,
             loading: false,
@@ -52,6 +61,18 @@ class HardwareItemBase extends React.Component<HardwareItemProps, HardwareItemSt
         });
     }
 
+    incrementQty() {
+        this.setState({
+            qtyRequested: this.state.qtyRequested + 1
+        });
+    }
+
+    decrementQty() {
+        this.setState({
+            qtyRequested: this.state.qtyRequested - 1
+        });
+    }
+
     handleItemRequest() {
         this.setState({
             loading: true
@@ -63,24 +84,28 @@ class HardwareItemBase extends React.Component<HardwareItemProps, HardwareItemSt
     handleQtyUpdate(qtyInput: ChangeEvent<HTMLInputElement>) {
         let qtyAsNumber: number = Number.parseInt(qtyInput.target.value);
 
-        if (Number.isNaN(qtyAsNumber)) {
-            qtyAsNumber = 0;
+        this.updateQtyRequested(qtyAsNumber);
+    }
+
+    updateQtyRequested(newQty: number) {
+        if (Number.isNaN(newQty)) {
+            newQty = 0;
         }
 
-        if (qtyAsNumber < 0) {
-            qtyAsNumber = 0;
+        if (newQty < 0) {
+            newQty = 0;
         }
 
-        if (qtyAsNumber > this.state.qtyRemaining
+        if (newQty > this.state.qtyRemaining
             && this.state.qtyRemaining <= this.props.maxReqQty
             && this.state.qtyRemaining > 0) {
-            qtyAsNumber = this.state.qtyRemaining;
-        } else if (qtyAsNumber > this.props.maxReqQty) {
-            qtyAsNumber = this.props.maxReqQty;
+            newQty = this.state.qtyRemaining;
+        } else if (newQty > this.props.maxReqQty) {
+            newQty = this.props.maxReqQty;
         }
 
         this.setState({
-            qtyRequested: qtyAsNumber
+            qtyRequested: newQty
         })
     }
 
@@ -89,6 +114,9 @@ class HardwareItemBase extends React.Component<HardwareItemProps, HardwareItemSt
             <Input type='number'
                    placeholder='Quantity'
                    floated="right"
+                   style={{
+                       width: 75
+                   }}
                    action={{
                        color: "blue",
                        labelPosition: "right",
@@ -103,6 +131,42 @@ class HardwareItemBase extends React.Component<HardwareItemProps, HardwareItemSt
                    value={this.state.qtyRequested}>
             </Input>
         </Form.Group>) : '';
+
+        const requestBtn = (
+            <Button primary
+                    icon
+                    disabled={this.state.qtyRequested <= 0}
+                    loading={this.state.loading}
+                    onClick={this.handleItemRequest}
+                    labelPosition="right"
+            >Request {this.state.qtyRequested}<Icon name="arrow alternate circle right outline"/></Button>
+        );
+
+        const minusBtn = (<Button icon="minus"
+                                  onClick={this.decrementQty}
+                                  disabled={this.state.loading || !this.state.qtyRequested}/>);
+
+        const plusBtn = (<Button icon="plus"
+                                 onClick={this.incrementQty}
+                                 disabled={this.state.loading || (this.state.qtyRequested == this.state.qtyRemaining
+                                     && this.state.qtyRemaining <= this.props.maxReqQty
+                                     && this.state.qtyRemaining > 0) || (this.state.qtyRequested == this.props.maxReqQty)}/>);
+        const qtyRequest2 = (
+            <Input action>
+                <input style={{width: 50, textAlign: "center"}}
+                       value={this.state.qtyRequested}
+                       disabled={this.state.loading}
+                       onChange={this.handleQtyUpdate}/>
+                <Popup disabled={this.state.loading || !this.state.qtyRequested} inverted trigger={minusBtn}
+                       content="Remove one from request"/>
+                <Popup disabled={this.state.loading || (this.state.qtyRequested == this.state.qtyRemaining
+                    && this.state.qtyRemaining <= this.props.maxReqQty
+                    && this.state.qtyRemaining > 0) || (this.state.qtyRequested == this.props.maxReqQty)} inverted
+                       trigger={plusBtn} content="Request another"/>
+                {requestBtn}
+            </Input>
+
+        );
         let maxPerRequest;
         if (!this.state.qtyRemaining) {
             maxPerRequest = `Request up to ${this.props.maxReqQty} at a time`
@@ -113,12 +177,15 @@ class HardwareItemBase extends React.Component<HardwareItemProps, HardwareItemSt
             <Item className="hw-card">
                 <Item.Image draggable={false} className="hw-image" size='tiny' src='http://placekitten.com/300/300'/>
                 <Item.Content>
-                    <Item.Header>{this.props.name}</Item.Header>
+                    <Item.Header>{this.props.name} <Button size="mini" basic primary={true} icon labelPosition='left'>
+                        <Icon name='pencil'/>
+                        <Link to={"/item/" + this.props.id}>Edit</Link>
+                    </Button></Item.Header>
                     <Item.Meta>{!this.state.qtyRemaining ? "Out of stock" : `${this.state.qtyRemaining} of ${this.props.totalQty} available`}</Item.Meta>
                     <Item.Meta>{maxPerRequest}</Item.Meta>
                     <Item.Meta><Label>{this.props.category}</Label></Item.Meta>
                     <Item.Description>{this.props.description}</Item.Description>
-                    <Item.Extra>{qtyRequest}</Item.Extra>
+                    <Item.Extra>{qtyRequest2}</Item.Extra>
                 </Item.Content>
             </Item>
         );
