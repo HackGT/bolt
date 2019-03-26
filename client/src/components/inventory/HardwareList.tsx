@@ -1,6 +1,6 @@
 import React from 'react';
 import HardwareItem from "./HardwareItem";
-import {Icon, Item, Message} from "semantic-ui-react";
+import {Icon, Item, Message, Grid, Header} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
 
 const sampleData = [
@@ -69,40 +69,14 @@ export interface RequestItem {
     status: ItemStatus,
 }
 
-export class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean , requestedItems: Array<RequestItem> }> {class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean }> {
+export class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean }> {
 
     constructor(props: { requestsEnabled: boolean }) {
         super(props);
         this.state = {
-            loading: true,
-            requestedItems: []
+            loading: true
         };
         this.dataCallback = this.dataCallback.bind(this);
-        this.addRequestedItem = this.addRequestedItem.bind(this);
-        this.removeRequestedItem = this.removeRequestedItem.bind(this);
-    }
-
-    addRequestedItem(requestedItem: RequestItem) {
-        let itemList = this.state.requestedItems;
-        itemList.push(requestedItem);
-        this.setState({
-            requestedItems: itemList
-        })
-    }
-
-    removeRequestedItem(requestedItem: RequestItem) {
-        let itemIndex = 0;
-        for (let i = 0; i < this.state.requestedItems.length; i++) {
-            if (this.state.requestedItems[i].item == requestedItem.item) {
-                itemIndex = i;
-                break;
-            }
-        }
-        let itemList = this.state.requestedItems;
-        itemList.splice(itemIndex, 1);
-        this.setState({
-            requestedItems: itemList
-        })
     }
 
     dataCallback() {
@@ -114,7 +88,6 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean }, 
     componentDidMount(): void {
         setTimeout(this.dataCallback, 3000);
     }
-
 
     render() {
         const noRequestsMessage = !this.props.requestsEnabled ? (<Message
@@ -138,7 +111,6 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean }, 
                               maxReqQty={item.maxReqQty}
                               category={item.category}
                               key={item.id}
-                              addRequestedItem={this.addRequestedItem}
                               id={item.id}
                 />))}
         </Item.Group>);
@@ -156,18 +128,9 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean }, 
                         {noRequestsMessage}
                         {this.state.loading ? loading : normalContent}
                     </Grid.Column>
-                    <Grid.Column>
-                        <h2>My Requests</h2>
-                        <RequestsList requestedItems={this.state.requestedItems} removeRequestedItem={this.removeRequestedItem}/>
-                    </Grid.Column>
                 </Grid.Row>
             </Grid>
-        return (<div>
-                <h1>Inventory</h1>
-                {noRequestsMessage}
-                {this.state.loading ? loading : normalContent}
-            </div>
-        );
+        )
     }
 }
 

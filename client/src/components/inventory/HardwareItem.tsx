@@ -11,7 +11,6 @@ export interface Item {
     totalQty: number,
     maxReqQty: number, // max number of a specific item you can request at once
     category: string,
-    addRequestedItem: (requestItem: RequestItem) => void
     imageUrl: string
 }
 
@@ -65,20 +64,6 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
             loading: false,
             qtyRequested: 1,
             qtyRemaining: updatedQtyRemaining
-        });
-
-        this.props.addRequestedItem(requestItem);
-    }
-
-    incrementQty() {
-        this.setState({
-            qtyRequested: this.state.qtyRequested + 1
-        });
-    }
-
-    decrementQty() {
-        this.setState({
-            qtyRequested: this.state.qtyRequested - 1
         });
     }
 
