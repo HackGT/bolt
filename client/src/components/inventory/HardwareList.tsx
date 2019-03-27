@@ -2,6 +2,7 @@ import React from 'react';
 import HardwareItem from "./HardwareItem";
 import {Icon, Item, Message, Grid, Header} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
+import {RequestedItem} from "../inventory/HardwareItem"
 
 const sampleData = [
     {
@@ -50,28 +51,9 @@ const sampleData = [
     },
 ];
 
+export class HardwareList extends React.Component<{ requestsEnabled: boolean, handleAddItem: (item: RequestedItem) => void, qtyUpdate: RequestedItem | null}, { loading: boolean }> {
 
-export enum ItemStatus {
-    Submitted = "yellow",
-    Approved = "orange",
-    Declined = "red",
-    Abandoned = "red",
-    Ready = "green",
-    Fulfilled = "blue",
-    Returned = "green",
-    Lost = "red",
-    Damaged = "red"
-}
-
-export interface RequestItem {
-    item: String,
-    quantity: Number,
-    status: ItemStatus,
-}
-
-export class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean }> {
-
-    constructor(props: { requestsEnabled: boolean }) {
+    constructor(props: { requestsEnabled: boolean, handleAddItem: (item: RequestedItem) => void, qtyUpdate: RequestedItem | null}) {
         super(props);
         this.state = {
             loading: true
@@ -100,7 +82,6 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean }, 
         sampleData.sort((a, b) => {
             return a.category.toLocaleLowerCase().localeCompare(b.category.toLocaleLowerCase()) || a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase())
         });
-
         const normalContent = (<Item.Group>
             {sampleData.map((item) => (
                 <HardwareItem name={item.name}
@@ -112,6 +93,8 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean }, 
                               category={item.category}
                               key={item.id}
                               id={item.id}
+                              addItem={this.props.handleAddItem}
+                              qtyUpdate={this.props.qtyUpdate}
                 />))}
         </Item.Group>);
         const loading = (<Item.Group>

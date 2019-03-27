@@ -1,7 +1,6 @@
 import React, {ChangeEvent} from 'react';
 import {Button, Form, Icon, Input, Item, Label, Popup} from "semantic-ui-react";
 import {withToastManager} from "react-toast-notifications";
-import {RequestItem, ItemStatus} from "./HardwareList";
 import {Link} from "react-router-dom";
 
 export interface Item {
@@ -14,10 +13,34 @@ export interface Item {
     imageUrl: string
 }
 
+export interface RequestedItem {
+    id: number,
+    user: string,
+    name: string,
+    qtyRequested: number,
+    category: string,
+    status: ItemStatus,
+    cancelled: boolean
+}
+
+export enum ItemStatus {
+    SUBMITTED = "yellow",
+    APPROVED = "orange",
+    DECLINED = "red",
+    ABANDONED = "red",
+    READY = "blue",
+    FULFILLED = "green",
+    RETURNED = "grey",
+    LOST = "red",
+    DAMAGED = "red"
+}
+
 interface HardwareItem {
     qtyRemaining: number, // # of this item remaining in our stock
     requestsEnabled: boolean, // whether hardware requests can be made at this time
     toastManager: any, // for making toast notifications
+    addItem: (item: RequestedItem) => void,
+    qtyUpdate: RequestedItem | null,
 }
 
 interface HardwareItemState {
@@ -36,6 +59,7 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
         this.incrementQty = this.incrementQty.bind(this);
         this.decrementQty = this.decrementQty.bind(this);
         this.updateQtyRequested = this.updateQtyRequested.bind(this);
+        this.addCancelledItem = this.addCancelledItem.bind(this);
         this.state = {
             qtyRequested: 1,
             loading: false,
@@ -55,16 +79,20 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
         if (updatedQtyRemaining < 0) {
             updatedQtyRemaining = 0;
         }
-        let requestItem: RequestItem = {
-            item: this.props.name,
-            quantity: this.state.qtyRequested,
-            status: ItemStatus.Submitted
-        }
         this.setState({
             loading: false,
-            qtyRequested: 1,
             qtyRemaining: updatedQtyRemaining
-        });
+        })
+        let newRequest: RequestedItem = {
+            id: this.props.id,
+            user: "Beardell",
+            name: this.props.name,
+            qtyRequested: this.state.qtyRequested,
+            category: this.props.category,
+            status: ItemStatus.SUBMITTED,
+            cancelled: false
+        }
+        this.props.addItem(newRequest)
     }
 
     incrementQty() {
@@ -114,7 +142,24 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
         })
     }
 
+    addCancelledItem(qtyToAdd: number) {
+        this.setState({
+            qtyRemaining: this.state.qtyRemaining + qtyToAdd
+        })
+    }
+
+    componentDidUpdate(prevProps: Item & HardwareItem, prevState: HardwareItemState) {
+        if (this.props.qtyUpdate) {
+            console.log("i am inside componentWillupdate")
+            if (this.props.qtyUpdate.name === this.props.name && this.state.qtyRemaining == prevState.qtyRemaining && !this.props.qtyUpdate.cancelled) {
+                this.addCancelledItem(this.props.qtyUpdate.qtyRequested)
+                this.props.qtyUpdate.cancelled = true;
+            }
+        }
+    }
+
     render() {
+        console.log(this.props.qtyUpdate)
         const qtyRequest = this.props.requestsEnabled ? (<Form.Group>
             <Input type='number'
                    placeholder='Quantity'
@@ -178,6 +223,7 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
         } else {
             maxPerRequest = `Request up to ${Math.min(this.props.maxReqQty, this.state.qtyRemaining)} at a time`;
         }
+
         return (
             <Item className="hw-card">
                 <Item.Image draggable={false} className="hw-image" size='tiny' src='http://placekitten.com/300/300'/>
