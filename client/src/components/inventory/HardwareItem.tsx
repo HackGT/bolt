@@ -27,7 +27,7 @@ export enum ItemStatus {
     SUBMITTED = "yellow",
     APPROVED = "orange",
     DECLINED = "red",
-    ABANDONED = "red",
+    CANCELLED = "red",
     READY = "blue",
     FULFILLED = "green",
     RETURNED = "grey",
