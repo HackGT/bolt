@@ -1,15 +1,63 @@
 import React from 'react';
 import HardwareItem from "./HardwareItem";
-import {Icon, Item, Message} from "semantic-ui-react";
+import {Icon, Item, Message, Grid, Header} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
+import {RequestedItem} from "../inventory/HardwareItem"
 
-class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loading: boolean }> {
-    constructor(props: { requestsEnabled: boolean }) {
+const sampleData = [
+    {
+        name: "Arduino Uno",
+        description: "Potato potato let's call the whole thing off",
+        qtyRemaining: 20,
+        totalQty: 30,
+        maxReqQty: 1,
+        returnRequired: true,
+        owner: "The Hive",
+        category: "Microcontrollers",
+        id: "541"
+    },
+    {
+        name: "Mango",
+        description: "The one and only Hardware Queen(TM)",
+        qtyRemaining: 0,
+        totalQty: 1,
+        maxReqQty: 1,
+        returnRequired: true,
+        owner: "Mango",
+        category: "People?",
+        id: "3432"
+    },
+    {
+        name: "Raspberry Pi 3",
+        description: "We heard you like fruit so we put a fruit in ya computer",
+        qtyRemaining: 20,
+        totalQty: 30,
+        maxReqQty: 1,
+        returnRequired: true,
+        owner: "HackGT",
+        category: "Microcontrollers",
+        id: "4642"
+    },
+    {
+        name: "10 Ohm Resistors",
+        description: "Not 9, not 11, 10 Ohms.  The perfect amount",
+        qtyRemaining: 1000,
+        totalQty: 1000,
+        maxReqQty: 10,
+        returnRequired: false,
+        owner: "",
+        category: "Resistors",
+        id: "46234"
+    },
+];
+
+export class HardwareList extends React.Component<{ requestsEnabled: boolean, handleAddItem: (item: RequestedItem) => void, qtyUpdate: RequestedItem | null}, { loading: boolean }> {
+
+    constructor(props: { requestsEnabled: boolean, handleAddItem: (item: RequestedItem) => void, qtyUpdate: RequestedItem | null}) {
         super(props);
         this.state = {
             loading: true
         };
-
         this.dataCallback = this.dataCallback.bind(this);
     }
 
@@ -23,56 +71,7 @@ class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loadi
         setTimeout(this.dataCallback, 3000);
     }
 
-
     render() {
-        const sampleData = [
-            {
-                name: "Arduino Uno",
-                description: "Potato potato let's call the whole thing off",
-                qtyRemaining: 20,
-                totalQty: 30,
-                maxReqQty: 1,
-                returnRequired: true,
-                owner: "The Hive",
-                category: "Microcontrollers",
-                id: "541"
-            },
-            {
-                name: "Mango",
-                description: "The one and only Hardware Queen(TM)",
-                qtyRemaining: 0,
-                totalQty: 1,
-                maxReqQty: 1,
-                returnRequired: true,
-                owner: "Mango",
-                category: "People?",
-                id: "3432"
-            },
-            {
-                name: "Raspberry Pi 3",
-                description: "We heard you like fruit so we put a fruit in ya computer",
-                qtyRemaining: 20,
-                totalQty: 30,
-                maxReqQty: 1,
-                returnRequired: true,
-                owner: "HackGT",
-                category: "Microcontrollers",
-                id: "4642"
-            },
-            {
-                name: "10 Ohm Resistors",
-                description: "Not 9, not 11, 10 Ohms.  The perfect amount",
-                qtyRemaining: 18,
-                totalQty: 20,
-                maxReqQty: 12,
-                returnRequired: false,
-                owner: "",
-                category: "Resistors",
-                id: "46234"
-            },
-        ];
-
-
         const noRequestsMessage = !this.props.requestsEnabled ? (<Message
             title="View-only inventory"
             warning icon>
@@ -83,7 +82,6 @@ class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loadi
         sampleData.sort((a, b) => {
             return a.category.toLocaleLowerCase().localeCompare(b.category.toLocaleLowerCase()) || a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase())
         });
-
         const normalContent = (<Item.Group>
             {sampleData.map((item) => (
                 <HardwareItem name={item.name}
@@ -95,6 +93,8 @@ class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loadi
                               category={item.category}
                               key={item.id}
                               id={item.id}
+                              addItem={this.props.handleAddItem} // prop that invokes the handleAddItem method of parent container to update its state
+                              qtyUpdate={this.props.qtyUpdate} // this prop is the object whose request has been cancelled
                 />))}
         </Item.Group>);
         const loading = (<Item.Group>
@@ -103,12 +103,17 @@ class HardwareList extends React.Component<{ requestsEnabled: boolean }, { loadi
             <PlaceholderItem/>
         </Item.Group>);
 
-        return (<div>
-                <h1>Inventory</h1>
-                {noRequestsMessage}
-                {this.state.loading ? loading : normalContent}
-            </div>
-        );
+        return (
+            <Grid columns={2}>
+                <Grid.Row>
+                    <Grid.Column>
+                        <Header>Inventory</Header>
+                        {noRequestsMessage}
+                        {this.state.loading ? loading : normalContent}
+                    </Grid.Column>
+                </Grid.Row>
+            </Grid>
+        )
     }
 }
 
