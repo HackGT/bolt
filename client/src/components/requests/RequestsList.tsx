@@ -8,7 +8,7 @@ class RequestsList extends Component<{requestedItemsList: RequestedItem[], remov
             case ItemStatus.SUBMITTED: return "Submitted"
             case ItemStatus.APPROVED: return "Approved"
             case ItemStatus.DECLINED: return "Declined"
-            case ItemStatus.ABANDONED: return "Abandoned"
+            case ItemStatus.CANCELLED: return "Cancelled"
             case ItemStatus.READY: return "Ready"
             case ItemStatus.FULFILLED: return "Fulfilled"
             case ItemStatus.RETURNED: return "Returned"
