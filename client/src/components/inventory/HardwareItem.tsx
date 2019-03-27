@@ -13,10 +13,34 @@ export interface Item {
     imageUrl: string
 }
 
+export interface RequestedItem {
+    id: number,
+    user: string,
+    name: string,
+    qtyRequested: number,
+    category: string,
+    status: ItemStatus,
+    cancelled: boolean
+}
+
+export enum ItemStatus {
+    SUBMITTED = "yellow",
+    APPROVED = "orange",
+    DECLINED = "red",
+    CANCELLED = "red",
+    READY = "blue",
+    FULFILLED = "green",
+    RETURNED = "grey",
+    LOST = "red",
+    DAMAGED = "red"
+}
+
 interface HardwareItem {
     qtyRemaining: number, // # of this item remaining in our stock
     requestsEnabled: boolean, // whether hardware requests can be made at this time
     toastManager: any, // for making toast notifications
+    addItem: (item: RequestedItem) => void,
+    qtyUpdate: RequestedItem | null,
 }
 
 interface HardwareItemState {
@@ -35,6 +59,7 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
         this.incrementQty = this.incrementQty.bind(this);
         this.decrementQty = this.decrementQty.bind(this);
         this.updateQtyRequested = this.updateQtyRequested.bind(this);
+        this.addCancelledItem = this.addCancelledItem.bind(this);
         this.state = {
             qtyRequested: 1,
             loading: false,
@@ -56,9 +81,18 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
         }
         this.setState({
             loading: false,
-            qtyRequested: 1,
             qtyRemaining: updatedQtyRemaining
-        });
+        })
+        let newRequest: RequestedItem = {
+            id: this.props.id,
+            user: "Beardell",
+            name: this.props.name,
+            qtyRequested: this.state.qtyRequested,
+            category: this.props.category,
+            status: ItemStatus.SUBMITTED,
+            cancelled: false
+        }
+        this.props.addItem(newRequest)
     }
 
     incrementQty() {
@@ -77,7 +111,6 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
         this.setState({
             loading: true
         });
-
         setTimeout(this.finishedLoading, 3000);
     }
 
@@ -107,6 +140,21 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
         this.setState({
             qtyRequested: newQty
         })
+    }
+
+    addCancelledItem(qtyToAdd: number) {
+        this.setState({
+            qtyRemaining: this.state.qtyRemaining + qtyToAdd
+        })
+    }
+
+    componentDidUpdate(prevProps: Item & HardwareItem, prevState: HardwareItemState) {
+        if (this.props.qtyUpdate) {
+            if (this.props.qtyUpdate.name === this.props.name && this.state.qtyRemaining == prevState.qtyRemaining && !this.props.qtyUpdate.cancelled) {
+                this.addCancelledItem(this.props.qtyUpdate.qtyRequested)
+                this.props.qtyUpdate.cancelled = true;
+            }
+        }
     }
 
     render() {
@@ -173,6 +221,7 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
         } else {
             maxPerRequest = `Request up to ${Math.min(this.props.maxReqQty, this.state.qtyRemaining)} at a time`;
         }
+
         return (
             <Item className="hw-card">
                 <Item.Image draggable={false} className="hw-image" size='tiny' src='http://placekitten.com/300/300'/>

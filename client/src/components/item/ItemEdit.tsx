@@ -21,7 +21,7 @@ interface ItemEditParams {
 }
 
 interface ItemEditState {
-    loading: boolean
+    loading: boolean,
     item: Item & ItemDetails | null,
 
     [name: string]: any | any[],
