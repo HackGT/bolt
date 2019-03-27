@@ -27,7 +27,7 @@ export enum ItemStatus {
     SUBMITTED = "yellow",
     APPROVED = "orange",
     DECLINED = "red",
-    ABANDONED = "red",
+    CANCELLED = "red",
     READY = "blue",
     FULFILLED = "green",
     RETURNED = "grey",
@@ -150,7 +150,6 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
 
     componentDidUpdate(prevProps: Item & HardwareItem, prevState: HardwareItemState) {
         if (this.props.qtyUpdate) {
-            console.log("i am inside componentWillupdate")
             if (this.props.qtyUpdate.name === this.props.name && this.state.qtyRemaining == prevState.qtyRemaining && !this.props.qtyUpdate.cancelled) {
                 this.addCancelledItem(this.props.qtyUpdate.qtyRequested)
                 this.props.qtyUpdate.cancelled = true;
@@ -159,7 +158,6 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
     }
 
     render() {
-        console.log(this.props.qtyUpdate)
         const qtyRequest = this.props.requestsEnabled ? (<Form.Group>
             <Input type='number'
                    placeholder='Quantity'

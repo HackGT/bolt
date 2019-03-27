@@ -93,8 +93,8 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean, ha
                               category={item.category}
                               key={item.id}
                               id={item.id}
-                              addItem={this.props.handleAddItem}
-                              qtyUpdate={this.props.qtyUpdate}
+                              addItem={this.props.handleAddItem} // prop that invokes the handleAddItem method of parent container to update its state
+                              qtyUpdate={this.props.qtyUpdate} // this prop is the object whose request has been cancelled
                 />))}
         </Item.Group>);
         const loading = (<Item.Group>
