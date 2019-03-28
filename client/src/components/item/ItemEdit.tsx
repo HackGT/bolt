@@ -20,9 +20,11 @@ interface ItemEditParams {
     params: { itemId: string }
 }
 
+export type ItemComplete = Item & ItemDetails
+
 interface ItemEditState {
     loading: boolean,
-    item: Item & ItemDetails | null,
+    item: ItemComplete | null,
 
     [name: string]: any | any[],
 }
