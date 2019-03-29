@@ -1,12 +1,21 @@
 import React from "react";
-import {Button, Container, Divider, Grid, Header, Segment, Step} from 'semantic-ui-react';
+import {Button, Container, Dimmer, Header, Loader, Segment, Step} from 'semantic-ui-react';
 import UploadStep from './CSVUpload';
+import ReviewStep from './CSVReview';
 import { ItemComplete } from "../item/ItemEdit";
+import { withToastManager } from "react-toast-notifications";
+import { Redirect } from "react-router-dom";
+
+interface CSVWizardProps {
+    toastManager: any
+}
 
 interface CSVWizardState {
     wizardStep: number,
-    isStepComplete: boolean,
     inventory: ItemComplete[], 
+    isStepComplete: boolean,
+    isSubmitting: boolean,
+    isComplete: boolean
 }
 
 interface StepInterface {
@@ -20,31 +29,51 @@ interface StepInterface {
     disabled?: boolean
 }
 
-class CSVWizard extends React.Component<{}, CSVWizardState> {
+class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
     constructor(props: any) {
         super(props);
         this.state = {
             wizardStep: 0,
+            inventory: [],
             isStepComplete: false,
-            inventory: []
+            isSubmitting: false,
+            isComplete: false
         };
     }
 
     nextStep = () => {
         const { wizardStep } = this.state; 
-        this.setState({ wizardStep: wizardStep+1 });
-    }
-
-    setStepStatus = (isStepComplete: boolean) => {
-        this.setState({isStepComplete});
+        this.setState({ wizardStep: wizardStep+1,
+                        isStepComplete: false });
     }
 
     setInventory = (inventory: ItemComplete[]) => {
-        this.setState({inventory})
+        this.setState({inventory, isStepComplete: true});
+    }
+
+    uploadInventory = () => {
+        this.setState({isSubmitting: true});
+        window.alert("Unimplemented");
+        window.setTimeout(this.onInventorySubmitted, 2000);
+    }
+
+    onInventorySubmitted = () => {
+        const { toastManager } = this.props;
+        this.setState({isSubmitting: false});
+        toastManager.add('CSV Submitted! Redirecting', {
+            appearance: 'success',
+            autoDismiss: true,
+            placement: "top-center"
+        });
+        window.setTimeout(() => {
+            this.setState({isComplete: true});
+        }, 2000); // Redirect, since you should be done with the wizard
     }
 
     render() {
-        const { wizardStep, isStepComplete } = this.state;
+        const { wizardStep, inventory, isStepComplete, isSubmitting, isComplete } = this.state;
+
+        if (isComplete) return <Redirect to='/' />;
 
         const nextButton = (
             <Button disabled={!isStepComplete} 
@@ -53,6 +82,17 @@ class CSVWizard extends React.Component<{}, CSVWizardState> {
                     primary
                     >
                 Next Step
+            </Button>
+        );
+
+        const submitButton = (
+            <Button 
+                    onClick={this.uploadInventory}
+                    floated='right'
+                    color='green'
+                    disabled={this.state.isSubmitting}
+                    >
+                Submit
             </Button>
         );
 
@@ -66,19 +106,16 @@ class CSVWizard extends React.Component<{}, CSVWizardState> {
 
         const stepsSrc: StepInterface[] = [
             {
-              key: 'upload',
-              icon: 'upload',
-              title: 'Upload',
-              stepDiv: <UploadStep setInventory={this.setInventory}/>
+                key: 'upload',
+                icon: 'upload',
+                title: 'Upload',
+                stepDiv: <UploadStep setInventory={this.setInventory}/>
             },
-            {
-              key: 'format',
-              icon: 'pencil',
-              title: 'Format Upload',
-            },
-            { key: 'confirm', 
-              icon: 'info', 
-              title: 'Confirm Upload',
+            { 
+                key: 'confirm', 
+                icon: 'pencil', 
+                title: 'Review Upload',
+                stepDiv: <ReviewStep inventory={inventory} />
             },
         ]
 
@@ -95,9 +132,12 @@ class CSVWizard extends React.Component<{}, CSVWizardState> {
 
         return (
             <div id="csv-upload-wrapper">
+                <Dimmer active={isSubmitting}>
+                    <Loader />
+                </Dimmer>
                 <Container>
                     <Step.Group items={steps} />
-                    {nextButton}
+                    {wizardStep === stepsSrc.length - 1 ? submitButton : nextButton}
                 </Container>
                 <Segment>
                     {activeStepContent}
@@ -107,4 +147,4 @@ class CSVWizard extends React.Component<{}, CSVWizardState> {
     }
 }
 
-export default CSVWizard;
+export default withToastManager(CSVWizard);
