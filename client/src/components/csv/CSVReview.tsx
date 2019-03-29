@@ -32,12 +32,12 @@ const ReviewCard = (props: ReviewCardProps) => {
             <Item.Image size='tiny' src={imageUrl}/>
             <Item.Content>
                 <Item.Header as='h4'>{name}</Item.Header>
-                <Item.Meta>{maxReqQty} requests limit | {totalQty} available, Owner: {owner}, Unit Cost: {price}</Item.Meta>
+                <Item.Meta>Request up to {maxReqQty} at a time | {totalQty} available, Owner: {owner}, Unit Cost: ${price}</Item.Meta>
                 <Item.Meta>
                     <Label>{category}</Label>
                     {hidden ? <Label tag color='red'>Hidden</Label>: null}
-                    {requireApproval ? <Label tag color='red'>Requires Approval</Label>: null}
-                    {returnRequired ? <Label tag color='red'>Return Required</Label> : null}
+                    {!requireApproval ? <Label tag color='red'>No Approval Required</Label>: null}
+                    {!returnRequired ? <Label tag color='red'>No Return Required</Label> : null}
                 </Item.Meta>
                 <Item.Description>{description}</Item.Description>
             </Item.Content>

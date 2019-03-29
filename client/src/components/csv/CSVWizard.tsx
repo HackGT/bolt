@@ -65,15 +65,12 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
 
     onInventorySubmitted = () => {
         const { toastManager } = this.props;
-        this.setState({isSubmitting: false});
+        this.setState({isComplete: true, isSubmitting: false});
         toastManager.add('CSV Submitted! Redirecting', {
             appearance: 'success',
             autoDismiss: true,
             placement: "top-center"
         });
-        window.setTimeout(() => {
-            this.setState({isComplete: true});
-        }, 2000); // Redirect, since you should be done with the wizard
     }
 
     render() {
