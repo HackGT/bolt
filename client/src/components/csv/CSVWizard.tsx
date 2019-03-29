@@ -47,6 +47,12 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
                         isStepComplete: false });
     }
 
+    setStepFactory = (newStep: number) => { // Careful, make sure isStepComplete set intentionally
+        return () => {
+            if (newStep == 0) this.setState({wizardStep: newStep});
+        }
+    }
+
     setInventory = (inventory: ItemComplete[]) => {
         this.setState({inventory, isStepComplete: true});
     }
@@ -108,6 +114,7 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
             {
                 key: 'upload',
                 icon: 'upload',
+                onClick: this.setStepFactory(0),
                 title: 'Upload',
                 stepDiv: <UploadStep setInventory={this.setInventory}/>
             },

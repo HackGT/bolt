@@ -35,7 +35,7 @@ const ReviewCard = (props: ReviewCardProps) => {
                 <Item.Meta>{maxReqQty} requests limit | {totalQty} available, Owner: {owner}, Unit Cost: {price}</Item.Meta>
                 <Item.Meta>
                     <Label>{category}</Label>
-                    {hidden ? <Label tag color='orange'>Hidden</Label>: null}
+                    {hidden ? <Label tag color='red'>Hidden</Label>: null}
                     {requireApproval ? <Label tag color='red'>Requires Approval</Label>: null}
                     {returnRequired ? <Label tag color='red'>Return Required</Label> : null}
                 </Item.Meta>

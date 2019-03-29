@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Container, Header, Label } from 'semantic-ui-react';
 import { withToastManager } from "react-toast-notifications";
 import { ItemComplete } from "../item/ItemEdit";
+import { unformat } from "accounting";
 
 const templateHeader = [
     "Name", "Description", "Quantity in stock", 
@@ -10,24 +11,25 @@ const templateHeader = [
     "Approval required", "Hidden", "Serial numbers (comma-separated)"
 ]; // Unused, recording for posterity
 
-const typePass = (field: string) => field 
+const typeString = (field: string) => field.trim() 
 const typeNumber = (field: string) => { const val = parseFloat(field); return isNaN(val) ? 0 : val }
+const typeMoney = (field: string) => unformat(field);
 const typeBool = (field: string) => field==='1' ? true : false
 
 // Default indices - kw are uniquely identifiable partial phrases
 const fieldInfo: {[field: string]: {index: number, typer: (field: string) => any, kw: string[]}} = {
-    "name": {index: 0, typer: typePass, kw:["name"]},
-    "description": {index: 1, typer: typePass, kw:["desc"]},
+    "name": {index: 0, typer: typeString, kw:["name"]},
+    "description": {index: 1, typer: typeString, kw:["desc"]},
     "totalQty": {index: 2, typer: typeNumber, kw:["total"]},
     "maxReqQty": {index: 3, typer: typeNumber, kw:["max"]},
-    "imageUrl": {index: 4, typer: typePass, kw:["image", "img", "url"]},
-    "category": {index: 5, typer: typePass, kw:["cat"]},
-    "price": {index: 6, typer: typeNumber, kw:["price", "cost"]},
-    "owner": {index: 7, typer: typePass, kw:["owner"]},
+    "imageUrl": {index: 4, typer: typeString, kw:["image", "img", "url"]},
+    "category": {index: 5, typer: typeString, kw:["cat"]},
+    "price": {index: 6, typer: typeMoney, kw:["price", "cost", "value"]},
+    "owner": {index: 7, typer: typeString, kw:["owner", "who"]},
     "returnRequired": {index: 8, typer: typeBool, kw:["ret"]},
     "requireApproval": {index: 9, typer: typeBool, kw:["approv"]},
     "hidden": {index: 10, typer: typeBool, kw:["hid"]},
-    // "serial": [11, typePass] // Not implemented
+    // "serial": [11, typeString] // Not implemented
 };
 
 const kwToName: {[kw: string]: string} = {};
@@ -159,7 +161,7 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
                             />
                         </Label>
                         <p style={styles.notice}> 
-                            Note: CSVs MUST start with a header line as follows <a href="https://docs.google.com/spreadsheets/d/1Ey0z9ACVmaf7GEcVLvxjuFTdidjXnrbGsTdb2fwYxGs/">here</a>
+                            Note: CSVs MUST start with a header line as follows <a href="https://docs.google.com/spreadsheets/d/1Ey0z9ACVmaf7GEcVLvxjuFTdidjXnrbGsTdb2fwYxGs/">here</a>. Formatting errors will not be picked up (yet)! Verify your entries!
                         </p>
                     </div>
                     <div style={styles.logWrapper}>
