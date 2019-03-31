@@ -11,6 +11,9 @@ export class Navigation extends React.Component {
                 <Menu.Item name="inventory">
                     <Icon name="home"/><Link to="/">Inventory</Link>
                 </Menu.Item>
+                <Menu.Item name="admin">
+                    <Icon name="file"/><Link to="/admin/csv">Import</Link>
+                </Menu.Item>
             </Menu>
         )
     }
