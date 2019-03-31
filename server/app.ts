@@ -16,8 +16,6 @@ import {
 	config
 } from "./common";
 
-import { DB, findUserByID } from "./database";
-
 // Set up Express and its middleware
 export let app = express();
 
@@ -74,16 +72,17 @@ process.on("unhandledRejection", err => {
 import { authRoutes, isAuthenticated } from "./auth/auth";
 app.use("/auth", authRoutes);
 
-// TODO: replace with UI code
-app.get("/", isAuthenticated, async (request, response) => {
-	response.send(`Hello, ${request.user.name}! Bolt has been started but <code>app.ts</code> isn't configured to serve the UI code yet.`);
-});
-
 app.route("/version").get((request, response) => {
 	response.json({
 		"version": VERSION_NUMBER,
 		"node": process.version
 	});
+});
+
+// Serve React app
+app.use(serveStatic(path.join(__dirname, "../client/build")));
+app.get("*", (request, response) => {
+	response.sendFile(path.join(__dirname, "../client/build", "index.html"));
 });
 
 app.listen(PORT, () => {
