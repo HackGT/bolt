@@ -5,7 +5,7 @@ import { URL } from "url";
 import * as passport from "passport";
 import { Strategy as OAuthStrategy } from "passport-oauth2";
 
-import { IUser } from "../database";
+import { IUser, findUserByID, createRecord, DB } from "../database";
 import { config } from "../common";
 import { Request, Response, NextFunction } from "express";
 
@@ -26,6 +26,11 @@ interface IProfile {
 	name: string;
 	email: string;
 	token: string;
+	scopes: IProfileScopes | null;
+}
+interface IProfileScopes {
+	slack: string;
+	phone: string;
 }
 
 // Because the passport typedefs don't include this for some reason
@@ -40,13 +45,7 @@ export class GroundTruthStrategy extends OAuthStrategy {
 	public static get defaultUserProperties() {
 		return {
 			"admin": false,
-
-			"applied": false,
-			"accepted": false,
-			"confirmed": false,
-			"preConfirmEmailSent": false,
-			"applicationStartTime": undefined,
-			"applicationSubmitTime": undefined
+			"haveID": false
 		};
 	}
 
@@ -87,11 +86,22 @@ export class GroundTruthStrategy extends OAuthStrategy {
 	}
 
 	protected static async passportCallback(request: Request, accessToken: string, refreshToken: string, profile: IProfile, done: PassportDone) {
-		let user = await User.findOne({ uuid: profile.uuid });
+		let user = await findUserByID(profile.uuid);
 		if (!user) {
-			user = createNew<IUser>(User, {
+			console.log(profile);
+			let scopes = profile.scopes;
+			if (!scopes) {
+				console.warn(`User ${profile.uuid} has no scope data`);
+				done(new Error("No scope data for new user"));
+				return;
+			}
+			delete profile.scopes;
+
+			user = await createRecord<IUser>("users", {
 				...GroundTruthStrategy.defaultUserProperties,
-				...profile
+				...profile,
+				slackUsername: scopes.slack,
+				phone: scopes.phone
 			});
 		}
 		else {
@@ -105,7 +115,7 @@ export class GroundTruthStrategy extends OAuthStrategy {
 		if (config.admins.emails.includes(profile.email)) {
 			user.admin = true;
 		}
-		await user.save();
+		await DB.from("users").where({ uuid: user.uuid }).update(user);
 		done(null, user);
 	}
 }

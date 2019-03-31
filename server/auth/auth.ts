@@ -7,9 +7,9 @@ import session from "express-session";
 import pgSession from "connect-pg-simple";
 import passport from "passport";
 
-import { IUser } from "../database";
+import { findUserByID, IUser } from "../database";
 
-import { config, COOKIE_OPTIONS, DB } from "../common";
+import { config, COOKIE_OPTIONS } from "../common";
 
 import {
 	AuthenticateOptions, GroundTruthStrategy, createLink, validateAndCacheHostName
@@ -40,12 +40,33 @@ passport.serializeUser<IUser, string>((user, done) => {
 	done(null, user.uuid);
 });
 passport.deserializeUser<IUser, string>(async (id, done) => {
-	let rows = await DB.from("users").where({ uuid: id });
-	done(new Error("Unimplemented"));
-	// User.findOne({ uuid: id }, (err, user) => {
-	// 	done(err, user!);
-	// });
+	findUserByID(id).then(user => {
+		done(null, user!);
+	}).catch(err => {
+		done(err);
+	});
 });
+
+export function isAuthenticated(request: express.Request, response: express.Response, next: express.NextFunction) {
+	response.setHeader("Cache-Control", "private");
+	if (!request.isAuthenticated() || !request.user) {
+		if (request.session) {
+			request.session.returnTo = request.originalUrl;
+		}
+		response.redirect("/auth/login");
+	}
+	else {
+		next();
+	}
+}
+
+export function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction) {
+	isAuthenticated(request, response, next);
+	if (request.user && request.user.admin) {
+		next();
+	}
+	response.status(403).send("You are not permitted to access this endpoint");
+}
 
 export let authRoutes = express.Router();
 
@@ -71,7 +92,7 @@ authRoutes.all("/logout", (request, response) => {
 	if (request.session) {
 		request.session.loginAction = "render";
 	}
-	response.redirect("/login");
+	response.redirect("/auth/login");
 });
 
 app.use(passport.initialize());
@@ -93,7 +114,7 @@ authRoutes.get("/login/callback", validateAndCacheHostName, (request, response, 
 
 	if (request.query.error === "access_denied") {
 		request.flash("error", "Authentication request was denied");
-		response.redirect("/login");
+		response.redirect("/auth/login");
 		return;
 	}
 	passport.authenticate("oauth2", {

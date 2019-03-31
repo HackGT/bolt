@@ -19,10 +19,17 @@ async function createTable(tableName: string, callback: (builder: knex.CreateTab
 	}
 }
 
-export async function findUserByID(tableName: string, id: string): Promise<IUser | null> {
-	DB.from("Users").where({ uuid: "52c3cbc9-ae9b-4496-ae4c-903b5e211152" }).then(rows => {
-		console.log(rows);
-	});
+export async function findUserByID(id: string): Promise<IUser | null> {
+	let rows = await DB.from("users").where({ uuid: id });
+	if (rows[0]) {
+		return rows[0] as IUser;
+	}
+	return null;
+}
+
+export async function createRecord<T extends object>(tableName: string, data: T) {
+	await DB.into(tableName).insert(data);
+	return data;
 }
 
 //
@@ -40,7 +47,7 @@ export interface IUser {
 	haveID: boolean;
 	admin: boolean;
 }
-createTable("Users", table => {
+createTable("users", table => {
 	table.uuid("uuid").notNullable().unique().primary();
 	table.string("token", 256);
 

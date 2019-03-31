@@ -16,7 +16,7 @@ import {
 	config
 } from "./common";
 
-import { DB } from "./database";
+import { DB, findUserByID } from "./database";
 
 // Set up Express and its middleware
 export let app = express();
@@ -71,13 +71,12 @@ process.on("unhandledRejection", err => {
 });
 
 // Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
-import { authRoutes } from "./auth/auth";
+import { authRoutes, isAuthenticated } from "./auth/auth";
 app.use("/auth", authRoutes);
 
 // TODO: replace with UI code
-app.get("/", (request, response) => {
-
-	response.send("Bolt has been started but <code>app.ts</code> isn't configured to serve the UI code yet");
+app.get("/", isAuthenticated, async (request, response) => {
+	response.send(`Hello, ${request.user.name}! Bolt has been started but <code>app.ts</code> isn't configured to serve the UI code yet.`);
 });
 
 app.route("/version").get((request, response) => {
