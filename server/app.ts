@@ -13,11 +13,10 @@ import {
 	// Constants
 	PORT, VERSION_NUMBER, COOKIE_OPTIONS,
 	// Configuration
-	config,
-	// TODO: remove
-	// Database
-	DB
+	config
 } from "./common";
+
+import { DB } from "./database";
 
 // Set up Express and its middleware
 export let app = express();
@@ -77,9 +76,7 @@ app.use("/auth", authRoutes);
 
 // TODO: replace with UI code
 app.get("/", (request, response) => {
-	DB.from("users").where({ uuid: "52c3cbc9-ae9b-4496-ae4c-903b5e211152" }).then(rows => {
-		console.log(rows);
-	});
+
 	response.send("Bolt has been started but <code>app.ts</code> isn't configured to serve the UI code yet");
 });
 

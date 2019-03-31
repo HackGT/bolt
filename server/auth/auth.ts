@@ -7,7 +7,7 @@ import session from "express-session";
 import pgSession from "connect-pg-simple";
 import passport from "passport";
 
-import { IUser } from "../schema";
+import { IUser } from "../database";
 
 import { config, COOKIE_OPTIONS, DB } from "../common";
 

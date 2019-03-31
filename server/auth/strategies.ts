@@ -5,7 +5,7 @@ import { URL } from "url";
 import * as passport from "passport";
 import { Strategy as OAuthStrategy } from "passport-oauth2";
 
-import { IUser } from "../schema";
+import { IUser } from "../database";
 import { config } from "../common";
 import { Request, Response, NextFunction } from "express";
 

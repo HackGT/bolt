@@ -3,11 +3,45 @@ import * as crypto from "crypto";
 import * as path from "path";
 import "passport";
 
-import { IConfig, IUser } from "./schema";
+import { IUser } from "./database";
 
 //
 // Config
 //
+namespace IConfig {
+	export interface Secrets {
+		session: string;
+		groundTruth: {
+			url: string;
+			id: string;
+			secret: string;
+		};
+	}
+	export interface Email {
+		from: string;
+		key: string;
+	}
+	export interface Server {
+		isProduction: boolean;
+		port: number;
+		cookieMaxAge: number;
+		cookieSecureOnly: boolean;
+		postgresURL: string;
+		defaultTimezone: string;
+	}
+
+	export interface Main {
+		secrets: Secrets;
+		email: Email;
+		server: Server;
+		admins: {
+			domains: string[];
+			emails: string[];
+		};
+		eventName: string;
+	}
+}
+
 class Config implements IConfig.Main {
 	public secrets: IConfig.Secrets = {
 		session: crypto.randomBytes(32).toString("hex"),
@@ -162,20 +196,6 @@ export const COOKIE_OPTIONS = {
 	"secure": config.server.cookieSecureOnly,
 	"httpOnly": true
 };
-
-//
-// Database connection
-//
-import knex from "knex";
-const DBConfig: knex.Config = {
-	client: "pg",
-	connection: config.server.postgresURL
-};
-if (!config.server.isProduction) {
-	// Keep local limits low so that ElephantDB works
-	DBConfig.pool = { min: 0, max: 2 };
-}
-export const DB = knex(DBConfig);
 
 //
 // Email
