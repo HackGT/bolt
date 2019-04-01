@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Grid} from "semantic-ui-react";
-import RequestManagementBoard from "./requestManagement/RequestManagementBoard";
+import RequestManagementBoard from "./RequestManagement/RequestManagementBoard";
 import {RequestedItem, ItemStatus} from "./inventory/HardwareItem"
 
 const boardStyle = {
@@ -9,11 +9,11 @@ const boardStyle = {
     background: "#eaeaea",
     overflowX: "hidden",
     padding: "15px "
-}
+};
 
 const cardStyle = {
     padding: "10px"
-}
+};
 export interface UserItemList {
     user: string,
     items: any[]
@@ -83,7 +83,7 @@ const sampleItems: RequestedItem[] = [
         status: ItemStatus.SUBMITTED,
         cancelled: false
     },
-]
+];
 interface RequestManagementContainerState {
     items: RequestedItem[]
 }
@@ -93,20 +93,20 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         super(props);
         this.state = {
             items: sampleItems
-        }
-        this.handleApprove = this.handleApprove.bind(this)
-        this.handleDecline = this.handleDecline.bind(this)
-        this.handleCross = this.handleCross.bind(this)
-        this.handleReady = this.handleReady.bind(this)
-        this.handlePrep = this.handlePrep.bind(this)
+        };
+        this.handleApprove = this.handleApprove.bind(this);
+        this.handleDecline = this.handleDecline.bind(this);
+        this.handleCross = this.handleCross.bind(this);
+        this.handleReady = this.handleReady.bind(this);
+        this.handlePrep = this.handlePrep.bind(this);
         this.handleDone = this.handleDone.bind(this)
     }
 
     handleApprove(id: number) {
-        console.log("handling approve")
+        console.log("handling approve");
         let index = sampleItems.findIndex((item) => {
             return item.id == id
-        })
+        });
         sampleItems[index].status = ItemStatus.APPROVED;
         this.setState({
             items: sampleItems
@@ -169,7 +169,7 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
 
 
     render() {
-        this.getItems(ItemStatus.SUBMITTED)
+        this.getItems(ItemStatus.SUBMITTED);
         return (
             <Grid>
                 <Grid.Row columns={3}>
@@ -177,7 +177,7 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
                         title="Submitted"
                         boardStyle={boardStyle}
                         items={this.getItems(ItemStatus.SUBMITTED)}
-                        sortedItems={[] as UserItemList[]}
+                        sortedItems={[]}
                         sortByUsers={false}
                         backToPrep={false}
                         handleApprove={this.handleApprove}
@@ -228,7 +228,7 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
 
     getItemsForEachUser(status: ItemStatus) {
         let itemsList = sampleItems;
-        let newItemsList: UserItemList[] = []
+        let newItemsList: UserItemList[] = [];
 
         itemsList.forEach(outerItem => {
             if (outerItem.status == status) {
@@ -242,7 +242,7 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
                             category: outerItem.category,
                             status: outerItem.status,
                             cancelled: outerItem.cancelled,
-                        })
+                        });
                         flag = true;
                         break;
                     }
@@ -263,7 +263,7 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
                     })
                 }
             }
-        })
+        });
         return newItemsList;
     }
 }
