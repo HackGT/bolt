@@ -1,12 +1,28 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 import {Card, Button, Label} from "semantic-ui-react";
-import {RequestedItem} from "../inventory/HardwareItem"
+import {RequestedItem} from "../inventory/HardwareItem";
 
 interface RequestedHardwareItemProps {
-    item: RequestedItem
+    item: RequestedItem,
+    handleApprove: (id: number) => void,
+    handleDecline: (id: number) => void,
 }
 class RequestedHardwareItem extends Component<RequestedHardwareItemProps,{}> {
+    constructor(props: RequestedHardwareItemProps) {
+        super(props)
+        this.onClickApprove = this.onClickApprove.bind(this)
+        this.onClickDecline = this.onClickDecline.bind(this)
+    }
+    onClickApprove() {
+        this.props.handleApprove(this.props.item.id)
+    }
+
+    onClickDecline() {
+        this.props.handleDecline(this.props.item.id)
+    }
+
     render() {
+        console.log(this.props)
         return (
             <Card>
               <Card.Content>
@@ -21,10 +37,10 @@ class RequestedHardwareItem extends Component<RequestedHardwareItemProps,{}> {
               </Card.Content>
               <Card.Content extra>
                 <div className='ui two buttons'>
-                  <Button basic color='green'>
+                  <Button color='green' onClick={this.onClickApprove}>
                     Approve
                   </Button>
-                  <Button basic color='red'>
+                  <Button color='red' onClick={this.onClickDecline}>
                     Decline
                   </Button>
                 </div>
