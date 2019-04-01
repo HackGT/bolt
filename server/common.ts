@@ -3,7 +3,12 @@ import * as crypto from "crypto";
 import * as path from "path";
 import "passport";
 
-import { IUser } from "./database";
+import {IUser} from "./database";
+//
+// Email
+//
+import sendgrid from "@sendgrid/mail";
+import marked from "marked";
 
 //
 // Config
@@ -60,7 +65,7 @@ class Config implements IConfig.Main {
 		port: 3000,
 		cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
 		cookieSecureOnly: false,
-		postgresURL: "mongodb://localhost/registration",
+		postgresURL: "postgresql://localhost/bolt",
 		defaultTimezone: "America/New_York"
 	};
 	public admins = {
@@ -197,12 +202,7 @@ export const COOKIE_OPTIONS = {
 	"httpOnly": true
 };
 
-//
-// Email
-//
-import sendgrid from "@sendgrid/mail";
 sendgrid.setApiKey(config.email.key);
-import marked from "marked";
 // tslint:disable-next-line:no-var-requires
 const striptags = require("striptags");
 
