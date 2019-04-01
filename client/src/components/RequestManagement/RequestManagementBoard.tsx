@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Grid, Card, Container} from "semantic-ui-react";
+import {Card, Container, Grid} from "semantic-ui-react";
 import RequestedHardwareItem from "./RequestedHardwareItem";
 import {RequestedItem} from "../inventory/HardwareItem";
 import {RequestedItemsByUser} from "./RequestedItemsByUser";
@@ -62,7 +62,7 @@ class RequestManagementBoard extends Component<RequestManagementBoardProps, {}> 
                     </Card.Group>
                 </Container>
             </Grid.Column>
-        )
+        );
         return returnValue;
     }
 }

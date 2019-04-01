@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Card, Button, Label} from "semantic-ui-react";
+import {Button, Card, Label} from "semantic-ui-react";
 import {RequestedItem} from "../inventory/HardwareItem";
 
 interface RequestedHardwareItemProps {
@@ -9,20 +9,20 @@ interface RequestedHardwareItemProps {
 }
 class RequestedHardwareItem extends Component<RequestedHardwareItemProps,{}> {
     constructor(props: RequestedHardwareItemProps) {
-        super(props)
-        this.onClickApprove = this.onClickApprove.bind(this)
-        this.onClickDecline = this.onClickDecline.bind(this)
+        super(props);
+        this.onClickApprove = this.onClickApprove.bind(this);
+        this.onClickDecline = this.onClickDecline.bind(this);
     }
     onClickApprove() {
-        this.props.handleApprove(this.props.item.id)
+        this.props.handleApprove(this.props.item.id);
     }
 
     onClickDecline() {
-        this.props.handleDecline(this.props.item.id)
+        this.props.handleDecline(this.props.item.id);
     }
 
     render() {
-        console.log(this.props)
+        console.log(this.props);
         return (
             <Card>
               <Card.Content>

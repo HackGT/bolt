@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {UserItemList} from "../RequestManagementContainer";
-import {Card, Button, Label, Icon, Popup} from "semantic-ui-react";
+import {Button, Card, Icon, Label, Popup} from "semantic-ui-react";
 
 interface RequestedItemsByUserProps {
     item: UserItemList,
@@ -13,27 +13,27 @@ interface RequestedItemsByUserProps {
 
 export class RequestedItemsByUser extends Component<RequestedItemsByUserProps> {
     constructor(props: RequestedItemsByUserProps) {
-        super(props)
-        this.onClickReady = this.onClickReady.bind(this)
-        this.onClickCross = this.onClickCross.bind(this)
-        this.onClickPrep = this.onClickPrep.bind(this)
-        this.onClickDone = this.onClickDone.bind(this)
+        super(props);
+        this.onClickReady = this.onClickReady.bind(this);
+        this.onClickCross = this.onClickCross.bind(this);
+        this.onClickPrep = this.onClickPrep.bind(this);
+        this.onClickDone = this.onClickDone.bind(this);
     }
 
     onClickReady() {
-        this.props.handleReady(this.props.item.user)
+        this.props.handleReady(this.props.item.user);
     }
 
     onClickCross() {
-        this.props.handleCross(this.props.item.user)
+        this.props.handleCross(this.props.item.user);
     }
 
     onClickPrep() {
-        this.props.handlePrep(this.props.item.user)
+        this.props.handlePrep(this.props.item.user);
     }
 
     onClickDone() {
-        this.props.handleDone(this.props.item.user)
+        this.props.handleDone(this.props.item.user);
     }
 
     render() {
@@ -48,7 +48,7 @@ export class RequestedItemsByUser extends Component<RequestedItemsByUserProps> {
         ) :
         (
             <Button onClick={this.onClickReady} color='green' size='mini' icon labelPosition="right">Ready<Icon name="arrow alternate circle right outline"/></Button>
-        )
+        );
         return (
             <Card>
                 <Card.Header style={{padding: "1rem"}}>
