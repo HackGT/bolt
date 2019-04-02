@@ -4,7 +4,7 @@ FROM node:10-alpine
 RUN mkdir -p /usr/src/bolt
 WORKDIR /usr/src/bolt
 COPY . /usr/src/bolt
-RUN npm install
+RUN npm install --unsafe-perm
 
 # Set Timezone to EST
 RUN apk add tzdata
