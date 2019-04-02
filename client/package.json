@@ -1,6 +1,6 @@
 {
-  "name": "bolt",
-  "version": "0.1.0",
+  "name": "bolt-client",
+  "version": "1.0.0",
   "private": true,
   "homepage": "https://hackgt.github.io/bolt",
   "dependencies": {
