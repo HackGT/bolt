@@ -8,7 +8,7 @@ secrets:
   - GROUND_TRUTH_ID
   - GROUND_TRUTH_SECRET
   - ADMIN_EMAILS
-  -
+
 env:
   PRODUCTION: true
   DEFAULT_TIMEZONE: "America/New_York"
