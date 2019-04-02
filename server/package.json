@@ -5,7 +5,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "gulp",
+    "serve": "node ./build/app.js",
+    "build": "gulp build"
   },
   "author": "Ryan Petschek",
   "license": "MIT",
@@ -35,15 +37,23 @@
     "cookie-signature": "^1.1.0",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
+    "fs": "0.0.1-security",
+    "gulp-copy": "^4.0.1",
+    "gulp-tslint": "^8.1.4",
+    "gulp-typescript": "^5.0.1",
     "knex": "^0.16.3",
     "marked": "^0.6.1",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.23",
     "morgan": "^1.9.1",
+    "nodemon": "^1.18.10",
     "passport": "^0.4.0",
     "passport-oauth2": "^1.5.0",
+    "path": "^0.12.7",
     "pg": "^7.9.0",
     "striptags": "^3.1.1",
-    "typescript": "^3.3.0"
+    "tslint": "^5.14.0",
+    "typescript": "^3.4.1",
+    "webpack": "^4.29.6"
   }
 }
