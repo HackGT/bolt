@@ -12,6 +12,6 @@ ENV TZ="/usr/share/zoneinfo/America/New_York"
 
 FROM node:10-alpine
 COPY --from=0 /usr/src/bolt/server/ /usr/src/bolt/server/
-WORKDIR /usr/src/ballot
+WORKDIR /usr/src/bolt
 EXPOSE 3000
 CMD ["node", "server/build/app.js"]
