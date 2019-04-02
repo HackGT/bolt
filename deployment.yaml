@@ -5,8 +5,10 @@ wants:
   postgres: true
 
 secrets:
-  - SESSION_SECRET
-  - SOCKET_PASSWORD
+  - GROUND_TRUTH_ID
+  - GROUND_TRUTH_SECRET
+  - ADMIN_EMAILS
+  -
 env:
-  SOCKET_AUTH_ENABLED: true
-  AUTH_ALLOW_LOCAL: true
+  PRODUCTION: true
+  DEFAULT_TIMEZONE: "America/New_York"
