@@ -52,7 +52,7 @@ class Config implements IConfig.Main {
     public secrets: IConfig.Secrets = {
         session: crypto.randomBytes(32).toString("hex"),
         groundTruth: {
-            url: "",
+            url: "https://login.hack.gt",
             id: "",
             secret: ""
         }
