@@ -104,15 +104,11 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean, ha
         </Item.Group>);
 
         return (
-            <Grid columns={2}>
-                <Grid.Row>
-                    <Grid.Column>
+                <div>
                         <Header>Inventory</Header>
                         {noRequestsMessage}
                         {this.state.loading ? loading : normalContent}
-                    </Grid.Column>
-                </Grid.Row>
-            </Grid>
+                </div>
         )
     }
 }

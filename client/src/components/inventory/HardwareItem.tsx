@@ -223,7 +223,7 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
         }
 
         return (
-            <Item className="hw-card">
+            <Item>
                 <Item.Image draggable={false} className="hw-image" size='tiny' src='http://placekitten.com/300/300'/>
                 <Item.Content>
                     <Item.Header>{this.props.name} <Button size="mini" basic primary={true} icon labelPosition='left'>
