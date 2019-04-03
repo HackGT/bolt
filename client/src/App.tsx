@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Navigation} from "./components/Navigation";
+import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
 import {ToastProvider} from 'react-toast-notifications';
 import HomeContainer from "./components/HomeContainer";

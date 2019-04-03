@@ -1,8 +1,17 @@
 import React from "react";
 import {Icon, Menu} from 'semantic-ui-react'
 import {Link} from "react-router-dom";
+import {connect} from "react-redux";
 
-export class Navigation extends React.Component {
+export interface OwnProps {}
+
+interface StateProps {
+    a: number
+}
+
+type Props = StateProps & OwnProps;
+
+class Navigation extends React.Component<Props, {}> {
     render() {
 
         return (
@@ -14,7 +23,17 @@ export class Navigation extends React.Component {
                 <Menu.Item name="admin">
                     <Icon name="file"/><Link to="/admin/csv">Import</Link>
                 </Menu.Item>
+                <Menu.Item>Hello: {this.props.a}</Menu.Item>
             </Menu>
         )
     }
 }
+
+function mapStateToProps(state: {a: number}) {
+    console.log("State is", state);
+    return {
+        a: state.a
+    }
+}
+
+export default connect(mapStateToProps) (Navigation)

@@ -5,6 +5,12 @@ const defaultState = {
 };
 
 const reducers = (state = defaultState, action: Action) => {
+    console.log(action);
+    if (!action) {
+        action = {
+            type: "DEFAULT"
+        };
+    }
     switch (action.type) {
         case 'TEST_ACTION':
             return {
