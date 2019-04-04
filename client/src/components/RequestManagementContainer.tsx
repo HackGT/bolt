@@ -3,14 +3,6 @@ import {Grid} from "semantic-ui-react";
 import RequestManagementBoard from "./RequestManagement/RequestManagementBoard";
 import {RequestedItem, ItemStatus} from "./inventory/HardwareItem"
 
-const boardStyle = {
-    height: "40rem",
-    overflowY: "scroll",
-    background: "#eaeaea",
-    overflowX: "hidden",
-    padding: "15px "
-};
-
 const cardStyle = {
     padding: "10px"
 };
@@ -175,7 +167,6 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
                 <Grid.Row columns={3}>
                     <RequestManagementBoard
                         title="Submitted"
-                        boardStyle={boardStyle}
                         items={this.getItems(ItemStatus.SUBMITTED)}
                         sortedItems={[]}
                         sortByUsers={false}
@@ -189,7 +180,6 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
                     />
                     <RequestManagementBoard
                         title="Ready to Prepare"
-                        boardStyle={boardStyle}
                         items={[] as RequestedItem[]}
                         sortedItems={this.getItemsForEachUser(ItemStatus.APPROVED)}
                         sortByUsers={true}
@@ -203,7 +193,6 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
                     />
                     <RequestManagementBoard
                         title="Ready for Pickup"
-                        boardStyle={boardStyle}
                         items={[] as RequestedItem[]}
                         sortedItems={this.getItemsForEachUser(ItemStatus.READY)}
                         sortByUsers={true}
@@ -231,7 +220,7 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         let newItemsList: UserItemList[] = [];
 
         itemsList.forEach(outerItem => {
-            if (outerItem.status == status) {
+            if (outerItem.status === status) {
                 let flag: boolean = false;
                 for (let i = 0; i < newItemsList.length; i++) {
                     if (newItemsList[i].user === outerItem.user) {

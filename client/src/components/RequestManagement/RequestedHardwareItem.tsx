@@ -22,17 +22,16 @@ class RequestedHardwareItem extends Component<RequestedHardwareItemProps,{}> {
     }
 
     render() {
-        console.log(this.props);
         return (
             <Card>
               <Card.Content>
-                <h3 style={{display: "inline", paddingRight: "2rem"}}>{this.props.item.user}</h3>
+                <h3 className="hardware-item-user-name">{this.props.item.user}</h3>
                 <span style={{float: "right"}}><em>Time</em></span>
                 <Card.Description>
                 <Label circular color="blue">
                     {this.props.item.qtyRequested}x
                 </Label>
-                    <span style={{paddingLeft: "1rem", paddingTop: "0.5rem"}}>{this.props.item.name}</span>
+                    <span className="hardware-item-name">{this.props.item.name}</span>
                 </Card.Description>
               </Card.Content>
               <Card.Content extra>

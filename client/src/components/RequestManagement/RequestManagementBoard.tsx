@@ -8,7 +8,6 @@ import {UserItemList} from "../RequestManagementContainer";
 
 interface RequestManagementBoardProps {
     title: string,
-    boardStyle: any,
     items: RequestedItem[],
     sortedItems: UserItemList[],
     sortByUsers: boolean,
@@ -23,15 +22,15 @@ interface RequestManagementBoardProps {
 
 class RequestManagementBoard extends Component<RequestManagementBoardProps, {}> {
     render() {
-        const returnValue = this.props.sortByUsers ? (
+        return this.props.sortByUsers ? (
             <Grid.Column>
                 <h2>{this.props.title}</h2>
-                <Container placeholder style={this.props.boardStyle}>
+                <Container placeholder className="hardware-board-style">
                     <Card.Group>
                         {this.props.sortedItems.map((item, index) => {
                             return (
                                 <RequestedItemsByUser
-                                    key={index}
+                                    key={item.user}
                                     item={item}
                                     backToPrep={this.props.backToPrep}
                                     handleReady={this.props.handleReady}
@@ -47,12 +46,12 @@ class RequestManagementBoard extends Component<RequestManagementBoardProps, {}> 
         ) : (
             <Grid.Column>
                 <h2>{this.props.title}</h2>
-                <Container placeholder style={this.props.boardStyle}>
+                <Container placeholder className="hardware-board-style">
                     <Card.Group>
                         {this.props.items.map((item, index) => {
                             return (
                                 <RequestedHardwareItem
-                                    key={index}
+                                    key={item.id}
                                     item={item}
                                     handleApprove={this.props.handleApprove}
                                     handleDecline={this.props.handleDecline}
@@ -63,7 +62,6 @@ class RequestManagementBoard extends Component<RequestManagementBoardProps, {}> 
                 </Container>
             </Grid.Column>
         );
-        return returnValue;
     }
 }
 
