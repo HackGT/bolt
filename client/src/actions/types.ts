@@ -1,0 +1,2 @@
+
+export const REQUESTS_AND_USERS = 'REQUESTS_AND_USERS';

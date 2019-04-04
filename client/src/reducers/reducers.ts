@@ -1,28 +1,39 @@
 import {Action} from "redux";
-import {SetUserAction, TestAction, User} from "../actions/actions";
+import {SetUserAction, TestAction, GenericAction, RequestsAndUsersAction, User} from "../actions/";
+import {types} from "../actions/";
+import { RequestedItem } from "../components/inventory/HardwareItem";
 
 export interface AppState {
     a: number,
-    user: User|null
+    user: User|null,
+    users: User[],
+    requests: RequestedItem[]
 }
 
 const defaultState: AppState = {
     a: 4,
-    user: null
+    user: null,
+    users: [],
+    requests: []
 };
 
-const reducers = (state = defaultState, action: SetUserAction|TestAction) => {
-    console.log(action);
-    if (!action) {
-        action = {
-            type: "DEFAULT",
-        };
-    }
+const defaultAction: GenericAction = {
+    type: "DEFAULT"
+};
+
+const reducers = (state = defaultState, action: SetUserAction|TestAction|GenericAction = defaultAction) => {
     switch (action.type) {
         case 'SET_USER':
             return {
                 ...state,
                 user: (action as SetUserAction).user
+            };
+        case types.REQUESTS_AND_USERS:
+            const { users, requests } = (action as RequestsAndUsersAction);
+            return {
+                ...state,
+                users,
+                requests
             };
         default:
             return state;

@@ -5,6 +5,7 @@ import {ToastProvider} from 'react-toast-notifications';
 import HomeContainer from "./components/HomeContainer";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import CSVWizard from "./components/csv/CSVWizard";
+import CheckinContainer from "./components/checkin/CheckinContainer";
 import ItemWrapper from "./components/item/ItemWrapper";
 import {setUser, User} from "./actions/actions";
 import {store} from "./store";
@@ -51,6 +52,7 @@ class App extends Component<Props, {}> {
                         <Switch>
                             <Route path="/" exact component={HomeContainer}/>
                             <PrivateRoute path="/admin/csv" component={CSVWizard}/>
+                            <Route path="/admin/checkin" component={CheckinContainer}/>
                             <PrivateRoute path="/item" component={ItemWrapper}/>
                             <Route component={HomeContainer}/>
                         </Switch>
