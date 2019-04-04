@@ -11,6 +11,25 @@ const DBConfig: knex.Config = {
 };
 export const DB = knex(DBConfig);
 
+// Set up sessions table used by connect-pg-simple (our session store)
+// From: https://github.com/voxpelli/node-connect-pg-simple/blob/master/table.sql
+async function setUpSessionsTable() {
+	let exists = await DB.schema.withSchema("public").hasTable("session");
+	if (!exists) {
+		await DB.raw(`
+			CREATE TABLE "session" (
+				"sid" varchar NOT NULL COLLATE "default",
+				"sess" json NOT NULL,
+				"expire" timestamp(6) NOT NULL
+			)
+			WITH (OIDS=FALSE);
+			ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
+		`);
+		console.log("Created session table");
+	}
+}
+setUpSessionsTable().catch(err => { throw err });
+
 async function createTable(tableName: string, callback: (builder: knex.CreateTableBuilder) => any) {
     const exists = await DB.schema.withSchema("public").hasTable(tableName);
     if (!exists) {
