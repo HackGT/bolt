@@ -11,11 +11,27 @@ const schema = buildSchema(fs.readFileSync(schemaFile, { encoding: "utf8" }));
 export const apiRoutes = express.Router();
 
 import { QueryResolvers } from "./api.graphql";
-const resolvers: QueryResolvers = {
-	me: async (root, args, context) => {
+// Helper function for incorrect typedefs
+// express-graphql does not have a `root` parameter as the first argument but code-gen puts it there anyway
+function fixArguments<A, B, C>(fakeRoot: A, fakeArgs: B, fakeContext: C): { args: B, context: C } {
+	return {
+		args: fakeRoot as unknown as B,
+		context: fakeArgs as unknown as C
+	};
+}
+
+
+const resolvers: QueryResolvers<express.Request> = {
+	user: async (root, _args, _context) => {
+		let { args, context } = fixArguments(root, _args, _context);
 		return {
-			id: "yo",
-			name: "Ryan"
+			uuid: context.user.uuid,
+			name: context.user.name,
+			email: context.user.email,
+			phone: context.user.phone,
+			slackUsername: context.user.slackUsername,
+			haveID: context.user.haveID,
+			admin: context.user.admin
 		};
 	}
 };
