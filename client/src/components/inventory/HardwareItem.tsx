@@ -2,6 +2,7 @@ import React, {ChangeEvent} from 'react';
 import {Button, Form, Icon, Input, Item, Label, Popup} from "semantic-ui-react";
 import {withToastManager} from "react-toast-notifications";
 import {Link} from "react-router-dom";
+import {User} from "../../actions/actions";
 
 export interface Item {
     id: number,
@@ -41,6 +42,7 @@ interface HardwareItem {
     toastManager: any, // for making toast notifications
     addItem: (item: RequestedItem) => void,
     qtyUpdate: RequestedItem | null,
+    user: User|null
 }
 
 interface HardwareItemState {
@@ -82,7 +84,7 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
         this.setState({
             loading: false,
             qtyRemaining: updatedQtyRemaining
-        })
+        });
         let newRequest: RequestedItem = {
             id: this.props.id,
             user: "Beardell",
@@ -91,7 +93,7 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
             category: this.props.category,
             status: ItemStatus.SUBMITTED,
             cancelled: false
-        }
+        };
         this.props.addItem(newRequest)
     }
 
@@ -151,7 +153,7 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
     componentDidUpdate(prevProps: Item & HardwareItem, prevState: HardwareItemState) {
         if (this.props.qtyUpdate) {
             if (this.props.qtyUpdate.name === this.props.name && this.state.qtyRemaining == prevState.qtyRemaining && !this.props.qtyUpdate.cancelled) {
-                this.addCancelledItem(this.props.qtyUpdate.qtyRequested)
+                this.addCancelledItem(this.props.qtyUpdate.qtyRequested);
                 this.props.qtyUpdate.cancelled = true;
             }
         }
@@ -199,7 +201,7 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
                                  disabled={this.state.loading || (this.state.qtyRequested == this.state.qtyRemaining
                                      && this.state.qtyRemaining <= this.props.maxReqQty
                                      && this.state.qtyRemaining > 0) || (this.state.qtyRequested == this.props.maxReqQty)}/>);
-        const qtyRequest2 = (
+        const qtyRequest2 = this.props.requestsEnabled ? (
             <Input action>
                 <input style={{width: 50, textAlign: "center"}}
                        value={this.state.qtyRequested}
@@ -212,9 +214,9 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
                     && this.state.qtyRemaining > 0) || (this.state.qtyRequested == this.props.maxReqQty)} inverted
                        trigger={plusBtn} content="Request another"/>
                 {requestBtn}
-            </Input>
+            </Input>) : '';
 
-        );
+
         let maxPerRequest;
         if (!this.state.qtyRemaining) {
             maxPerRequest = `Request up to ${this.props.maxReqQty} at a time`
@@ -222,14 +224,15 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
             maxPerRequest = `Request up to ${Math.min(this.props.maxReqQty, this.state.qtyRemaining)} at a time`;
         }
 
+        const editBtn = this.props.user && this.props.user.isAdmin ? (<Button size="mini" basic primary={true} icon labelPosition='left'>
+            <Icon name='pencil'/>
+            <Link to={"/item/" + this.props.id}>Edit</Link>
+        </Button>) : '';
         return (
-            <Item className="hw-card">
+            <Item>
                 <Item.Image draggable={false} className="hw-image" size='tiny' src='http://placekitten.com/300/300'/>
                 <Item.Content>
-                    <Item.Header>{this.props.name} <Button size="mini" basic primary={true} icon labelPosition='left'>
-                        <Icon name='pencil'/>
-                        <Link to={"/item/" + this.props.id}>Edit</Link>
-                    </Button></Item.Header>
+                    <Item.Header>{this.props.name} {editBtn}</Item.Header>
                     <Item.Meta>{!this.state.qtyRemaining ? "Out of stock" : `${this.state.qtyRemaining} of ${this.props.totalQty} available`}</Item.Meta>
                     <Item.Meta>{maxPerRequest}</Item.Meta>
                     <Item.Meta><Label>{this.props.category}</Label></Item.Meta>
