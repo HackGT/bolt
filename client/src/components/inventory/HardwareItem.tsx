@@ -228,7 +228,6 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
             <Icon name='pencil'/>
             <Link to={"/item/" + this.props.id}>Edit</Link>
         </Button>) : '';
-
         return (
             <Item>
                 <Item.Image draggable={false} className="hw-image" size='tiny' src='http://placekitten.com/300/300'/>
