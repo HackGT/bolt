@@ -87,7 +87,7 @@ export class HardwareList extends React.Component<Props, { loading: boolean }> {
         setTimeout(this.dataCallback, 3000);
     }
 
-    render() 
+    render() {
         console.log(this.props.requestsEnabled && !this.props.user , this.props.requestsEnabled, this.props.user);
 
         let noRequestsMessageText = "";
