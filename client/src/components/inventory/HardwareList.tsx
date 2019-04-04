@@ -3,6 +3,9 @@ import HardwareItem from "./HardwareItem";
 import {Icon, Item, Message, Grid, Header} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
 import {RequestedItem} from "../inventory/HardwareItem"
+import {AppState} from "../../reducers/reducers";
+import {connect} from "react-redux";
+import {User} from "../../actions/actions";
 
 const sampleData = [
     {
@@ -51,9 +54,22 @@ const sampleData = [
     },
 ];
 
-export class HardwareList extends React.Component<{ requestsEnabled: boolean, handleAddItem: (item: RequestedItem) => void, qtyUpdate: RequestedItem | null}, { loading: boolean }> {
+export interface OwnProps {
+    requestsEnabled: boolean,
+    handleAddItem: (item: RequestedItem) => void,
+    qtyUpdate: RequestedItem | null
+}
 
-    constructor(props: { requestsEnabled: boolean, handleAddItem: (item: RequestedItem) => void, qtyUpdate: RequestedItem | null}) {
+interface StateProps {
+    a: number
+    user: User|null
+}
+
+type Props = StateProps & OwnProps;
+
+export class HardwareList extends React.Component<Props, { loading: boolean }> {
+
+    constructor(props: Props) {
         super(props);
         this.state = {
             loading: true
@@ -72,11 +88,21 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean, ha
     }
 
     render() {
-        const noRequestsMessage = !this.props.requestsEnabled ? (<Message
+        console.log(this.props.requestsEnabled && !this.props.user , this.props.requestsEnabled, this.props.user);
+
+        let noRequestsMessageText = "";
+
+        if (!this.props.requestsEnabled) {
+            noRequestsMessageText = "Hardware checkout requests can't be made at this time.";
+        } else if (this.props.requestsEnabled && !this.props.user) {
+            noRequestsMessageText = "Sign in to request hardware.";
+        }
+
+        const noRequestsMessage = this.props.requestsEnabled && !this.props.user ? (<Message
             title="View-only inventory"
             warning icon>
-            <Icon name='clock outline'/>
-            Hardware checkout requests can be made after March 19, 2019, at 5:04 PM.
+            <Icon name='warning sign'/>
+            {noRequestsMessageText}
         </Message>) : '';
 
         sampleData.sort((a, b) => {
@@ -86,7 +112,7 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean, ha
             {sampleData.map((item) => (
                 <HardwareItem name={item.name}
                               description={item.description}
-                              requestsEnabled={this.props.requestsEnabled}
+                              requestsEnabled={this.props.requestsEnabled && this.props.user}
                               qtyRemaining={item.qtyRemaining}
                               totalQty={item.totalQty}
                               maxReqQty={item.maxReqQty}
@@ -95,6 +121,7 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean, ha
                               id={item.id}
                               addItem={this.props.handleAddItem} // prop that invokes the handleAddItem method of parent container to update its state
                               qtyUpdate={this.props.qtyUpdate} // this prop is the object whose request has been cancelled
+                              user={this.props.user}
                 />))}
         </Item.Group>);
         const loading = (<Item.Group>
@@ -113,4 +140,12 @@ export class HardwareList extends React.Component<{ requestsEnabled: boolean, ha
     }
 }
 
-export default HardwareList;
+function mapStateToProps(state: AppState) {
+    return {
+        a: state.a,
+        user: state.user
+    }
+}
+
+
+export default connect(mapStateToProps) (HardwareList);

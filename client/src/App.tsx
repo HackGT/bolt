@@ -6,8 +6,38 @@ import HomeContainer from "./components/HomeContainer";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import CSVWizard from "./components/csv/CSVWizard";
 import ItemWrapper from "./components/item/ItemWrapper";
+import {setUser, User} from "./actions/actions";
+import {store} from "./store";
+import {AppState} from "./reducers/reducers";
+import {connect} from "react-redux";
+import PrivateRoute from "./components/util/PrivateRoute";
 
-class App extends Component {
+export interface OwnProps {}
+
+interface StateProps {
+    a: number
+    user: User|null
+}
+
+type Props = StateProps & OwnProps;
+
+class App extends Component<Props, {}> {
+    async checkAuth(): Promise<User> {
+        return new Promise(resolve => setTimeout(() => resolve({
+            "uuid": "abcdedf-afdhkasdf-adfsk",
+            "name": "Evan Strat",
+            "isAdmin": false
+        }), 5000));
+    }
+
+    async componentWillMount(): Promise<void> {
+        const user: User = await this.checkAuth();
+        console.log(user);
+        if (user) {
+            store.dispatch(setUser(user));
+        }
+    }
+
     render() {
         return (
             <div style={{
@@ -20,8 +50,8 @@ class App extends Component {
                         <Navigation/>
                         <Switch>
                             <Route path="/" exact component={HomeContainer}/>
-                            <Route path="/admin/csv" component={CSVWizard}/>
-                            <Route path="/item" component={ItemWrapper}/>
+                            <PrivateRoute path="/admin/csv" component={CSVWizard}/>
+                            <PrivateRoute path="/item" component={ItemWrapper}/>
                             <Route component={HomeContainer}/>
                         </Switch>
                         <Footer/>
@@ -32,4 +62,11 @@ class App extends Component {
     }
 }
 
-export default App;
+function mapStateToProps(state: AppState) {
+    return {
+        a: state.a,
+        user: state.user
+    }
+}
+
+export default connect(mapStateToProps) (App);
