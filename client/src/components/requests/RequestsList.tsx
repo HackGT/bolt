@@ -1,22 +1,10 @@
 import React, {Component} from 'react';
 import {Header, Icon, Segment, Card, Image, Button, Label, Grid, Divider, Container, Step} from "semantic-ui-react";
-import {RequestedItem, ItemStatus} from "../inventory/HardwareItem"
+import { RequestedItem } from "../inventory/HardwareItem"
+import { StatusToString, StatusToColor } from '../../enums';
 
 class RequestsList extends Component<{requestedItemsList: RequestedItem[], removeItem: (index: number) => void}>{
-    getItemStatusString(status: ItemStatus) {
-        switch(status) {
-            case ItemStatus.SUBMITTED: return "Submitted"
-            case ItemStatus.APPROVED: return "Approved"
-            case ItemStatus.DECLINED: return "Declined"
-            case ItemStatus.CANCELLED: return "Cancelled"
-            case ItemStatus.READY: return "Ready"
-            case ItemStatus.FULFILLED: return "Fulfilled"
-            case ItemStatus.RETURNED: return "Returned"
-            case ItemStatus.LOST: return "Lost"
-            case ItemStatus.DAMAGED: return "Damaged"
-        }
-    }
-
+    
     render() {
         const noRequest = (
             <Segment placeholder>
@@ -41,7 +29,7 @@ class RequestsList extends Component<{requestedItemsList: RequestedItem[], remov
 
                                         <Label medium circular color="blue">{item.qtyRequested}</Label>
 
-                                        <Label large color={item.status}>{this.getItemStatusString(item.status)}</Label>
+                                        <Label large color={StatusToColor(item.status)}>{StatusToString(item.status)}</Label>
 
                                         <Button floated="right" basic color="red" onClick={() => {this.props.removeItem(index)}}>
                                             Cancel Request

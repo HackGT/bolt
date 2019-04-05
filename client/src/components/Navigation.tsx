@@ -40,7 +40,7 @@ class Navigation extends React.Component<Props, {}> {
             </Menu.Item>
         </Link>) : null;
 
-        const checkinLink = user ? (<Link to="/admin/checkin">
+        const checkinLink = user && user.isAdmin ? (<Link to="/admin/checkin">
             <Menu.Item>
                 <Icon name="clipboard" />
                 Checkin

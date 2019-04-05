@@ -1,7 +1,7 @@
 import {Action, ActionCreator} from "redux";
 import { types } from './';
 import UserMenuItems from "../components/navigation/UserMenuItems";
-import { RequestedItem } from "../components/inventory/HardwareItem";
+import { RequestedItem, ItemStatus } from "../components/inventory/HardwareItem";
 export interface User {
     uuid: string,
     isAdmin: boolean,
@@ -42,12 +42,29 @@ interface RequestsAndUsers {
 
 export type RequestsAndUsersAction = RequestsAndUsers & GenericAction;
 
+interface RequestStatus {
+    requestId: string,
+    status: ItemStatus
+}
+
+export type RequestStatusAction = RequestStatus & GenericAction;
+
 export const fetchRequestsAndUsers = () => {
     return (dispatch: any, getState: any) => {
         return new Promise<RequestsAndUsers>((resolve) => {
             const mock = {
-                users: [],
-                requests: []
+                users: [{
+                    uuid: "1a", isAdmin: true, name: "Joel"
+                }],
+                requests: [{
+                    id: "5b",
+                    user: "1a",
+                    name: "RPI 3",
+                    qtyRequested: 3,
+                    category: "hardware lol",
+                    status: ItemStatus.FULFILLED,
+                    cancelled: false
+                }]
             }
             setTimeout(() => {resolve(mock)}, 1000);
         })
@@ -59,5 +76,40 @@ export const fetchRequestsAndUsers = () => {
                 requests
             });
         })
+        .catch((err: string) => {
+            throw Error(err);
+        });;
     };
+}
+
+interface AckResponse {
+    status: string,
+    message: string
+}
+
+export const updateRequestStatus = (requestId: string, status: ItemStatus, resolve: any) => {
+    return (dispatch: any) => {
+        return new Promise<AckResponse>((resolve) => {
+            const mock = {
+                status: "ok",
+                message: "Status updated"
+            }
+            setTimeout(() => {resolve(mock)}, 1000);
+        })
+        .then((json) => {
+            const { status: responseStatus, message } = json;
+            if (responseStatus === 'ok') {
+                dispatch({
+                    type: types.REQUEST_STATUS,
+                    requestId,
+                    status
+                });
+                return;
+            }
+            throw Error(message);
+        })
+        .catch((err: string) => {
+            throw Error(err);
+        });
+    }
 }

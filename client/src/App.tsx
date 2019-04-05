@@ -52,7 +52,7 @@ class App extends Component<Props, {}> {
                         <Switch>
                             <Route path="/" exact component={HomeContainer}/>
                             <PrivateRoute path="/admin/csv" component={CSVWizard}/>
-                            <Route path="/admin/checkin" component={CheckinContainer}/>
+                            <PrivateRoute path="/admin/checkin" component={CheckinContainer}/>
                             <PrivateRoute path="/item" component={ItemWrapper}/>
                             <Route component={HomeContainer}/>
                         </Switch>

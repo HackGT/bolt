@@ -1,10 +1,11 @@
 import React from "react";
-import {Container, Header} from 'semantic-ui-react';
+import {Container, Dimmer, Header, Input, Loader, Segment, Divider} from 'semantic-ui-react';
 import { withToastManager } from "react-toast-notifications";
 import {withRouter} from "react-router-dom";
 import { connect } from 'react-redux'
 import {bindActionCreators, compose} from "redux";
 import { fetchRequestsAndUsers } from '../../actions/';
+import AdminRequests from "./AdminRequests";
 
 interface CheckinContainerProps {
     toastManager: any,
@@ -12,18 +13,20 @@ interface CheckinContainerProps {
 }
 
 interface CheckinContainerState {
-    loading: boolean
+    loading: boolean,
+    search: string
 }
 
 class CheckinContainer extends React.Component<CheckinContainerProps, CheckinContainerState> {
     constructor(props: any) {
         super(props);
         this.state = {
-            loading: false
+            loading: false,
+            search: ""
         };
     }
 
-    componentWillMount() { // Refresh store
+    componentWillMount() {
         const { fetchRequestsAndUsers } = this.props;
         this.setState({
             loading: true
@@ -32,39 +35,57 @@ class CheckinContainer extends React.Component<CheckinContainerProps, CheckinCon
     }
 
     componentDidUpdate() {
-        const { loading } = this.state;
+        const { loading } = this.state; // TODO: error handling
         if (loading) {
             this.setState({loading: false});    
         }
     }
 
+    updateFilter = (e: any) => {
+        this.setState({
+            search: e.target.value.trim()
+        });
+    }
     /* 
-     * Plan: Two views, a search for users, and a search for requests (filtered by name)
-     * User search is kind of optional, but brings up a face if necessary (Another milestone) 
+     * TODO: User's profile pulls up on the side
     **/
     render() {
-        const { loading } = this.state;
+        const { loading, search } = this.state;
 
-        const loadingState = (
+        const RequestsWrapper = (
             <Container>
-                Loading
-            </Container>
-        );
-
-        const loadedState = (
-            <Container>
-                Loaded
+                <Segment attached>
+                    <Input 
+                        value={search} onChange={this.updateFilter}
+                        placeholder="Name..."
+                        label="Filter by Requester"
+                    />
+                </Segment>
+                <Segment attached>
+                    <Dimmer active={loading} inverted>
+                        <Loader inverted>Checking it Twice...</Loader>
+                    </Dimmer>
+                    { loading ? <div style={styles.empty}></div> : <AdminRequests filter={search} /> }
+                </Segment>
             </Container>
         );
 
         return (
-            <div id="checkin-wrapper">
-                <Header>
-                    Item Checkin Return
-                </Header>
-                {loading ? loadingState : loadedState}
-            </div>
+            <Container id="checkin-wrapper">
+                <Segment>
+                    <Header>
+                        Item Checkin Return
+                    </Header>
+                </Segment>
+                { RequestsWrapper }
+            </Container>
         );
+    }
+}
+
+const styles = {
+    empty: {
+        height: '200px',
     }
 }
 
