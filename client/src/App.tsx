@@ -27,7 +27,7 @@ class App extends Component<Props, {}> {
         return new Promise(resolve => setTimeout(() => resolve({
             "uuid": "abcdedf-afdhkasdf-adfsk",
             "name": "Evan Strat",
-            "isAdmin": false
+            "isAdmin": true
         }), 5000));
     }
 
