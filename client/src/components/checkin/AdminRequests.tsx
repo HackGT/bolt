@@ -120,11 +120,11 @@ class AdminRequest extends React.Component<RequestProps, RequestState> {
                                 Returned
                             </Button>
                             <Button.Or />
-                            <Button style={styles.button} color={StatusToColor(ItemStatus.LOST)} onClick={this.updateStatusFactory(ItemStatus.LOST)}>
+                            <Button basic style={styles.button} color={StatusToColor(ItemStatus.LOST)} onClick={this.updateStatusFactory(ItemStatus.LOST)}>
                                 Lost
                             </Button>
                             <Button.Or />
-                            <Button style={styles.button} color={StatusToColor(ItemStatus.DAMAGED)} onClick={this.updateStatusFactory(ItemStatus.DAMAGED)}>
+                            <Button basic style={styles.button} color={StatusToColor(ItemStatus.DAMAGED)} onClick={this.updateStatusFactory(ItemStatus.DAMAGED)}>
                                 Damaged
                             </Button>
                         </Button.Group>
