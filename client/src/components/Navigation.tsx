@@ -16,27 +16,43 @@ type Props = StateProps & OwnProps;
 
 class Navigation extends React.Component<Props, {}> {
     render() {
-        const loginLink = (!this.props.user) ? (<Menu.Item><a href="/auth/login">Sign in</a></Menu.Item>) : '';
+        const { user } = this.props;
 
-        const userProfile = (this.props.user) ? (
-            <Menu.Item><Icon name="user"/> {this.props.user.name}</Menu.Item>
+        const homeLink = (<Link to="/">
+            <Menu.Item name="inventory">
+                <Icon name="home"/>Inventory
+            </Menu.Item>
+        </Link>);
+
+        const loginLink = !user ? (<a href="/auth/login"><Menu.Item>Sign in</Menu.Item></a>) : null;
+
+        const userProfile = (user) ? (
+            <Menu.Item><Icon name="user"/> {user.name}</Menu.Item>
         ) : ('');
 
-        const logoutLink = (this.props.user) ? (
-            <Menu.Item><a href="/auth/logout">Sign out</a></Menu.Item>
-        ) : ('');
+        const logoutLink = (user) ? (<a href="/auth/logout">
+            <Menu.Item>Sign out</Menu.Item>
+        </a>) : null;
 
-        const importLink = this.props.user && this.props.user.isAdmin ? (<Menu.Item name="admin">
-            <Icon name="file"/><Link to="/admin/csv">Import</Link>
-        </Menu.Item>) : '';
+        const importLink = user && user.isAdmin ? (<Link to="/admin/csv">
+            <Menu.Item>
+                <Icon name="file"/>Import
+            </Menu.Item>
+        </Link>) : null;
+
+        const checkinLink = user && user.isAdmin ? (<Link to="/admin/checkin">
+            <Menu.Item>
+                <Icon name="clipboard" />
+                Checkin
+            </Menu.Item>
+        </Link>): null;
 
         return (
             <Menu stackable>
                 <Menu.Item header>HackGT Hardware</Menu.Item>
-                <Menu.Item name="inventory">
-                    <Icon name="home"/><Link to="/">Inventory</Link>
-                </Menu.Item>
+                {homeLink}
                 {importLink}
+                {checkinLink}
                 {loginLink}
                 {userProfile}
                 {logoutLink}

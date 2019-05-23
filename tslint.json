@@ -10,6 +10,7 @@
       "double",
       "avoid-escape"
     ],
+    "max-classes-per-file": false,
     "interface-name": [false],
     "no-empty-interface": false,
     "no-namespace": false,
@@ -57,7 +58,6 @@
     "no-switch-case-fall-through": true,
     "typedef": [
       true,
-      "call-signature",
       "parameter"
     ],
     "trailing-comma": [

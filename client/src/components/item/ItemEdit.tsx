@@ -59,7 +59,7 @@ class ItemEdit extends Component<ItemEditProps, ItemEditState> {
     finishedLoadingItemData() {
         this.setState({
             item: {
-                id: 3,
+                id: "3a",
                 category: "Microcontrollers",
                 name: "Raspberry Pi 3",
                 totalQty: 50,

@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 import {User} from "../../actions/actions";
 
 export interface Item {
-    id: number,
+    id: string,
     name: string, // name of this item
     description: string, // brief description
     totalQty: number,
@@ -15,7 +15,7 @@ export interface Item {
 }
 
 export interface RequestedItem {
-    id: number,
+    id: string,
     user: string,
     name: string,
     qtyRequested: number,
@@ -25,15 +25,15 @@ export interface RequestedItem {
 }
 
 export enum ItemStatus {
-    SUBMITTED = "yellow",
-    APPROVED = "orange",
-    DECLINED = "red",
-    CANCELLED = "red",
-    READY = "blue",
-    FULFILLED = "green",
-    RETURNED = "grey",
-    LOST = "red",
-    DAMAGED = "red"
+    SUBMITTED = "submitted",
+    APPROVED = "approved",
+    DECLINED = "declined",
+    CANCELLED = "cancelled",
+    READY = "ready",
+    FULFILLED = "fulfilled",
+    RETURNED = "returned",
+    LOST = "lost",
+    DAMAGED = "damaged"
 }
 
 interface HardwareItem {
