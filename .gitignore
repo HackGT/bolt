@@ -4,6 +4,7 @@ node_modules/
 client/node_modules/
 server/node_modules/
 node_modules
-server/config/config.json
+server/src/config/config.json
 server/build/
 *.js
+server/src/api/api.graphql.ts

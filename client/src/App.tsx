@@ -28,17 +28,37 @@ class App extends Component<Props, {}> {
         return new Promise(resolve => setTimeout(() => resolve({
             uuid: "abcdedf-afdhkasdf-adfsk",
             name: "Evan Strat",
-            isAdmin: true
+            admin: true
         }), 5000));
     }
 
     public async componentWillMount(): Promise<void> {
-        const user: User = await this.checkAuth();
+        const userRequest = await fetch("/api", {
+            credentials: "include",
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query: `
+                        query {
+                          user {
+                            uuid
+                            name
+                            admin
+                          }
+                        }
+                    `
+            }),
+        });
+        const json = await userRequest.json();
+        const user = json.data.user;
         console.log(user);
         if (user) {
             store.dispatch(setUser(user));
         }
     }
+
 
     public render() {
         return (

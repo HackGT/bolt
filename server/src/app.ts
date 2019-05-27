@@ -66,8 +66,11 @@ process.on("unhandledRejection", err => {
 });
 
 // Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
-import { authRoutes } from "./auth/auth";
+import {authRoutes, isAuthenticated} from "./auth/auth";
 app.use("/auth", authRoutes);
+
+import { apiRoutes } from "./api/api";
+app.use("/api", isAuthenticated, apiRoutes);
 
 app.route("/version").get((request, response) => {
     response.json({
@@ -77,8 +80,8 @@ app.route("/version").get((request, response) => {
 });
 
 // Serve React app
-app.use(serveStatic(path.join(__dirname, "../../client/build")));
-app.get("*", (request, response) => {
+app.use(isAuthenticated, serveStatic(path.join(__dirname, "../../client/build")));
+app.get("*", isAuthenticated, (request, response) => {
     response.sendFile(path.join(__dirname, "../../client/build", "index.html"));
 });
 

@@ -1,11 +1,12 @@
-import React from 'react';
+import React from "react";
 import HardwareItem from "./HardwareItem";
 import {Icon, Item, Message, Grid, Header} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
-import {RequestedItem} from "../inventory/HardwareItem"
+import {RequestedItem} from "../inventory/HardwareItem";
 import {AppState} from "../../reducers/reducers";
 import {connect} from "react-redux";
-import {User} from "../../actions/actions";
+import {setUser, User} from "../../actions/actions";
+import {store} from "../../store";
 
 const sampleData = [
     {
@@ -55,14 +56,14 @@ const sampleData = [
 ];
 
 export interface OwnProps {
-    requestsEnabled: boolean,
-    handleAddItem: (item: RequestedItem) => void,
-    qtyUpdate: RequestedItem | null
+    requestsEnabled: boolean;
+    handleAddItem: (item: RequestedItem) => void;
+    qtyUpdate: RequestedItem | null;
 }
 
 interface StateProps {
-    a: number
-    user: User|null
+    a: number;
+    user: User|null;
 }
 
 type Props = StateProps & OwnProps;
@@ -77,17 +78,44 @@ export class HardwareList extends React.Component<Props, { loading: boolean }> {
         this.dataCallback = this.dataCallback.bind(this);
     }
 
-    dataCallback() {
+    public dataCallback() {
         this.setState({
             loading: false
         });
     }
 
-    componentDidMount(): void {
+    public async componentWillMount(): Promise<void> {
+        const userRequest = await fetch("/api", {
+            credentials: "include",
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query: `
+                        query {
+                          user {
+                            uuid
+                            name
+                            admin
+                          }
+                        }
+                    `
+            }),
+        });
+        const json = await userRequest.json();
+        const user = json.data.user;
+        console.log(user);
+        if (user) {
+            store.dispatch(setUser(user));
+        }
+    }
+
+    public componentDidMount(): void {
         setTimeout(this.dataCallback, 3000);
     }
 
-    render() {
+    public render() {
         console.log(this.props.requestsEnabled && !this.props.user , this.props.requestsEnabled, this.props.user);
 
         let noRequestsMessageText = "";
@@ -101,12 +129,12 @@ export class HardwareList extends React.Component<Props, { loading: boolean }> {
         const noRequestsMessage = this.props.requestsEnabled && !this.props.user ? (<Message
             title="View-only inventory"
             warning icon>
-            <Icon name='warning sign'/>
+            <Icon name="warning sign"/>
             {noRequestsMessageText}
-        </Message>) : '';
+        </Message>) : "";
 
         sampleData.sort((a, b) => {
-            return a.category.toLocaleLowerCase().localeCompare(b.category.toLocaleLowerCase()) || a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase())
+            return a.category.toLocaleLowerCase().localeCompare(b.category.toLocaleLowerCase()) || a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase());
         });
         const normalContent = (<Item.Group>
             {sampleData.map((item) => (
@@ -136,7 +164,7 @@ export class HardwareList extends React.Component<Props, { loading: boolean }> {
                         {noRequestsMessage}
                         {this.state.loading ? loading : normalContent}
                 </div>
-        )
+        );
     }
 }
 
@@ -144,7 +172,7 @@ function mapStateToProps(state: AppState) {
     return {
         a: state.a,
         user: state.user
-    }
+    };
 }
 
 

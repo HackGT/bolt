@@ -6,8 +6,9 @@ import {store} from "../../store";
 
 function userIsAdmin() {
     const state = store.getState();
-    console.log(state.user, state.user !== null && state.user.isAdmin)
-    return state.user !== null && state.user.isAdmin;
+    console.log(state.user, state.user !== null && state.user.admin);
+    console.log("User is admin: ", state.user !== null && state.user.admin)
+    return state.user !== null && state.user.admin;
 }
 
 function PrivateRoute({ component: Component, ...rest }: any) {
@@ -34,7 +35,7 @@ function mapStateToProps(state: AppState) {
     return {
         a: state.a,
         user: state.user
-    }
+    };
 }
 
 export default connect(mapStateToProps) (PrivateRoute);

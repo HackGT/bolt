@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 import {match, Route} from "react-router";
 import ItemEdit from "./ItemEdit";
 
 class ItemWrapper extends Component<{ match: match }> {
-    render() {
+    public render() {
         return (
             <div>
                 <Route path={`${this.props.match.url}/:itemId`} component={ItemEdit}/>
