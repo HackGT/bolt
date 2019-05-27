@@ -21,10 +21,15 @@ Required environment variables
 | secrets.admins.domains | Email domains that will result in a user being automatically made an admin
 | secrets.admins.emails | Email address that will result in a user being automatically made an admin
 
-Useful URLs
+Development
 -----
 - For local development:
   - Access server endpoints, such as authentication, using the development server.
   - For frontend development, run `npm start` inside the `/client` directory.
 - You can find GraphiQL at `/api/graphiql`, but note that this endpoint is restricted to admin users.  For local development,
 promote your account to an admin in order to access GraphiQL.
+
+Code Style
+====
+Code style is enforced by tslint.  The project standard is 4-space indentation; please ensure that any files you change
+comply with this.
