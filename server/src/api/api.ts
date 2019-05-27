@@ -5,14 +5,15 @@ import * as path from "path";
 import express from "express";
 import graphqlHTTP from "express-graphql";
 import {buildSchema, GraphQLError} from "graphql";
+import {QueryResolvers} from "./api.graphql";
+import {DB} from "../database";
+import {isAdminNoAuthCheck} from "../auth/auth";
 
 const schemaFile = path.join(__dirname, "./api.graphql");
 const schema = buildSchema(fs.readFileSync(schemaFile, { encoding: "utf8" }));
 
 export const apiRoutes = express.Router();
 
-import { QueryResolvers } from "./api.graphql";
-import {DB} from "../database";
 // Helper function for incorrect typedefs
 // express-graphql does not have a `root` parameter as the first argument but code-gen puts it there anyway
 function fixArguments<A, B, C>(fakeRoot: A, fakeArgs: B, fakeContext: C): { args: B, context: C } {
@@ -93,7 +94,7 @@ apiRoutes.post("/", graphqlHTTP({
     graphiql: false
 }));
 
-apiRoutes.all("/graphiql", graphqlHTTP({
+apiRoutes.all("/graphiql", isAdminNoAuthCheck, graphqlHTTP({
     schema,
     rootValue: resolvers,
     graphiql: true
