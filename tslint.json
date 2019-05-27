@@ -56,6 +56,7 @@
       "ignore-params"
     ],
     "no-switch-case-fall-through": true,
+    "prefer-for-of": false,
     "typedef": [
       true,
       "parameter"

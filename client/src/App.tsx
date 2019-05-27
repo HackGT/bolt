@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
-import {ToastProvider} from 'react-toast-notifications';
+import {ToastProvider} from "react-toast-notifications";
 import HomeContainer from "./components/HomeContainer";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import CSVWizard from "./components/csv/CSVWizard";
@@ -17,22 +17,22 @@ import RequestManagementContainer from "./components/RequestManagementContainer"
 export interface OwnProps {}
 
 interface StateProps {
-    a: number
-    user: User|null
+    a: number;
+    user: User|null;
 }
 
 type Props = StateProps & OwnProps;
 
 class App extends Component<Props, {}> {
-    async checkAuth(): Promise<User> {
+    public async checkAuth(): Promise<User> {
         return new Promise(resolve => setTimeout(() => resolve({
-            "uuid": "abcdedf-afdhkasdf-adfsk",
-            "name": "Evan Strat",
-            "isAdmin": true
+            uuid: "abcdedf-afdhkasdf-adfsk",
+            name: "Evan Strat",
+            isAdmin: true
         }), 5000));
     }
 
-    async componentWillMount(): Promise<void> {
+    public async componentWillMount(): Promise<void> {
         const user: User = await this.checkAuth();
         console.log(user);
         if (user) {
@@ -40,12 +40,12 @@ class App extends Component<Props, {}> {
         }
     }
 
-    render() {
+    public render() {
         return (
             <div style={{
-                width: '100%',
+                width: "100%",
                 maxWidth: 960,
-                margin: '0 auto'
+                margin: "0 auto"
             }}>
                 <Router>
                     <ToastProvider placement="top-center">
@@ -70,7 +70,7 @@ function mapStateToProps(state: AppState) {
     return {
         a: state.a,
         user: state.user
-    }
+    };
 }
 
 export default connect(mapStateToProps) (App);
