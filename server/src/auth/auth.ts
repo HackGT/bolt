@@ -63,7 +63,6 @@ export function isAdmin(request: express.Request, response: express.Response, ne
 
 export function isAdminNoAuthCheck(request: express.Request, response: express.Response, next: express.NextFunction): void {
     if (request.user && request.user.admin) {
-        console.log("inside");
         next();
         return; // Prevents a "Can't set headers after they are sent" error
     }
