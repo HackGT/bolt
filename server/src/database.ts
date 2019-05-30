@@ -1,9 +1,9 @@
-import { config } from "./common";
-
+import {config} from "./common";
 //
 // Database connection
 //
 import knex from "knex";
+
 const DBConfig: knex.Config = {
     client: "pg",
     connection: config.server.postgresURL,
@@ -88,7 +88,7 @@ createTable("users", table => {
         table.text("item_name").notNullable();
         table.text("description").notNullable();
         table.text("imageUrl").notNullable();
-        table.integer("category_id").unsigned().references("category_id").inTable("categories");
+        table.integer("category_id").unsigned().references("category_id").inTable("categories").notNullable();
         table.integer("totalAvailable").notNullable();
         table.integer("maxRequestQty").notNullable();
         table.decimal("price", 6, 2).nullable().defaultTo(0);

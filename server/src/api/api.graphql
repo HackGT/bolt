@@ -23,7 +23,7 @@ type User {
 
 type Item {
 	id: Int!
-	name: String!
+	item_name: String!
 	description: String!
 	imageUrl: String!
 	category: String!
@@ -44,7 +44,7 @@ type Item {
 }
 
 input ItemInput {
-    name: String!
+	item_name: String!
     description: String!
     imageUrl: String!
     category: String!

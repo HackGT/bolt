@@ -79,13 +79,11 @@ const resolvers: QueryResolvers<express.Request> | MutationResolvers<express.Req
 
         console.log({
             id: item.item_id,
-            name: item.item_name,
             category: item.category_name,
             ...item
         });
         return {
             id: item.item_id,
-            name: item.item_name,
             category: item.category_name,
 
             ...item
@@ -109,7 +107,6 @@ const resolvers: QueryResolvers<express.Request> | MutationResolvers<express.Req
         return items.map(item => {
             return {
                 id: item.item_id,
-                name: item.item_name,
                 category: item.category_name,
                 ...item
             };
@@ -135,23 +132,57 @@ const resolvers: QueryResolvers<express.Request> | MutationResolvers<express.Req
             throw new GraphQLError("You do not have permission to access the createItem endpoint");
         }
 
-        const newObjId = await DB.from("items").insert(args.newItem).returning("item_id");
+        if (!args.newItem.item_name.trim().length) {
+            throw new GraphQLError("The item name (item_name) can't be empty.");
+        }
 
-        console.log("The new item's ID is", newObjId);
+        if (!args.newItem.category.trim().length) {
+            throw new GraphQLError("The category for this item can't be blank.");
+        }
+
+        if (args.newItem.totalAvailable < 0) {
+            throw new GraphQLError(`The total quantity available (totalQtyAvailable) for a new item can't be less than 0.  Value provided: ${args.newItem.totalAvailable}`);
+        }
+
+        if (args.newItem.maxRequestQty < 1) {
+            throw new GraphQLError(`The max request quantity (maxRequestQty) must be at least 1.  Value provided: ${args.newItem.maxRequestQty}`);
+        }
+
+        if (args.newItem.maxRequestQty > args.newItem.totalAvailable) {
+            throw new GraphQLError(`The max request quantity (maxRequestQty) can't be greater than the total quantity of this item (totalAvailable) that is available.  maxRequestQty: ${args.newItem.maxRequestQty}, totalAvailable: ${args.newItem.totalAvailable}`);
+        }
+
+        const matchingCategories = await DB.from("categories").where({
+            category_name: args.newItem.category
+        });
+
+        let categoryId;
+        if (!matchingCategories.length) {
+            // TODO: what is there's an error here?
+            // TODO: currently the category name must be an exact match
+            categoryId = await DB.from("categories").insert({
+                category_name: args.newItem.category
+            }).returning("category_id");
+            console.log(categoryId);
+            categoryId = categoryId[0];
+            console.log(`No existing category named "${args.newItem.category}".  Created a new category with ID ${categoryId}.`);
+        } else {
+            categoryId = matchingCategories[0].category_id;
+            console.log(`Existing category named "${args.newItem.category}" found with ID ${categoryId}.`);
+        }
+
+        delete args.newItem.category; // Remove the category property from the input item so knex won't try to add it to the database
+
+        const newObjId = await DB.from("items").insert({
+            category_id: categoryId,
+            ...args.newItem
+        }).returning("item_id");
+
+        console.log("The new item's ID is", newObjId[0]);
 
         return {
-            id: 3,
-            name: "Arduino",
-            description: "",
-            imageUrl: "",
-            category: "A",
-            totalAvailable: 3,
-            maxRequestQty: 3,
-            price: 3,
-            hidden: true,
-            returnRequired: true,
-            approvalRequired: true,
-            owner: ""
+            id: newObjId[0],
+            ...args.newItem
         };
     },
 };
