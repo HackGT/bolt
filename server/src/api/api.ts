@@ -120,6 +120,7 @@ const resolvers: QueryResolvers<express.Request> | MutationResolvers<express.Req
     /**
      * Create a new item
      * TODO: implement
+     * TODO: error handling?
      * Access level: admins
      * @param root
      * @param _args
@@ -133,6 +134,10 @@ const resolvers: QueryResolvers<express.Request> | MutationResolvers<express.Req
         if (!context.user.admin) {
             throw new GraphQLError("You do not have permission to access the createItem endpoint");
         }
+
+        const newObjId = await DB.from("items").insert(args.newItem).returning("item_id");
+
+        console.log("The new item's ID is", newObjId);
 
         return {
             id: 3,
