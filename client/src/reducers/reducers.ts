@@ -1,13 +1,19 @@
-import {Action} from "redux";
-import {SetUserAction, TestAction, GenericAction, RequestsAndUsersAction, RequestStatusAction, User} from "../actions/";
-import {types} from "../actions/";
-import { RequestedItem } from "../components/inventory/HardwareItem";
+import {
+    GenericAction,
+    RequestsAndUsersAction,
+    RequestStatusAction,
+    SetUserAction,
+    TestAction,
+    types,
+    User
+} from "../actions/";
+import {RequestedItem} from "../components/inventory/HardwareItem";
 
 export interface AppState {
-    a: number,
-    user: User|null,
-    users: User[],
-    requests: RequestedItem[]
+    a: number;
+    user: User | null;
+    users: User[];
+    requests: RequestedItem[];
 }
 
 const defaultState: AppState = {
@@ -23,7 +29,7 @@ const defaultAction: GenericAction = {
 
 const reducers = (state = defaultState, action: SetUserAction|TestAction|GenericAction = defaultAction) => {
     switch (action.type) {
-        case 'SET_USER':
+        case "SET_USER":
             return {
                 ...state,
                 user: (action as SetUserAction).user
@@ -38,14 +44,16 @@ const reducers = (state = defaultState, action: SetUserAction|TestAction|Generic
         case types.REQUEST_STATUS:
             const { requestId, status } = (action as RequestStatusAction);
             const { requests: stateRequests } = state;
-            const reqIndex = stateRequests.findIndex(req => req.id == requestId);
-            if (reqIndex == -1) {
+            const reqIndex = stateRequests.findIndex(req => req.id === requestId);
+            if (reqIndex === -1) {
                 console.error("State mismatch, request not found");
                 return state;
-            } 
+            }
             const newRequests = stateRequests.map((req, i) => {
-                if (i == reqIndex) return {...stateRequests[reqIndex], status};
-                return stateRequests[i] 
+                if (i === reqIndex) {
+                    return {...stateRequests[reqIndex], status};
+                }
+                return stateRequests[i];
             });
             return {
                 ...state,

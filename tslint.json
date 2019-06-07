@@ -15,6 +15,7 @@
     "interface-over-type-literal": false,
     "no-empty-interface": false,
     "no-namespace": false,
+    "no-trailing-whitespace": false,
     "ordered-imports": false,
     "object-literal-sort-keys": false,
     "arrow-parens": false,

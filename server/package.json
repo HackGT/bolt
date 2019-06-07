@@ -59,7 +59,7 @@
     "pg": "^7.9.0",
     "striptags": "^3.1.1",
     "tslint": "^5.14.0",
-    "typescript": "^3.4.1",
+    "typescript": "~3.4.1",
     "webpack": "^4.29.6"
   },
   "devDependencies": {

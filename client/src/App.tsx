@@ -24,14 +24,6 @@ interface StateProps {
 type Props = StateProps & OwnProps;
 
 class App extends Component<Props, {}> {
-    public async checkAuth(): Promise<User> {
-        return new Promise(resolve => setTimeout(() => resolve({
-            uuid: "abcdedf-afdhkasdf-adfsk",
-            name: "Evan Strat",
-            admin: true
-        }), 5000));
-    }
-
     public async componentWillMount(): Promise<void> {
         const userRequest = await fetch("/api", {
             credentials: "include",

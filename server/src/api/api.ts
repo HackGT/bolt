@@ -153,7 +153,7 @@ const resolvers: any = {
 
         let categoryId;
         if (!matchingCategories.length) {
-            // TODO: what is there's an error here?
+            // TODO: what if there's an error here?
             // TODO: currently the category name must be an exact match
             categoryId = await DB.from("categories").insert({
                 category_name: args.newItem.category

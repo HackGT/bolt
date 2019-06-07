@@ -1,12 +1,14 @@
 import React from "react";
 import HardwareItem from "./HardwareItem";
-import {Icon, Item, Message, Grid, Header} from "semantic-ui-react";
+import {Header, Icon, Item, Message} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
 import {RequestedItem} from "../inventory/HardwareItem";
 import {AppState} from "../../reducers/reducers";
 import {connect} from "react-redux";
-import {setUser, User} from "../../actions/actions";
-import {store} from "../../store";
+import {User} from "../../actions/actions";
+import Query from "react-apollo/Query";
+import {HwItem} from "../../types/ItemType";
+import gql from "graphql-tag";
 
 const sampleData = [
     {
@@ -55,6 +57,7 @@ const sampleData = [
     },
 ];
 
+
 export interface OwnProps {
     requestsEnabled: boolean;
     handleAddItem: (item: RequestedItem) => void;
@@ -68,103 +71,116 @@ interface StateProps {
 
 type Props = StateProps & OwnProps;
 
-export class HardwareList extends React.Component<Props, { loading: boolean }> {
+export class HardwareList extends React.Component<Props, { isLoading: boolean }> {
 
     constructor(props: Props) {
         super(props);
         this.state = {
-            loading: true
+            isLoading: true
         };
-        this.dataCallback = this.dataCallback.bind(this);
     }
 
-    public dataCallback() {
-        this.setState({
-            loading: false
-        });
-    }
-
-    public async componentWillMount(): Promise<void> {
-        const userRequest = await fetch("/api", {
-            credentials: "include",
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                query: `
-                        query {
-                          user {
-                            uuid
-                            name
-                            admin
-                          }
-                        }
-                    `
-            }),
-        });
-        const json = await userRequest.json();
-        const user = json.data.user;
-        console.log(user);
-        if (user) {
-            store.dispatch(setUser(user));
-        }
-    }
-
-    public componentDidMount(): void {
-        setTimeout(this.dataCallback, 3000);
-    }
 
     public render() {
-        console.log(this.props.requestsEnabled && !this.props.user , this.props.requestsEnabled, this.props.user);
+        return <Query
+            query={gql`
+                query {
+                    items {
+                        id
+                        item_name
+                        description
+                        imageUrl
+                        category
+                        totalAvailable
+                        maxRequestQty
+                        hidden
+                        approvalRequired
+                        returnRequired
+                        owner
+                    }
+                }
+            `}>
+            {({loading, error, data}: any) => {
+                if (error) {
+                    console.log("error", error);
+                }
+                // TODO: come back to this
+                if (loading) {
+                    return (
+                        <div>
+                            <Header>Inventory</Header>
+                            const loadingGroup = (<Item.Group>
+                            <PlaceholderItem/>
+                            <PlaceholderItem/>
+                            <PlaceholderItem/>
+                        </Item.Group>);
+                        </div>
+                    );
+                }
+                if (error) {
+                    return <Message negative>
+                        <Message.Header>Error displaying hardware inventory</Message.Header>
+                        <p>Try refreshing the page. If that doesn't work, contact a member of the HackGT Team for
+                            assistance.</p>
+                    </Message>;
+                }
 
-        let noRequestsMessageText = "";
+                let noRequestsMessageText = "";
 
-        if (!this.props.requestsEnabled) {
-            noRequestsMessageText = "Hardware checkout requests can't be made at this time.";
-        } else if (this.props.requestsEnabled && !this.props.user) {
-            noRequestsMessageText = "Sign in to request hardware.";
-        }
+                if (!this.props.requestsEnabled) {
+                    noRequestsMessageText = "Hardware checkout requests can't be made at this time.";
+                } else if (this.props.requestsEnabled && !this.props.user) {
+                    noRequestsMessageText = "Sign in to request hardware.";
+                }
 
-        const noRequestsMessage = this.props.requestsEnabled && !this.props.user ? (<Message
-            title="View-only inventory"
-            warning icon>
-            <Icon name="warning sign"/>
-            {noRequestsMessageText}
-        </Message>) : "";
+                const noRequestsMessage = this.props.requestsEnabled && !this.props.user ? (<Message
+                    title="View-only inventory"
+                    warning icon>
+                    <Icon name="warning sign"/>
+                    {noRequestsMessageText}
+                </Message>) : "";
+                console.log(loading, error, data);
+                let normalContent = (<p>Oops, there's no items! <small>Well, this is awkward.</small></p>);
+                if (data.items) {
+                    data.items.sort((a: HwItem, b: HwItem) => {
+                        return a.category.toLocaleLowerCase().localeCompare(b.category.toLocaleLowerCase())
+                            || a.item_name.toLocaleLowerCase().localeCompare(b.item_name.toLocaleLowerCase());
+                    });
 
-        sampleData.sort((a, b) => {
-            return a.category.toLocaleLowerCase().localeCompare(b.category.toLocaleLowerCase()) || a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase());
-        });
-        const normalContent = (<Item.Group>
-            {sampleData.map((item) => (
-                <HardwareItem name={item.name}
-                              description={item.description}
-                              requestsEnabled={this.props.requestsEnabled && this.props.user}
-                              qtyRemaining={item.qtyRemaining}
-                              totalQty={item.totalQty}
-                              maxReqQty={item.maxReqQty}
-                              category={item.category}
-                              key={item.id}
-                              id={item.id}
-                              addItem={this.props.handleAddItem} // prop that invokes the handleAddItem method of parent container to update its state
-                              qtyUpdate={this.props.qtyUpdate} // this prop is the object whose request has been cancelled
-                              user={this.props.user}
-                />))}
-        </Item.Group>);
-        const loading = (<Item.Group>
-            <PlaceholderItem/>
-            <PlaceholderItem/>
-            <PlaceholderItem/>
-        </Item.Group>);
 
-        return (
-                <div>
+                    normalContent = (<Item.Group>
+                        {data.items.map((item: HwItem) => (
+                            <HardwareItem name={item.item_name}
+                                          description={item.description}
+                                          requestsEnabled={this.props.requestsEnabled && this.props.user}
+                                          qtyRemaining={0}
+                                          totalQty={item.totalAvailable}
+                                          maxReqQty={item.maxRequestQty}
+                                          category={item.category}
+                                          key={item.id}
+                                          id={item.id}
+                                          addItem={this.props.handleAddItem} // prop that invokes the handleAddItem method of parent container to update its state
+                                          qtyUpdate={this.props.qtyUpdate} // this prop is the object whose request has been cancelled
+                                          user={this.props.user}
+                            />))}
+                    </Item.Group>);
+                }
+
+
+                return (
+                    <div>
                         <Header>Inventory</Header>
                         {noRequestsMessage}
-                        {this.state.loading ? loading : normalContent}
-                </div>
-        );
+                        {normalContent}
+                    </div>
+                );
+            }}
+        </Query>;
+
+
+
+
+
     }
 }
 
