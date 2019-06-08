@@ -34,24 +34,40 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
 
 
     public render() {
-        return <Query
+
+        let noRequestsMessageText = "";
+        if (!this.props.requestsEnabled) {
+            noRequestsMessageText = "Hardware checkout requests can't be made at this time.";
+        } else if (this.props.requestsEnabled && !this.props.user) {
+            noRequestsMessageText = "Sign in to request hardware.";
+        }
+
+        console.log(this.props.requestsEnabled);
+        const noRequestsMessage = !this.props.requestsEnabled || !this.props.user ? (<Message
+            title="View-only inventory"
+            warning icon>
+            <Icon name="warning sign"/>
+            {noRequestsMessageText}
+        </Message>) : "";
+
+        const query = <Query
             query={gql`
-                query {
-                    items {
-                        id
-                        item_name
-                        description
-                        imageUrl
-                        category
-                        totalAvailable
-                        maxRequestQty
-                        hidden
-                        approvalRequired
-                        returnRequired
-                        owner
-                    }
-                }
-            `}>
+                        query {
+                            items {
+                                id
+                                item_name
+                                description
+                                imageUrl
+                                category
+                                totalAvailable
+                                maxRequestQty
+                                hidden
+                                approvalRequired
+                                returnRequired
+                                owner
+                            }
+                        }
+                    `}>
             {({loading, error, data}: any) => {
                 if (error) {
                     console.log("error", error);
@@ -59,14 +75,11 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                 // TODO: come back to this
                 if (loading) {
                     return (
-                        <div>
-                            <Header>Inventory</Header>
-                            const loadingGroup = (<Item.Group>
+                        <Item.Group>
                             <PlaceholderItem/>
                             <PlaceholderItem/>
                             <PlaceholderItem/>
-                        </Item.Group>);
-                        </div>
+                        </Item.Group>
                     );
                 }
                 if (error) {
@@ -77,28 +90,18 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                     </Message>;
                 }
 
-                let noRequestsMessageText = "";
+                let normalContent = (
+                    <Message>
+                        <Message.Header>Oops, there's no items!</Message.Header>
+                        <p>Well, this is awkward.</p>
+                    </Message>
+                );
 
-                if (!this.props.requestsEnabled) {
-                    noRequestsMessageText = "Hardware checkout requests can't be made at this time.";
-                } else if (this.props.requestsEnabled && !this.props.user) {
-                    noRequestsMessageText = "Sign in to request hardware.";
-                }
-
-                const noRequestsMessage = this.props.requestsEnabled && !this.props.user ? (<Message
-                    title="View-only inventory"
-                    warning icon>
-                    <Icon name="warning sign"/>
-                    {noRequestsMessageText}
-                </Message>) : "";
-
-                let normalContent = (<p>Oops, there's no items! <small>Well, this is awkward.</small></p>);
                 if (data.items) {
                     data.items.sort((a: HwItem, b: HwItem) => {
                         return a.category.toLocaleLowerCase().localeCompare(b.category.toLocaleLowerCase())
                             || a.item_name.toLocaleLowerCase().localeCompare(b.item_name.toLocaleLowerCase());
                     });
-
 
                     normalContent = (<Item.Group>
                         {data.items.map((item: HwItem) => (
@@ -117,16 +120,17 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                             />))}
                     </Item.Group>);
                 }
-
-                return (
-                    <div>
-                        <Header>Inventory</Header>
-                        {noRequestsMessage}
-                        {normalContent}
-                    </div>
-                );
+                console.log(normalContent);
+                return normalContent;
             }}
         </Query>;
+
+        return (
+            <div>
+                <Header>Inventory</Header>
+                {noRequestsMessage}
+                {query}
+            </div>);
     }
 }
 
