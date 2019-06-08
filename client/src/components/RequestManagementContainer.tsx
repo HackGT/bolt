@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {Grid} from "semantic-ui-react";
 import RequestManagementBoard from "./RequestManagement/RequestManagementBoard";
-import {RequestedItem, ItemStatus} from "./inventory/HardwareItem";
+import {ItemStatus, RequestedItem} from "./inventory/HardwareItem";
 
 const cardStyle = {
     padding: "10px"
@@ -86,15 +86,9 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         this.state = {
             items: sampleItems
         };
-        this.handleApprove = this.handleApprove.bind(this);
-        this.handleDecline = this.handleDecline.bind(this);
-        this.handleCross = this.handleCross.bind(this);
-        this.handleReady = this.handleReady.bind(this);
-        this.handlePrep = this.handlePrep.bind(this);
-        this.handleDone = this.handleDone.bind(this);
     }
 
-    public handleApprove(id: string) {
+    public handleApprove = (id: string) => {
         console.log("handling approve");
         const index = sampleItems.findIndex((item) => {
             return item.id === id;
@@ -103,13 +97,13 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         this.setState({
             items: sampleItems
         });
-    }
+    };
 
-    public handleDecline(id: string) {
+    public handleDecline = (id: string) => {
         console.log("handling decline");
-    }
+    };
 
-    public handleReady(user: string) {
+    public handleReady = (user: string) => {
         for (let i = 0; i < sampleItems.length; i++) {
             if (sampleItems[i].user === user) {
                 sampleItems[i].status = ItemStatus.READY;
@@ -119,9 +113,9 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         this.setState({
             items: sampleItems
         });
-    }
+    };
 
-    public handleDone(user: string) {
+    public handleDone = (user: string) => {
         for (let i = 0; i < sampleItems.length; i++) {
             if (sampleItems[i].user === user) {
                 sampleItems[i].status = ItemStatus.FULFILLED;
@@ -131,9 +125,9 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         this.setState({
             items: sampleItems
         });
-    }
+    };
 
-    public handleCross(user: string) {
+    public handleCross = (user: string) => {
 
         for (let i = 0; i < sampleItems.length; i++) {
             if (sampleItems[i].user === user) {
@@ -144,9 +138,9 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         this.setState({
             items: sampleItems
         });
-    }
+    };
 
-    public handlePrep(user: string) {
+    public handlePrep = (user: string) => {
 
         for (let i = 0; i < sampleItems.length; i++) {
             if (sampleItems[i].user === user) {
@@ -157,7 +151,7 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         this.setState({
             items: sampleItems
         });
-    }
+    };
 
 
     public render() {

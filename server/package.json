@@ -12,7 +12,7 @@
     "generate-api": "node ./node_modules/@graphql-codegen/cli/dist/commonjs/cli.js --config graphql-gen.yml",
     "prestart": "npm run generate-api"
   },
-  "author": "Ryan Petschek",
+  "author": "Ryan Petschek, Evan Strat",
   "license": "MIT",
   "dependencies": {
     "@sendgrid/mail": "^6.3.1",

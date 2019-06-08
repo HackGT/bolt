@@ -1,7 +1,7 @@
-import {Action, ActionCreator} from "redux";
-import { types } from "./";
-import UserMenuItems from "../components/navigation/UserMenuItems";
-import { RequestedItem, ItemStatus } from "../components/inventory/HardwareItem";
+import {ActionCreator} from "redux";
+import {types} from "./";
+import {ItemStatus, RequestedItem} from "../components/inventory/HardwareItem";
+
 export interface User {
     uuid: string;
     admin: boolean;
@@ -26,12 +26,8 @@ export interface LogoutUserAction {
     type: string;
 }
 
-export const testAction: ActionCreator<Action> = () => ({
-    type: "TEST_ACTION"
-});
-
 export const setUser: ActionCreator<SetUserAction> = (user) => ({
-    type: "SET_USER",
+    type: types.SET_USER,
     user
 });
 

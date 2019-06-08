@@ -10,54 +10,6 @@ import Query from "react-apollo/Query";
 import {HwItem} from "../../types/ItemType";
 import gql from "graphql-tag";
 
-const sampleData = [
-    {
-        name: "Arduino Uno",
-        description: "Potato potato let's call the whole thing off",
-        qtyRemaining: 20,
-        totalQty: 30,
-        maxReqQty: 1,
-        returnRequired: true,
-        owner: "The Hive",
-        category: "Microcontrollers",
-        id: "541"
-    },
-    {
-        name: "Mango",
-        description: "The one and only Hardware Queen(TM)",
-        qtyRemaining: 0,
-        totalQty: 1,
-        maxReqQty: 1,
-        returnRequired: true,
-        owner: "Mango",
-        category: "People?",
-        id: "3432"
-    },
-    {
-        name: "Raspberry Pi 3",
-        description: "We heard you like fruit so we put a fruit in ya computer",
-        qtyRemaining: 20,
-        totalQty: 30,
-        maxReqQty: 1,
-        returnRequired: true,
-        owner: "HackGT",
-        category: "Microcontrollers",
-        id: "4642"
-    },
-    {
-        name: "10 Ohm Resistors",
-        description: "Not 9, not 11, 10 Ohms.  The perfect amount",
-        qtyRemaining: 1000,
-        totalQty: 1000,
-        maxReqQty: 10,
-        returnRequired: false,
-        owner: "",
-        category: "Resistors",
-        id: "46234"
-    },
-];
-
-
 export interface OwnProps {
     requestsEnabled: boolean;
     handleAddItem: (item: RequestedItem) => void;
@@ -139,7 +91,7 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                     <Icon name="warning sign"/>
                     {noRequestsMessageText}
                 </Message>) : "";
-                console.log(loading, error, data);
+
                 let normalContent = (<p>Oops, there's no items! <small>Well, this is awkward.</small></p>);
                 if (data.items) {
                     data.items.sort((a: HwItem, b: HwItem) => {
@@ -166,7 +118,6 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                     </Item.Group>);
                 }
 
-
                 return (
                     <div>
                         <Header>Inventory</Header>
@@ -176,11 +127,6 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                 );
             }}
         </Query>;
-
-
-
-
-
     }
 }
 

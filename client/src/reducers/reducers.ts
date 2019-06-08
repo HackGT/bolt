@@ -29,7 +29,7 @@ const defaultAction: GenericAction = {
 
 const reducers = (state = defaultState, action: SetUserAction|TestAction|GenericAction = defaultAction) => {
     switch (action.type) {
-        case "SET_USER":
+        case types.SET_USER:
             return {
                 ...state,
                 user: (action as SetUserAction).user

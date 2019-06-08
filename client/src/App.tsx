@@ -17,7 +17,6 @@ import RequestManagementContainer from "./components/RequestManagementContainer"
 export interface OwnProps {}
 
 interface StateProps {
-    a: number;
     user: User|null;
 }
 
@@ -44,10 +43,15 @@ class App extends Component<Props, {}> {
             }),
         });
         const json = await userRequest.json();
-        const user = json.data.user;
-        console.log(user);
-        if (user) {
-            store.dispatch(setUser(user));
+        console.log(json);
+        if (json && json.data && json.data.user) {
+            const user = json.data.user;
+            console.log(user);
+            if (user) {
+                store.dispatch(setUser(user));
+            }
+        } else {
+            console.error("Invalid user information returned by server, can't sign in:", json);
         }
     }
 
@@ -56,7 +60,7 @@ class App extends Component<Props, {}> {
         return (
             <div style={{
                 width: "100%",
-                maxWidth: 960,
+                maxWidth: "960px",
                 margin: "0 auto"
             }}>
                 <Router>
@@ -80,7 +84,6 @@ class App extends Component<Props, {}> {
 
 function mapStateToProps(state: AppState) {
     return {
-        a: state.a,
         user: state.user
     };
 }
