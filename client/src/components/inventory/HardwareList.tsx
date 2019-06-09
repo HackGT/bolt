@@ -17,7 +17,6 @@ export interface OwnProps {
 }
 
 interface StateProps {
-    a: number;
     user: User|null;
 }
 
@@ -136,7 +135,6 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
 
 function mapStateToProps(state: AppState) {
     return {
-        a: state.a,
         user: state.user
     };
 }
