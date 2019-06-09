@@ -13,6 +13,7 @@ import {AppState} from "./reducers/reducers";
 import {connect} from "react-redux";
 import PrivateRoute from "./components/util/PrivateRoute";
 import RequestManagementContainer from "./components/RequestManagementContainer";
+import AdminOverviewContainer from "./components/admin/AdminOverviewContainer";
 
 export interface OwnProps {}
 
@@ -72,6 +73,7 @@ class App extends Component<Props, {}> {
                             <PrivateRoute path="/admin/checkin" component={CheckinContainer}/>
                             <PrivateRoute path="/item" component={ItemWrapper}/>
                             <PrivateRoute path="/requests" component={RequestManagementContainer}/>
+                            <PrivateRoute path="/admin" component={AdminOverviewContainer}/>
                             <Route component={HomeContainer}/>
                         </Switch>
                         <Footer/>
