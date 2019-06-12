@@ -1,150 +1,142 @@
-import React from 'react';
+import React from "react";
 import HardwareItem from "./HardwareItem";
-import {Icon, Item, Message, Grid, Header} from "semantic-ui-react";
+import {Header, Icon, Item, Message} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
-import {RequestedItem} from "../inventory/HardwareItem"
+import {RequestedItem} from "../inventory/HardwareItem";
 import {AppState} from "../../reducers/reducers";
 import {connect} from "react-redux";
 import {User} from "../../actions/actions";
-
-const sampleData = [
-    {
-        name: "Arduino Uno",
-        description: "Potato potato let's call the whole thing off",
-        qtyRemaining: 20,
-        totalQty: 30,
-        maxReqQty: 1,
-        returnRequired: true,
-        owner: "The Hive",
-        category: "Microcontrollers",
-        id: "541"
-    },
-    {
-        name: "Mango",
-        description: "The one and only Hardware Queen(TM)",
-        qtyRemaining: 0,
-        totalQty: 1,
-        maxReqQty: 1,
-        returnRequired: true,
-        owner: "Mango",
-        category: "People?",
-        id: "3432"
-    },
-    {
-        name: "Raspberry Pi 3",
-        description: "We heard you like fruit so we put a fruit in ya computer",
-        qtyRemaining: 20,
-        totalQty: 30,
-        maxReqQty: 1,
-        returnRequired: true,
-        owner: "HackGT",
-        category: "Microcontrollers",
-        id: "4642"
-    },
-    {
-        name: "10 Ohm Resistors",
-        description: "Not 9, not 11, 10 Ohms.  The perfect amount",
-        qtyRemaining: 1000,
-        totalQty: 1000,
-        maxReqQty: 10,
-        returnRequired: false,
-        owner: "",
-        category: "Resistors",
-        id: "46234"
-    },
-];
+import Query from "react-apollo/Query";
+import {HwItem} from "../../types/ItemType";
+import gql from "graphql-tag";
 
 export interface OwnProps {
-    requestsEnabled: boolean,
-    handleAddItem: (item: RequestedItem) => void,
-    qtyUpdate: RequestedItem | null
+    requestsEnabled: boolean;
+    handleAddItem: (item: RequestedItem) => void;
+    qtyUpdate: RequestedItem | null;
 }
 
 interface StateProps {
-    a: number
-    user: User|null
+    user: User|null;
 }
 
 type Props = StateProps & OwnProps;
 
-export class HardwareList extends React.Component<Props, { loading: boolean }> {
+export class HardwareList extends React.Component<Props, { isLoading: boolean }> {
 
     constructor(props: Props) {
         super(props);
         this.state = {
-            loading: true
+            isLoading: true
         };
-        this.dataCallback = this.dataCallback.bind(this);
     }
 
-    dataCallback() {
-        this.setState({
-            loading: false
-        });
-    }
 
-    componentDidMount(): void {
-        setTimeout(this.dataCallback, 3000);
-    }
-
-    render() {
-        console.log(this.props.requestsEnabled && !this.props.user , this.props.requestsEnabled, this.props.user);
+    public render() {
 
         let noRequestsMessageText = "";
-
         if (!this.props.requestsEnabled) {
             noRequestsMessageText = "Hardware checkout requests can't be made at this time.";
         } else if (this.props.requestsEnabled && !this.props.user) {
             noRequestsMessageText = "Sign in to request hardware.";
         }
 
-        const noRequestsMessage = this.props.requestsEnabled && !this.props.user ? (<Message
+        console.log(this.props.requestsEnabled);
+        const noRequestsMessage = !this.props.requestsEnabled || !this.props.user ? (<Message
             title="View-only inventory"
             warning icon>
-            <Icon name='warning sign'/>
+            <Icon name="warning sign"/>
             {noRequestsMessageText}
-        </Message>) : '';
+        </Message>) : "";
 
-        sampleData.sort((a, b) => {
-            return a.category.toLocaleLowerCase().localeCompare(b.category.toLocaleLowerCase()) || a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase())
-        });
-        const normalContent = (<Item.Group>
-            {sampleData.map((item) => (
-                <HardwareItem name={item.name}
-                              description={item.description}
-                              requestsEnabled={this.props.requestsEnabled && this.props.user}
-                              qtyRemaining={item.qtyRemaining}
-                              totalQty={item.totalQty}
-                              maxReqQty={item.maxReqQty}
-                              category={item.category}
-                              key={item.id}
-                              id={item.id}
-                              addItem={this.props.handleAddItem} // prop that invokes the handleAddItem method of parent container to update its state
-                              qtyUpdate={this.props.qtyUpdate} // this prop is the object whose request has been cancelled
-                              user={this.props.user}
-                />))}
-        </Item.Group>);
-        const loading = (<Item.Group>
-            <PlaceholderItem/>
-            <PlaceholderItem/>
-            <PlaceholderItem/>
-        </Item.Group>);
+        const query = <Query
+            query={gql`
+                        query {
+                            items {
+                                id
+                                item_name
+                                description
+                                imageUrl
+                                category
+                                totalAvailable
+                                maxRequestQty
+                                hidden
+                                approvalRequired
+                                returnRequired
+                                owner
+                            }
+                        }
+                    `}>
+            {({loading, error, data}: any) => {
+                if (error) {
+                    console.log("error", error);
+                }
+                // TODO: come back to this
+                if (loading) {
+                    return (
+                        <Item.Group>
+                            <PlaceholderItem/>
+                            <PlaceholderItem/>
+                            <PlaceholderItem/>
+                        </Item.Group>
+                    );
+                }
+                if (error) {
+                    return <Message negative>
+                        <Message.Header>Error displaying hardware inventory</Message.Header>
+                        <p>Try refreshing the page. If that doesn't work, contact a member of the HackGT Team for
+                            assistance.</p>
+                    </Message>;
+                }
+
+                let normalContent = (
+                    <Message>
+                        <Message.Header>Oops, there's no items!</Message.Header>
+                        <p>Well, this is awkward.</p>
+                    </Message>
+                );
+
+                if (data.items) {
+                    data.items.sort((a: HwItem, b: HwItem) => {
+                        return a.category.toLocaleLowerCase().localeCompare(b.category.toLocaleLowerCase())
+                            || a.item_name.toLocaleLowerCase().localeCompare(b.item_name.toLocaleLowerCase());
+                    });
+
+                    normalContent = (<Item.Group>
+                        {data.items.map((item: HwItem) => (
+                            <HardwareItem name={item.item_name}
+                                          description={item.description}
+                                          requestsEnabled={this.props.requestsEnabled && this.props.user}
+                                          qtyRemaining={0}
+                                          totalQty={item.totalAvailable}
+                                          maxReqQty={item.maxRequestQty}
+                                          category={item.category}
+                                          key={item.id}
+                                          id={item.id}
+                                          addItem={this.props.handleAddItem} // prop that invokes the handleAddItem method of parent container to update its state
+                                          qtyUpdate={this.props.qtyUpdate} // this prop is the object whose request has been cancelled
+                                          user={this.props.user}
+                            />))}
+                    </Item.Group>);
+                }
+                console.log(normalContent);
+                return normalContent;
+            }}
+        </Query>;
 
         return (
-                <div>
-                        <Header>Inventory</Header>
-                        {noRequestsMessage}
-                        {this.state.loading ? loading : normalContent}
-                </div>
-        )
+            <div>
+                <Header>Inventory</Header>
+                {noRequestsMessage}
+                {query}
+            </div>);
     }
 }
 
 function mapStateToProps(state: AppState) {
     return {
-        a: state.a,
         user: state.user
-    }
+    };
 }
 
 

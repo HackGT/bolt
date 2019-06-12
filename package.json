@@ -22,7 +22,7 @@
     "type": "git",
     "url": "git+https://github.com/hackgt/bolt.git"
   },
-  "author": "",
+  "author": "Evan Strat",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/hackgt/bolt/issues"

@@ -1,4 +1,4 @@
-FROM node:10-alpine
+FROM node:12.4-alpine
 
 # Bundle Source
 RUN mkdir -p /usr/src/bolt

@@ -1,50 +1,46 @@
-import {Action, ActionCreator} from "redux";
-import { types } from './';
-import UserMenuItems from "../components/navigation/UserMenuItems";
-import { RequestedItem, ItemStatus } from "../components/inventory/HardwareItem";
+import {ActionCreator} from "redux";
+import {types} from "./";
+import {ItemStatus, RequestedItem} from "../components/inventory/HardwareItem";
+
 export interface User {
-    uuid: string,
-    isAdmin: boolean,
-    name: string
+    uuid: string;
+    admin: boolean;
+    name: string;
 }
 
 export interface TestAction {
-    type: string
+    type: string;
 }
 
 export interface SetUserAction {
-    type: string,
-    user: User|null
+    type: string;
+    user: User|null;
 }
 
 export interface GenericAction {
-    type: string,
-    [key: string]: string
+    type: string;
+    [key: string]: string;
 }
 
 export interface LogoutUserAction {
-    type: string
+    type: string;
 }
 
-export const testAction: ActionCreator<Action> = () => ({
-    type: 'TEST_ACTION'
-});
-
 export const setUser: ActionCreator<SetUserAction> = (user) => ({
-    type: 'SET_USER',
-    "user": user
+    type: types.SET_USER,
+    user
 });
 
 interface RequestsAndUsers {
-    requests: RequestedItem[],
-    users: User[]
+    requests: RequestedItem[];
+    users: User[];
 }
 
 export type RequestsAndUsersAction = RequestsAndUsers & GenericAction;
 
 interface RequestStatus {
-    requestId: string,
-    status: ItemStatus
+    requestId: string;
+    status: ItemStatus;
 }
 
 export type RequestStatusAction = RequestStatus & GenericAction;
@@ -54,7 +50,7 @@ export const fetchRequestsAndUsers = () => {
         return new Promise<RequestsAndUsers>((resolve) => {
             const mock = {
                 users: [{
-                    uuid: "1a", isAdmin: true, name: "Joel"
+                    uuid: "1a", admin: true, name: "Joel"
                 }],
                 requests: [{
                     id: "5b",
@@ -65,8 +61,8 @@ export const fetchRequestsAndUsers = () => {
                     status: ItemStatus.FULFILLED,
                     cancelled: false
                 }]
-            }
-            setTimeout(() => {resolve(mock)}, 1000);
+            };
+            setTimeout(() => {resolve(mock); }, 1000);
         })
         .then((json) => {
             const { users, requests } = json;
@@ -78,13 +74,13 @@ export const fetchRequestsAndUsers = () => {
         })
         .catch((err: string) => {
             throw Error(err);
-        });;
+        });
     };
-}
+};
 
 interface AckResponse {
-    status: string,
-    message: string
+    status: string;
+    message: string;
 }
 
 export const updateRequestStatus = (requestId: string, status: ItemStatus, resolve: any) => {
@@ -93,12 +89,12 @@ export const updateRequestStatus = (requestId: string, status: ItemStatus, resol
             const mock = {
                 status: "ok",
                 message: "Status updated"
-            }
-            setTimeout(() => {resolve(mock)}, 1000);
+            };
+            setTimeout(() => {resolve(mock); }, 1000);
         })
         .then((json) => {
             const { status: responseStatus, message } = json;
-            if (responseStatus === 'ok') {
+            if (responseStatus === "ok") {
                 dispatch({
                     type: types.REQUEST_STATUS,
                     requestId,
@@ -111,5 +107,5 @@ export const updateRequestStatus = (requestId: string, status: ItemStatus, resol
         .catch((err: string) => {
             throw Error(err);
         });
-    }
-}
+    };
+};

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 import {Card, Container, Grid} from "semantic-ui-react";
 import RequestedHardwareItem from "./RequestedHardwareItem";
 import {RequestedItem} from "../inventory/HardwareItem";
@@ -7,21 +7,21 @@ import {UserItemList} from "../RequestManagementContainer";
 
 
 interface RequestManagementBoardProps {
-    title: string,
-    items: RequestedItem[],
-    sortedItems: UserItemList[],
-    sortByUsers: boolean,
-    backToPrep: boolean,
-    handleApprove: (id: number) => void,
-    handleDecline: (id: number) => void,
-    handleReady: (user: string) => void,
-    handleCross: (user: string) => void,
-    handlePrep: (user: string) => void,
-    handleDone: (user: string) => void,
+    title: string;
+    items: RequestedItem[];
+    sortedItems: UserItemList[];
+    sortByUsers: boolean;
+    backToPrep: boolean;
+    handleApprove: (id: string) => void;
+    handleDecline: (id: string) => void;
+    handleReady: (user: string) => void;
+    handleCross: (user: string) => void;
+    handlePrep: (user: string) => void;
+    handleDone: (user: string) => void;
 }
 
 class RequestManagementBoard extends Component<RequestManagementBoardProps, {}> {
-    render() {
+    public render() {
         return this.props.sortByUsers ? (
             <Grid.Column>
                 <h2>{this.props.title}</h2>
@@ -38,7 +38,7 @@ class RequestManagementBoard extends Component<RequestManagementBoardProps, {}> 
                                     handlePrep={this.props.handlePrep}
                                     handleDone={this.props.handleDone}
                                 />
-                            )
+                            );
                         })}
                     </Card.Group>
                 </Container>
@@ -56,7 +56,7 @@ class RequestManagementBoard extends Component<RequestManagementBoardProps, {}> 
                                     handleApprove={this.props.handleApprove}
                                     handleDecline={this.props.handleDecline}
                                 />
-                            )
+                            );
                         })}
                     </Card.Group>
                 </Container>

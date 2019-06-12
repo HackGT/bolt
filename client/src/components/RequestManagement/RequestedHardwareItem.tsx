@@ -3,25 +3,25 @@ import {Button, Card, Label} from "semantic-ui-react";
 import {RequestedItem} from "../inventory/HardwareItem";
 
 interface RequestedHardwareItemProps {
-    item: RequestedItem,
-    handleApprove: (id: number) => void,
-    handleDecline: (id: number) => void,
+    item: RequestedItem;
+    handleApprove: (id: string) => void;
+    handleDecline: (id: string) => void;
 }
-class RequestedHardwareItem extends Component<RequestedHardwareItemProps,{}> {
+class RequestedHardwareItem extends Component<RequestedHardwareItemProps, {}> {
     constructor(props: RequestedHardwareItemProps) {
         super(props);
         this.onClickApprove = this.onClickApprove.bind(this);
         this.onClickDecline = this.onClickDecline.bind(this);
     }
-    onClickApprove() {
+    public onClickApprove() {
         this.props.handleApprove(this.props.item.id);
     }
 
-    onClickDecline() {
+    public onClickDecline() {
         this.props.handleDecline(this.props.item.id);
     }
 
-    render() {
+    public render() {
         return (
             <Card>
               <Card.Content>
@@ -35,17 +35,17 @@ class RequestedHardwareItem extends Component<RequestedHardwareItemProps,{}> {
                 </Card.Description>
               </Card.Content>
               <Card.Content extra>
-                <div className='ui two buttons'>
-                  <Button color='green' onClick={this.onClickApprove}>
+                <div className="ui two buttons">
+                  <Button color="green" onClick={this.onClickApprove}>
                     Approve
                   </Button>
-                  <Button color='red' onClick={this.onClickDecline}>
+                  <Button color="red" onClick={this.onClickDecline}>
                     Decline
                   </Button>
                 </div>
               </Card.Content>
             </Card>
-        )
+        );
     }
 }
 

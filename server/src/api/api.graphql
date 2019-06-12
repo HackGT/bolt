@@ -1,0 +1,65 @@
+type Query {
+	# Get information about the currently logged in user
+	user: User
+	item(id: Int!): Item
+	items: [Item!]
+}
+
+type Mutation {
+	createItem(newItem: ItemInput!): Item!
+}
+
+type User {
+	uuid: ID!
+	name: String!
+	email: String!
+	phone: String!
+	slackUsername: String!
+	# Whether this user's ID has been collected or not
+	haveID: Boolean!
+	# Whether this user has admin permissions
+	admin: Boolean!
+}
+
+type Item {
+	id: Int!
+	item_name: String!
+	description: String!
+	imageUrl: String!
+	category: String!
+	# Total number of this item in the hardware inventory
+	totalAvailable: Int!
+	# The largest quantity of this item that can be requested in one request
+	maxRequestQty: Int!
+	# The value of this item to replace it if lost or damaged
+	price: Float!
+	# Whether to show this item to non-admins on the hardware list
+	hidden: Boolean!
+	# Whether people who check out this item are expected to return it
+	returnRequired: Boolean!
+	# Whether admin approval is required before requests for this item will be processed
+	approvalRequired: Boolean!
+	# The person or organization that owns this item
+	owner: String!
+}
+
+input ItemInput {
+	item_name: String!
+    description: String!
+    imageUrl: String!
+    category: String!
+    # Total number of this item in the hardware inventory
+    totalAvailable: Int!
+    # The largest quantity of this item that can be requested in one request
+    maxRequestQty: Int!
+    # The value of this item to replace it if lost or damaged
+    price: Float!
+    # Whether to show this item to non-admins on the hardware list
+    hidden: Boolean!
+    # Whether people who check out this item are expected to return it
+    returnRequired: Boolean!
+    # Whether admin approval is required before requests for this item will be processed
+    approvalRequired: Boolean!
+    # The person or organization that owns this item
+    owner: String!
+}

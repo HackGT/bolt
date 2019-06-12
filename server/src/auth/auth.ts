@@ -1,22 +1,19 @@
 import * as http from "http";
 import * as https from "https";
-import { URL } from "url";
+import {URL} from "url";
 import * as crypto from "crypto";
 import express from "express";
 import session from "express-session";
 import pgSession from "connect-pg-simple";
 import passport from "passport";
 
-import { findUserByID, IUser } from "../database";
+import {findUserByID, IUser} from "../database";
 
-import { config, COOKIE_OPTIONS } from "../common";
+import {config, COOKIE_OPTIONS} from "../common";
 
-import {
-    AuthenticateOptions, GroundTruthStrategy, createLink, validateAndCacheHostName
-} from "./strategies";
-
+import {AuthenticateOptions, createLink, GroundTruthStrategy, validateAndCacheHostName} from "./strategies";
 // Passport authentication
-import { app } from "../app";
+import {app} from "../app";
 
 if (!config.server.isProduction) {
     console.warn("OAuth callback(s) running in development mode");
@@ -60,8 +57,14 @@ export function isAuthenticated(request: express.Request, response: express.Resp
 
 export function isAdmin(request: express.Request, response: express.Response, next: express.NextFunction): void {
     isAuthenticated(request, response, next);
+    isAdminNoAuthCheck(request, response, next);
+}
+
+
+export function isAdminNoAuthCheck(request: express.Request, response: express.Response, next: express.NextFunction): void {
     if (request.user && request.user.admin) {
         next();
+        return; // Prevents a "Can't set headers after they are sent" error
     }
     response.status(403).send("You are not permitted to access this endpoint");
 }

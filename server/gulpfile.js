@@ -24,7 +24,7 @@ gulp.task("lint", () => {
 });
 
 gulp.task("build:static", () => {
-   return gulp.src(["./src/config/*", "./package.json"])
+   return gulp.src(["./src/config/*", "./package.json", "./src/api/api.graphql"])
        .pipe(gulpCopy("build", { "prefix": 1 }));
 });
 
