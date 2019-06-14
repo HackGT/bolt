@@ -69,7 +69,7 @@ class App extends Component<Props, {}> {
                         <Navigation/>
                         <Switch>
                             <Route path="/" exact component={HomeContainer}/>
-                            <PrivateRoute path="/admin/item" component={ItemWrapper}/>
+                            <PrivateRoute path="/admin/items" component={ItemWrapper}/>
                             <PrivateRoute path="/requests" component={RequestManagementContainer}/>
                             <PrivateRoute path="/admin" component={AdminOverviewContainer}/>
                             <PrivateRoute path="/admin/csv" component={CSVWizard}/>
