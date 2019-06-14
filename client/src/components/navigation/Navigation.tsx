@@ -2,8 +2,8 @@ import React from "react";
 import {Icon, Menu} from "semantic-ui-react";
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
-import {AppState} from "../reducers/reducers";
-import {User} from "../actions/actions";
+import {AppState} from "../../reducers/reducers";
+import {User} from "../../actions";
 
 export interface OwnProps {}
 
@@ -30,35 +30,35 @@ class Navigation extends React.Component<Props, {}> {
             <Menu.Item><Icon name="user"/> {user.name}</Menu.Item>
         ) : ("");
 
+        const adminLink = this.isAdmin() ? (<Link to="/admin">
+            <Menu.Item>
+                <Icon name="setting"/>Admin
+            </Menu.Item>
+        </Link>) : null;
+
         const logoutLink = (user) ? (<a href="/auth/logout">
             <Menu.Item>Sign out</Menu.Item>
         </a>) : null;
 
-        const importLink = user && user.admin ? (<Link to="/admin/csv">
-            <Menu.Item>
-                <Icon name="file"/>Import
-            </Menu.Item>
-        </Link>) : null;
-
-        const checkinLink = user && user.admin ? (<Link to="/admin/checkin">
-            <Menu.Item>
-                <Icon name="clipboard" />
-                Checkin
-            </Menu.Item>
-        </Link>) : null;
 
         return (
             <Menu stackable>
                 <Menu.Item header>HackGT Hardware</Menu.Item>
                 {homeLink}
-                {importLink}
-                {checkinLink}
+                {adminLink}
                 {loginLink}
-                {userProfile}
-                {logoutLink}
+                <Menu.Menu position="right">
+                    {userProfile}
+                    {logoutLink}
+                </Menu.Menu>
             </Menu>
 
         );
+    }
+
+    private isAdmin = () => {
+        const {user} = this.props;
+        return user && user.admin;
     }
 }
 

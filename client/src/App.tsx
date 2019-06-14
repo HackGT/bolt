@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import Navigation from "./components/Navigation";
+import Navigation from "./components/navigation/Navigation";
 import Footer from "./components/Footer";
 import {ToastProvider} from "react-toast-notifications";
 import HomeContainer from "./components/HomeContainer";
@@ -69,11 +69,11 @@ class App extends Component<Props, {}> {
                         <Navigation/>
                         <Switch>
                             <Route path="/" exact component={HomeContainer}/>
-                            <PrivateRoute path="/admin/csv" component={CSVWizard}/>
-                            <PrivateRoute path="/admin/checkin" component={CheckinContainer}/>
-                            <PrivateRoute path="/item" component={ItemWrapper}/>
+                            <PrivateRoute path="/admin/item" component={ItemWrapper}/>
                             <PrivateRoute path="/requests" component={RequestManagementContainer}/>
                             <PrivateRoute path="/admin" component={AdminOverviewContainer}/>
+                            <PrivateRoute path="/admin/csv" component={CSVWizard}/>
+                            <PrivateRoute path="/admin/checkin" component={CheckinContainer}/>
                             <Route component={HomeContainer}/>
                         </Switch>
                         <Footer/>
