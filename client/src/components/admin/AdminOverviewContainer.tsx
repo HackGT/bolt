@@ -57,6 +57,20 @@ const reports: AdminCardLink[] = [
     },
 ];
 
+const funPhrases: string[] = [
+    "Congrats, you made it to the big leagues!",
+    "The coolest part of Bolt",
+    "Links, links, getcha links here!",
+    "Hello, friendly administrator",
+    "Use your power wisely",
+    "Nice to see you",
+    "It's a wonderful day to configure Bolt"
+];
+
+function pickRandomElement<T>(arr: T[]): T {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
 class AdminOverviewContainer extends Component {
     public render() {
         return (
@@ -64,7 +78,7 @@ class AdminOverviewContainer extends Component {
                 <Grid.Row>
                     <Grid.Column>
                         <Header as="h1">Administration
-                            <Header.Subheader>The coolest part of Bolt</Header.Subheader>
+                            <Header.Subheader>{pickRandomElement(funPhrases)}</Header.Subheader>
                         </Header>
                         <div className="ui centered cards">
                             <AdminLinksCard title="Hardware Desk" links={hardwareDesk}/>
