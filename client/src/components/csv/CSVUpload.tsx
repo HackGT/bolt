@@ -1,8 +1,8 @@
 import React from "react";
-import { Button, Container, Header, Label } from 'semantic-ui-react';
-import { withToastManager } from "react-toast-notifications";
-import { ItemComplete } from "../item/ItemEdit";
-import { unformat } from "accounting";
+import {Button, Container, Header, Label} from "semantic-ui-react";
+import {withToastManager} from "react-toast-notifications";
+import {ItemComplete} from "../item/ItemEditForm";
+import {unformat} from "accounting";
 
 const templateHeader = [
     "Name", "Description", "Quantity in stock", 
@@ -11,24 +11,27 @@ const templateHeader = [
     "Approval required", "Hidden", "Serial numbers (comma-separated)"
 ]; // Unused, recording for posterity
 
-const typeString = (field: string) => field.trim() 
-const typeNumber = (field: string) => { const val = parseFloat(field); return isNaN(val) ? 0 : val }
+const typeString = (field: string) => field.trim();
+const typeNumber = (field: string) => {
+    const val = parseFloat(field);
+    return isNaN(val) ? 0 : val;
+};
 const typeMoney = (field: string) => unformat(field);
-const typeBool = (field: string) => field==='1' ? true : false
+const typeBool = (field: string) => field === "1";
 
 // Default indices - kw are uniquely identifiable partial phrases
 const fieldInfo: {[field: string]: {index: number, typer: (field: string) => any, kw: string[]}} = {
-    "name": {index: 0, typer: typeString, kw:["name"]},
-    "description": {index: 1, typer: typeString, kw:["desc"]},
-    "totalQty": {index: 2, typer: typeNumber, kw:["total"]},
-    "maxReqQty": {index: 3, typer: typeNumber, kw:["max"]},
-    "imageUrl": {index: 4, typer: typeString, kw:["image", "img", "url"]},
-    "category": {index: 5, typer: typeString, kw:["cat"]},
-    "price": {index: 6, typer: typeMoney, kw:["price", "cost", "value"]},
-    "owner": {index: 7, typer: typeString, kw:["owner", "who"]},
-    "returnRequired": {index: 8, typer: typeBool, kw:["ret"]},
-    "requireApproval": {index: 9, typer: typeBool, kw:["approv"]},
-    "hidden": {index: 10, typer: typeBool, kw:["hid"]},
+    name: {index: 0, typer: typeString, kw: ["name"]},
+    description: {index: 1, typer: typeString, kw: ["desc"]},
+    totalQty: {index: 2, typer: typeNumber, kw: ["total"]},
+    maxReqQty: {index: 3, typer: typeNumber, kw: ["max"]},
+    imageUrl: {index: 4, typer: typeString, kw: ["image", "img", "url"]},
+    category: {index: 5, typer: typeString, kw: ["cat"]},
+    price: {index: 6, typer: typeMoney, kw: ["price", "cost", "value"]},
+    owner: {index: 7, typer: typeString, kw: ["owner", "who"]},
+    returnRequired: {index: 8, typer: typeBool, kw: ["ret"]},
+    requireApproval: {index: 9, typer: typeBool, kw: ["approv"]},
+    hidden: {index: 10, typer: typeBool, kw: ["hid"]},
     // "serial": [11, typeString] // Not implemented
 };
 
@@ -36,17 +39,17 @@ const kwToName: {[kw: string]: string} = {};
 Object.keys(fieldInfo).forEach((field) => {
     const info = fieldInfo[field];
     info.kw.forEach(key => {
-        kwToName[key] = field
+        kwToName[key] = field;
     });
-})
+});
 
 interface UploadProps {
-    setInventory: (inventory: ItemComplete[]) => any,
-    toastManager: any
+    setInventory: (inventory: ItemComplete[]) => any;
+    toastManager: any;
 }
 
 interface UploadState {
-    logs: string[]
+    logs: string[];
 }
 
 class UploadStep extends React.Component<UploadProps, UploadState> {
@@ -57,30 +60,32 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
         };
     }
 
-    addLog = (msg: string) => {
+    public addLog = (msg: string) => {
         const { logs } = this.state;
         logs.push(msg);
         this.setState({ logs });
     }
 
-    onCSVSelect = (e: any) => {
-        if (!e.target.files || !e.target.files[0]) return;
+    public onCSVSelect = (e: any) => {
+        if (!e.target.files || !e.target.files[0]) {
+            return;
+        }
         const file = e.target.files[0];
-        var reader = new FileReader();
+        const reader = new FileReader();
 
         const { toastManager, setInventory } = this.props;
 
-        reader.addEventListener('load', (e: any) => {
+        reader.addEventListener("load", (e: any) => {
             
             const csvdata: string = e.target.result;
             const lines = csvdata.split("\n");
             // Only request the first line to cleanse headers
-            const header = lines[0].split(',').map(field => field.toLowerCase());
+            const header = lines[0].split(",").map(field => field.toLowerCase());
 
             // Hardcoded header assumption
             if (header.length != templateHeader.length) {
-                toastManager.add('Improper CSV formatting, header too long', {
-                    appearance: 'error',
+                toastManager.add("Improper CSV formatting, header too long", {
+                    appearance: "error",
                     autoDismiss: true,
                     placement: "top-center"
                 });
@@ -90,18 +95,22 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
             // Mutate non-default indices based on headers here
             header.forEach((heading, i) => {
                 Object.keys(kwToName).some(kw => {
-                    if (!heading.includes(kw)) return false;
+                    if (!heading.includes(kw)) {
+                        return false;
+                    }
                     fieldInfo[kwToName[kw]].index = i;
                     return true;
                 });
-            })
+            });
             
             const items: ItemComplete[] = [];
             this.addLog("Starting CSV parse");
-            for(let i = 1; i < lines.length; i++) {
+            for (let i = 1; i < lines.length; i++) {
                 const fields = lines[i].split(",");
                 // hack: If we encounter an empty name, end parsing immediately
-                if (fields[0] === "") break;
+                if (fields[0] === "") {
+                    break;
+                }
 
                 // TODO: Verify serial number length matches quantity
                 // Merge all overflow items into serial numbers
@@ -130,11 +139,11 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
         reader.readAsBinaryString(file);
     }
 
-    render() {
+    public render() {
         const { logs } = this.state;
         return (
             <Container>
-                <Header as='h3' dividing>
+                <Header as="h3" dividing>
                     Upload a CSV
                 </Header>
                 <Container style={styles.wrapper}>
@@ -148,7 +157,7 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
                                 icon="upload"
                                 label={{
                                     basic: true,
-                                    content: 'Select file'
+                                    content: "Select file"
                                 }}
                                 labelPosition="right"
                             />
@@ -156,7 +165,7 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
                                 hidden
                                 id="upload"
                                 type="file"
-                                accept='text/csv'
+                                accept="text/csv"
                                 onChange={this.onCSVSelect}
                             />
                         </Label>
@@ -166,7 +175,7 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
                     </div>
                     <div style={styles.logWrapper}>
                         <Container>
-                            <Header as='h4'>
+                            <Header as="h4">
                                 Feed
                             </Header>
                             {logs.map((log, i) => (<p key={i}>{log}</p>))}
@@ -176,24 +185,24 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
             </Container>
         );
     }
-};
+}
 
 const styles = {
     buttonWrapper: {
-        flex: 'none',
-        width: '15em'
+        flex: "none",
+        width: "15em"
     },
     logWrapper: {
-        borderLeft: '2px solid black',
-        marginLeft: '1em',
-        paddingLeft: '1em'
+        borderLeft: "2px solid black",
+        marginLeft: "1em",
+        paddingLeft: "1em"
     },
     notice: {
-        marginTop: '1em'
+        marginTop: "1em"
     },
     wrapper: {
-        display: 'flex',
+        display: "flex",
     }
-}
+};
 
 export default withToastManager(UploadStep);

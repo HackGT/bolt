@@ -2,8 +2,8 @@ import React from "react";
 import {Button, Container, Dimmer, Header, Loader, Segment, Step} from 'semantic-ui-react';
 import UploadStep from './CSVUpload';
 import ReviewStep from './CSVReview';
-import { ItemComplete } from "../item/ItemEdit";
-import { withToastManager } from "react-toast-notifications";
+import {ItemComplete} from "../item/ItemEditForm";
+import {withToastManager} from "react-toast-notifications";
 import {Redirect, withRouter} from "react-router-dom";
 import {compose} from "redux";
 

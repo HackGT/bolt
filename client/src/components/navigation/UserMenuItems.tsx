@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 
 class UserMenuItems extends Component {
-    render() {
+    public render() {
         return (
             <div>
 

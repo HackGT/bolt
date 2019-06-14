@@ -1,6 +1,6 @@
 import React from "react";
-import {Container, Label, Item} from 'semantic-ui-react';
-import { ItemComplete } from "../item/ItemEdit";
+import {Container, Item, Label} from 'semantic-ui-react';
+import {ItemComplete} from "../item/ItemEditForm";
 
 interface ReviewCardProps {
     item: ItemComplete
