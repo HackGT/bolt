@@ -101,7 +101,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                 [inputName]: value
             }
         });
-    };
+    }
 
     public handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const target = event.target;
