@@ -3,6 +3,7 @@ type Query {
 	user: User
 	item(id: Int!): Item
 	items: [Item!]
+    categories: [Category!]
 }
 
 type Mutation {
@@ -62,4 +63,9 @@ input ItemInput {
     approvalRequired: Boolean!
     # The person or organization that owns this item
     owner: String!
+}
+
+type Category {
+    category_id: Int!
+    category_name: String!
 }
