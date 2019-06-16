@@ -27,10 +27,27 @@ export type ItemComplete = ItemNoId & ItemDetails & {
 
 interface ItemEditState {
     loading: boolean;
-    item: ItemComplete | null;
-
-    [name: string]: any | any[];
+    item: ItemComplete;
+    itemOwnerChoices: DropdownProps[];
 }
+
+const GET_ITEMS = gql`
+    query {
+        items {
+            id
+            item_name
+            description
+            imageUrl
+            category
+            totalAvailable
+            maxRequestQty
+            hidden
+            approvalRequired
+            returnRequired
+            owner
+        }
+    }
+`;
 
 const CREATE_ITEM = gql`
     mutation createItem ($newItem: ItemInput!) {
@@ -41,6 +58,7 @@ const CREATE_ITEM = gql`
     }
 `;
 
+// temporary - will be resolved in a future PR
 const UPDATE_ITEM = CREATE_ITEM;
 
 class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
@@ -66,11 +84,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                 {key: "hive", text: "The Hive", value: "The Hive"},
                 {key: "is", text: "Invention Studio", value: "Invention Studio"}]
         };
-
-    }
-
-    public componentDidMount = (): void => {
-        // this.loadItemData(this.props.match.params.itemId);
 
     }
 
@@ -104,8 +117,15 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
 
     public handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
         const target = event.target;
-        const value = target.type === "checkbox" ? target.checked : target.value;
+        let value: string | number = target.value;
         const name = target.name;
+        const inputType = target.type;
+        console.log("inputType", inputType);
+
+        // Convert number input values to numbers
+        if (inputType === "number") {
+            value = Number.parseFloat(value);
+        }
 
         // @ts-ignore
         this.setState({
@@ -134,7 +154,14 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
             {key: "invention_studio", text: "Invention Studio", value: "Invention Studio"}];
 
         return (
-            <Mutation mutation={this.props.createItem ? CREATE_ITEM : UPDATE_ITEM}>
+            <Mutation mutation={this.props.createItem ? CREATE_ITEM : UPDATE_ITEM}
+                      update={(cache: any, {data: {createItem}}: any): any => {
+                          const {items} = cache.readQuery({query: GET_ITEMS});
+                          cache.writeQuery({
+                              query: GET_ITEMS,
+                              data: {items: items.concat([createItem])}
+                          });
+                      }}>
                 {(submitForm: any, {loading, error, called, data}: any) => (
                     <Form loading={this.state.loading || loading} onChange={this.handleInputChange}
                           onSubmit={e => {
@@ -142,28 +169,16 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                               const {toastManager} = this.props;
                               submitForm({
                                   variables: {
-                                      newItem: {
-                                          item_name: "Blueberry Pi 2",
-                                          description: "Better than Raspberry",
-                                          imageUrl: "lolno",
-                                          category: "Microcontrollers",
-                                          totalAvailable: 3,
-                                          maxRequestQty: 1,
-                                          price: 29.95,
-                                          approvalRequired: true,
-                                          returnRequired: true,
-                                          hidden: false,
-                                          owner: "HackGT"
-                                      }
+                                      newItem: this.state.item
                                   }
                               }).then(() => {
-                                  toastManager.add("Successfully created ${item_name}", {
+                                  toastManager.add(`Successfully created ${this.state.item.item_name}`, {
                                       appearance: "success",
                                       autoDismiss: true,
                                       placement: "top-center"
                                   });
                               }).catch(() => {
-                                  toastManager.add("Unable to create your item :(", {
+                                  toastManager.add("Couldn't create your item because of an error", {
                                       appearance: "error",
                                       autoDismiss: false,
                                       placement: "top-center"
@@ -182,25 +197,29 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                         required
                                         placeholder="Ventral quark accelerator"/>
                             <Form.Input width={6}
-                                        name="item-img"
-                                        label="Image"
-                                        type="file"/>
+                                        name="imageUrl"
+                                        label="Image URL"
+                                        type="url"/>
                         </Form.Group>
                         <Form.TextArea width={12}
                                        label="Description"
                                        type="textarea"
                                        name="description"
                                        rows={2}
+                                       required
                                        placeholder="Prior to use, dust the dorsal tachyon resistance sensor array."/>
                         <Form.Group>
                             <Form.Input label="Category"
                             >
-                                <AddOptionDropdown name="category" required={true} placeholder="Spacecraft"
+                                <AddOptionDropdown name="category" required placeholder="Spacecraft"
                                                    options={categoryChoices} onChange={this.handleInputChangeDropdown}/>
                             </Form.Input>
                             <Form.Input width={4}
                                         label="Item value ($)"
                                         type="number"
+                                        step={.01}
+                                        min={0}
+                                        required
                                         name="price"
                                         labelPosition="left"
                                         placeholder="42.00">
@@ -257,7 +276,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                content="Whether to hide this item on the public list of hardware"/>
 
                         <Button primary type="submit">Create item</Button>
-                        {console.log(loading, called, error, data)}
                     </Form>
                 )}
             </Mutation>
