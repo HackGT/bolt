@@ -10,14 +10,12 @@ import {
 import {RequestedItem} from "../components/inventory/HardwareItem";
 
 export interface AppState {
-    a: number;
     user: User | null;
     users: User[];
     requests: RequestedItem[];
 }
 
 const defaultState: AppState = {
-    a: 4,
     user: null,
     users: [],
     requests: []

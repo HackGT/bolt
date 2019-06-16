@@ -71,7 +71,6 @@ function PrivateRoute({ component: Component, ...rest }: any) {
 
 function mapStateToProps(state: AppState) {
     return {
-        a: state.a,
         user: state.user
     };
 }

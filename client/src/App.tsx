@@ -70,10 +70,10 @@ class App extends Component<Props, {}> {
                         <Switch>
                             <Route path="/" exact component={HomeContainer}/>
                             <PrivateRoute path="/admin/items" component={ItemWrapper}/>
-                            <PrivateRoute path="/requests" component={RequestManagementContainer}/>
-                            <PrivateRoute path="/admin" component={AdminOverviewContainer}/>
-                            <PrivateRoute path="/admin/csv" component={CSVWizard}/>
-                            <PrivateRoute path="/admin/checkin" component={CheckinContainer}/>
+                            <PrivateRoute exact path="/requests" component={RequestManagementContainer}/>
+                            <PrivateRoute exact path="/admin" component={AdminOverviewContainer}/>
+                            <PrivateRoute exact path="/admin/csv" component={CSVWizard}/>
+                            <PrivateRoute exact path="/admin/checkin" component={CheckinContainer}/>
                             <Route component={HomeContainer}/>
                         </Switch>
                         <Footer/>

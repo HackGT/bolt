@@ -115,8 +115,8 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
                 // TODO: Verify serial number length matches quantity
                 // Merge all overflow items into serial numbers
                 // const serialNumbers = fields.slice(11);
-                
-                // const quantity = fields[fieldInfo["totalQty"].index];
+
+                // const quantity = fields[fieldInfo["totalAvailable"].index];
                 // if (quantity != serialNumbers.length) {
                 //     this.addLog(`Error: Line ${i+1} malformed.`);
                 //     this.addLog(lines[i]);

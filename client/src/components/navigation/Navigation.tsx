@@ -8,7 +8,6 @@ import {User} from "../../actions";
 export interface OwnProps {}
 
 interface StateProps {
-    a: number;
     user: User|null;
 }
 
@@ -63,9 +62,7 @@ class Navigation extends React.Component<Props, {}> {
 }
 
 function mapStateToProps(state: AppState) {
-    console.log("State is", state);
     return {
-        a: state.a,
         user: state.user
     };
 }

@@ -26,7 +26,7 @@ const items: AdminCardLink[] = [
     },
     {
         name: "Create new item",
-        to: "#"
+        to: "/admin/items/new"
     },
     {
         name: "Import items",
