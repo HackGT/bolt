@@ -104,12 +104,12 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
 
                     normalContent = (<Item.Group>
                         {data.items.map((item: HwItem) => (
-                            <HardwareItem name={item.item_name}
+                            <HardwareItem item_name={item.item_name}
                                           description={item.description}
                                           requestsEnabled={this.props.requestsEnabled && this.props.user}
                                           qtyRemaining={0}
-                                          totalQty={item.totalAvailable}
-                                          maxReqQty={item.maxRequestQty}
+                                          totalAvailable={item.totalAvailable}
+                                          maxRequestQty={item.maxRequestQty}
                                           category={item.category}
                                           key={item.id}
                                           id={item.id}
@@ -119,7 +119,7 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                             />))}
                     </Item.Group>);
                 }
-                console.log(normalContent);
+                console.log(data.items);
                 return normalContent;
             }}
         </Query>;
