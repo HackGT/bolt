@@ -92,7 +92,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
     }
 
     public handleInputChangeDropdown = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps, inputName: string): void => {
-        const target = event.target;
         const value = data.value;
         // @ts-ignore
         this.setState({
