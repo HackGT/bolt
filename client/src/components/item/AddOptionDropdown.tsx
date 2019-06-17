@@ -8,6 +8,8 @@ interface AddOptionDropdownProps {
     options: Option[];
     loading?: boolean;
     disabled?: boolean;
+    error?: boolean;
+    value?: string;
     onChange: (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps, inputName: string) => void;
 }
 
@@ -27,7 +29,7 @@ class AddOptionDropdown extends Component<AddOptionDropdownProps, AddOptionDropd
         console.log("props are:", props.options);
         this.state = {
             options: this.props.options,
-            currentValue: ""
+            currentValue: this.props.value || ""
         };
     }
 
@@ -58,6 +60,7 @@ class AddOptionDropdown extends Component<AddOptionDropdownProps, AddOptionDropd
                       name={this.props.name}
                       allowAdditions
                       onAddItem={this.handleAddition}
+                      error={this.props.error || false}
                       onChange={this.handleChange}
                       selection
                       search
