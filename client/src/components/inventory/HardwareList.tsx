@@ -96,7 +96,7 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                     </Message>
                 );
 
-                if (data.items) {
+                if (data && data.items) {
                     data.items.sort((a: HwItem, b: HwItem) => {
                         return a.category.toLocaleLowerCase().localeCompare(b.category.toLocaleLowerCase())
                             || a.item_name.toLocaleLowerCase().localeCompare(b.item_name.toLocaleLowerCase());
