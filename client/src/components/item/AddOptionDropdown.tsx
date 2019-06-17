@@ -6,6 +6,8 @@ interface AddOptionDropdownProps {
     required: boolean;
     placeholder: string;
     options: Option[];
+    loading?: boolean;
+    disabled?: boolean;
     onChange: (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps, inputName: string) => void;
 }
 
@@ -22,6 +24,7 @@ interface AddOptionDropdownState {
 class AddOptionDropdown extends Component<AddOptionDropdownProps, AddOptionDropdownState> {
     constructor(props: AddOptionDropdownProps) {
         super(props);
+        console.log("props are:", props.options);
         this.state = {
             options: this.props.options,
             currentValue: ""
@@ -40,7 +43,7 @@ class AddOptionDropdown extends Component<AddOptionDropdownProps, AddOptionDropd
             currentValue: data.value
         });
         this.props.onChange(event, data, this.props.name);
-    };
+    }
     // onAddItem(e: React.KeyboardEvent<HTMLElement>, dropdown: DropdownProps): void {
     //     const value: string = dropdown.
     //     this.setState({
@@ -58,8 +61,10 @@ class AddOptionDropdown extends Component<AddOptionDropdownProps, AddOptionDropd
                       onChange={this.handleChange}
                       selection
                       search
+                      loading={this.props.loading || false}
                       required={this.props.required}
                       options={this.state.options}
+                      disabled={this.props.disabled || false}
                       placeholder={this.props.placeholder}
                       value={this.state.currentValue}
             />

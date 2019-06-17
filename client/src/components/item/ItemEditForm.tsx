@@ -1,11 +1,12 @@
 import React, {ChangeEvent, Component, FormEvent} from "react";
 import {ItemNoId} from "../inventory/HardwareItem";
 import {Button, CheckboxProps, DropdownProps, Form, Label, Popup} from "semantic-ui-react";
-import AddOptionDropdown from "./AddOptionDropdown";
+import AddOptionDropdown, {Option} from "./AddOptionDropdown";
 import Mutation from "react-apollo/Mutation";
 import {withToastManager} from "react-toast-notifications";
 import gql from "graphql-tag";
 import {Redirect} from "react-router";
+import {Query} from "react-apollo";
 
 interface ItemDetails {
     approvalRequired: boolean;
@@ -23,6 +24,11 @@ interface ItemEditProps {
 
 export type ItemComplete = ItemNoId & ItemDetails & {
     [name: string]: any | any[];
+};
+
+export type Category = {
+    category_id: number;
+    category_name: string;
 };
 
 interface ItemEditState {
@@ -60,6 +66,15 @@ const CREATE_ITEM = gql`
 
 // temporary - will be resolved in a future PR
 const UPDATE_ITEM = CREATE_ITEM;
+
+const CATEGORIES_QUERY = gql`
+    query categories {
+        categories {
+            category_id
+            category_name
+        }
+    }
+`;
 
 class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
     constructor(props: ItemEditProps) {
@@ -159,9 +174,14 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                           const {items} = cache.readQuery({query: GET_ITEMS});
                           cache.writeQuery({
                               query: GET_ITEMS,
-                              data: {items: items.concat([createItem])}
+                              data: {
+                                  items: items.concat([createItem])
+                              }
                           });
-                      }}>
+                      }}
+                      refetchQueries={[{
+                          query: CATEGORIES_QUERY
+                      }]}>
                 {(submitForm: any, {loading, error, called, data}: any) => (
                     <Form loading={this.state.loading || loading} onChange={this.handleInputChange}
                           onSubmit={e => {
@@ -211,8 +231,38 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                         <Form.Group>
                             <Form.Input label="Category"
                             >
-                                <AddOptionDropdown name="category" required placeholder="Spacecraft"
-                                                   options={categoryChoices} onChange={this.handleInputChangeDropdown}/>
+                                <Query query={CATEGORIES_QUERY}>
+
+                                    {(result: any) => {
+                                        const queryLoading = result.loading;
+                                        const queryError = result.error;
+                                        const queryData = result.data;
+                                        console.log("categories query, l, e, d", queryLoading, queryError, queryData);
+                                        let categoriesList: Option[] = [];
+                                        console.log(categoriesList);
+                                        let dataLoadedKey = 0; // this allows us to "reset" the AddOptionDropdown when we
+                                        // have the list of existing categories it should show.
+                                        // See https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key
+                                        // for more information on why this is necessary and why it works.
+                                        if (queryData.categories) {
+                                            categoriesList = queryData.categories.map((c: Category) => {
+                                                return {
+                                                    value: c.category_name,
+                                                    text: c.category_name
+                                                };
+                                            });
+                                            dataLoadedKey = 1;
+                                        }
+                                        console.log(categoriesList);
+                                        // FIXME: loaded category list not appearing
+                                        return (<AddOptionDropdown name="category" required placeholder="Spacecraft"
+                                                                   loading={queryLoading} disabled={queryLoading}
+                                                                   key={dataLoadedKey}
+                                                                   options={categoriesList}
+                                                                   onChange={this.handleInputChangeDropdown}/>);
+                                    }}
+                                </Query>
+
                             </Form.Input>
                             <Form.Input width={4}
                                         label="Item value ($)"
