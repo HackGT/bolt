@@ -280,9 +280,11 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                         });
                                                         dataLoadedKey = 1;
                                                     }
+                                                    const queryErrorMsg = <Message error visible={queryError}
+                                                                                   size="small"
+                                                                                   content="Error loading categories list from server.  You can still enter a category by hand."/>;
                                                     return (<div>
-                                                        <Message error visible={queryError} size="small"
-                                                                 content="Error loading categories list from server.  You can still enter a category by hand."/>
+                                                        {queryError ? queryErrorMsg : ""}
                                                         <AddOptionDropdown name="category" required
                                                                            placeholder="Spacecraft"
                                                                            loading={queryLoading}
