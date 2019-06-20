@@ -20,13 +20,13 @@ export interface Option {
 
 interface AddOptionDropdownState {
     options: Option[];
-    currentValue?: any;
+    currentValue?: string;
 }
 
 class AddOptionDropdown extends Component<AddOptionDropdownProps, AddOptionDropdownState> {
     constructor(props: AddOptionDropdownProps) {
         super(props);
-        console.log("props are:", props.options);
+
         this.state = {
             options: this.props.options,
             currentValue: this.props.value || ""
@@ -40,18 +40,11 @@ class AddOptionDropdown extends Component<AddOptionDropdownProps, AddOptionDropd
     }
 
     public handleChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
-        console.log(event, data.value);
         this.setState({
-            currentValue: data.value
+            currentValue: (data.value as string)
         });
         this.props.onChange(event, data, this.props.name);
     }
-    // onAddItem(e: React.KeyboardEvent<HTMLElement>, dropdown: DropdownProps): void {
-    //     const value: string = dropdown.
-    //     this.setState({
-    //         options: [{ text: value, value: value }, ...this.state.options],
-    //     });
-    // }
 
     public render() {
         return (
@@ -60,14 +53,14 @@ class AddOptionDropdown extends Component<AddOptionDropdownProps, AddOptionDropd
                       name={this.props.name}
                       allowAdditions
                       onAddItem={this.handleAddition}
-                      error={this.props.error || false}
+                      error={this.props.error}
                       onChange={this.handleChange}
                       selection
                       search
-                      loading={this.props.loading || false}
+                      loading={this.props.loading}
                       required={this.props.required}
                       options={this.state.options}
-                      disabled={this.props.disabled || false}
+                      disabled={this.props.disabled}
                       placeholder={this.props.placeholder}
                       value={this.state.currentValue}
             />
