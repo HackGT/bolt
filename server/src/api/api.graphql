@@ -1,8 +1,11 @@
 type Query {
 	# Get information about the currently logged in user
 	user: User
+    # Get information about a specific item, given its ID
 	item(id: Int!): Item
+    # Get an array of every item in the database
 	items: [Item!]
+    # Get a list containing each category that is on at least one item
     categories: [Category!]
 }
 
@@ -66,6 +69,8 @@ input ItemInput {
 }
 
 type Category {
+    # The unique ID for this category
     category_id: Int!
+    # The human-readable, user-facing name for this category
     category_name: String!
 }
