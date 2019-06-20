@@ -44,10 +44,8 @@ class App extends Component<Props, {}> {
             }),
         });
         const json = await userRequest.json();
-        console.log(json);
         if (json && json.data && json.data.user) {
             const user = json.data.user;
-            console.log(user);
             if (user) {
                 store.dispatch(setUser(user));
             }

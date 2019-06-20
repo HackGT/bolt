@@ -41,7 +41,6 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
             noRequestsMessageText = "Sign in to request hardware.";
         }
 
-        console.log(this.props.requestsEnabled);
         const noRequestsMessage = !this.props.requestsEnabled || !this.props.user ? (<Message
             title="View-only inventory"
             warning icon>
@@ -69,7 +68,7 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                     `}>
             {({loading, error, data}: any) => {
                 if (error) {
-                    console.log("error", error);
+                    console.error(error);
                 }
                 // TODO: come back to this
                 if (loading) {
@@ -119,7 +118,6 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                             />))}
                     </Item.Group>);
                 }
-                console.log(data.items);
                 return normalContent;
             }}
         </Query>;
