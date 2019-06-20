@@ -1,12 +1,17 @@
 import React, {Component} from "react";
-import {match, Route} from "react-router";
-import ItemEdit from "./ItemEdit";
+import {match, Switch} from "react-router";
+import ItemEditForm from "./ItemEditForm";
+import CreateItemWrapper from "./CreateItemWrapper";
+import PrivateRoute from "../util/PrivateRoute";
 
 class ItemWrapper extends Component<{ match: match }> {
     public render() {
         return (
             <div>
-                <Route path={`${this.props.match.url}/:itemId`} component={ItemEdit}/>
+                <Switch>
+                    <PrivateRoute exact path={`${this.props.match.url}/new`} component={CreateItemWrapper}/>
+                    <PrivateRoute exact path={`${this.props.match.url}/:itemId`} component={ItemEditForm}/>
+                </Switch>
             </div>
         );
     }

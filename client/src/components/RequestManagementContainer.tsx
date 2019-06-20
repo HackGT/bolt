@@ -22,7 +22,7 @@ export interface UserItemList {
 
 const sampleItems: RequestedItem[] = [
     {
-        id: "f758d35e-06c2-4c78-9a94-e3cc5647ef93",
+        id: 1,
         user: "Beardell",
         name: "Arduino UNO",
         qtyRequested: 3,
@@ -31,7 +31,7 @@ const sampleItems: RequestedItem[] = [
         cancelled: false
     },
     {
-        id: "7d2974c6-44ab-41c7-b88b-c2350db6defa",
+        id: 2,
         user: "Obunga",
         name: "Raspberry PI",
         qtyRequested: 2,
@@ -40,7 +40,7 @@ const sampleItems: RequestedItem[] = [
         cancelled: false
     },
     {
-        id: "859bc711-fd52-4e30-93a4-584c690240ec",
+        id: 3,
         user: "Obunga",
         name: "10 Ohm Resistors",
         qtyRequested: 5,
@@ -49,7 +49,7 @@ const sampleItems: RequestedItem[] = [
         cancelled: false
     },
     {
-        id: "1061cad0-a3e0-48d0-836e-672b91fb4833",
+        id: 4,
         user: "Ant Man",
         name: "10 Ohm Resistors",
         qtyRequested: 40,
@@ -58,7 +58,7 @@ const sampleItems: RequestedItem[] = [
         cancelled: false
     },
     {
-        id: "deb6a5f9-dd50-4006-82fb-1bab6b6fc707",
+        id: 5,
         user: "Waluigi",
         name: "Mango",
         qtyRequested: 1,
@@ -67,7 +67,7 @@ const sampleItems: RequestedItem[] = [
         cancelled: false
     },
     {
-        id: "6213a71b-131a-4a40-8fc0-48597b5d296d",
+        id: 6,
         user: "Obunga",
         name: "Raspberry PI",
         qtyRequested: 3,
@@ -88,7 +88,7 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         };
     }
 
-    public handleApprove = (id: string) => {
+    public handleApprove = (id: number) => {
         console.log("handling approve");
         const index = sampleItems.findIndex((item) => {
             return item.id === id;
@@ -97,11 +97,11 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         this.setState({
             items: sampleItems
         });
-    };
+    }
 
-    public handleDecline = (id: string) => {
+    public handleDecline = (id: number) => {
         console.log("handling decline");
-    };
+    }
 
     public handleReady = (user: string) => {
         for (let i = 0; i < sampleItems.length; i++) {
@@ -113,7 +113,7 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         this.setState({
             items: sampleItems
         });
-    };
+    }
 
     public handleDone = (user: string) => {
         for (let i = 0; i < sampleItems.length; i++) {
@@ -125,7 +125,7 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         this.setState({
             items: sampleItems
         });
-    };
+    }
 
     public handleCross = (user: string) => {
 
@@ -138,7 +138,7 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         this.setState({
             items: sampleItems
         });
-    };
+    }
 
     public handlePrep = (user: string) => {
 
@@ -151,7 +151,7 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
         this.setState({
             items: sampleItems
         });
-    };
+    }
 
 
     public render() {

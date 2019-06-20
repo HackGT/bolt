@@ -1,33 +1,34 @@
 import React from "react";
-import {Button, Container, Dimmer, Header, Loader, Segment, Step} from 'semantic-ui-react';
-import UploadStep from './CSVUpload';
-import ReviewStep from './CSVReview';
-import { ItemComplete } from "../item/ItemEdit";
-import { withToastManager } from "react-toast-notifications";
+import {Button, Container, Dimmer, Header, Loader, Segment, Step} from "semantic-ui-react";
+import UploadStep from "./CSVUpload";
+import ReviewStep from "./CSVReview";
+import {ItemComplete} from "../item/ItemEditForm";
+import {withToastManager} from "react-toast-notifications";
 import {Redirect, withRouter} from "react-router-dom";
 import {compose} from "redux";
 
 interface CSVWizardProps {
-    toastManager: any
+    toastManager: any;
 }
 
 interface CSVWizardState {
-    wizardStep: number,
-    inventory: ItemComplete[], 
-    isStepComplete: boolean,
-    isSubmitting: boolean,
-    isComplete: boolean
+    wizardStep: number;
+    inventory: ItemComplete[];
+    isStepComplete: boolean;
+    isSubmitting: boolean;
+    isComplete: boolean;
 }
 
 interface StepInterface {
-    [key: string]: any,
-    key: string,
-    icon: string,
-    title: string,
-    description?: string,
-    stepDiv?: React.ReactElement,
-    active?: boolean,
-    disabled?: boolean
+    key: string;
+    icon: string;
+    title: string;
+    description?: string;
+    stepDiv?: React.ReactElement;
+    active?: boolean;
+    disabled?: boolean;
+
+    [key: string]: any;
 }
 
 class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
@@ -42,47 +43,52 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
         };
     }
 
-    nextStep = () => {
-        const { wizardStep } = this.state; 
-        this.setState({ wizardStep: wizardStep+1,
+    public nextStep = () => {
+        const { wizardStep } = this.state;
+        this.setState({
+            wizardStep: wizardStep + 1,
                         isStepComplete: false });
     }
 
-    setStepFactory = (newStep: number) => { // Careful, make sure isStepComplete set intentionally
+    public setStepFactory = (newStep: number) => { // Careful, make sure isStepComplete set intentionally
         return () => {
-            if (newStep == 0) this.setState({wizardStep: newStep});
-        }
+            if (newStep === 0) {
+                this.setState({wizardStep: newStep});
+            }
+        };
     }
 
-    setInventory = (inventory: ItemComplete[]) => {
+    public setInventory = (inventory: ItemComplete[]) => {
         this.setState({inventory, isStepComplete: true});
     }
 
-    uploadInventory = () => {
+    public uploadInventory = () => {
         this.setState({isSubmitting: true});
         window.alert("Unimplemented");
         window.setTimeout(this.onInventorySubmitted, 2000);
     }
 
-    onInventorySubmitted = () => {
+    public onInventorySubmitted = () => {
         const { toastManager } = this.props;
         this.setState({isComplete: true, isSubmitting: false});
-        toastManager.add('CSV Submitted! Redirecting', {
-            appearance: 'success',
+        toastManager.add("CSV Submitted! Redirecting", {
+            appearance: "success",
             autoDismiss: true,
             placement: "top-center"
         });
     }
 
-    render() {
+    public render() {
         const { wizardStep, inventory, isStepComplete, isSubmitting, isComplete } = this.state;
 
-        if (isComplete) return <Redirect to='/' />;
+        if (isComplete) {
+            return <Redirect to="/"/>;
+        }
 
         const nextButton = (
-            <Button disabled={!isStepComplete} 
+            <Button disabled={!isStepComplete}
                     onClick={this.nextStep}
-                    floated='right'
+                    floated="right"
                     primary
                     >
                 Next Step
@@ -90,11 +96,11 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
         );
 
         const submitButton = (
-            <Button 
-                    onClick={this.uploadInventory}
-                    floated='right'
-                    color='green'
-                    disabled={this.state.isSubmitting}
+            <Button
+                onClick={this.uploadInventory}
+                floated="right"
+                color="green"
+                disabled={this.state.isSubmitting}
                     >
                 Submit
             </Button>
@@ -110,30 +116,34 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
 
         const stepsSrc: StepInterface[] = [
             {
-                key: 'upload',
-                icon: 'upload',
+                key: "upload",
+                icon: "upload",
                 onClick: this.setStepFactory(0),
-                title: 'Upload',
+                title: "Upload",
                 stepDiv: <UploadStep setInventory={this.setInventory}/>
             },
-            { 
-                key: 'confirm', 
-                icon: 'pencil', 
-                title: 'Review Upload',
+            {
+                key: "confirm",
+                icon: "pencil",
+                title: "Review Upload",
                 stepDiv: <ReviewStep inventory={inventory} />
             },
-        ]
+        ];
 
         // Select appropriate step div to show
         const activeStepContent = stepsSrc[wizardStep].stepDiv || defaultStep;
         
         // Set appropriate state in step component and strip stepDiv for proper props
         const steps: StepInterface[] = stepsSrc.map((step, i) => {
-            if (i == wizardStep) step.active = true;
-            if (i > wizardStep) step.disabled = true;
+            if (i === wizardStep) {
+                step.active = true;
+            }
+            if (i > wizardStep) {
+                step.disabled = true;
+            }
             delete step.stepDiv;
-            return step; 
-        })
+            return step;
+        });
 
         return (
             <div id="csv-upload-wrapper">

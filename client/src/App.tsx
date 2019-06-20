@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import Navigation from "./components/Navigation";
+import Navigation from "./components/navigation/Navigation";
 import Footer from "./components/Footer";
 import {ToastProvider} from "react-toast-notifications";
 import HomeContainer from "./components/HomeContainer";
@@ -44,10 +44,8 @@ class App extends Component<Props, {}> {
             }),
         });
         const json = await userRequest.json();
-        console.log(json);
         if (json && json.data && json.data.user) {
             const user = json.data.user;
-            console.log(user);
             if (user) {
                 store.dispatch(setUser(user));
             }
@@ -69,11 +67,11 @@ class App extends Component<Props, {}> {
                         <Navigation/>
                         <Switch>
                             <Route path="/" exact component={HomeContainer}/>
-                            <PrivateRoute path="/admin/csv" component={CSVWizard}/>
-                            <PrivateRoute path="/admin/checkin" component={CheckinContainer}/>
-                            <PrivateRoute path="/item" component={ItemWrapper}/>
-                            <PrivateRoute path="/requests" component={RequestManagementContainer}/>
-                            <PrivateRoute path="/admin" component={AdminOverviewContainer}/>
+                            <PrivateRoute path="/admin/items" component={ItemWrapper}/>
+                            <PrivateRoute exact path="/requests" component={RequestManagementContainer}/>
+                            <PrivateRoute exact path="/admin" component={AdminOverviewContainer}/>
+                            <PrivateRoute exact path="/admin/csv" component={CSVWizard}/>
+                            <PrivateRoute exact path="/admin/checkin" component={CheckinContainer}/>
                             <Route component={HomeContainer}/>
                         </Switch>
                         <Footer/>

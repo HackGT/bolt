@@ -4,8 +4,8 @@ import {RequestedItem} from "../inventory/HardwareItem";
 
 interface RequestedHardwareItemProps {
     item: RequestedItem;
-    handleApprove: (id: string) => void;
-    handleDecline: (id: string) => void;
+    handleApprove: (id: number) => void;
+    handleDecline: (id: number) => void;
 }
 class RequestedHardwareItem extends Component<RequestedHardwareItemProps, {}> {
     constructor(props: RequestedHardwareItemProps) {

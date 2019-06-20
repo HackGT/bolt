@@ -12,8 +12,8 @@ interface RequestManagementBoardProps {
     sortedItems: UserItemList[];
     sortByUsers: boolean;
     backToPrep: boolean;
-    handleApprove: (id: string) => void;
-    handleDecline: (id: string) => void;
+    handleApprove: (id: number) => void;
+    handleDecline: (id: number) => void;
     handleReady: (user: string) => void;
     handleCross: (user: string) => void;
     handlePrep: (user: string) => void;

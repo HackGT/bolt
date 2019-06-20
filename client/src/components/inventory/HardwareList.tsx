@@ -41,7 +41,6 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
             noRequestsMessageText = "Sign in to request hardware.";
         }
 
-        console.log(this.props.requestsEnabled);
         const noRequestsMessage = !this.props.requestsEnabled || !this.props.user ? (<Message
             title="View-only inventory"
             warning icon>
@@ -69,7 +68,7 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                     `}>
             {({loading, error, data}: any) => {
                 if (error) {
-                    console.log("error", error);
+                    console.error(error);
                 }
                 // TODO: come back to this
                 if (loading) {
@@ -96,7 +95,7 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                     </Message>
                 );
 
-                if (data.items) {
+                if (data && data.items) {
                     data.items.sort((a: HwItem, b: HwItem) => {
                         return a.category.toLocaleLowerCase().localeCompare(b.category.toLocaleLowerCase())
                             || a.item_name.toLocaleLowerCase().localeCompare(b.item_name.toLocaleLowerCase());
@@ -104,12 +103,12 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
 
                     normalContent = (<Item.Group>
                         {data.items.map((item: HwItem) => (
-                            <HardwareItem name={item.item_name}
+                            <HardwareItem item_name={item.item_name}
                                           description={item.description}
                                           requestsEnabled={this.props.requestsEnabled && this.props.user}
                                           qtyRemaining={0}
-                                          totalQty={item.totalAvailable}
-                                          maxReqQty={item.maxRequestQty}
+                                          totalAvailable={item.totalAvailable}
+                                          maxRequestQty={item.maxRequestQty}
                                           category={item.category}
                                           key={item.id}
                                           id={item.id}
@@ -119,7 +118,6 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                             />))}
                     </Item.Group>);
                 }
-                console.log(normalContent);
                 return normalContent;
             }}
         </Query>;

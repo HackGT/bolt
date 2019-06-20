@@ -5,7 +5,7 @@ import * as path from "path";
 import express from "express";
 import graphqlHTTP from "express-graphql";
 import {buildSchema, GraphQLError} from "graphql";
-import {DB} from "../database";
+import {Category, DB} from "../database";
 import {isAdminNoAuthCheck} from "../auth/auth";
 // import {MutationResolvers, QueryResolvers} from "./api.graphql";
 
@@ -70,13 +70,7 @@ const resolvers: any = {
             return null;
         }
         item = item[0];
-        console.log(item);
 
-        console.log({
-            id: item.item_id,
-            category: item.category_name,
-            ...item
-        });
         return {
             id: item.item_id,
             category: item.category_name,
@@ -97,7 +91,6 @@ const resolvers: any = {
         const {args, context} = fixArguments(root, _args, _context);
         const items = await DB.from("items")
             .join("categories", "items.category_id", "=", "categories.category_id");
-        console.log(items);
 
         return items.map(item => {
             return {
@@ -180,6 +173,11 @@ const resolvers: any = {
             ...args.newItem
         };
     },
+    categories: async (root, _args, _context): Promise<[Category]> => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+        return await DB.from("categories");
+    }
 };
 
 apiRoutes.post("/", graphqlHTTP({

@@ -39,7 +39,7 @@ interface RequestsAndUsers {
 export type RequestsAndUsersAction = RequestsAndUsers & GenericAction;
 
 interface RequestStatus {
-    requestId: string;
+    requestId: number;
     status: ItemStatus;
 }
 
@@ -53,7 +53,7 @@ export const fetchRequestsAndUsers = () => {
                     uuid: "1a", admin: true, name: "Joel"
                 }],
                 requests: [{
-                    id: "5b",
+                    id: 5,
                     user: "1a",
                     name: "RPI 3",
                     qtyRequested: 3,

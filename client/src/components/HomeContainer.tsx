@@ -70,7 +70,6 @@ class HomeContainer extends Component<Props, State> {
 
 function mapStateToProps(state: AppState) {
     return {
-        a: state.a,
         user: state.user
     };
 }
