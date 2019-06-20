@@ -1,7 +1,7 @@
 import React, {ChangeEvent, Component, FormEvent} from "react";
 import HardwareItem, {ItemNoId} from "../inventory/HardwareItem";
 import {Button, CheckboxProps, DropdownProps, Form, Grid, Header, Item, Label, Message, Popup} from "semantic-ui-react";
-import AddOptionDropdown, {Option} from "./AddOptionDropdown";
+import AddOptionDropdown, {Option} from "../util/AddOptionDropdown";
 import Mutation from "react-apollo/Mutation";
 import {withToastManager} from "react-toast-notifications";
 import gql from "graphql-tag";
@@ -38,6 +38,7 @@ interface ItemEditState {
     itemPreviewKey: number;
     categoryError: boolean;
     ownerError: boolean;
+    qtyPerRequestTooLargeError: boolean;
 }
 
 const GET_ITEMS = gql`
@@ -85,6 +86,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
         this.state = {
             categoryError: false,
             ownerError: false,
+            qtyPerRequestTooLargeError: false,
             loading: !this.props.createItem,
             item: {
                 item_name: "",
@@ -109,8 +111,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
     }
 
     public handleInputChangeCheckbox = (event: FormEvent<HTMLInputElement>, checkboxProps: CheckboxProps): void => {
-        console.log(checkboxProps.checked);
-        console.log(event);
         if (checkboxProps && checkboxProps.name && typeof checkboxProps.checked !== "undefined") {
             const value: boolean = checkboxProps.checked;
             const name: string = checkboxProps.name;
@@ -141,7 +141,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
         let value: string | number = target.value;
         const name = target.name;
         const inputType = target.type;
-        console.log("inputType", inputType);
 
         // Convert number input values to numbers
         if (inputType === "number") {
@@ -164,7 +163,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
     }
 
     public render() {
-        console.log("itemId is...", this.props.itemId);
         const categories = ["Extension Cords", "Laptops", "Microcontrollers", "Robotics"];
 
         const categoryChoices = categories.map(item => {
@@ -179,6 +177,10 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
             {key: "hackgt", text: "HackGT", value: "HackGT"},
             {key: "the_hive", text: "The Hive", value: "The Hive"},
             {key: "invention_studio", text: "Invention Studio", value: "Invention Studio"}];
+
+        const qtyPerRequestTooBigErrorMessage = <Message error visible={this.state.qtyPerRequestTooLargeError}
+                                                         size="small"
+                                                         content="The quantity allowed per request can't be greater than the quantity in stock."/>;
 
         return (
             <Grid columns={16}>
@@ -197,7 +199,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                   refetchQueries={[{
                                       query: CATEGORIES_QUERY
                                   }]}>
-                            {(submitForm: any, {loading, error, called, data}: any) => (
+                            {(submitForm: any, {loading, error, data}: any) => (
                                 <Form loading={this.state.loading || loading} onChange={this.handleInputChange}
                                       error={this.state.categoryError || this.state.ownerError}
                                       onSubmit={e => {
@@ -205,11 +207,13 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                           const {toastManager} = this.props;
                                           const categoryError = this.state.item.category === "";
                                           const ownerError = this.state.item.owner === "";
+                                          const qtyPerRequestTooLargeError = this.state.item.maxRequestQty > this.state.item.totalAvailable;
                                           this.setState({
                                               categoryError,
-                                              ownerError
+                                              ownerError,
+                                              qtyPerRequestTooLargeError
                                           });
-                                          if (categoryError || ownerError) {
+                                          if (categoryError || ownerError || qtyPerRequestTooLargeError) {
                                               return;
                                           }
                                           submitForm({
@@ -264,9 +268,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                     const queryLoading = result.loading;
                                                     const queryError = result.error;
                                                     const queryData = result.data;
-                                                    console.log("categories query, l, e, d", queryLoading, queryError, queryData);
                                                     let categoriesList: Option[] = [];
-                                                    console.log(categoriesList);
                                                     let dataLoadedKey = 0; // this allows us to "reset" the AddOptionDropdown when we
                                                     // have the list of existing categories it should show.
                                                     // See https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key
@@ -320,11 +322,13 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                     </Form.Group>
 
                                     <h2>Stock</h2>
+                                    {this.state.qtyPerRequestTooLargeError ? qtyPerRequestTooBigErrorMessage : ""}
                                     <Form.Group>
                                         <Form.Input width={6}
                                                     label="Quantity in stock"
                                                     type="number"
                                                     name="totalAvailable"
+                                                    error={this.state.qtyPerRequestTooLargeError}
                                                     required
                                                     placeholder="47">
                                             <input type="number" min={0}/>
@@ -333,6 +337,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                     label="Quantity allowed per request"
                                                     type="number"
                                                     name="maxRequestQty"
+                                                    error={this.state.qtyPerRequestTooLargeError}
                                                     required
                                                     placeholder="6">
                                             <input type="number" min={1}/>
