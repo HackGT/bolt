@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import {match} from "react-router";
 import {Query} from "react-apollo";
 import gql from "graphql-tag";
-import {GraphQLQuery} from "../../api/api.service";
 import ItemEditForm from "./ItemEditForm";
 import {Header, Loader, Message} from "semantic-ui-react";
 
@@ -18,7 +17,7 @@ interface EditItemState {
     item_name: string;
 }
 
-const ITEM_QUERY: GraphQLQuery = gql`
+const ITEM_QUERY = gql`
     query getItem($itemId: Int!) {
         item(id: $itemId) {
             item_name
