@@ -4,7 +4,7 @@ import {Query} from "react-apollo";
 import gql from "graphql-tag";
 import {GraphQLQuery} from "../../api/api.service";
 import ItemEditForm from "./ItemEditForm";
-import {Loader, Message} from "semantic-ui-react";
+import {Header, Loader, Message} from "semantic-ui-react";
 
 interface EditItemProps {
     match: match & EditItemParams;
@@ -15,6 +15,7 @@ interface EditItemParams {
 }
 
 interface EditItemState {
+    item_name: string;
 }
 
 const ITEM_QUERY: GraphQLQuery = gql`
@@ -37,7 +38,9 @@ const ITEM_QUERY: GraphQLQuery = gql`
 class EditItemWrapper extends Component<EditItemProps, EditItemState> {
     constructor(props: EditItemProps) {
         super(props);
-
+        this.state = {
+            item_name: ""
+        };
     }
 
 
@@ -45,28 +48,31 @@ class EditItemWrapper extends Component<EditItemProps, EditItemState> {
         const itemId: number = parseInt(this.props.match.params.itemId, 10);
         console.log(itemId);
         return (
-            <Query
-                query={ITEM_QUERY}
-                variables={
-                    {itemId}
-                }
-                fetchPolicy="no-cache"
-            >
-                {
-                    ({loading, error, data}: any) => {
-                        if (loading) {
-                            return <Loader active={true} content="Just a sec!"/>;
-                        }
-                        if (error) {
-                            return <Message error visible={true}
-                                            header="Can't fetch item"
-                                            content={error.message}
-                            />;
-                        }
-                        return <ItemEditForm preloadItemId={itemId} preloadItem={data.item}/>;
+            <div>
+                <Header as="h1">Edit item</Header>
+                <Query
+                    query={ITEM_QUERY}
+                    variables={
+                        {itemId}
                     }
-                }
-            </Query>
+                    fetchPolicy="no-cache"
+                >
+                    {
+                        ({loading, error, data}: any) => {
+                            if (loading) {
+                                return <Loader active={true} content="Just a sec!"/>;
+                            } else if (error) {
+                                return <Message error visible={true}
+                                                header="Can't fetch item"
+                                                content={error.message}
+                                />;
+                            }
+                            return <ItemEditForm preloadItemId={itemId} preloadItem={data.item}/>;
+
+                        }
+                    }
+                </Query>
+            </div>
         );
     }
 }

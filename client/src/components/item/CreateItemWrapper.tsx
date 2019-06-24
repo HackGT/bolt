@@ -3,6 +3,7 @@ import {connect} from "react-redux";
 import {AppState} from "../../reducers/reducers";
 import ItemEditForm from "./ItemEditForm";
 import {match} from "react-router";
+import {Header} from "semantic-ui-react";
 
 interface CreateItemProps {
     match: match & CreateItemParams;
@@ -25,7 +26,7 @@ class CreateItemWrapper extends Component<CreateItemProps, CreateItemState> {
     public render() {
         return (
             <div>
-                <h1>Create item</h1>
+                <Header as="h1">Create item</Header>
                 <ItemEditForm createItem={true}/>
             </div>
         );
