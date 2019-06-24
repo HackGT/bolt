@@ -7,8 +7,6 @@ import graphqlHTTP from "express-graphql";
 import {buildSchema, GraphQLError} from "graphql";
 import {Category, DB} from "../database";
 import {isAdminNoAuthCheck} from "../auth/auth";
-import {Item} from "./api.graphql";
-// import {MutationResolvers, QueryResolvers} from "./api.graphql";
 
 const schemaFile = path.join(__dirname, "./api.graphql");
 const schema = buildSchema(fs.readFileSync(schemaFile, {encoding: "utf8"}));
@@ -182,7 +180,7 @@ const resolvers: any = {
      * @param _args
      * @param _context
      */
-    updateItem: async (root, _args, _context): Promise<Item> => {
+    updateItem: async (root, _args, _context) => {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
 
