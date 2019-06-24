@@ -1,8 +1,8 @@
 import React, {Component} from "react";
 import {match, Switch} from "react-router";
-import ItemEditForm from "./ItemEditForm";
 import CreateItemWrapper from "./CreateItemWrapper";
 import PrivateRoute from "../util/PrivateRoute";
+import EditItemWrapper from "./EditItemWrapper";
 
 class ItemWrapper extends Component<{ match: match }> {
     public render() {
@@ -10,7 +10,7 @@ class ItemWrapper extends Component<{ match: match }> {
             <div>
                 <Switch>
                     <PrivateRoute exact path={`${this.props.match.url}/new`} component={CreateItemWrapper}/>
-                    <PrivateRoute exact path={`${this.props.match.url}/:itemId`} component={ItemEditForm}/>
+                    <PrivateRoute exact path={`${this.props.match.url}/:itemId`} component={EditItemWrapper}/>
                 </Switch>
             </div>
         );

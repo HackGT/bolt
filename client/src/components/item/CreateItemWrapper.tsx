@@ -13,7 +13,6 @@ interface CreateItemParams {
 }
 
 interface CreateItemState {
-    [name: string]: any | any[];
 }
 
 class CreateItemWrapper extends Component<CreateItemProps, CreateItemState> {

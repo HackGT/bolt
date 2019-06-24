@@ -1,7 +1,7 @@
 import React, {ChangeEvent, Component, FormEvent} from "react";
 import HardwareItem, {ItemNoId} from "../inventory/HardwareItem";
 import {Button, CheckboxProps, DropdownProps, Form, Grid, Header, Item, Label, Message, Popup} from "semantic-ui-react";
-import AddOptionDropdown, {Option} from "../util/AddOptionDropdown";
+import AddOptionDropdown from "../util/AddOptionDropdown";
 import Mutation from "react-apollo/Mutation";
 import {withToastManager} from "react-toast-notifications";
 import gql from "graphql-tag";
@@ -17,9 +17,11 @@ interface ItemDetails {
 }
 
 interface ItemEditProps {
-    itemId?: number;
+    preloadItemId: number;
+    preloadItem: ItemComplete;
     createItem: boolean;
     toastManager: any;
+    loading?: boolean;
 }
 
 export type ItemComplete = ItemNoId & ItemDetails & {
@@ -34,7 +36,7 @@ export type Category = {
 interface ItemEditState {
     loading: boolean;
     item: ItemComplete;
-    itemOwnerChoices: DropdownProps[];
+    itemOwnerChoices: string[];
     itemPreviewKey: number;
     categoryError: boolean;
     ownerError: boolean;
@@ -64,12 +66,38 @@ const CREATE_ITEM = gql`
         createItem(newItem: $newItem) {
             id
             item_name
+            description
+            imageUrl
+            category
+            totalAvailable
+            maxRequestQty
+            hidden
+            approvalRequired
+            returnRequired
+            owner
         }
     }
 `;
 
-// temporary - will be resolved in a future PR
-const UPDATE_ITEM = CREATE_ITEM;
+// Having this mutation return the item metadata (everything except ID) is
+// what makes the cache update when an item is updated!
+const UPDATE_ITEM = gql`
+    mutation updateItem ($itemId: Int!, $updatedItem: ItemInput!) {
+        updateItem(id: $itemId, updatedItem: $updatedItem) {
+            id
+            item_name
+            description
+            imageUrl
+            category
+            totalAvailable
+            maxRequestQty
+            hidden
+            approvalRequired
+            returnRequired
+            owner
+        }
+    }
+`;
 
 const CATEGORIES_QUERY = gql`
     query categories {
@@ -87,8 +115,8 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
             categoryError: false,
             ownerError: false,
             qtyPerRequestTooLargeError: false,
-            loading: !this.props.createItem,
-            item: {
+            loading: false,
+            item: this.props.createItem ? {
                 item_name: "",
                 description: "",
                 imageUrl: "",
@@ -100,11 +128,8 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                 returnRequired: true,
                 hidden: false,
                 owner: "HackGT"
-            },
-            itemOwnerChoices: [
-                {key: "hackgt", text: "HackGT", value: "HackGT"},
-                {key: "hive", text: "The Hive", value: "The Hive"},
-                {key: "is", text: "Invention Studio", value: "Invention Studio"}],
+            } : this.props.preloadItem,
+            itemOwnerChoices: ["HackGT", "The Hive", "Invention Studio"],
             itemPreviewKey: 0
         };
 
@@ -172,22 +197,21 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                 text: item
             };
         });
+        const editing = !this.props.createItem;
 
-        const itemOwnerChoices = [
-            {key: "hackgt", text: "HackGT", value: "HackGT"},
-            {key: "the_hive", text: "The Hive", value: "The Hive"},
-            {key: "invention_studio", text: "Invention Studio", value: "Invention Studio"}];
+        const itemOwnerChoices = ["HackGT", "The Hive", "Invention Studio"];
 
         const qtyPerRequestTooBigErrorMessage = <Message error visible={this.state.qtyPerRequestTooLargeError}
                                                          size="small"
                                                          content="The quantity allowed per request can't be greater than the quantity in stock."/>;
+
 
         return (
             <Grid columns={16}>
                 <Grid.Row>
                     <Grid.Column width={11}>
                         <Mutation mutation={this.props.createItem ? CREATE_ITEM : UPDATE_ITEM}
-                                  update={(cache: any, {data: {createItem}}: any): any => {
+                                  update={this.props.createItem ? (cache: any, {data: {createItem}}: any): any => {
                                       const {items} = cache.readQuery({query: GET_ITEMS});
                                       cache.writeQuery({
                                           query: GET_ITEMS,
@@ -195,12 +219,13 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                               items: items.concat([createItem])
                                           }
                                       });
-                                  }}
+                                  } : undefined}
                                   refetchQueries={[{
                                       query: CATEGORIES_QUERY
                                   }]}>
                             {(submitForm: any, {loading, error, data}: any) => (
-                                <Form loading={this.state.loading || loading} onChange={this.handleInputChange}
+                                <Form loading={this.state.loading || loading || this.props.loading}
+                                      onChange={this.handleInputChange}
                                       error={this.state.categoryError || this.state.ownerError}
                                       onSubmit={e => {
                                           e.preventDefault();
@@ -216,18 +241,29 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                           if (categoryError || ownerError || qtyPerRequestTooLargeError) {
                                               return;
                                           }
+                                          let variables: any = {newItem: this.state.item};
+                                          if (!this.props.createItem) {
+                                              const itemCopy = this.state.item;
+                                              delete itemCopy.__typename;
+                                              variables = {
+                                                  itemId: this.props.preloadItemId,
+                                                  updatedItem: this.state.item
+                                              };
+                                          }
+
+
+                                          const createOrUpdate = this.props.createItem ? "created" : "updated";
+
                                           submitForm({
-                                              variables: {
-                                                  newItem: this.state.item
-                                              }
+                                              variables
                                           }).then(() => {
-                                              toastManager.add(`Successfully created ${this.state.item.item_name}`, {
+                                              toastManager.add(`Successfully ${createOrUpdate} ${this.state.item.item_name}`, {
                                                   appearance: "success",
                                                   autoDismiss: true,
                                                   placement: "top-center"
                                               });
-                                          }).catch(() => {
-                                              toastManager.add("Couldn't create your item because of an error", {
+                                          }).catch((err: Error) => {
+                                              toastManager.add(`Couldn't ${createOrUpdate} your item because of an error: ${err.message}`, {
                                                   appearance: "error",
                                                   autoDismiss: false,
                                                   placement: "top-center"
@@ -245,10 +281,12 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                     label="Item name"
                                                     type="text"
                                                     name="item_name"
+                                                    value={this.state.item.item_name}
                                                     required
                                                     placeholder="Ventral quark accelerator"/>
                                         <Form.Input width={6}
                                                     name="imageUrl"
+                                                    value={this.state.item.imageUrl}
                                                     label="Image URL"
                                                     type="url"/>
                                     </Form.Group>
@@ -256,6 +294,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                    label="Description"
                                                    type="textarea"
                                                    name="description"
+                                                   value={this.state.item.description}
                                                    rows={2}
                                                    required
                                                    placeholder="Prior to use, dust the dorsal tachyon resistance sensor array."/>
@@ -268,18 +307,13 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                     const queryLoading = result.loading;
                                                     const queryError = result.error;
                                                     const queryData = result.data;
-                                                    let categoriesList: Option[] = [];
+                                                    let categoriesList: string[] = [];
                                                     let dataLoadedKey = 0; // this allows us to "reset" the AddOptionDropdown when we
                                                     // have the list of existing categories it should show.
                                                     // See https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key
                                                     // for more information on why this is necessary and why it works.
                                                     if (queryData && queryData.categories) {
-                                                        categoriesList = queryData.categories.map((c: Category) => {
-                                                            return {
-                                                                value: c.category_name,
-                                                                text: c.category_name
-                                                            };
-                                                        });
+                                                        categoriesList = queryData.categories.map((item: Category) => item.category_name);
                                                         dataLoadedKey = 1;
                                                     }
                                                     const queryErrorMsg = <Message error visible={queryError}
@@ -292,6 +326,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                                            loading={queryLoading}
                                                                            disabled={queryLoading}
                                                                            key={dataLoadedKey}
+                                                                           value={this.state.item.category}
                                                                            options={categoriesList}
                                                                            error={this.state.categoryError}
                                                                            onChange={this.handleInputChangeDropdown}/>
@@ -307,16 +342,19 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                     min={0}
                                                     required
                                                     name="price"
+                                                    value={this.state.item.price || ""}
                                                     labelPosition="left"
                                                     placeholder="42.00">
                                             <Label>$</Label>
                                             <input min={0}/>
                                         </Form.Input>
                                         <Form.Input label="Owner" required>
-                                            <AddOptionDropdown name="owner" required={true} placeholder="Owner"
+                                            <AddOptionDropdown name="owner" required
+                                                               placeholder="Owner"
                                                                options={itemOwnerChoices}
                                                                value={this.state.item.owner}
                                                                error={this.state.ownerError}
+                                                               key={this.state.itemPreviewKey}
                                                                onChange={this.handleInputChangeDropdown}/>
                                         </Form.Input>
                                     </Form.Group>
@@ -328,6 +366,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                     label="Quantity in stock"
                                                     type="number"
                                                     name="totalAvailable"
+                                                    value={this.state.item.totalAvailable || ""}
                                                     error={this.state.qtyPerRequestTooLargeError}
                                                     required
                                                     placeholder="47">
@@ -337,6 +376,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                     label="Quantity allowed per request"
                                                     type="number"
                                                     name="maxRequestQty"
+                                                    value={this.state.item.maxRequestQty || ""}
                                                     error={this.state.qtyPerRequestTooLargeError}
                                                     required
                                                     placeholder="6">
@@ -353,20 +393,24 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
 
                                     <Popup inverted={true} trigger={<Form.Checkbox name="returnRequired"
                                                                                    label="Return required"
+                                                                                   checked={this.state.item.returnRequired}
                                                                                    onChange={this.handleInputChangeCheckbox}
-                                                                                   defaultChecked/>}
+                                    />}
                                            content="Whether users who check out this item are expected to return it"/>
                                     <Popup inverted={true} trigger={<Form.Checkbox label="Approval required"
                                                                                    name="approvalRequired"
+                                                                                   checked={this.state.item.approvalRequired}
                                                                                    onChange={this.handleInputChangeCheckbox}
-                                                                                   defaultChecked/>}
+                                    />}
                                            content="Whether hardware checkout staff must approve requests for this item"/>
                                     <Popup inverted={true} trigger={<Form.Checkbox label="Hidden"
                                                                                    name="hidden"
+                                                                                   checked={this.state.item.hidden}
                                                                                    onChange={this.handleInputChangeCheckbox}/>}
                                            content="Whether to hide this item on the public list of hardware"/>
 
-                                    <Button primary type="submit">Create item</Button>
+                                    <Button primary
+                                            type="submit">{this.props.createItem ? "Create item" : "Edit item"}</Button>
 
                                 </Form>
                             )}
