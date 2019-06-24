@@ -10,7 +10,11 @@ type Query {
 }
 
 type Mutation {
+    # Create a new item
 	createItem(newItem: ItemInput!): Item!
+    # Update the item with the specified ID to have the properties in updatedItem.  At this time
+    #    all fields must be included
+    updateItem(id: Int!, updatedItem: ItemInput!): Item!
 }
 
 type User {
