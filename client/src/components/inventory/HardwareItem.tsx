@@ -231,7 +231,7 @@ class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItem
 
         const editBtn = this.props.user && this.props.user.admin ? (<Button size="mini" basic primary={true} icon labelPosition="left">
             <Icon name="pencil"/>
-            <Link to={"admin/items/" + this.props.id}>Edit</Link>
+            <Link to={`admin/items/${this.props.id}`}>Edit</Link>
         </Button>) : "";
         return (
             <Item>
