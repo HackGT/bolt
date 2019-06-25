@@ -207,7 +207,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
 
 
         return (
-            <Grid columns={16}>
+            <Grid columns={16} stackable>
                 <Grid.Row>
                     <Grid.Column width={11}>
                         <Mutation mutation={this.props.createItem ? CREATE_ITEM : UPDATE_ITEM}
