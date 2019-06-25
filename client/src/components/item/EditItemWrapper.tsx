@@ -59,7 +59,7 @@ class EditItemWrapper extends Component<EditItemProps, EditItemState> {
                     {
                         ({loading, error, data}: any) => {
                             if (loading) {
-                                return <Loader active={true} content="Just a sec!"/>;
+                                return <Loader active inline="centered" content="Just a sec!"/>;
                             } else if (error) {
                                 return <Message error visible={true}
                                                 header="Can't fetch item"
