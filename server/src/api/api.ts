@@ -7,7 +7,6 @@ import graphqlHTTP from "express-graphql";
 import {buildSchema, GraphQLError} from "graphql";
 import {Category, DB} from "../database";
 import {isAdminNoAuthCheck} from "../auth/auth";
-// import {MutationResolvers, QueryResolvers} from "./api.graphql";
 
 const schemaFile = path.join(__dirname, "./api.graphql");
 const schema = buildSchema(fs.readFileSync(schemaFile, {encoding: "utf8"}));
@@ -104,7 +103,6 @@ const resolvers: any = {
     /* Mutations */
     /**
      * Create a new item
-     * TODO: implement
      * TODO: error handling?
      * Access level: admins
      * @param root
@@ -159,6 +157,7 @@ const resolvers: any = {
             console.log(`Existing category named "${args.newItem.category}" found with ID ${categoryId}.`);
         }
 
+        const savedCategory = args.newItem.category;
         delete args.newItem.category; // Remove the category property from the input item so knex won't try to add it to the database
 
         const newObjId = await DB.from("items").insert({
@@ -170,7 +169,83 @@ const resolvers: any = {
 
         return {
             id: newObjId[0],
+            category: savedCategory,
             ...args.newItem
+        };
+    },
+    /**
+     * Update an existing item given its ID
+     * TODO: reduce duplicate code from createItem
+     * @param root
+     * @param _args
+     * @param _context
+     */
+    updateItem: async (root, _args, _context) => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+
+        // Restrict endpoint to admins
+        if (!context.user.admin) {
+            throw new GraphQLError("You do not have permission to access the updateItem endpoint");
+        }
+
+        if (!args.id || args.id <= 0) {
+            throw new GraphQLError("You must provide a valid item ID (greater than or equal to 0) to update an item.");
+        }
+
+        if (!args.updatedItem.item_name.trim().length) {
+            throw new GraphQLError("The item name (item_name) can't be empty.");
+        }
+
+        if (!args.updatedItem.category.trim().length) {
+            throw new GraphQLError("The category for this item can't be blank.");
+        }
+
+        if (args.updatedItem.totalAvailable < 0) {
+            throw new GraphQLError(`The total quantity available (totalQtyAvailable) for a new item can't be less than 0.  Value provided: ${args.updatedItem.totalAvailable}`);
+        }
+
+        if (args.updatedItem.maxRequestQty < 1) {
+            throw new GraphQLError(`The max request quantity (maxRequestQty) must be at least 1.  Value provided: ${args.updatedItem.maxRequestQty}`);
+        }
+
+        if (args.updatedItem.maxRequestQty > args.updatedItem.totalAvailable) {
+            throw new GraphQLError(`The max request quantity (maxRequestQty) can't be greater than the total quantity of this item (totalAvailable) that is available.  maxRequestQty: ${args.updatedItem.maxRequestQty}, totalAvailable: ${args.updatedItem.totalAvailable}`);
+        }
+
+        const matchingCategories = await DB.from("categories").where({
+            category_name: args.updatedItem.category
+        });
+
+        let categoryId;
+        if (!matchingCategories.length) {
+            // TODO: what if there's an error here?
+            // TODO: currently the category name must be an exact match
+            categoryId = await DB.from("categories").insert({
+                category_name: args.updatedItem.category
+            }).returning("category_id");
+            console.log(categoryId);
+            categoryId = categoryId[0];
+            console.log(`No existing category named "${args.updatedItem.category}".  Created a new category with ID ${categoryId}.`);
+        } else {
+            categoryId = matchingCategories[0].category_id;
+            console.log(`Existing category named "${args.updatedItem.category}" found with ID ${categoryId}.`);
+        }
+
+        const savedCategory = args.updatedItem.category;
+        delete args.updatedItem.category; // Remove the category property from the input item so knex won't try to add it to the database
+
+        await DB.from("items")
+            .where({item_id: args.id})
+            .update({
+                category_id: categoryId,
+                ...args.updatedItem
+            });
+
+        return {
+            id: args.id,
+            category: savedCategory,
+            ...args.updatedItem
         };
     },
     categories: async (root, _args, _context): Promise<[Category]> => {

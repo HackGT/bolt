@@ -5,7 +5,7 @@ interface AddOptionDropdownProps {
     name: string;
     required: boolean;
     placeholder: string;
-    options: Option[];
+    options: string[];
     loading?: boolean;
     disabled?: boolean;
     error?: boolean;
@@ -26,11 +26,23 @@ interface AddOptionDropdownState {
 class AddOptionDropdown extends Component<AddOptionDropdownProps, AddOptionDropdownState> {
     constructor(props: AddOptionDropdownProps) {
         super(props);
+        // tslint:disable-next-line:prefer-const
+        let options: string[] = this.props.options;
+
+        if (this.props.value && this.props.options.indexOf(this.props.value) === -1) {
+            options.push(this.props.value);
+        }
 
         this.state = {
-            options: this.props.options,
+            options: options.map(item => {
+                return {
+                    text: item,
+                    value: item
+                };
+            }),
             currentValue: this.props.value || ""
         };
+
     }
 
     public handleAddition = (e: any, {value}: any) => {
