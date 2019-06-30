@@ -7,6 +7,8 @@ type Query {
 	items: [Item!]
     # Get a list containing each category that is on at least one item
     categories: [Category!]
+	# Get a single request by its ID
+	request(id: Int!): Request
 }
 
 type Mutation {
@@ -77,4 +79,32 @@ type Category {
     category_id: Int!
     # The human-readable, user-facing name for this category
     category_name: String!
+}
+
+enum RequestStatus {
+	SUBMITTED
+	APPROVED
+	DENIED
+	ABANDONED
+	READY_FOR_PICKUP
+	FULFILLED
+	RETURNED
+	LOST
+	DAMAGED
+}
+
+type Request {
+	request_id: Int!,
+	user: User!,
+	item: Item!,
+	status: RequestStatus!,
+	quantity: Int!,
+	createdAt: String!,
+	updatedAt: String!
+}
+
+input RequestInput {
+	user_id: String!,
+	item_id: Int!,
+	quantity: Int!
 }

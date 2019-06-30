@@ -115,7 +115,7 @@ createTable("users", table => {
         table.integer("item_id").unsigned().references("item_id").inTable("items").notNullable();
         table.integer("quantity").unsigned().notNullable();
         table.uuid("user_id").references("uuid").inTable("users").notNullable();
-        table.enum("request_status", REQUEST_STATUSES);
+        table.enum("status", REQUEST_STATUSES);
         table.timestamps(true, true); // adds timestamps with timezones to requests,
         //     the caveat is that as of 2019 the TIMESTAMP  type will overflow in 2038... FYI future Earthlings working
         //     on this project.  http://code.openark.org/blog/mysql/timestamp-vs-datetime-which-should-i-be-using

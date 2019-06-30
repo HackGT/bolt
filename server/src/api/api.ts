@@ -99,6 +99,62 @@ const resolvers: any = {
             };
         });
     },
+    request: async (root, _args, _context) => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+
+        if (args.id <= 0) {
+            throw new GraphQLError("Invalid request ID.  The request ID you provided was <= 0, but request IDs must be >= 1.");
+        }
+
+        let request = await DB.from("requests")
+            .where({request_id: args.id})
+            .join("users", "requests.user_id", "=", "users.uuid")
+            .join("items", "requests.item_id", "=", "items.item_id")
+            .join("categories", "categories.category_id", "=", "items.category_id");
+
+        if (request.length === 0) {
+            return null;
+        }
+
+        request = request[0];
+        console.log("request", request);
+        console.log("request.haveID", request.haveID);
+        // TODO: use a mapper for this
+        const user = {
+            uuid: request.uuid,
+            admin: request.admin,
+            name: request.name,
+            email: request.email,
+            phone: request.phone,
+            slackUsername: request.slackUsername,
+            haveID: request.haveID
+        };
+
+        const item = {
+            id: request.item_id,
+            item_name: request.item_name,
+            description: request.description,
+            imageUrl: request.imageUrl,
+            category: request.category_name,
+            totalAvailable: request.totalAvailable,
+            maxRequestQty: request.maxRequestQty,
+            price: request.price, // TODO: should not be accessible to non-admins
+            hidden: request.hidden,
+            returnRequired: request.returnRequired,
+            approvalRequired: request.approvalRequired,
+            owner: request.owner // TODO: should not be accessible to non-admins
+        };
+
+        return {
+            user,
+            item,
+            status: request.status,
+            quantity: request.quantity,
+            createdAt: request.created_at.toLocaleString(),
+            updatedAt: request.updated_at.toLocaleString()
+        };
+    },
 
     /* Mutations */
     /**
