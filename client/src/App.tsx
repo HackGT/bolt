@@ -14,6 +14,7 @@ import {connect} from "react-redux";
 import PrivateRoute from "./components/util/PrivateRoute";
 import RequestManagementContainer from "./components/RequestManagementContainer";
 import AdminOverviewContainer from "./components/admin/AdminOverviewContainer";
+import {bugsnagClient} from "./index";
 
 export interface OwnProps {}
 
@@ -48,9 +49,16 @@ class App extends Component<Props, {}> {
             const user = json.data.user;
             if (user) {
                 store.dispatch(setUser(user));
+                bugsnagClient.user = user;
             }
         } else {
-            console.error("Invalid user information returned by server, can't sign in:", json);
+            console.error("Invalid user information returned by server, can't sign in: ", json);
+            bugsnagClient.notify("Invalid user information returned by server, can't sign in", {
+                severity: "error",
+                metaData: {
+                    fetchResult: json
+                }
+            });
         }
     }
 

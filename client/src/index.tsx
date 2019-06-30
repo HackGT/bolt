@@ -11,6 +11,9 @@ import {ApolloLink} from "apollo-link";
 import {onError} from "apollo-link-error";
 import {HttpLink} from "apollo-link-http";
 import {InMemoryCache} from "apollo-cache-inmemory";
+import bugsnag from "@bugsnag/js";
+import bugsnagReact from "@bugsnag/plugin-react";
+import packageJson from "../package.json";
 
 // @ts-ignore
 const client = new ApolloClient({
@@ -38,12 +41,21 @@ const client = new ApolloClient({
     }
 });
 
+export const bugsnagClient = bugsnag({
+    apiKey: "f58d12ac7715ad9ffcfdd17fa3b93fc0",
+    appVersion: `${packageJson.version}`
+});
+bugsnagClient.use(bugsnagReact, React);
+const ErrorBoundary = bugsnagClient.getPlugin("react");
+
 ReactDOM.render(
-    (<ApolloProvider client={client}>
-        <Provider store={store}>
-            <App/>
-        </Provider>
-    </ApolloProvider>), document.getElementById("root"));
+    (<ErrorBoundary>
+        <ApolloProvider client={client}>
+            <Provider store={store}>
+                <App/>
+            </Provider>
+        </ApolloProvider>
+    </ErrorBoundary>), document.getElementById("root"));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
