@@ -7,6 +7,8 @@ import graphqlHTTP from "express-graphql";
 import {buildSchema, GraphQLError} from "graphql";
 import {Category, DB} from "../database";
 import {isAdminNoAuthCheck} from "../auth/auth";
+import {nestedRequest} from "./requests";
+import {RequestSearch} from "./api.graphql";
 
 const schemaFile = path.join(__dirname, "./api.graphql");
 const schema = buildSchema(fs.readFileSync(schemaFile, {encoding: "utf8"}));
@@ -99,61 +101,53 @@ const resolvers: any = {
             };
         });
     },
-    request: async (root, _args, _context) => {
+    requests: async (root, _args, _context) => {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
 
-        if (args.id <= 0) {
-            throw new GraphQLError("Invalid request ID.  The request ID you provided was <= 0, but request IDs must be >= 1.");
+        //
+        // if (args.id <= 0) {
+        //     throw new GraphQLError("Invalid request ID.  The request ID you provided was <= 0, but request IDs must be >= 1.");
+        // }
+
+        const searchObj: RequestSearch = {};
+
+        if (args.search.item_id) {
+            // TODO: validation
+            searchObj.item_id = args.search.item_id;
         }
 
-        let request = await DB.from("requests")
-            .where({request_id: args.id})
+        if (args.search.request_id) {
+            // TODO: validation
+            searchObj.request_id = args.search.request_id;
+        }
+
+        if (args.search.user_id) {
+            // TODO: validation
+            searchObj.user_id = args.search.user_id;
+        }
+
+        if (args.search.status) {
+            searchObj.status = args.search.status;
+        }
+
+        const requests = await DB.from("requests")
+            .where(searchObj)
             .join("users", "requests.user_id", "=", "users.uuid")
-            .join("items", "requests.item_id", "=", "items.item_id")
+            .join("items", "requests.request_item_id", "=", "items.item_id")
             .join("categories", "categories.category_id", "=", "items.category_id");
 
-        if (request.length === 0) {
+        if (requests.length === 0) {
             return null;
         }
 
-        request = request[0];
-        console.log("request", request);
-        console.log("request.haveID", request.haveID);
-        // TODO: use a mapper for this
-        const user = {
-            uuid: request.uuid,
-            admin: request.admin,
-            name: request.name,
-            email: request.email,
-            phone: request.phone,
-            slackUsername: request.slackUsername,
-            haveID: request.haveID
-        };
-
-        const item = {
-            id: request.item_id,
-            item_name: request.item_name,
-            description: request.description,
-            imageUrl: request.imageUrl,
-            category: request.category_name,
-            totalAvailable: request.totalAvailable,
-            maxRequestQty: request.maxRequestQty,
-            price: request.price, // TODO: should not be accessible to non-admins
-            hidden: request.hidden,
-            returnRequired: request.returnRequired,
-            approvalRequired: request.approvalRequired,
-            owner: request.owner // TODO: should not be accessible to non-admins
-        };
-
-        return {
-            user,
-            item,
-            status: request.status,
-            quantity: request.quantity,
-            createdAt: request.created_at.toLocaleString(),
-            updatedAt: request.updated_at.toLocaleString()
-        };
+        return requests.reduce((result, request) => {
+            // Only return requests user is allowed to see
+            if (context.user.admin || context.user.uuid === requests.uuid) {
+                result.push(nestedRequest(request));
+                return result;
+            }
+        }, []);
     },
 
     /* Mutations */
@@ -308,7 +302,8 @@ const resolvers: any = {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
         return await DB.from("categories");
-    }
+    },
+
 };
 
 apiRoutes.post("/", graphqlHTTP({

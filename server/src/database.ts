@@ -112,7 +112,7 @@ createTable("users", table => {
 
     createTable("requests", table => {
         table.increments("request_id"); // use of increments also makes this the primary key
-        table.integer("item_id").unsigned().references("item_id").inTable("items").notNullable();
+        table.integer("request_item_id").unsigned().references("item_id").inTable("items").notNullable();
         table.integer("quantity").unsigned().notNullable();
         table.uuid("user_id").references("uuid").inTable("users").notNullable();
         table.enum("status", REQUEST_STATUSES);

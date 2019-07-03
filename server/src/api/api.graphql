@@ -8,7 +8,7 @@ type Query {
     # Get a list containing each category that is on at least one item
     categories: [Category!]
 	# Get a single request by its ID
-	request(id: Int!): Request
+    requests(search: RequestSearch!): [Request]
 }
 
 type Mutation {
@@ -101,6 +101,14 @@ type Request {
 	quantity: Int!,
 	createdAt: String!,
 	updatedAt: String!
+}
+
+
+input RequestSearch {
+    item_id: Int,
+    request_id: Int,
+    user_id: String,
+    status: RequestStatus
 }
 
 input RequestInput {
