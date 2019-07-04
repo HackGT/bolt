@@ -107,6 +107,7 @@ const resolvers: any = {
 
         const searchObj: RequestSearch = {};
 
+
         if (args.search.item_id) {
             searchObj.item_id = args.search.item_id;
         }
@@ -123,19 +124,25 @@ const resolvers: any = {
             searchObj.status = args.search.status;
         }
 
+        // If user is not an admin
+        if (!context.user.admin) {
+            // then if they are requesting requests for a user that is not themselves
+            if (args.search.user_id && args.search.user_id !== context.user.uuid) {
+                // return an empty array and avoid making a DB query
+                return [];
+            }
+
+            // otherwise, restrict their results to just their user ID
+            searchObj.user_id = context.user.uuid;
+        }
+
         const requests = await DB.from("requests")
             .where(searchObj)
             .join("users", "requests.user_id", "=", "users.uuid")
             .join("items", "requests.request_item_id", "=", "items.item_id")
             .join("categories", "categories.category_id", "=", "items.category_id");
 
-        return requests.reduce((result, request) => {
-            // Only return requests user is allowed to see
-            if (context.user.admin || context.user.uuid === request.uuid) {
-                result.push(nestedRequest(request));
-            }
-            return result;
-        }, []);
+        return requests.map(request => nestedRequest(request));
     },
 
     /* Mutations */
