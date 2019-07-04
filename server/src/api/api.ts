@@ -105,25 +105,17 @@ const resolvers: any = {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
 
-        //
-        // if (args.id <= 0) {
-        //     throw new GraphQLError("Invalid request ID.  The request ID you provided was <= 0, but request IDs must be >= 1.");
-        // }
-
         const searchObj: RequestSearch = {};
 
         if (args.search.item_id) {
-            // TODO: validation
             searchObj.item_id = args.search.item_id;
         }
 
         if (args.search.request_id) {
-            // TODO: validation
             searchObj.request_id = args.search.request_id;
         }
 
         if (args.search.user_id) {
-            // TODO: validation
             searchObj.user_id = args.search.user_id;
         }
 
@@ -137,16 +129,12 @@ const resolvers: any = {
             .join("items", "requests.request_item_id", "=", "items.item_id")
             .join("categories", "categories.category_id", "=", "items.category_id");
 
-        if (requests.length === 0) {
-            return null;
-        }
-
         return requests.reduce((result, request) => {
             // Only return requests user is allowed to see
-            if (context.user.admin || context.user.uuid === requests.uuid) {
+            if (context.user.admin || context.user.uuid === request.uuid) {
                 result.push(nestedRequest(request));
-                return result;
             }
+            return result;
         }, []);
     },
 
