@@ -1,4 +1,5 @@
 import {RequestStatus} from "./api.graphql";
+import moment from "moment";
 
 export interface KnexRequest {
     request_id: number;
@@ -28,6 +29,10 @@ export interface KnexRequest {
     haveID: boolean;
 }
 
+function localTimestamp(createdAt: string): string {
+    return moment(createdAt).toISOString(true);
+}
+
 export function nestedRequest(request: KnexRequest) {
     const user = {
         uuid: request.uuid,
@@ -54,12 +59,13 @@ export function nestedRequest(request: KnexRequest) {
         owner: request.owner // TODO: should not be accessible to non-admins
     };
 
+
     return {
         user,
         item,
         status: request.status,
         quantity: request.quantity,
-        createdAt: request.created_at.toLocaleString(),
-        updatedAt: request.updated_at.toLocaleString()
+        createdAt: localTimestamp(request.created_at),
+        updatedAt: localTimestamp(request.updated_at)
     };
 }
