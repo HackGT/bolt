@@ -43,7 +43,16 @@ export function localTimestamp(createdAt: string): string {
     return moment(createdAt).toISOString(true);
 }
 
-export function nestedRequest(request: KnexRequest) {
+/**
+ * Return null if user is not an admin
+ * @param val
+ * @param isAdmin
+ */
+export function onlyIfAdmin(val: any, isAdmin: boolean) {
+    return (isAdmin) ? val : null;
+}
+
+export function nestedRequest(request: KnexRequest, isAdmin: boolean) {
     const user = {
         uuid: request.uuid,
         admin: request.admin,
@@ -62,11 +71,11 @@ export function nestedRequest(request: KnexRequest) {
         category: request.category_name,
         totalAvailable: request.totalAvailable,
         maxRequestQty: request.maxRequestQty,
-        price: request.price, // TODO: should not be accessible to non-admins
+        price: onlyIfAdmin(request.price, isAdmin),
         hidden: request.hidden,
         returnRequired: request.returnRequired,
         approvalRequired: request.approvalRequired,
-        owner: request.owner // TODO: should not be accessible to non-admins
+        owner: onlyIfAdmin(request.owner, isAdmin)
     };
 
 

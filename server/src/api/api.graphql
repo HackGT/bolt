@@ -17,6 +17,7 @@ type Mutation {
     # Update the item with the specified ID to have the properties in updatedItem.  At this time
     #    all fields must be included
     updateItem(id: Int!, updatedItem: ItemInput!): Item!
+    createRequest(newRequest: RequestInput!):  Request
 }
 
 type User {
@@ -41,16 +42,16 @@ type Item {
 	totalAvailable: Int!
 	# The largest quantity of this item that can be requested in one request
 	maxRequestQty: Int!
-	# The value of this item to replace it if lost or damaged
-	price: Float!
+    # The value of this item to replace it if lost or damaged (only visible to admins)
+    price: Float
 	# Whether to show this item to non-admins on the hardware list
 	hidden: Boolean!
 	# Whether people who check out this item are expected to return it
 	returnRequired: Boolean!
 	# Whether admin approval is required before requests for this item will be processed
 	approvalRequired: Boolean!
-	# The person or organization that owns this item
-	owner: String!
+    # The person or organization that owns this item (only visible to admins)
+    owner: String
 }
 
 input ItemInput {
@@ -86,6 +87,7 @@ enum RequestStatus {
 	APPROVED
 	DENIED
 	ABANDONED
+    CANCELLED
 	READY_FOR_PICKUP
 	FULFILLED
 	RETURNED
@@ -103,7 +105,6 @@ type Request {
 	updatedAt: String!
 }
 
-
 input RequestSearch {
     item_id: Int,
     request_id: Int,
@@ -113,6 +114,6 @@ input RequestSearch {
 
 input RequestInput {
 	user_id: String!,
-	item_id: Int!,
+    request_item_id: Int!,
 	quantity: Int!
 }

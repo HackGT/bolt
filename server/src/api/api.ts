@@ -7,8 +7,7 @@ import graphqlHTTP from "express-graphql";
 import {buildSchema, GraphQLError} from "graphql";
 import {Category, DB} from "../database";
 import {isAdminNoAuthCheck} from "../auth/auth";
-import {nestedRequest} from "./requests";
-import {RequestSearch} from "./api.graphql";
+import {localTimestamp, nestedRequest, onlyIfAdmin, RequestStatus} from "./requests";
 
 const schemaFile = path.join(__dirname, "./api.graphql");
 const schema = buildSchema(fs.readFileSync(schemaFile, {encoding: "utf8"}));
@@ -21,6 +20,29 @@ function fixArguments<A, B, C>(fakeRoot: A, fakeArgs: B, fakeContext: C): { args
     return {
         args: fakeRoot as unknown as B,
         context: fakeArgs as unknown as C
+    };
+}
+
+async function getItem(itemId: number, isAdmin: boolean) {
+    if (itemId <= 0) {
+        throw new GraphQLError("Invalid item ID.  The item ID you provided was <= 0, but item IDs must be >= 1.");
+    }
+
+    let item = await DB.from("items")
+        .join("categories", "items.category_id", "=", "categories.category_id")
+        .where({item_id: itemId});
+
+    if (item.length === 0) {
+        return null;
+    }
+    item = item[0];
+
+    return {
+        ...item,
+        id: item.item_id,
+        category: item.category_name,
+        price: onlyIfAdmin(item.price, isAdmin),
+        owner: onlyIfAdmin(item.owner, isAdmin)
     };
 }
 
@@ -59,25 +81,7 @@ const resolvers: any = {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
 
-        if (args.id <= 0) {
-            throw new GraphQLError("Invalid item ID.  The item ID you provided was <= 0, but item IDs must be >= 1.");
-        }
-
-        let item = await DB.from("items")
-            .join("categories", "items.category_id", "=", "categories.category_id")
-            .where({item_id: args.id});
-
-        if (item.length === 0) {
-            return null;
-        }
-        item = item[0];
-
-        return {
-            id: item.item_id,
-            category: item.category_name,
-
-            ...item
-        };
+        return await getItem(args.id, context.user.admin);
     },
     /**
      * Bulk items API
@@ -95,17 +99,24 @@ const resolvers: any = {
 
         return items.map(item => {
             return {
+                ...item,
                 id: item.item_id,
                 category: item.category_name,
-                ...item
+                price: onlyIfAdmin(item.price, context.user.admin),
+                owner: onlyIfAdmin(item.owner, context.user.admin)
             };
         });
+    },
+    categories: async (root, _args, _context): Promise<[Category]> => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+        return await DB.from("categories");
     },
     requests: async (root, _args, _context) => {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
 
-        const searchObj: RequestSearch = {};
+        const searchObj: any = {};
 
 
         if (args.search.item_id) {
@@ -142,7 +153,7 @@ const resolvers: any = {
             .join("items", "requests.request_item_id", "=", "items.item_id")
             .join("categories", "categories.category_id", "=", "items.category_id");
 
-        return requests.map(request => nestedRequest(request));
+        return requests.map(request => nestedRequest(request, context.user.admin));
     },
 
     /* Mutations */
@@ -293,10 +304,69 @@ const resolvers: any = {
             ...args.updatedItem
         };
     },
-    categories: async (root, _args, _context): Promise<[Category]> => {
+    createRequest: async (root, _args, _context) => {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
-        return await DB.from("categories");
+        // if non-admin, user on request must be user signed in
+        // TODO: test this
+        if (!context.user.admin && context.user.uuid !== args.newRequest.user_id) {
+            throw new GraphQLError("Unable to create request because you are not an admin and your UUID " +
+                "does not match the UUID of the user this request is for");
+        }
+
+        // make sure the user the request is for exists
+        const users = await DB.from("users").where({
+            uuid: args.newRequest.user_id
+        }).select("name", "email", "uuid", "phone", "slackUsername", "haveID", "admin");
+
+        let user;
+        if (users.length === 0) {
+            throw new GraphQLError("Unable to create this request because no user with the UUID provided was found");
+        } else {
+            user = users[0];
+        }
+
+        // fetch the item
+        const item: any = await getItem(args.newRequest.request_item_id, context.user.admin);
+
+        if (!item) {
+            throw new GraphQLError("Can't create request for item that doesn't exist!  Item ID provided: ", args.newRequest.request_item_id);
+        }
+
+        // clip item quantity to allowed values
+        if (args.newRequest.quantity > item.maxRequestQty) {
+            console.log("clipping request quantity (too high), original:", args.newRequest.quantity, ", new:", item.maxRequestQty);
+            args.newRequest.quantity = item.maxRequestQty;
+        } else if (args.newRequest.quantity < 1) {
+            console.log("clipping request quantity (too low), original:", args.newRequest.quantity, ", new:", 1);
+            args.newRequest.quantity = 1;
+        }
+
+        // TODO: if item has approvalRequired == false, initial status should be APPROVED as long as the total qty
+        //       of this item the user has requested
+        let initialStatus: RequestStatus = "SUBMITTED";
+        console.log("item", item);
+        if (!item.approvalRequired) {
+            initialStatus = "APPROVED";
+        }
+
+        // return the request object with the item, censoring price/owner for non-admins
+        let newRequest = await DB.from("requests").insert({
+            ...args.newRequest,
+            status: initialStatus
+        })
+            .returning(["request_id", "created_at", "updated_at"]);
+
+        newRequest = newRequest[0];
+        return {
+            request_id: newRequest.request_id,
+            quantity: args.newRequest.quantity,
+            status: initialStatus,
+            item,
+            user,
+            createdAt: localTimestamp(newRequest.created_at),
+            updatedAt: localTimestamp(newRequest.updated_at)
+        };
     },
 
 };
