@@ -103,6 +103,7 @@ createTable("users", table => {
         "APPROVED",
         "DENIED",
         "ABANDONED",
+        "CANCELLED",
         "READY_FOR_PICKUP",
         "FULFILLED",
         "RETURNED",

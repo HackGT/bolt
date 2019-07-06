@@ -1,5 +1,15 @@
-import {RequestStatus} from "./api.graphql";
 import moment from "moment";
+
+export type RequestStatus = "SUBMITTED"
+    | "APPROVED"
+    | "DENIED"
+    | "ABANDONED"
+    | "CANCELLED"
+    | "READY_FOR_PICKUP"
+    | "FULFILLED"
+    | "RETURNED"
+    | "LOST"
+    | "DAMAGE";
 
 export interface KnexRequest {
     request_id: number;
@@ -29,7 +39,7 @@ export interface KnexRequest {
     haveID: boolean;
 }
 
-function localTimestamp(createdAt: string): string {
+export function localTimestamp(createdAt: string): string {
     return moment(createdAt).toISOString(true);
 }
 
