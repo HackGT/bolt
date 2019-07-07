@@ -11,12 +11,15 @@ export type RequestStatus = "SUBMITTED"
     | "LOST"
     | "DAMAGE";
 
-export interface KnexRequest {
+export interface KnexSimpleRequest {
     request_id: number;
     status: RequestStatus;
     quantity: number;
     created_at: string;
     updated_at: string;
+}
+
+export interface KnexRequest extends KnexSimpleRequest {
     item_id: number;
     item_name: string;
     description: string;
@@ -38,6 +41,7 @@ export interface KnexRequest {
     slackUsername: string;
     haveID: boolean;
 }
+
 
 export function localTimestamp(createdAt: string): string {
     return moment(createdAt).toISOString(true);
@@ -82,6 +86,17 @@ export function nestedRequest(request: KnexRequest, isAdmin: boolean) {
     return {
         user,
         item,
+        request_id: request.request_id,
+        status: request.status,
+        quantity: request.quantity,
+        createdAt: localTimestamp(request.created_at),
+        updatedAt: localTimestamp(request.updated_at)
+    };
+}
+
+export function toSimpleRequest(request: KnexSimpleRequest) {
+    return {
+        request_id: request.request_id,
         status: request.status,
         quantity: request.quantity,
         createdAt: localTimestamp(request.created_at),

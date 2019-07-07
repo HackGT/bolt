@@ -17,7 +17,8 @@ type Mutation {
     # Update the item with the specified ID to have the properties in updatedItem.  At this time
     #    all fields must be included
     updateItem(id: Int!, updatedItem: ItemInput!): Item!
-    createRequest(newRequest: RequestInput!):  Request
+	createRequest(newRequest: RequestInput!):  Request!
+	updateRequest(updatedRequest: RequestUpdateInput!): SimpleRequest
     # Delete the request with the specified ID.  Returns true if successful; otherwise, false
     deleteRequest(id: Int!): Boolean!
 }
@@ -107,6 +108,15 @@ type Request {
 	updatedAt: String!
 }
 
+# Simple representation of a request without the linked item or user
+type SimpleRequest {
+	request_id: Int!,
+	status: RequestStatus!,
+	quantity: Int!,
+	createdAt: String!,
+	updatedAt: String!
+}
+
 input RequestSearch {
     item_id: Int,
     request_id: Int,
@@ -118,4 +128,10 @@ input RequestInput {
 	user_id: String!,
     request_item_id: Int!,
 	quantity: Int!
+}
+
+input RequestUpdateInput {
+	request_id: Int!,
+	new_quantity: Int,
+	new_status: RequestStatus
 }

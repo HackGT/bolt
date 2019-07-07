@@ -7,7 +7,7 @@ import graphqlHTTP from "express-graphql";
 import {buildSchema, GraphQLError} from "graphql";
 import {Category, DB} from "../database";
 import {isAdminNoAuthCheck} from "../auth/auth";
-import {localTimestamp, nestedRequest, onlyIfAdmin, RequestStatus} from "./requests";
+import {localTimestamp, nestedRequest, onlyIfAdmin, RequestStatus, toSimpleRequest} from "./requests";
 
 const schemaFile = path.join(__dirname, "./api.graphql");
 const schema = buildSchema(fs.readFileSync(schemaFile, {encoding: "utf8"}));
@@ -232,6 +232,7 @@ const resolvers: any = {
     /**
      * Update an existing item given its ID
      * TODO: reduce duplicate code from createItem
+     * TODO: should be refactored to be like updateRequest
      * @param root
      * @param _args
      * @param _context
@@ -382,10 +383,51 @@ const resolvers: any = {
             })
             .del();
 
-        console.log(numRowsAffected);
-
         return numRowsAffected !== 0;
+    },
+    updateRequest: async (root, _args, _context) => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
 
+        if (!context.user.admin) {
+            throw new GraphQLError("You do not have permission to access the updateRequest endpoint.");
+        }
+
+        const updateObj: any = {};
+
+        // Not going to validate against maxRequestQty since only admins can change this currently
+
+        const newQuantity = args.updatedRequest.new_quantity;
+        if (newQuantity) {
+            if (newQuantity <= 0) {
+                throw new GraphQLError(`Invalid new requested quantity of ${newQuantity} specified.  The new requested quantity must be >= 1.`);
+            }
+            updateObj.quantity = Math.max(newQuantity, 1);
+        }
+
+        // TODO: status change validation logic
+        if (args.updatedRequest.new_status) {
+            updateObj.status = args.updatedRequest.new_status;
+        }
+
+        if (Object.keys(updateObj).length >= 1) {
+            updateObj.updated_at = new Date();
+
+            const updatedRequest = await DB.from("requests")
+                .where({
+                    request_id: args.updatedRequest.request_id,
+                })
+                .update(updateObj)
+                .returning(["request_id", "quantity", "status", "created_at", "updated_at"]);
+
+            if (updatedRequest.length === 0) {
+                return null;
+            }
+
+            return toSimpleRequest(updatedRequest[0]);
+        }
+
+        return null;
     }
 
 };
