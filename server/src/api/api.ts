@@ -368,6 +368,25 @@ const resolvers: any = {
             updatedAt: localTimestamp(newRequest.updated_at)
         };
     },
+    deleteRequest: async (root, _args, _context): Promise<boolean> => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+
+        if (!context.user.admin) {
+            throw new GraphQLError("You do not have permission to access the deleteRequest endpoint.");
+        }
+
+        const numRowsAffected = await DB.from("requests")
+            .where({
+                request_id: args.id,
+            })
+            .del();
+
+        console.log(numRowsAffected);
+
+        return numRowsAffected !== 0;
+
+    }
 
 };
 

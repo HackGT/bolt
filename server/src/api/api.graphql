@@ -18,6 +18,8 @@ type Mutation {
     #    all fields must be included
     updateItem(id: Int!, updatedItem: ItemInput!): Item!
     createRequest(newRequest: RequestInput!):  Request
+    # Delete the request with the specified ID.  Returns true if successful; otherwise, false
+    deleteRequest(id: Int!): Boolean!
 }
 
 type User {
