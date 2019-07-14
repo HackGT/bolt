@@ -7,7 +7,7 @@ type Query {
 	items: [Item!]
     # Get a list containing each category that is on at least one item
     categories: [Category!]
-	# Get a single request by its ID
+	# Return request(s) matching the search query provided and that the user has permission to see
     requests(search: RequestSearch!): [Request]
 }
 
@@ -98,16 +98,6 @@ enum RequestStatus {
 	DAMAGED
 }
 
-type Request {
-	request_id: Int!,
-	user: User!,
-	item: Item!,
-	status: RequestStatus!,
-	quantity: Int!,
-	createdAt: String!,
-	updatedAt: String!
-}
-
 # Simple representation of a request without the linked item or user
 type SimpleRequest {
 	request_id: Int!,
@@ -116,6 +106,17 @@ type SimpleRequest {
 	createdAt: String!,
 	updatedAt: String!
 }
+
+type Request {
+	user: User!,
+	item: Item!,
+	status: RequestStatus!,
+	quantity: Int!,
+	createdAt: String!,
+	updatedAt: String!
+}
+
+
 
 input RequestSearch {
     item_id: Int,

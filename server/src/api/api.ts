@@ -320,12 +320,11 @@ const resolvers: any = {
             uuid: args.newRequest.user_id
         }).select("name", "email", "uuid", "phone", "slackUsername", "haveID", "admin");
 
-        let user;
         if (users.length === 0) {
             throw new GraphQLError("Unable to create this request because no user with the UUID provided was found");
-        } else {
-            user = users[0];
         }
+
+        const user = users[0];
 
         // fetch the item
         const item: any = await getItem(args.newRequest.request_item_id, context.user.admin);
@@ -343,13 +342,7 @@ const resolvers: any = {
             args.newRequest.quantity = 1;
         }
 
-        // TODO: if item has approvalRequired == false, initial status should be APPROVED as long as the total qty
-        //       of this item the user has requested
-        let initialStatus: RequestStatus = "SUBMITTED";
-        console.log("item", item);
-        if (!item.approvalRequired) {
-            initialStatus = "APPROVED";
-        }
+        const initialStatus: RequestStatus = item.approvalRequired ? "APPROVED" : "SUBMITTED";
 
         // return the request object with the item, censoring price/owner for non-admins
         let newRequest = await DB.from("requests").insert({
@@ -359,6 +352,7 @@ const resolvers: any = {
             .returning(["request_id", "created_at", "updated_at"]);
 
         newRequest = newRequest[0];
+
         return {
             request_id: newRequest.request_id,
             quantity: args.newRequest.quantity,
@@ -398,11 +392,8 @@ const resolvers: any = {
         // Not going to validate against maxRequestQty since only admins can change this currently
 
         const newQuantity = args.updatedRequest.new_quantity;
-        if (newQuantity) {
-            if (newQuantity <= 0) {
-                throw new GraphQLError(`Invalid new requested quantity of ${newQuantity} specified.  The new requested quantity must be >= 1.`);
-            }
-            updateObj.quantity = Math.max(newQuantity, 1);
+        if (newQuantity && newQuantity <= 0) {
+            throw new GraphQLError(`Invalid new requested quantity of ${newQuantity} specified.  The new requested quantity must be >= 1.`);
         }
 
         // TODO: status change validation logic
