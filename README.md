@@ -22,6 +22,9 @@ Required environment variables
 | secrets.groundTruth.secret | Client secret provided by Ground Truth
 | secrets.admins.domains | Email domains that will result in a user being automatically made an admin
 | secrets.admins.emails | Email address that will result in a user being automatically made an admin
+| secrets.server.postgresURL | URL to connect to the postgresql database.  If you need to supply database connection credentials, this is the place to do it.
+| secrets.server.isProduction | Boolean indicating whether to run the server in production mode.
+| secrets.server.defaultTimezone | Default server timezone
 
 ### Frontend
 
