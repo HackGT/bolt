@@ -8,3 +8,4 @@ server/src/config/config.json
 server/build/
 *.js
 server/src/api/api.graphql.ts
+server/src/api/graphql.types.ts

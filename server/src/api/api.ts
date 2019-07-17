@@ -8,8 +8,7 @@ import {buildSchema, GraphQLError} from "graphql";
 import {Category, DB} from "../database";
 import {isAdminNoAuthCheck} from "../auth/auth";
 import {localTimestamp, nestedRequest, onlyIfAdmin, RequestStatus, toSimpleRequest} from "./requests";
-import "graphql-import-node";
-import {User} from "./api.graphql";
+import {User} from "./graphql.types";
 
 const schemaFile = path.join(__dirname, "./api.graphql");
 const schema = buildSchema(fs.readFileSync(schemaFile, {encoding: "utf8"}));
