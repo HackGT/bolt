@@ -8,6 +8,8 @@ import {buildSchema, GraphQLError} from "graphql";
 import {Category, DB} from "../database";
 import {isAdminNoAuthCheck} from "../auth/auth";
 import {localTimestamp, nestedRequest, onlyIfAdmin, RequestStatus, toSimpleRequest} from "./requests";
+import "graphql-import-node";
+import {User} from "./api.graphql";
 
 const schemaFile = path.join(__dirname, "./api.graphql");
 const schema = buildSchema(fs.readFileSync(schemaFile, {encoding: "utf8"}));
@@ -56,7 +58,7 @@ const resolvers: any = {
      * @param _args
      * @param _context
      */
-    user: async (root, _args, _context) => {
+    user: async (root, _args, _context): Promise<User> => {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
         return {
