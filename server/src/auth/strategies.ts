@@ -24,6 +24,7 @@ interface IOAuthStrategyOptions extends IStrategyOptions {
 interface IProfile {
     uuid: string;
     name: string;
+    nameParts: { firstName: string, lastName: string, preferredName?: string};
     email: string;
     token: string;
     scopes: IProfileScopes | null;
@@ -61,7 +62,7 @@ export class GroundTruthStrategy extends OAuthStrategy {
                 return;
             }
             delete profile.scopes;
-
+            delete profile.nameParts; // Basically ignore the Ground Truth nameParts field for now
             user = await createRecord<IUser>("users", {
                 ...GroundTruthStrategy.defaultUserProperties,
                 ...profile,
