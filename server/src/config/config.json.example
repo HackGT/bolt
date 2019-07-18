@@ -9,9 +9,7 @@
     }
   },
   "admins": {
-    "domains": [
-      "hack.gt"
-    ],
+    "domains": [],
     "emails": []
   },
   "server": {
