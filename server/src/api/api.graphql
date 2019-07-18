@@ -108,6 +108,7 @@ type SimpleRequest {
 }
 
 type Request {
+    request_id: Int!,
 	user: User!,
 	item: Item!,
 	status: RequestStatus!,

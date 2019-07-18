@@ -1,15 +1,5 @@
 import moment from "moment";
-
-export type RequestStatus = "SUBMITTED"
-    | "APPROVED"
-    | "DENIED"
-    | "ABANDONED"
-    | "CANCELLED"
-    | "READY_FOR_PICKUP"
-    | "FULFILLED"
-    | "RETURNED"
-    | "LOST"
-    | "DAMAGE";
+import {RequestStatus} from "./graphql.types";
 
 export interface KnexSimpleRequest {
     request_id: number;
