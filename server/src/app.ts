@@ -7,7 +7,6 @@ import cookieParser from "cookie-parser";
 import * as cookieSignature from "cookie-signature";
 import * as chalk from "chalk";
 import morgan from "morgan";
-import "graphql-import-node";
 import {config, COOKIE_OPTIONS, PORT, VERSION_NUMBER} from "./common";
 // Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
 import {authRoutes, isAuthenticated} from "./auth/auth";
