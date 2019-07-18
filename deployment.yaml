@@ -12,3 +12,4 @@ secrets:
 env:
   PRODUCTION: true
   DEFAULT_TIMEZONE: "America/New_York"
+  BUGSNAG_ENABLED: false
