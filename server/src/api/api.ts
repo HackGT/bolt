@@ -319,7 +319,7 @@ const resolvers: QueryTypeResolver|MutationTypeResolver = {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
         // if non-admin, user on request must be user signed in
-        // TODO: test this
+
         if (!context.user.admin && context.user.uuid !== args.newRequest.user_id) {
             throw new GraphQLError("Unable to create request because you are not an admin and your UUID " +
                 "does not match the UUID of the user this request is for");
