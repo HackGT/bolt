@@ -7,6 +7,8 @@ type Query {
 	items: [Item!]
     # Get a list containing each category that is on at least one item
     categories: [Category!]
+	# Return request(s) matching the search query provided and that the user has permission to see
+    requests(search: RequestSearch!): [Request]
 }
 
 type Mutation {
@@ -15,6 +17,10 @@ type Mutation {
     # Update the item with the specified ID to have the properties in updatedItem.  At this time
     #    all fields must be included
     updateItem(id: Int!, updatedItem: ItemInput!): Item!
+	createRequest(newRequest: RequestInput!):  Request!
+	updateRequest(updatedRequest: RequestUpdateInput!): SimpleRequest
+    # Delete the request with the specified ID.  Returns true if successful; otherwise, false
+    deleteRequest(id: Int!): Boolean!
 }
 
 type User {
@@ -39,16 +45,16 @@ type Item {
 	totalAvailable: Int!
 	# The largest quantity of this item that can be requested in one request
 	maxRequestQty: Int!
-	# The value of this item to replace it if lost or damaged
-	price: Float!
+    # The value of this item to replace it if lost or damaged (only visible to admins)
+    price: Float
 	# Whether to show this item to non-admins on the hardware list
 	hidden: Boolean!
 	# Whether people who check out this item are expected to return it
 	returnRequired: Boolean!
 	# Whether admin approval is required before requests for this item will be processed
 	approvalRequired: Boolean!
-	# The person or organization that owns this item
-	owner: String!
+    # The person or organization that owns this item (only visible to admins)
+    owner: String
 }
 
 input ItemInput {
@@ -77,4 +83,57 @@ type Category {
     category_id: Int!
     # The human-readable, user-facing name for this category
     category_name: String!
+}
+
+enum RequestStatus {
+	SUBMITTED
+	APPROVED
+	DENIED
+	ABANDONED
+    CANCELLED
+	READY_FOR_PICKUP
+	FULFILLED
+	RETURNED
+	LOST
+	DAMAGED
+}
+
+# Simple representation of a request without the linked item or user
+type SimpleRequest {
+	request_id: Int!,
+	status: RequestStatus!,
+	quantity: Int!,
+	createdAt: String!,
+	updatedAt: String!
+}
+
+type Request {
+    request_id: Int!,
+	user: User!,
+	item: Item!,
+	status: RequestStatus!,
+	quantity: Int!,
+	createdAt: String!,
+	updatedAt: String!
+}
+
+
+
+input RequestSearch {
+    item_id: Int,
+    request_id: Int,
+    user_id: String,
+    status: RequestStatus
+}
+
+input RequestInput {
+	user_id: String!,
+    request_item_id: Int!,
+	quantity: Int!
+}
+
+input RequestUpdateInput {
+	request_id: Int!,
+	new_quantity: Int,
+	new_status: RequestStatus
 }

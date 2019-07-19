@@ -5,8 +5,19 @@ import * as path from "path";
 import express from "express";
 import graphqlHTTP from "express-graphql";
 import {buildSchema, GraphQLError} from "graphql";
-import {Category, DB} from "../database";
+import {DB, IItem} from "../database";
 import {isAdminNoAuthCheck} from "../auth/auth";
+import {localTimestamp, nestedRequest, onlyIfAdmin, toSimpleRequest} from "./requests";
+import {
+    Category,
+    Item,
+    MutationTypeResolver,
+    QueryTypeResolver,
+    RequestStatus,
+    User,
+    Request,
+    SimpleRequest
+} from "./graphql.types";
 
 const schemaFile = path.join(__dirname, "./api.graphql");
 const schema = buildSchema(fs.readFileSync(schemaFile, {encoding: "utf8"}));
@@ -22,8 +33,31 @@ function fixArguments<A, B, C>(fakeRoot: A, fakeArgs: B, fakeContext: C): { args
     };
 }
 
+async function getItem(itemId: number, isAdmin: boolean): Promise<Item|null> {
+    if (itemId <= 0) {
+        throw new GraphQLError("Invalid item ID.  The item ID you provided was <= 0, but item IDs must be >= 1.");
+    }
+
+    const item: IItem[] = await DB.from("items")
+        .join("categories", "items.category_id", "=", "categories.category_id")
+        .where({item_id: itemId});
+
+    if (item.length === 0) {
+        return null;
+    }
+    const actualItem: any = item[0];
+
+    return {
+        ...actualItem,
+        id: actualItem.item_id,
+        category: actualItem.category_name,
+        price: onlyIfAdmin(actualItem.price, isAdmin),
+        owner: onlyIfAdmin(actualItem.owner, isAdmin)
+    };
+}
+
 // using any here is slightly yikes but might solve the import .graphql file issue
-const resolvers: any = {
+const resolvers: QueryTypeResolver|MutationTypeResolver = {
     /* Queries */
     /**
      * Returns information about the current signed in user
@@ -32,7 +66,7 @@ const resolvers: any = {
      * @param _args
      * @param _context
      */
-    user: async (root, _args, _context) => {
+    user: async (root, _args, _context): Promise<User> => {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
         return {
@@ -53,29 +87,11 @@ const resolvers: any = {
      * @param _args
      * @param _context
      */
-    item: async (root, _args, _context) => {
+    item: async (root, _args, _context): Promise<Item|null> => {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
 
-        if (args.id <= 0) {
-            throw new GraphQLError("Invalid item ID.  The item ID you provided was <= 0, but item IDs must be >= 1.");
-        }
-
-        let item = await DB.from("items")
-            .join("categories", "items.category_id", "=", "categories.category_id")
-            .where({item_id: args.id});
-
-        if (item.length === 0) {
-            return null;
-        }
-        item = item[0];
-
-        return {
-            id: item.item_id,
-            category: item.category_name,
-
-            ...item
-        };
+        return await getItem(args.id, context.user.admin);
     },
     /**
      * Bulk items API
@@ -85,7 +101,7 @@ const resolvers: any = {
      * @param _args
      * @param _context
      */
-    items: async (root, _args, _context) => {
+    items: async (root, _args, _context): Promise<Item[]> => {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
         const items = await DB.from("items")
@@ -93,11 +109,61 @@ const resolvers: any = {
 
         return items.map(item => {
             return {
+                ...item,
                 id: item.item_id,
                 category: item.category_name,
-                ...item
+                price: onlyIfAdmin(item.price, context.user.admin),
+                owner: onlyIfAdmin(item.owner, context.user.admin)
             };
         });
+    },
+    categories: async (root, _args, _context): Promise<Category[]> => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+        return await DB.from("categories");
+    },
+    requests: async (root, _args, _context): Promise<Request[]> => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+
+        const searchObj: any = {};
+
+
+        if (args.search.item_id) {
+            searchObj.item_id = args.search.item_id;
+        }
+
+        if (args.search.request_id) {
+            searchObj.request_id = args.search.request_id;
+        }
+
+        if (args.search.user_id) {
+            searchObj.user_id = args.search.user_id;
+        }
+
+        if (args.search.status) {
+            searchObj.status = args.search.status;
+        }
+
+        // If user is not an admin
+        if (!context.user.admin) {
+            // then if they are requesting requests for a user that is not themselves
+            if (args.search.user_id && args.search.user_id !== context.user.uuid) {
+                // return an empty array and avoid making a DB query
+                return [];
+            }
+
+            // otherwise, restrict their results to just their user ID
+            searchObj.user_id = context.user.uuid;
+        }
+
+        const requests = await DB.from("requests")
+            .where(searchObj)
+            .join("users", "requests.user_id", "=", "users.uuid")
+            .join("items", "requests.request_item_id", "=", "items.item_id")
+            .join("categories", "categories.category_id", "=", "items.category_id");
+
+        return requests.map(request => nestedRequest(request, context.user.admin));
     },
 
     /* Mutations */
@@ -109,7 +175,7 @@ const resolvers: any = {
      * @param _args
      * @param _context
      */
-    createItem: async (root, _args, _context) => {
+    createItem: async (root, _args, _context): Promise<Item> => {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
 
@@ -176,11 +242,12 @@ const resolvers: any = {
     /**
      * Update an existing item given its ID
      * TODO: reduce duplicate code from createItem
+     * TODO: should be refactored to be like updateRequest
      * @param root
      * @param _args
      * @param _context
      */
-    updateItem: async (root, _args, _context) => {
+    updateItem: async (root, _args, _context): Promise<Item> => {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
 
@@ -232,7 +299,7 @@ const resolvers: any = {
             console.log(`Existing category named "${args.updatedItem.category}" found with ID ${categoryId}.`);
         }
 
-        const savedCategory = args.updatedItem.category;
+        const savedCategory: string = args.updatedItem.category;
         delete args.updatedItem.category; // Remove the category property from the input item so knex won't try to add it to the database
 
         await DB.from("items")
@@ -248,11 +315,122 @@ const resolvers: any = {
             ...args.updatedItem
         };
     },
-    categories: async (root, _args, _context): Promise<[Category]> => {
+    createRequest: async (root, _args, _context): Promise<Request> => {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
-        return await DB.from("categories");
+        // if non-admin, user on request must be user signed in
+
+        if (!context.user.admin && context.user.uuid !== args.newRequest.user_id) {
+            throw new GraphQLError("Unable to create request because you are not an admin and your UUID " +
+                "does not match the UUID of the user this request is for");
+        }
+
+        // make sure the user the request is for exists
+        const users: User[] = await DB.from("users").where({
+            uuid: args.newRequest.user_id
+        }).select("name", "email", "uuid", "phone", "slackUsername", "haveID", "admin");
+
+        if (users.length === 0) {
+            throw new GraphQLError("Unable to create this request because no user with the UUID provided was found");
+        }
+
+        const user: User = users[0];
+
+        // fetch the item
+        const item: Item|null = await getItem(args.newRequest.request_item_id, context.user.admin);
+
+        if (!item) {
+            throw new GraphQLError(`Can't create request for item that doesn't exist!  Item ID provided: ${args.newRequest.request_item_id}`);
+        }
+
+        // clip item quantity to allowed values
+        if (args.newRequest.quantity > item.maxRequestQty) {
+            console.log("clipping request quantity (too high), original:", args.newRequest.quantity, ", new:", item.maxRequestQty);
+            args.newRequest.quantity = item.maxRequestQty;
+        } else if (args.newRequest.quantity < 1) {
+            console.log("clipping request quantity (too low), original:", args.newRequest.quantity, ", new:", 1);
+            args.newRequest.quantity = 1;
+        }
+
+        const initialStatus: RequestStatus = item.approvalRequired ? "APPROVED" : "SUBMITTED";
+
+        // return the request object with the item, censoring price/owner for non-admins
+        let newRequest = await DB.from("requests").insert({
+            ...args.newRequest,
+            status: initialStatus
+        })
+            .returning(["request_id", "created_at", "updated_at"]);
+
+        newRequest = newRequest[0];
+
+        return {
+            request_id: newRequest.request_id,
+            quantity: args.newRequest.quantity,
+            status: initialStatus,
+            item,
+            user,
+            createdAt: localTimestamp(newRequest.created_at),
+            updatedAt: localTimestamp(newRequest.updated_at)
+        };
+    },
+    deleteRequest: async (root, _args, _context): Promise<boolean> => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+
+        if (!context.user.admin) {
+            throw new GraphQLError("You do not have permission to access the deleteRequest endpoint.");
+        }
+
+        const numRowsAffected: number = await DB.from("requests")
+            .where({
+                request_id: args.id,
+            })
+            .del();
+
+        return numRowsAffected !== 0;
+    },
+    updateRequest: async (root, _args, _context): Promise<SimpleRequest|null> => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+
+        if (!context.user.admin) {
+            throw new GraphQLError("You do not have permission to access the updateRequest endpoint.");
+        }
+
+        const updateObj: any = {};
+
+        // Not going to validate against maxRequestQty since only admins can change this currently
+
+        const newQuantity: number|undefined = args.updatedRequest.new_quantity;
+        if (newQuantity && newQuantity <= 0) {
+            throw new GraphQLError(`Invalid new requested quantity of ${newQuantity} specified.  The new requested quantity must be >= 1.`);
+        }
+
+        // TODO: status change validation logic
+        if (args.updatedRequest.new_status) {
+            updateObj.status = args.updatedRequest.new_status;
+        }
+
+        if (Object.keys(updateObj).length >= 1) {
+            updateObj.updated_at = new Date();
+
+            const updatedRequest = await DB.from("requests")
+                .where({
+                    request_id: args.updatedRequest.request_id,
+                })
+                .update(updateObj)
+                .returning(["request_id", "quantity", "status", "created_at", "updated_at"]);
+
+            if (updatedRequest.length === 0) {
+                return null;
+            }
+
+            return toSimpleRequest(updatedRequest[0]);
+        }
+
+        return null;
     }
+
 };
 
 apiRoutes.post("/", graphqlHTTP({
