@@ -4,57 +4,29 @@ import {AppState} from "../../reducers/reducers";
 import AdminLinksCard, {AdminCardLink} from "./AdminLinksCard";
 import {Grid, Header} from "semantic-ui-react";
 
+function adminCardLink(name: string, to: string = "#"): AdminCardLink {
+    return { name, to };
+}
 const hardwareDesk: AdminCardLink[] = [
-    {
-        name: "Work hardware desk",
-        to: "#"
-    },
-    {
-        name: "Item check-in",
-        to: "/admin/checkin"
-    },
-    {
-        name: "Manage items",
-        to: "#"
-    },
+    adminCardLink("Work hardware desk"),
+    adminCardLink("Item check-in", "/admin/checkin")
 ];
 
-const items: AdminCardLink[] = [
-    {
-        name: "View all items",
-        to: "#"
-    },
-    {
-        name: "Create new item",
-        to: "/admin/items/new"
-    },
-    {
-        name: "Import items",
-        to: "#"
-    },
-    {
-        name: "Export items",
-        to: "#"
-    }
+const manage: AdminCardLink[] = [
+    adminCardLink("Users", "/admin/users"),
+    adminCardLink("Requests"),
+    adminCardLink("Items")
 ];
 
 const reports: AdminCardLink[] = [
-    {
-        name: "Unreturned items",
-        to: "#"
-    },
-    {
-        name: "Popular items",
-        to: "#"
-    },
-    {
-        name: "Lost/Damaged items",
-        to: "#"
-    },
-    {
-        name: "Request statistics",
-        to: "#"
-    },
+    adminCardLink("Unreturned, lost, and damaged items"),
+    adminCardLink("Request statistics"),
+    adminCardLink("Popular items"),
+];
+
+const utilities: AdminCardLink[] = [
+    adminCardLink("Import items"),
+    adminCardLink("Export items"),
 ];
 
 const funPhrases: string[] = [
@@ -64,7 +36,11 @@ const funPhrases: string[] = [
     "Hello, friendly administrator",
     "Use your power wisely",
     "Nice to see you",
-    "It's a wonderful day to configure Bolt"
+    "It's a wonderful day to configure Bolt",
+    "Millions of hardware items look up to you",
+    "We go together like a nut and a bolt",
+    "Did you know: Bolt is held together with 1,482 bolts",
+    "A developer somewhere spent multiple minutes adding these random phrases"
 ];
 
 function pickRandomElement<T>(arr: T[]): T {
@@ -82,7 +58,7 @@ class AdminOverviewContainer extends Component {
                         </Header>
                         <div className="ui centered cards">
                             <AdminLinksCard title="Hardware Desk" links={hardwareDesk}/>
-                            <AdminLinksCard title="Items" links={items}/>
+                            <AdminLinksCard title="Manage..." links={manage}/>
                             <AdminLinksCard title="Reports" links={reports}/>
                         </div>
                     </Grid.Column>

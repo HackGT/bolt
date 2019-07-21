@@ -23,21 +23,18 @@ class Navigation extends React.Component<Props, {}> {
             </Menu.Item>
         </Link>);
 
-        const loginLink = !user ? (<a href="/auth/login"><Menu.Item>Sign in</Menu.Item></a>) : null;
+        const loginLink = !user ? (<Menu.Item href="/auth/login">Sign in</Menu.Item>) : null;
 
         const userProfile = (user) ? (
             <Menu.Item><Icon name="user"/> {user.name}</Menu.Item>
         ) : ("");
 
-        const adminLink = this.isAdmin() ? (<Link to="/admin">
-            <Menu.Item>
+        const adminLink = this.isAdmin() ? (
+            <Menu.Item as={Link} to="/admin">
                 <Icon name="setting"/>Admin
-            </Menu.Item>
-        </Link>) : null;
+            </Menu.Item>) : null;
 
-        const logoutLink = (user) ? (<a href="/auth/logout">
-            <Menu.Item>Sign out</Menu.Item>
-        </a>) : null;
+        const logoutLink = (user) ? (<Menu.Item href="/auth/logout">Sign out</Menu.Item>) : null;
 
 
         return (

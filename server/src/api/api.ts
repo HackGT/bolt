@@ -443,6 +443,25 @@ const resolvers: QueryTypeResolver|MutationTypeResolver = {
         }
 
         return null;
+    },
+    changeUserAdmin: async (root, _args, _context): Promise<boolean> => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+
+        if (!context.user.admin || context.user.uuid === args.uuid) {
+            return false;
+        }
+
+        const updatedUser = await DB.from("users")
+            .where({
+                uuid: args.uuid,
+            })
+            .update({
+                admin: args.admin
+            })
+            .returning("uuid");
+
+        return updatedUser.length === 1;
     }
 
 };

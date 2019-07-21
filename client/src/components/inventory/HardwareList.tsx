@@ -124,7 +124,7 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
 
         return (
             <div>
-                <Header>Inventory</Header>
+                <Header as="h1">Inventory</Header>
                 {noRequestsMessage}
                 {query}
             </div>);
