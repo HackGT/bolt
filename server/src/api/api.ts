@@ -13,10 +13,10 @@ import {
     Item,
     MutationTypeResolver,
     QueryTypeResolver,
-    RequestStatus,
-    User,
     Request,
-    SimpleRequest
+    RequestStatus,
+    SimpleRequest,
+    User
 } from "./graphql.types";
 
 const schemaFile = path.join(__dirname, "./api.graphql");
@@ -56,7 +56,6 @@ async function getItem(itemId: number, isAdmin: boolean): Promise<Item|null> {
     };
 }
 
-// using any here is slightly yikes but might solve the import .graphql file issue
 const resolvers: QueryTypeResolver|MutationTypeResolver = {
     /* Queries */
     /**
@@ -78,6 +77,21 @@ const resolvers: QueryTypeResolver|MutationTypeResolver = {
             haveID: context.user.haveID,
             admin: context.user.admin
         };
+    },
+    users: async (root, _args, _context): Promise<User[]> => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+
+        if (!context.user.admin) {
+            return [];
+        }
+
+        const colNames: string[] = ["uuid", "name", "haveID", "phone",
+            "email", "slackUsername", "admin"];
+
+        return await DB.from("users")
+            .where(args.search)
+            .select(colNames);
     },
     /**
      * Returns information about a single item
