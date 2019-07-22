@@ -73,7 +73,8 @@ class App extends Component<Props, {}> {
             <div style={{
                 width: "100%",
                 maxWidth: "960px",
-                margin: "0 auto"
+                margin: "0 auto",
+                padding: "0 5px"
             }}>
                 <Router>
                     <ToastProvider placement="top-center">

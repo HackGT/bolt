@@ -1,11 +1,11 @@
 import React, {Component} from "react";
 import {connect} from "react-redux";
 import {AppState} from "../../reducers/reducers";
-import {Breadcrumb, Header, Icon, Loader, Message, Table, TableHeaderCell} from "semantic-ui-react";
+import {Header, Loader, Message} from "semantic-ui-react";
 import {Query} from "react-apollo";
 import gql from "graphql-tag";
-import ItemEditForm from "../item/ItemEditForm";
-import AdminUsersListTable from "./AdminUsersListTable";
+import AdminUsersListTable, {FullUser} from "./AdminUsersListTable";
+import {withToastManager} from "react-toast-notifications";
 
 export const usersQuery = gql`
     query users {
@@ -24,31 +24,29 @@ export const usersQuery = gql`
 class AdminUsersListWrapper extends Component {
     public render() {
 
-        return (
-            <div>
-                <Header as="h1">Users</Header>
-                <Query
-                    query={usersQuery}
-                    fetchPolicy="cache-and-network"
-                >
-                    {
-                        ({loading, error, data}: any) => {
-                            if (loading) {
-                                return <Loader active inline="centered" content="Just a sec!"/>;
-                            } else if (error) {
-                                return <Message error visible={true}
-                                                header="Can't fetch users"
-                                                content={`Hmm, an error is preventing us from displaying the list of users.  The error was: ${error.message}`}
-                                />;
-                            }
-                            const { users } = data;
-                            console.log(users);
-                            return <AdminUsersListTable users={users} />;
+        return <div>
+            <Header as="h1">Users</Header>
+            <Query
+                query={usersQuery}
+                fetchPolicy="cache-and-network"
+            >
+                {
+                    ({loading, error, data}: any) => {
+                        if (loading) {
+                            return <Loader active inline="centered" content="Just a sec!"/>;
+                        } else if (error) {
+                            return <Message error visible={true}
+                                            header="Can't fetch users"
+                                            content={`Hmm, an error is preventing us from displaying the list of users.  The error was: ${error.message}`}
+                            />;
                         }
+                        const {users}: { users: FullUser[] } = data;
+                        console.log(users);
+                        return <AdminUsersListTableWrapped users={users}/>;
                     }
-                </Query>
-            </div>
-        );
+                }
+            </Query>
+        </div>;
     }
 }
 
@@ -57,6 +55,8 @@ function mapStateToProps(state: AppState) {
         user: state.user
     };
 }
+
+const AdminUsersListTableWrapped = withToastManager(AdminUsersListTable);
 export default connect(
     mapStateToProps
 )(AdminUsersListWrapper);
