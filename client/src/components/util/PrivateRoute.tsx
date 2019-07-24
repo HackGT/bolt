@@ -3,6 +3,7 @@ import {Redirect, Route} from "react-router";
 import {AppState} from "../../reducers/reducers";
 import {connect} from "react-redux";
 import {Loader} from "semantic-ui-react";
+import {User} from "../../actions";
 
 function PrivateRoute({ component: Component, user, ...rest }: any) {
     if (user === null) {

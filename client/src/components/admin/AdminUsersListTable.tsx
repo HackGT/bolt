@@ -8,6 +8,8 @@ import gql from "graphql-tag";
 import {usersQuery} from "./AdminUsersListWrapper";
 import {compose} from "redux";
 import {withToastManager} from "react-toast-notifications";
+import PrivateRoute from "../util/PrivateRoute";
+import {Link} from "react-router-dom";
 
 export interface FullUser extends User {
     email: string;
@@ -66,7 +68,7 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
                 <Table.Cell>{user.slackUsername}</Table.Cell>
                 <Table.Cell>{AdminUsersListTable.checkOrX(user.haveID)}</Table.Cell>
                 <Table.Cell>{AdminUsersListTable.checkOrX(user.admin)}</Table.Cell>
-                <Table.Cell>{this.adminButton(user, changeAdmin)}</Table.Cell>
+                <Table.Cell>{this.adminButton(user, changeAdmin)} <Button as={Link} primary basic compact size="tiny" to={`/user/${user.uuid}`}>Edit</Button></Table.Cell>
             </Table.Row>
         ));
 
@@ -138,7 +140,7 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
         }
         // flip admin value so we promote/demote this user
         const newAdminValue = !admin;
-        return <Button size="small" basic primary icon
+        return <Button size="small" basic primary icon compact
                        loading={this.state.loadingUsers[uuid] || false}
                        labelPosition="left"
                        onClick={e => {

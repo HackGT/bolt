@@ -16,6 +16,7 @@ import RequestManagementContainer from "./components/RequestManagementContainer"
 import AdminOverviewContainer from "./components/admin/AdminOverviewContainer";
 import {bugsnagClient, bugsnagEnabled} from "./index";
 import AdminUsersListWrapper from "./components/admin/AdminUsersListWrapper";
+import UserProfileWrapper from "./components/users/UserProfileWrapper";
 
 export interface OwnProps {}
 
@@ -81,9 +82,10 @@ class App extends Component<Props, {}> {
                         <Navigation/>
                         <Switch>
                             <Route path="/" exact component={HomeContainer}/>
-                            <PrivateRoute path="/admin/items" component={ItemWrapper}/>
-                            <PrivateRoute exact path="/requests" component={RequestManagementContainer}/>
+                            <Route path="/user" component={UserProfileWrapper} />
                             <PrivateRoute exact path="/admin" component={AdminOverviewContainer}/>
+                            <PrivateRoute exact path="/admin/desk" component={RequestManagementContainer}/>
+                            <PrivateRoute path="/admin/items" component={ItemWrapper}/>
                             <PrivateRoute exact path="/admin/csv" component={CSVWizard}/>
                             <PrivateRoute exact path="/admin/checkin" component={CheckinContainer}/>
                             <PrivateRoute exact path="/admin/users" component={AdminUsersListWrapper}/>
