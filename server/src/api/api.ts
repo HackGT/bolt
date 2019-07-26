@@ -81,16 +81,20 @@ const resolvers: QueryTypeResolver|MutationTypeResolver = {
     users: async (root, _args, _context): Promise<User[]> => {
         // @ts-ignore
         const {args, context} = fixArguments(root, _args, _context);
+        let searchObj = args.search;
 
+        // Restrict results to current user for non-admins
         if (!context.user.admin) {
-            return [];
+            searchObj = {
+                uuid: context.user.uuid
+            };
         }
 
         const colNames: string[] = ["uuid", "name", "haveID", "phone",
             "email", "slackUsername", "admin"];
 
         return await DB.from("users")
-            .where(args.search)
+            .where(searchObj)
             .select(colNames);
     },
     /**
