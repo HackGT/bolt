@@ -21,6 +21,7 @@ interface EditUserParams {
 const USER_QUERY = gql`
     query users($uuid:String!) {
         users(search:{uuid:$uuid}) {
+            uuid
             name
             email
             phone
@@ -61,7 +62,6 @@ class EditUserProfileWrapper extends Component<EditUserProps, {}> {
 
         return (
             <div>
-                {header}
                 <Query
                     query={USER_QUERY}
                     variables={

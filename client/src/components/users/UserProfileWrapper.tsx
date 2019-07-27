@@ -7,7 +7,6 @@ import EditUserProfileWrapper from "./EditUserProfileWrapper";
 
 class UserProfileWrapper extends Component<{ match: match }> {
     public render() {
-        console.log(this.props.match.url);
         return (
             <div>
                 <Switch>

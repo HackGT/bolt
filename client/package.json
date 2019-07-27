@@ -27,7 +27,7 @@
     "redux-starter-kit": "^0.4.3",
     "redux-thunk": "^2.3.0",
     "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^0.86.0",
+    "semantic-ui-react": "^0.87.3",
     "typescript": "3.3.3333"
   },
   "scripts": {
@@ -50,6 +50,7 @@
   "author": "Evan Strat",
   "devDependencies": {
     "@types/accounting": "^0.4.1",
+    "@types/cleave.js": "^1.4.0",
     "@types/jest": "24.0.11",
     "@types/node": "11.11.3",
     "@types/react": "^16.8.8",
