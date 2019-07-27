@@ -18,13 +18,14 @@ type Mutation {
 	createItem(newItem: ItemInput!): Item!
     # Update the item with the specified ID to have the properties in updatedItem.  At this time
     #    all fields must be included
-    updateItem(id: Int!, updatedItem: ItemInput!): Item!
+    updateItem(id: Int!, updatedItem: ItemInput!): Item
 	createRequest(newRequest: RequestInput!):  Request!
 	updateRequest(updatedRequest: RequestUpdateInput!): SimpleRequest
     # Delete the request with the specified ID.  Returns true if successful; otherwise, false
     deleteRequest(id: Int!): Boolean!
 	# Modify a user's admin status, true if success, false otherwise
 	changeUserAdmin(uuid: String!, admin: Boolean!): Boolean!
+    updateUser(uuid: String!, updatedUser: UserUpdateInput!): User
 }
 
 type User {
@@ -150,4 +151,11 @@ input UserSearch {
 	email: String,
 	slackUsername: String,
 	admin: Boolean
+}
+
+input UserUpdateInput {
+    phone: String,
+    slackUsername: String,
+    haveID: Boolean,
+    admin: Boolean
 }

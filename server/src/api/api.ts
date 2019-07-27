@@ -16,7 +16,8 @@ import {
     Request,
     RequestStatus,
     SimpleRequest,
-    User
+    User,
+    UserUpdateInput
 } from "./graphql.types";
 
 const schemaFile = path.join(__dirname, "./api.graphql");
@@ -466,6 +467,39 @@ const resolvers: QueryTypeResolver|MutationTypeResolver = {
             .returning("uuid");
 
         return updatedUser.length === 1;
+    },
+    updateUser: async (root, _args, _context): Promise<User | null> => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+
+        const searchObj: UserUpdateInput = args.updatedUser;
+
+        if (!context.user.admin && args.uuid !== context.user.uuid) {
+            throw new GraphQLError("You do not have permission to update users other than yourself.");
+        }
+
+        // non-admins can't change these properties
+        if (!context.user.admin) {
+            delete searchObj.admin;
+            delete searchObj.haveID;
+        }
+
+        if (searchObj.phone && !(/^\((\d){3}\) (\d){3}-(\d){4}$/).test(searchObj.phone)) {
+            throw new GraphQLError("User not updated because phone number format is invalid");
+        }
+
+        const updatedUser: User[] = await DB.from("users")
+            .where({
+                uuid: args.uuid,
+            })
+            .update(searchObj)
+            .returning(["uuid", "name", "email", "phone", "slackUsername", "haveID", "admin"]);
+
+        if (!updatedUser.length) {
+            return null;
+        }
+
+        return updatedUser[0];
     }
 
 };
