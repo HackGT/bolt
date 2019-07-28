@@ -56,7 +56,7 @@ function mapStateToProps(state: AppState) {
     };
 }
 
-const AdminUsersListTableWrapped = withToastManager(AdminUsersListTable);
+export const AdminUsersListTableWrapped = withToastManager(AdminUsersListTable);
 export default connect(
     mapStateToProps
 )(AdminUsersListWrapper);
