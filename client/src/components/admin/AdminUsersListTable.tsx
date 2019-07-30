@@ -1,14 +1,11 @@
-import React, {Component, ReactNode} from "react";
+import React, {Component} from "react";
 import {connect} from "react-redux";
 import {AppState} from "../../reducers/reducers";
-import {Button, Icon, Table, TableHeaderCell} from "semantic-ui-react";
+import {Button, Icon, Input, Table, TableHeaderCell} from "semantic-ui-react";
 import {User} from "../../actions";
 import {Mutation} from "react-apollo";
 import gql from "graphql-tag";
 import {usersQuery} from "./AdminUsersListWrapper";
-import {compose} from "redux";
-import {withToastManager} from "react-toast-notifications";
-import PrivateRoute from "../util/PrivateRoute";
 import {Link} from "react-router-dom";
 
 export interface FullUser extends User {
@@ -33,6 +30,7 @@ type UsersListState = {
     loadingUsers: {
         [key: string]: boolean
     };
+    searchQuery: string;
 };
 
 type Props = UsersListProps & StateProps;
@@ -50,7 +48,8 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
         super(props);
         this.state = {
             users: props.users,
-            loadingUsers: {}
+            loadingUsers: {},
+            searchQuery: ""
         };
     }
 
@@ -60,7 +59,7 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
             <TableHeaderCell key={col} textAlign="center">{col}</TableHeaderCell>
         ));
 
-        const tableRows = (changeAdmin: any) => this.state.users.map(user => (
+        let tableRows = (changeAdmin: any) => this.state.users.filter((user => this.containsSearchQuery(user))).map(user => (
             <Table.Row key={user.uuid}>
                 <Table.Cell>{user.name}</Table.Cell>
                 <Table.Cell><a href={`mailto:${user.email}`}>{user.email}</a></Table.Cell>
@@ -72,11 +71,19 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
             </Table.Row>
         ));
 
+
+        if (!tableRows(null).length) {
+            tableRows = (changeAdmin: any) => [<Table.Row>
+                <Table.Cell colspan={7}>No users found</Table.Cell>
+            </Table.Row>];
+        }
+
         const changeUserAdmin = gql`
             mutation changeAdmin($uuid: String!, $admin:Boolean!) {
                 changeUserAdmin(uuid: $uuid, admin: $admin)
             }
         `;
+
 
         return (
             <Mutation mutation={changeUserAdmin}
@@ -84,18 +91,40 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
                       awaitRefetchQueries={true}
             >
                 { (changeAdmin: any, { loading, data }: any) => (
-                    <Table compact celled textAlign="center">
-                        <Table.Header>
-                            <Table.Row>
-                                {tableCols}
-                            </Table.Row>
-                        </Table.Header>
-                        <Table.Body>
-                            {tableRows(changeAdmin)}
-                        </Table.Body>
-                    </Table>
+                    <div>
+                        <Input type="text"
+                               label="Search users"
+                               name="searchQuery"
+                               onChange={(e, {value}) => {
+                                   // @ts-ignore
+                                   this.setState({
+                                       searchQuery: value.trim().toLowerCase()
+                                   });
+                               }
+                               }
+                        />
+                        <Table compact celled textAlign="center">
+                            <Table.Header>
+                                <Table.Row>
+                                    {tableCols}
+                                </Table.Row>
+                            </Table.Header>
+                            <Table.Body>
+                                {tableRows(changeAdmin)}
+                            </Table.Body>
+                        </Table>
+                    </div>
                 )}
             </Mutation>);
+    }
+
+    private containsSearchQuery(user: FullUser) {
+        const query: string = this.state.searchQuery;
+        return user.name.toLowerCase().indexOf(query) !== -1
+            || user.email.toLowerCase().indexOf(query) !== -1
+            || user.phone.indexOf(query) !== -1
+            || user.slackUsername.indexOf(query) !== -1
+            || user.uuid.indexOf(query) !== -1;
     }
 
     private getUserIndex(uuid: string) {

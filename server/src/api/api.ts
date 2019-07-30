@@ -96,7 +96,8 @@ const resolvers: QueryTypeResolver|MutationTypeResolver = {
 
         return await DB.from("users")
             .where(searchObj)
-            .select(colNames);
+            .select(colNames)
+            .orderBy("name");
     },
     /**
      * Returns information about a single item
