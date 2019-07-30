@@ -23,19 +23,17 @@ class Navigation extends React.Component<Props, {}> {
             </Menu.Item>
         </Link>);
 
-        const loginLink = !user ? (<Menu.Item href="/auth/login">Sign in</Menu.Item>) : null;
+        const loginLink = !user && <Menu.Item href="/auth/login">Sign in</Menu.Item>;
 
-        const userProfile = (user) ? (
-            <Menu.Item as={Link} to="/user/me"><Icon name="user"/> {user.name}</Menu.Item>
-        ) : ("");
+        const userProfile = user &&
+            <Menu.Item as={Link} to="/user/me"><Icon name="user"/> {user.name}</Menu.Item>;
 
-        const adminLink = this.isAdmin() ? (
+        const adminLink = this.isAdmin() &&
             <Menu.Item as={Link} to="/admin">
                 <Icon name="setting"/>Admin
-            </Menu.Item>) : null;
+            </Menu.Item>;
 
-        const logoutLink = (user) ? (<Menu.Item href="/auth/logout">Sign out</Menu.Item>) : null;
-
+        const logoutLink = user && <Menu.Item href="/auth/logout">Sign out</Menu.Item>;
 
         return (
             <Menu stackable>

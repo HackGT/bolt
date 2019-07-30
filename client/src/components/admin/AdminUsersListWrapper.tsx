@@ -41,7 +41,7 @@ class AdminUsersListWrapper extends Component {
                             />;
                         }
                         const {users}: { users: FullUser[] } = data;
-                        console.log(users);
+
                         return <AdminUsersListTableWrapped users={users}/>;
                     }
                 }

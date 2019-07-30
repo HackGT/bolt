@@ -83,11 +83,8 @@ class EditUserProfileWrapper extends Component<EditUserProps, {}> {
                                                 content={error.message}
                                 />;
                             }
-                            {
-                                console.log(data);
-                            }
-                            return <UserProfileWrapper preloadUser={data.users[0]}/>;
 
+                            return <UserProfileWrapper preloadUser={data.users[0]}/>;
                         }
                     }
                 </Query>

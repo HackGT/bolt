@@ -251,19 +251,16 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                               };
                                           }
 
-
-                                          const createOrUpdate = this.props.createItem ? "created" : "updated";
-
                                           submitForm({
                                               variables
                                           }).then(() => {
-                                              toastManager.add(`Successfully ${createOrUpdate} ${this.state.item.item_name}`, {
+                                              toastManager.add(`${this.state.item.item_name} saved`, {
                                                   appearance: "success",
                                                   autoDismiss: true,
                                                   placement: "top-center"
                                               });
                                           }).catch((err: Error) => {
-                                              toastManager.add(`Couldn't ${createOrUpdate} your item because of an error: ${err.message}`, {
+                                              toastManager.add(`Couldn't save your item because of an error: ${err.message}`, {
                                                   appearance: "error",
                                                   autoDismiss: false,
                                                   placement: "top-center"

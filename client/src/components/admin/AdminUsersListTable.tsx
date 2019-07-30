@@ -22,7 +22,7 @@ type UsersListProps = {
 };
 
 interface StateProps {
-    user: User|null;
+    user: User | null;
 }
 
 type UsersListState = {
@@ -38,10 +38,10 @@ type Props = UsersListProps & StateProps;
 class AdminUsersListTable extends Component<Props, UsersListState> {
     private static checkOrX(value: boolean) {
         if (value) {
-            return <Icon color="green" name="checkmark" size="large" />;
+            return <Icon color="green" name="checkmark" size="large"/>;
         }
-        
-        return <Icon color="red" name="close" size="large" />;
+
+        return <Icon color="red" name="close" size="large"/>;
     }
 
     constructor(props: Props) {
@@ -54,7 +54,7 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
     }
 
     public render = () => {
-        const tableColNames: string[] = ["Name", "Email", "Phone", "Slack Username", "Have ID", "Admin", "Actions"];
+        const tableColNames = ["Name", "Email", "Phone", "Slack Username", "Have ID", "Admin", "Actions"];
         const tableCols = tableColNames.map(col => (
             <TableHeaderCell key={col} textAlign="center">{col}</TableHeaderCell>
         ));
@@ -67,7 +67,8 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
                 <Table.Cell>{user.slackUsername}</Table.Cell>
                 <Table.Cell>{AdminUsersListTable.checkOrX(user.haveID)}</Table.Cell>
                 <Table.Cell>{AdminUsersListTable.checkOrX(user.admin)}</Table.Cell>
-                <Table.Cell>{this.adminButton(user, changeAdmin)} <Button as={Link} primary basic compact size="tiny" to={`/user/${user.uuid}`}>Edit</Button></Table.Cell>
+                <Table.Cell>{this.adminButton(user, changeAdmin)} <Button as={Link} primary basic compact size="tiny"
+                                                                          to={`/user/${user.uuid}`}>Edit</Button></Table.Cell>
             </Table.Row>
         ));
 
@@ -78,19 +79,21 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
             </Table.Row>];
         }
 
-        const changeUserAdmin = gql`
-            mutation changeAdmin($uuid: String!, $admin:Boolean!) {
-                changeUserAdmin(uuid: $uuid, admin: $admin)
+        const UPDATE_USER = gql`
+            mutation updateUser($uuid: String!, $updatedUser: UserUpdateInput!) {
+                updateUser(uuid:$uuid, updatedUser:$updatedUser) {
+                    uuid
+                }
             }
         `;
 
 
         return (
-            <Mutation mutation={changeUserAdmin}
-                      refetchQueries={[{ query: usersQuery }]}
+            <Mutation mutation={UPDATE_USER}
+                      refetchQueries={[{query: usersQuery}]}
                       awaitRefetchQueries={true}
             >
-                { (changeAdmin: any, { loading, data }: any) => (
+                {(changeAdmin: any, {loading, data}: any) => (
                     <div>
                         <Input type="text"
                                label="Search users"
@@ -128,27 +131,20 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
     }
 
     private getUserIndex(uuid: string) {
-        const users = this.state.users;
-        for (let i = 0; i < users.length; i++) {
-            if (users[i].uuid === uuid) {
-                return i;
-            }
-        }
-        return -1;
+        return this.state.users.findIndex((user) => user.uuid === uuid);
     }
 
     private modifyUserAdminInState = (uuid: string, admin: boolean) => {
         const userIndex = this.getUserIndex(uuid);
-        const usersCopy = this.state.users;
+        const users = this.state.users;
 
-        const currentUser = usersCopy[userIndex];
-
-        currentUser.admin = admin;
-
-        usersCopy[userIndex] = currentUser;
+        users[userIndex] = {
+            ...users[userIndex],
+            admin
+        };
 
         this.setState({
-            users: usersCopy,
+            users
         });
     }
 
@@ -162,7 +158,7 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
     }
 
     private adminButton = (user: FullUser, changeAdmin: any, loading: boolean = true) => {
-        const { name, uuid, admin } = user;
+        const {name, uuid, admin} = user;
 
         if (this.props.user && uuid === this.props.user.uuid) {
             return "";
@@ -173,45 +169,43 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
                        loading={this.state.loadingUsers[uuid] || false}
                        labelPosition="left"
                        onClick={e => {
-                            e.preventDefault();
-                            this.modifyLoadingUsers(uuid, true);
-                            const {toastManager} = this.props;
+                           e.preventDefault();
+                           this.modifyLoadingUsers(uuid, true);
+                           const {toastManager} = this.props;
 
-                            changeAdmin({
-                                variables: {uuid, admin: newAdminValue}
-                            }).then(({ data }: any) => {
-                                console.log(data.changeUserAdmin);
-                                if (data.changeUserAdmin) {
-                                    const addOrRemove = newAdminValue ? "now" : "no longer";
-                                    toastManager.add(`${name} is ${addOrRemove} an admin`, {
-                                        appearance: "success",
-                                        autoDismiss: true,
-                                        placement: "top-center"
-                                    });
-                                    this.modifyUserAdminInState(uuid, newAdminValue);
-                                } else {
-                                    toastManager.add(`The admin status for ${name} was not changed because the server didn't find any users to update or your account no longer has admin permissions.  Refresh the page and try again.`, {
-                                        appearance: "warning",
-                                        autoDismiss: false,
-                                        placement: "top-center"
-                                    });
-                                }
-                                this.modifyLoadingUsers(uuid, false);
-                            }).catch((err: any) => {
-                                console.error(err);
-                                toastManager.add(`Couldn't change admin status for ${name} because of an error: ${err.message}`, {
-                                    appearance: "error",
-                                    autoDismiss: false,
-                                    placement: "top-center"
-                                });
-                                this.modifyLoadingUsers(uuid, false);
-                            });
-                        }
-        }>
-            <Icon name={ newAdminValue ? "arrow up" : "arrow down"} />
-            { newAdminValue ? "Make admin" : "Remove admin"}
+                           changeAdmin({
+                               variables: {uuid, updatedUser: {admin: newAdminValue}}
+                           }).then(({data}: any) => {
+                               if (data.updateUser) {
+                                   const addOrRemove = newAdminValue ? "now" : "no longer";
+                                   toastManager.add(`${name} is ${addOrRemove} an admin`, {
+                                       appearance: "success",
+                                       autoDismiss: true,
+                                       placement: "top-center"
+                                   });
+                                   this.modifyUserAdminInState(uuid, newAdminValue);
+                               } else {
+                                   toastManager.add(`The admin status for ${name} was not changed because the server didn't find any users to update or your account no longer has admin permissions.  Refresh the page and try again.`, {
+                                       appearance: "warning",
+                                       autoDismiss: false,
+                                       placement: "top-center"
+                                   });
+                               }
+                               this.modifyLoadingUsers(uuid, false);
+                           }).catch((err: any) => {
+                               toastManager.add(`Couldn't change admin status for ${name} because of an error: ${err.message}`, {
+                                   appearance: "error",
+                                   autoDismiss: false,
+                                   placement: "top-center"
+                               });
+                               this.modifyLoadingUsers(uuid, false);
+                           });
+                       }
+                       }>
+            <Icon name={newAdminValue ? "arrow up" : "arrow down"}/>
+            {newAdminValue ? "Make admin" : "Remove admin"}
         </Button>;
-    }
+    };
 }
 
 function mapStateToProps(state: AppState) {

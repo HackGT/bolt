@@ -23,8 +23,6 @@ type Mutation {
 	updateRequest(updatedRequest: RequestUpdateInput!): SimpleRequest
     # Delete the request with the specified ID.  Returns true if successful; otherwise, false
     deleteRequest(id: Int!): Boolean!
-	# Modify a user's admin status, true if success, false otherwise
-	changeUserAdmin(uuid: String!, admin: Boolean!): Boolean!
     updateUser(uuid: String!, updatedUser: UserUpdateInput!): User
 }
 
