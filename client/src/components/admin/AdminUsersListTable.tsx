@@ -205,7 +205,7 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
             <Icon name={newAdminValue ? "arrow up" : "arrow down"}/>
             {newAdminValue ? "Make admin" : "Remove admin"}
         </Button>;
-    };
+    }
 }
 
 function mapStateToProps(state: AppState) {
