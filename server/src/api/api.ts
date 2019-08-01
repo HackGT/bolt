@@ -13,10 +13,11 @@ import {
     Item,
     MutationTypeResolver,
     QueryTypeResolver,
-    RequestStatus,
-    User,
     Request,
-    SimpleRequest
+    RequestStatus,
+    SimpleRequest,
+    User,
+    UserUpdateInput
 } from "./graphql.types";
 
 const schemaFile = path.join(__dirname, "./api.graphql");
@@ -56,7 +57,6 @@ async function getItem(itemId: number, isAdmin: boolean): Promise<Item|null> {
     };
 }
 
-// using any here is slightly yikes but might solve the import .graphql file issue
 const resolvers: QueryTypeResolver|MutationTypeResolver = {
     /* Queries */
     /**
@@ -78,6 +78,26 @@ const resolvers: QueryTypeResolver|MutationTypeResolver = {
             haveID: context.user.haveID,
             admin: context.user.admin
         };
+    },
+    users: async (root, _args, _context): Promise<User[]> => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+        let searchObj = args.search;
+
+        // Restrict results to current user for non-admins
+        if (!context.user.admin) {
+            searchObj = {
+                uuid: context.user.uuid
+            };
+        }
+
+        const colNames: string[] = ["uuid", "name", "haveID", "phone",
+            "email", "slackUsername", "admin"];
+
+        return await DB.from("users")
+            .where(searchObj)
+            .select(colNames)
+            .orderBy("name");
     },
     /**
      * Returns information about a single item
@@ -215,7 +235,6 @@ const resolvers: QueryTypeResolver|MutationTypeResolver = {
             categoryId = await DB.from("categories").insert({
                 category_name: args.newItem.category
             }).returning("category_id");
-            console.log(categoryId);
             categoryId = categoryId[0];
             console.log(`No existing category named "${args.newItem.category}".  Created a new category with ID ${categoryId}.`);
         } else {
@@ -291,7 +310,6 @@ const resolvers: QueryTypeResolver|MutationTypeResolver = {
             categoryId = await DB.from("categories").insert({
                 category_name: args.updatedItem.category
             }).returning("category_id");
-            console.log(categoryId);
             categoryId = categoryId[0];
             console.log(`No existing category named "${args.updatedItem.category}".  Created a new category with ID ${categoryId}.`);
         } else {
@@ -429,6 +447,49 @@ const resolvers: QueryTypeResolver|MutationTypeResolver = {
         }
 
         return null;
+    },
+    updateUser: async (root, _args, _context): Promise<User | null> => {
+        // @ts-ignore
+        const {args, context} = fixArguments(root, _args, _context);
+
+        const searchObj: UserUpdateInput = args.updatedUser;
+
+        if (!context.user.admin && args.uuid !== context.user.uuid) {
+            throw new GraphQLError("You do not have permission to update users other than yourself.");
+        }
+
+        // non-admins can't change these properties
+        if (!context.user.admin) {
+            delete searchObj.admin;
+            delete searchObj.haveID;
+        }
+
+        // don't let an admin remove their own admin permissions
+        if (context.user.admin && args.uuid === context.user.uuid) {
+            delete searchObj.admin;
+        }
+
+        // stop if no properties are going to be updated
+        if (!Object.keys(searchObj).length) {
+            return null;
+        }
+
+        if (searchObj.phone && !(/^\((\d){3}\) (\d){3}-(\d){4}$/).test(searchObj.phone)) {
+            throw new GraphQLError("User not updated because phone number format is invalid");
+        }
+
+        const updatedUser: User[] = await DB.from("users")
+            .where({
+                uuid: args.uuid,
+            })
+            .update(searchObj)
+            .returning(["uuid", "name", "email", "phone", "slackUsername", "haveID", "admin"]);
+
+        if (!updatedUser.length) {
+            return null;
+        }
+
+        return updatedUser[0];
     }
 
 };

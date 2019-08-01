@@ -1,6 +1,8 @@
 type Query {
 	# Get information about the currently logged in user
 	user: User
+	# For admins, get information about all users
+	users(search: UserSearch!): [User!]
     # Get information about a specific item, given its ID
 	item(id: Int!): Item
     # Get an array of every item in the database
@@ -8,7 +10,7 @@ type Query {
     # Get a list containing each category that is on at least one item
     categories: [Category!]
 	# Return request(s) matching the search query provided and that the user has permission to see
-    requests(search: RequestSearch!): [Request]
+    requests(search: RequestSearch!): [Request!]
 }
 
 type Mutation {
@@ -16,11 +18,12 @@ type Mutation {
 	createItem(newItem: ItemInput!): Item!
     # Update the item with the specified ID to have the properties in updatedItem.  At this time
     #    all fields must be included
-    updateItem(id: Int!, updatedItem: ItemInput!): Item!
+    updateItem(id: Int!, updatedItem: ItemInput!): Item
 	createRequest(newRequest: RequestInput!):  Request!
 	updateRequest(updatedRequest: RequestUpdateInput!): SimpleRequest
     # Delete the request with the specified ID.  Returns true if successful; otherwise, false
     deleteRequest(id: Int!): Boolean!
+    updateUser(uuid: String!, updatedUser: UserUpdateInput!): User
 }
 
 type User {
@@ -136,4 +139,21 @@ input RequestUpdateInput {
 	request_id: Int!,
 	new_quantity: Int,
 	new_status: RequestStatus
+}
+
+input UserSearch {
+	uuid: String,
+	name: String,
+	haveID: Boolean,
+	phone: String,
+	email: String,
+	slackUsername: String,
+	admin: Boolean
+}
+
+input UserUpdateInput {
+    phone: String,
+    slackUsername: String,
+    haveID: Boolean,
+    admin: Boolean
 }

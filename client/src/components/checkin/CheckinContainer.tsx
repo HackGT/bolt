@@ -1,20 +1,20 @@
 import React from "react";
-import {Container, Dimmer, Header, Input, Loader, Segment, Divider} from 'semantic-ui-react';
+import {Container, Dimmer, Header, Input, Loader, Segment, Divider} from "semantic-ui-react";
 import { withToastManager } from "react-toast-notifications";
 import {withRouter} from "react-router-dom";
-import { connect } from 'react-redux'
+import { connect } from "react-redux";
 import {bindActionCreators, compose} from "redux";
-import { fetchRequestsAndUsers } from '../../actions/';
+import { fetchRequestsAndUsers } from "../../actions/";
 import AdminRequests from "./AdminRequests";
 
 interface CheckinContainerProps {
-    toastManager: any,
-    fetchRequestsAndUsers: any
+    toastManager: any;
+    fetchRequestsAndUsers: any;
 }
 
 interface CheckinContainerState {
-    loading: boolean,
-    search: string
+    loading: boolean;
+    search: string;
 }
 
 class CheckinContainer extends React.Component<CheckinContainerProps, CheckinContainerState> {
@@ -26,7 +26,7 @@ class CheckinContainer extends React.Component<CheckinContainerProps, CheckinCon
         };
     }
 
-    componentWillMount() {
+    public componentWillMount() {
         const { fetchRequestsAndUsers } = this.props;
         this.setState({
             loading: true
@@ -34,14 +34,14 @@ class CheckinContainer extends React.Component<CheckinContainerProps, CheckinCon
         fetchRequestsAndUsers();
     }
 
-    componentDidUpdate() {
+    public componentDidUpdate() {
         const { loading } = this.state; // TODO: error handling
         if (loading) {
             this.setState({loading: false});    
         }
     }
 
-    updateFilter = (e: any) => {
+    public updateFilter = (e: any) => {
         this.setState({
             search: e.target.value.trim()
         });
@@ -49,7 +49,7 @@ class CheckinContainer extends React.Component<CheckinContainerProps, CheckinCon
     /* 
      * TODO: User's profile pulls up on the side
     **/
-    render() {
+    public render() {
         const { loading, search } = this.state;
 
         const RequestsWrapper = (
@@ -85,17 +85,17 @@ class CheckinContainer extends React.Component<CheckinContainerProps, CheckinCon
 
 const styles = {
     empty: {
-        height: '200px',
+        height: "200px",
     }
-}
+};
 
 const mapStateToProps = (state: any) => {
     const { requests, users } = state;
     return { requests, users };
-}
+};
 
 const mapDispatchToProps = (dispatch: any) => bindActionCreators({
     fetchRequestsAndUsers
-}, dispatch)
+}, dispatch);
   
 export default compose(withRouter, connect(mapStateToProps, mapDispatchToProps), withToastManager)(CheckinContainer);

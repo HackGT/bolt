@@ -7,7 +7,7 @@ import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import CSVWizard from "./components/csv/CSVWizard";
 import CheckinContainer from "./components/checkin/CheckinContainer";
 import ItemWrapper from "./components/item/ItemWrapper";
-import {setUser, User} from "./actions/actions";
+import {setUser, User} from "./actions";
 import {store} from "./store";
 import {AppState} from "./reducers/reducers";
 import {connect} from "react-redux";
@@ -15,6 +15,8 @@ import PrivateRoute from "./components/util/PrivateRoute";
 import RequestManagementContainer from "./components/RequestManagementContainer";
 import AdminOverviewContainer from "./components/admin/AdminOverviewContainer";
 import {bugsnagClient, bugsnagEnabled} from "./index";
+import AdminUsersListWrapper from "./components/admin/AdminUsersListWrapper";
+import UserProfileWrapper from "./components/users/UserProfileWrapper";
 
 export interface OwnProps {}
 
@@ -72,18 +74,21 @@ class App extends Component<Props, {}> {
             <div style={{
                 width: "100%",
                 maxWidth: "960px",
-                margin: "0 auto"
+                margin: "0 auto",
+                padding: "0 5px"
             }}>
                 <Router>
                     <ToastProvider placement="top-center">
                         <Navigation/>
                         <Switch>
                             <Route path="/" exact component={HomeContainer}/>
-                            <PrivateRoute path="/admin/items" component={ItemWrapper}/>
-                            <PrivateRoute exact path="/requests" component={RequestManagementContainer}/>
+                            <Route path="/user" component={UserProfileWrapper} />
                             <PrivateRoute exact path="/admin" component={AdminOverviewContainer}/>
+                            <PrivateRoute exact path="/admin/desk" component={RequestManagementContainer}/>
+                            <PrivateRoute path="/admin/items" component={ItemWrapper}/>
                             <PrivateRoute exact path="/admin/csv" component={CSVWizard}/>
                             <PrivateRoute exact path="/admin/checkin" component={CheckinContainer}/>
+                            <PrivateRoute exact path="/admin/users" component={AdminUsersListWrapper}/>
                             <Route component={HomeContainer}/>
                         </Switch>
                         <Footer/>

@@ -2,63 +2,26 @@ import React from "react";
 import {Redirect, Route} from "react-router";
 import {AppState} from "../../reducers/reducers";
 import {connect} from "react-redux";
-import {store} from "../../store";
-import {setUser} from "../../actions";
+import {Loader} from "semantic-ui-react";
+import {User} from "../../actions";
 
-async function userIsAdmin() {
-    const state = store.getState();
-    // If it looks like this user isn't an admin request their info since sometimes the user info
-    // isn't immediately known on a new page load
-    if (state.user === null || !state.user.admin) {
-
-        const userRequest = await fetch("/api", {
-            credentials: "include",
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                query: `
-                        query {
-                          user {
-                            uuid
-                            name
-                            admin
-                          }
-                        }
-                    `
-            }),
-        });
-        const json = await userRequest.json();
-        if (json && json.data && json.data.user) {
-            const user = json.data.user;
-            if (user) {
-                store.dispatch(setUser(user));
-            }
-        } else {
-            console.error("Invalid user information returned by server, can't sign in:", json);
-        }
+function PrivateRoute({ component: Component, user, ...rest }: any) {
+    if (user === null) {
+        return <Loader active inline="centered" content="Please wait..."/>;
     }
 
-    return state.user !== null && state.user.admin;
-}
+    if (user.admin) {
+        return <Route {...rest} render={(props: any) => <Component {...props} />} />;
+    }
 
-function PrivateRoute({ component: Component, ...rest }: any) {
     return (
         <Route
             {...rest}
-            render={(props: any) =>
-                userIsAdmin() ? (
-                    <Component {...props} />
-                ) : (
-                    <Redirect
-                        to={{
-                            pathname: "/",
-                            state: { from: props.location }
-                        }}
-                    />
-                )
-            }
+            render={(props: any) => <Redirect to={{
+                pathname: "/",
+                state: {from: props.location}
+            }}
+                />}
         />
     );
 }
@@ -69,4 +32,4 @@ function mapStateToProps(state: AppState) {
     };
 }
 
-export default connect(mapStateToProps) (PrivateRoute);
+export default connect(mapStateToProps)(PrivateRoute);
