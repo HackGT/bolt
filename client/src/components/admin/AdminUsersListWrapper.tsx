@@ -5,7 +5,6 @@ import {Header, Loader, Message} from "semantic-ui-react";
 import {Query} from "react-apollo";
 import gql from "graphql-tag";
 import AdminUsersListTable, {FullUser} from "./AdminUsersListTable";
-import {withToastManager} from "react-toast-notifications";
 
 export const usersQuery = gql`
     query users {
@@ -42,7 +41,7 @@ class AdminUsersListWrapper extends Component {
                         }
                         const {users}: { users: FullUser[] } = data;
 
-                        return <AdminUsersListTableWrapped users={users}/>;
+                        return <AdminUsersListTable users={users}/>;
                     }
                 }
             </Query>
@@ -56,7 +55,6 @@ function mapStateToProps(state: AppState) {
     };
 }
 
-export const AdminUsersListTableWrapped = withToastManager(AdminUsersListTable);
 export default connect(
     mapStateToProps
 )(AdminUsersListWrapper);

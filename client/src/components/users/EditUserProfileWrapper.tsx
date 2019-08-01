@@ -7,7 +7,6 @@ import {User} from "../../actions";
 import UserProfile from "./UserProfile";
 import {AppState} from "../../reducers/reducers";
 import {connect} from "react-redux";
-import {withToastManager} from "react-toast-notifications";
 
 
 interface EditUserProps {
@@ -84,7 +83,7 @@ class EditUserProfileWrapper extends Component<EditUserProps, {}> {
                                 />;
                             }
 
-                            return <UserProfileWrapper preloadUser={data.users[0]}/>;
+                            return <UserProfile preloadUser={data.users[0]}/>;
                         }
                     }
                 </Query>
@@ -98,8 +97,6 @@ function mapStateToProps(state: AppState) {
         user: state.user
     };
 }
-
-export const UserProfileWrapper = withToastManager(UserProfile);
 
 export default connect(
     mapStateToProps

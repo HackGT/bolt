@@ -8,6 +8,7 @@ import Cleave from "cleave.js/react";
 import {Link, Redirect} from "react-router-dom";
 import Mutation from "react-apollo/Mutation";
 import gql from "graphql-tag";
+import {withToastManager} from "react-toast-notifications";
 
 type UserProfileProps = {
     signedInUser: User | null;
@@ -257,6 +258,4 @@ function mapStateToProps(state: AppState) {
     };
 }
 
-export default connect(
-    mapStateToProps
-)(UserProfile);
+export default withToastManager(connect(mapStateToProps)(UserProfile));

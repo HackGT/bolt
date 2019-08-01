@@ -7,6 +7,8 @@ import {Mutation} from "react-apollo";
 import gql from "graphql-tag";
 import {usersQuery} from "./AdminUsersListWrapper";
 import {Link} from "react-router-dom";
+import {withToastManager} from "react-toast-notifications";
+
 
 export interface FullUser extends User {
     email: string;
@@ -214,4 +216,5 @@ function mapStateToProps(state: AppState) {
     };
 }
 
-export default connect(mapStateToProps)(AdminUsersListTable);
+// Using compose here doesn't work.  Note the structure of this: withToastManager( connect()(component) )
+export default withToastManager(connect(mapStateToProps)(AdminUsersListTable));
