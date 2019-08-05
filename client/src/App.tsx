@@ -12,7 +12,7 @@ import {store} from "./store";
 import {AppState} from "./reducers/reducers";
 import {connect} from "react-redux";
 import PrivateRoute from "./components/util/PrivateRoute";
-import RequestManagementContainer from "./components/RequestManagementContainer";
+import DeskContainer from "./components/desk/DeskContainer";
 import AdminOverviewContainer from "./components/admin/AdminOverviewContainer";
 import {bugsnagClient, bugsnagEnabled} from "./index";
 import AdminUsersListWrapper from "./components/admin/AdminUsersListWrapper";
@@ -84,7 +84,7 @@ class App extends Component<Props, {}> {
                             <Route path="/" exact component={HomeContainer}/>
                             <Route path="/user" component={UserProfileWrapper} />
                             <PrivateRoute exact path="/admin" component={AdminOverviewContainer}/>
-                            <PrivateRoute exact path="/admin/desk" component={RequestManagementContainer}/>
+                            <PrivateRoute exact path="/admin/desk" component={DeskContainer}/>
                             <PrivateRoute path="/admin/items" component={ItemWrapper}/>
                             <PrivateRoute exact path="/admin/csv" component={CSVWizard}/>
                             <PrivateRoute exact path="/admin/checkin" component={CheckinContainer}/>

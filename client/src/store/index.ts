@@ -12,6 +12,5 @@ export const store = createStore(
     reducers,
     composeSetup(
         applyMiddleware(thunk) as any
-
     )
 );

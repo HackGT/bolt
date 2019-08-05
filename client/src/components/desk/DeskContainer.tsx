@@ -1,7 +1,7 @@
 import React, {Component} from "react";
-import {Grid} from "semantic-ui-react";
-import RequestManagementBoard from "./RequestManagement/RequestManagementBoard";
-import {ItemStatus, RequestedItem} from "./inventory/HardwareItem";
+import {Grid, Header} from "semantic-ui-react";
+import RequestManagementBoard from "./RequestManagementBoard";
+import {ItemStatus, RequestedItem} from "../inventory/HardwareItem";
 
 const cardStyle = {
     padding: "10px"
@@ -80,7 +80,7 @@ interface RequestManagementContainerState {
     items: RequestedItem[];
 }
 
-class RequestManagementContainer extends Component<{}, RequestManagementContainerState> {
+class DeskContainer extends Component<{}, RequestManagementContainerState> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -156,50 +156,51 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
 
     public render() {
         this.getItems(ItemStatus.SUBMITTED);
-        return (
-            <Grid>
-                <Grid.Row columns={3}>
-                    <RequestManagementBoard
-                        title="Submitted"
-                        items={this.getItems(ItemStatus.SUBMITTED)}
-                        sortedItems={[]}
-                        sortByUsers={false}
-                        backToPrep={false}
-                        handleApprove={this.handleApprove}
-                        handleDecline={this.handleDecline}
-                        handleReady={this.handleReady}
-                        handleCross={this.handleCross}
-                        handlePrep={this.handlePrep}
-                        handleDone={this.handleDone}
-                    />
-                    <RequestManagementBoard
-                        title="Ready to Prepare"
-                        items={[] as RequestedItem[]}
-                        sortedItems={this.getItemsForEachUser(ItemStatus.APPROVED)}
-                        sortByUsers={true}
-                        backToPrep={false}
-                        handleApprove={this.handleApprove}
-                        handleDecline={this.handleDecline}
-                        handleReady={this.handleReady}
-                        handleCross={this.handleCross}
-                        handlePrep={this.handlePrep}
-                        handleDone={this.handleDone}
-                    />
-                    <RequestManagementBoard
-                        title="Ready for Pickup"
-                        items={[] as RequestedItem[]}
-                        sortedItems={this.getItemsForEachUser(ItemStatus.READY)}
-                        sortByUsers={true}
-                        backToPrep={true}
-                        handleApprove={this.handleApprove}
-                        handleDecline={this.handleDecline}
-                        handleReady={this.handleReady}
-                        handleCross={this.handleCross}
-                        handlePrep={this.handlePrep}
-                        handleDone={this.handleDone}
-                    />
-                </Grid.Row>
-            </Grid>
+        return (<div>
+                <Header size="huge">Hardware Desk</Header>
+                <Grid>
+                    <Grid.Row columns={3}>
+                        <RequestManagementBoard
+                            title="Submitted"
+                            items={this.getItems(ItemStatus.SUBMITTED)}
+                            sortedItems={[]}
+                            sortByUsers={false}
+                            backToPrep={false}
+                            handleApprove={this.handleApprove}
+                            handleDecline={this.handleDecline}
+                            handleReady={this.handleReady}
+                            handleCross={this.handleCross}
+                            handlePrep={this.handlePrep}
+                            handleDone={this.handleDone}
+                        />
+                        <RequestManagementBoard
+                            title="Ready to Prepare"
+                            items={[] as RequestedItem[]}
+                            sortedItems={this.getItemsForEachUser(ItemStatus.APPROVED)}
+                            sortByUsers={true}
+                            backToPrep={false}
+                            handleApprove={this.handleApprove}
+                            handleDecline={this.handleDecline}
+                            handleReady={this.handleReady}
+                            handleCross={this.handleCross}
+                            handlePrep={this.handlePrep}
+                            handleDone={this.handleDone}
+                        />
+                        <RequestManagementBoard
+                            title="Ready for Pickup"
+                            items={[] as RequestedItem[]}
+                            sortedItems={this.getItemsForEachUser(ItemStatus.READY)}
+                            sortByUsers={true}
+                            backToPrep={true}
+                            handleApprove={this.handleApprove}
+                            handleDecline={this.handleDecline}
+                            handleReady={this.handleReady}
+                            handleCross={this.handleCross}
+                            handlePrep={this.handlePrep}
+                            handleDone={this.handleDone}
+                        />
+                    </Grid.Row>
+                </Grid></div>
         );
     }
 
@@ -251,4 +252,4 @@ class RequestManagementContainer extends Component<{}, RequestManagementContaine
     }
 }
 
-export default RequestManagementContainer;
+export default DeskContainer;

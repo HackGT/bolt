@@ -8,7 +8,7 @@ function adminCardLink(name: string, to: string = "#"): AdminCardLink {
     return { name, to };
 }
 const hardwareDesk: AdminCardLink[] = [
-    adminCardLink("Work hardware desk"),
+    adminCardLink("Work hardware desk", "/admin/desk"),
     adminCardLink("Item check-in", "/admin/checkin")
 ];
 

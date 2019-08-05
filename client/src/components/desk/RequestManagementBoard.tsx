@@ -3,7 +3,7 @@ import {Card, Container, Grid} from "semantic-ui-react";
 import RequestedHardwareItem from "./RequestedHardwareItem";
 import {RequestedItem} from "../inventory/HardwareItem";
 import {RequestedItemsByUser} from "./RequestedItemsByUser";
-import {UserItemList} from "../RequestManagementContainer";
+import {UserItemList} from "./DeskContainer";
 
 
 interface RequestManagementBoardProps {
