@@ -1,3 +1,21 @@
+.hw-card:not(:last-child) {
+  margin-bottom: 15px;
+}
+
+.hw-qty {
+  margin-left: 0 !important;
+}
+
+.hw-positive {
+  color: #28a745;
+}
+
+.hw-negative {
+  color: #dc3545;
+}
+
+
+
 .hardware-item-user-name {
   display: inline;
   padding-right: 2rem;
@@ -8,8 +26,9 @@
   padding-top: 0.5rem;
 }
 
-.hardware-board-style{
-  height: 40rem;
+.hw-list {
+  min-height: 5rem;
+  max-height: 40rem;
   overflow-y: scroll;
   background: #eaeaea;
   overflow-x: hidden;

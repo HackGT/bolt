@@ -1,6 +1,6 @@
 import React, {Component} from "react";
-import {UserItemList} from "./DeskContainer";
-import {Button, Card, Icon, Label, Popup} from "semantic-ui-react";
+import {UserItemList} from "./DeskContainerOld";
+import {Button, Card, Icon, Label, Popup, Progress} from "semantic-ui-react";
 
 interface RequestedItemsByUserProps {
     item: UserItemList;
@@ -80,6 +80,7 @@ export class RequestedItemsByUser extends Component<RequestedItemsByUserProps> {
                         </Card.Content>
                     );
                 })}
+                <Progress attached="top" percent={85} active={true} color={"red"}/>
             </Card>
         );
     }

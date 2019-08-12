@@ -12,11 +12,11 @@ import {store} from "./store";
 import {AppState} from "./reducers/reducers";
 import {connect} from "react-redux";
 import PrivateRoute from "./components/util/PrivateRoute";
-import DeskContainer from "./components/desk/DeskContainer";
 import AdminOverviewContainer from "./components/admin/AdminOverviewContainer";
 import {bugsnagClient, bugsnagEnabled} from "./index";
 import AdminUsersListWrapper from "./components/admin/AdminUsersListWrapper";
 import UserProfileWrapper from "./components/users/UserProfileWrapper";
+import DeskContainer from "./components/desk/DeskContainer";
 
 export interface OwnProps {}
 

@@ -3,7 +3,7 @@ import {Card, Container, Grid} from "semantic-ui-react";
 import RequestedHardwareItem from "./RequestedHardwareItem";
 import {RequestedItem} from "../inventory/HardwareItem";
 import {RequestedItemsByUser} from "./RequestedItemsByUser";
-import {UserItemList} from "./DeskContainer";
+import {UserItemList} from "./DeskContainerOld";
 
 
 interface RequestManagementBoardProps {
@@ -25,7 +25,7 @@ class RequestManagementBoard extends Component<RequestManagementBoardProps, {}> 
         return this.props.sortByUsers ? (
             <Grid.Column>
                 <h2>{this.props.title}</h2>
-                <Container placeholder className="hardware-board-style">
+                <Container placeholder className="hw-list">
                     <Card.Group>
                         {this.props.sortedItems.map((item, index) => {
                             return (
@@ -46,7 +46,7 @@ class RequestManagementBoard extends Component<RequestManagementBoardProps, {}> 
         ) : (
             <Grid.Column>
                 <h2>{this.props.title}</h2>
-                <Container placeholder className="hardware-board-style">
+                <Container placeholder className="hw-list">
                     <Card.Group>
                         {this.props.items.map((item, index) => {
                             return (
