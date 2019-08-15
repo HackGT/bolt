@@ -43,17 +43,52 @@ async function getItem(itemId: number, isAdmin: boolean): Promise<Item|null> {
         .join("categories", "items.category_id", "=", "categories.category_id")
         .where({item_id: itemId});
 
+
+    // the lesser of two evils.  These 2 partial queries give us all the info we need to calculate the two different quantity values
+    const qtyNotAtDesk: number = parseInt((await DB.from("requests")
+        .whereIn("status", ["FULFILLED", "LOST", "DAMAGED"])
+        .andWhere({
+            request_item_id: itemId
+        })
+        .count("request_id"))[0].count, 10);
+
+    console.log(qtyNotAtDesk);
+    console.log("HELLO???");
+
+    const qtyPartialReserved: number = parseInt((await DB.from("requests")
+        .whereIn("status", ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP"])
+        .andWhere({
+            request_item_id: itemId
+        })
+        .count("request_id"))[0].count, 10);
+
+
     if (item.length === 0) {
         return null;
     }
     const actualItem: any = item[0];
+
+    const totalAvailable: number = actualItem.totalAvailable;
+    const unreservedQty: number = totalAvailable - (qtyNotAtDesk + qtyPartialReserved);
+    const qtyInStock: number = totalAvailable - qtyNotAtDesk;
+
+    // select count(request_id) as "qty NOT in stock" -- 1
+    // from requests
+    // where status in ('FULFILLED', 'LOST', 'DAMAGED') and request_item_id = 32;
+
+    // select count(request_id) as "qty reserved partial" -- 7
+    // from requests
+    // where status in ('SUBMITTED', 'APPROVED', 'READY_FOR_PICKUP') and request_item_id = 32;
+
 
     return {
         ...actualItem,
         id: actualItem.item_id,
         category: actualItem.category_name,
         price: onlyIfAdmin(actualItem.price, isAdmin),
-        owner: onlyIfAdmin(actualItem.owner, isAdmin)
+        owner: onlyIfAdmin(actualItem.owner, isAdmin),
+        qtyUnreserved: unreservedQty,
+        qtyInStock
     };
 }
 
@@ -380,6 +415,10 @@ const resolvers: QueryTypeResolver|MutationTypeResolver = {
             .returning(["request_id", "created_at", "updated_at"]);
 
         newRequest = newRequest[0];
+
+        if (item.qtyUnreserved) {
+            item.qtyUnreserved -= args.newRequest.quantity;
+        }
 
         return {
             request_id: newRequest.request_id,
