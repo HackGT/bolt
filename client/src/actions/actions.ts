@@ -1,12 +1,7 @@
 import {ActionCreator} from "redux";
 import {types} from "./";
 import {ItemStatus, RequestedItem} from "../components/inventory/HardwareItem";
-
-export interface User {
-    uuid: string;
-    admin: boolean;
-    name: string;
-}
+import {User} from "../types/User";
 
 export interface TestAction {
     type: string;

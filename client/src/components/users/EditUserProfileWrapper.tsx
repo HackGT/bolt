@@ -3,10 +3,10 @@ import {match} from "react-router";
 import {Query} from "react-apollo";
 import gql from "graphql-tag";
 import {Header, Loader, Message} from "semantic-ui-react";
-import {User} from "../../actions";
 import UserProfile from "./UserProfile";
-import {AppState} from "../../reducers/reducers";
 import {connect} from "react-redux";
+import {User} from "../../types/User";
+import {AppState} from "../../state/Store";
 
 
 interface EditUserProps {
@@ -94,7 +94,7 @@ class EditUserProfileWrapper extends Component<EditUserProps, {}> {
 
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user
+        user: state.account
     };
 }
 

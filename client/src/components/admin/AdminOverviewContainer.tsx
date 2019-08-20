@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {connect} from "react-redux";
-import {AppState} from "../../reducers/reducers";
+import {AppState} from "../../state/Store";
 import AdminLinksCard, {AdminCardLink} from "./AdminLinksCard";
 import {Grid, Header} from "semantic-ui-react";
 
@@ -70,7 +70,7 @@ class AdminOverviewContainer extends Component {
 
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user
+        user: state.account
     };
 }
 

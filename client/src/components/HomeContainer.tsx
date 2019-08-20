@@ -3,14 +3,13 @@ import {Grid} from "semantic-ui-react";
 import HardwareList from "./inventory/HardwareList";
 import RequestsList from "./requests/RequestsList";
 import {RequestedItem} from "./inventory/HardwareItem";
-import {AppState} from "../reducers/reducers";
 import {connect} from "react-redux";
-import {User} from "../actions/actions";
+import {User} from "../types/User";
+import {AppState} from "../state/Store";
 
 export interface OwnProps {}
 
 interface StateProps {
-    a: number;
     user: User | null;
 }
 
@@ -70,7 +69,7 @@ class HomeContainer extends Component<Props, State> {
 
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user
+        user: state.account
     };
 }
 

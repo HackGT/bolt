@@ -2,8 +2,8 @@ import React from "react";
 import {Icon, Menu} from "semantic-ui-react";
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
-import {AppState} from "../../reducers/reducers";
-import {User} from "../../actions";
+import {User} from "../types/User";
+import {AppState} from "../state/Store";
 
 export interface OwnProps {}
 
@@ -58,7 +58,7 @@ class Navigation extends React.Component<Props, {}> {
 
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user
+        user: state.account
     };
 }
 

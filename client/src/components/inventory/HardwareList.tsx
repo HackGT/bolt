@@ -1,14 +1,14 @@
 import React from "react";
-import HardwareItem from "./HardwareItem";
-import {Header, Icon, Item, Message} from "semantic-ui-react";
+import HardwareItem, {RequestedItem} from "./HardwareItem";
+import {Button, Header, Icon, Item, Message} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
-import {RequestedItem} from "../inventory/HardwareItem";
-import {AppState} from "../../reducers/reducers";
 import {connect} from "react-redux";
-import {User} from "../../actions/actions";
 import Query from "react-apollo/Query";
-import {HwItem} from "../../types/ItemType";
+import {HwItem} from "../../types/Hardware";
 import gql from "graphql-tag";
+import {Link} from "react-router-dom";
+import {User} from "../../types/User";
+import {AppState} from "../../state/Store";
 
 export interface OwnProps {
     requestsEnabled: boolean;
@@ -63,6 +63,7 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                                 approvalRequired
                                 returnRequired
                                 owner
+                                qtyUnreserved
                             }
                         }
                     `}>
@@ -92,6 +93,8 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                     <Message>
                         <Message.Header>Oops, there's no items!</Message.Header>
                         <p>Well, this is awkward.</p>
+                        {this.props.user && this.props.user.admin ?
+                            <Button as={Link} to="/admin/items/new">Create your first item</Button> : ""}
                     </Message>
                 );
 
@@ -109,6 +112,7 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
                                           qtyRemaining={0}
                                           totalAvailable={item.totalAvailable}
                                           maxRequestQty={item.maxRequestQty}
+                                          inStock={item.qtyUnreserved > 0}
                                           category={item.category}
                                           key={item.id}
                                           id={item.id}
@@ -133,7 +137,7 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
 
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user
+        user: state.account
     };
 }
 

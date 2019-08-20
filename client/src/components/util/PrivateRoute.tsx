@@ -1,9 +1,8 @@
 import React from "react";
 import {Redirect, Route} from "react-router";
-import {AppState} from "../../reducers/reducers";
 import {connect} from "react-redux";
 import {Loader} from "semantic-ui-react";
-import {User} from "../../actions";
+import {AppState} from "../../state/Store";
 
 function PrivateRoute({ component: Component, user, ...rest }: any) {
     if (user === null) {
@@ -28,7 +27,7 @@ function PrivateRoute({ component: Component, user, ...rest }: any) {
 
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user
+        user: state.account
     };
 }
 

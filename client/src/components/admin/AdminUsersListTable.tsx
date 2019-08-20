@@ -1,22 +1,13 @@
 import React, {Component} from "react";
 import {connect} from "react-redux";
-import {AppState} from "../../reducers/reducers";
+import {AppState} from "../../state/Store";
 import {Button, Icon, Input, Table, TableHeaderCell} from "semantic-ui-react";
-import {User} from "../../actions";
 import {Mutation} from "react-apollo";
 import gql from "graphql-tag";
 import {usersQuery} from "./AdminUsersListWrapper";
 import {Link} from "react-router-dom";
 import {withToastManager} from "react-toast-notifications";
-
-
-export interface FullUser extends User {
-    email: string;
-    phone: string;
-    slackUsername: string;
-    haveID: boolean;
-    admin: boolean;
-}
+import {FullUser, User} from "../../types/User";
 
 type UsersListProps = {
     users: FullUser[];
@@ -212,7 +203,7 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
 
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user
+        user: state.account
     };
 }
 

@@ -3,7 +3,7 @@ import {Container, Grid, Segment} from "semantic-ui-react";
 
 interface CardListProps {
     title: string;
-
+    length: number;
 }
 
 interface CardListState {
@@ -19,7 +19,7 @@ class CardList extends Component<CardListProps, CardListState> {
         return (
             <Grid.Column>
                 <h2>{this.props.title}</h2>
-                <Segment attached="top">18 requests</Segment>
+                <Segment attached="top">{this.props.length} request{this.props.length === 1 ? "" : "s"}</Segment>
                 <Container placeholder className="hw-list">
                     {this.props.children}
                 </Container>

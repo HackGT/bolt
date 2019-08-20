@@ -1,13 +1,6 @@
-import {
-    GenericAction,
-    RequestsAndUsersAction,
-    RequestStatusAction,
-    SetUserAction,
-    TestAction,
-    types,
-    User
-} from "../actions/";
+import {GenericAction, RequestsAndUsersAction, RequestStatusAction, SetUserAction, types,} from "../actions/";
 import {RequestedItem} from "../components/inventory/HardwareItem";
+import {User} from "../types/User";
 
 export interface AppState {
     user: User | null;
@@ -25,7 +18,7 @@ const defaultAction: GenericAction = {
     type: "DEFAULT"
 };
 
-const reducers = (state = defaultState, action: SetUserAction|TestAction|GenericAction = defaultAction) => {
+const reducers = (state = defaultState, action: any = defaultAction) => {
     switch (action.type) {
         case types.SET_USER:
             return {

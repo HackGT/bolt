@@ -53,7 +53,6 @@ async function getItem(itemId: number, isAdmin: boolean): Promise<Item|null> {
         .count("request_id"))[0].count, 10);
 
     console.log(qtyNotAtDesk);
-    console.log("HELLO???");
 
     const qtyPartialReserved: number = parseInt((await DB.from("requests")
         .whereIn("status", ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP"])
@@ -162,13 +161,64 @@ const resolvers: QueryTypeResolver|MutationTypeResolver = {
         const items = await DB.from("items")
             .join("categories", "items.category_id", "=", "categories.category_id");
 
+        // select request_item_id, count(request_id) as "qty reserved partial" -- 7
+        // from requests
+        // where status in ('SUBMITTED', 'APPROVED', 'READY_FOR_PICKUP') and request_item_id = 32
+        // group by request_item_id
+        // order by request_item_id;
+        //
+        // select request_item_id, count(request_id) as "qty reserved partial" -- 7
+        // from requests
+        // where status in ('SUBMITTED', 'APPROVED', 'READY_FOR_PICKUP')
+        // group by request_item_id
+        // order by request_item_id;
+
+        // the lesser of two evils.  These 2 partial queries give us all the info we need to calculate the two different quantity values
+        const qtyNotAtDesk = await DB.from("requests")
+            .whereIn("status", ["FULFILLED", "LOST", "DAMAGED"])
+            .groupBy("request_item_id")
+            .orderBy("request_item_id")
+            .select("request_item_id")
+            .count("request_id");
+
+        const qtyNotAtDeskObj = {};
+
+        qtyNotAtDesk.forEach((value, index, arr) => {
+            qtyNotAtDeskObj[value.request_item_id.toString()] = parseInt(value.count, 10);
+        });
+
+        console.log(qtyNotAtDeskObj);
+
+        const qtyPartialReserved = await DB.from("requests")
+            .whereIn("status", ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP"])
+            .groupBy("request_item_id")
+            .orderBy("request_item_id")
+            .select("request_item_id")
+            .count("request_id");
+
+        const qtyPartialReservedObj = {};
+
+        qtyPartialReserved.forEach((value, index, arr) => {
+            qtyPartialReservedObj[value.request_item_id.toString()] = parseInt(value.count, 10);
+        });
+
+        console.log("qtyPartialReserved", qtyPartialReservedObj);
+
+
         return items.map(item => {
+            const totalAvailable: number = item.totalAvailable;
+            console.log(totalAvailable);
+            const qtyUnreserved: number = totalAvailable - ((qtyNotAtDeskObj[item.item_id.toString()] || 0) + (qtyPartialReservedObj[item.item_id.toString()] || 0));
+            const qtyInStock: number = totalAvailable - (qtyNotAtDeskObj[item.item_id.toString()] || 0);
+            console.log(qtyUnreserved, qtyInStock);
             return {
                 ...item,
                 id: item.item_id,
                 category: item.category_name,
                 price: onlyIfAdmin(item.price, context.user.admin),
-                owner: onlyIfAdmin(item.owner, context.user.admin)
+                owner: onlyIfAdmin(item.owner, context.user.admin),
+                qtyInStock,
+                qtyUnreserved
             };
         });
     },

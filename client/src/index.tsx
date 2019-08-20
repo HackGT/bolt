@@ -4,7 +4,7 @@ import "./index.scss";
 import App from "./App";
 import {Provider} from "react-redux";
 import * as serviceWorker from "./serviceWorker";
-import {store} from "./store";
+import {store} from "./state/Store";
 import ApolloProvider from "react-apollo/ApolloProvider";
 import {ApolloClient} from "apollo-client";
 import {ApolloLink} from "apollo-link";

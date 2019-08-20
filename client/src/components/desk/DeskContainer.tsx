@@ -20,7 +20,7 @@ class DeskContainer extends Component {
                 <Grid stackable>
                     <Grid.Row columns={3}>
                         <SubmittedList/>
-                        <CardList title="Ready to Prepare">
+                        <CardList title="Ready to Prepare" length={0}>
                             <Segment placeholder>
                                 <Container textAlign="center">
                                     <Header>
@@ -29,7 +29,7 @@ class DeskContainer extends Component {
                                 </Container>
                             </Segment>
                         </CardList>
-                        <CardList title="Ready for Pickup">
+                        <CardList title="Ready for Pickup" length={0}>
                             <Segment placeholder>
                                 <Container textAlign="center">
                                     <Header>

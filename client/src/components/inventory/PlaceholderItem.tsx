@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 import {Placeholder} from "semantic-ui-react";
 
 class PlaceholderItem extends Component {
-    render() {
+    public render() {
         return (
             <Placeholder>
                 <Placeholder.Header image>

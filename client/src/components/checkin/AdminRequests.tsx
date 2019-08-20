@@ -1,11 +1,12 @@
 import React from "react";
-import { Button, Card, Container, Label, Icon, Segment, Divider } from "semantic-ui-react";
-import { withToastManager } from "react-toast-notifications";
-import { connect } from "react-redux";
+import {Button, Card, Container, Divider, Icon, Label} from "semantic-ui-react";
+import {withToastManager} from "react-toast-notifications";
+import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
-import { User, updateRequestStatus } from "../../actions/";
-import { RequestedItem, ItemStatus } from "../inventory/HardwareItem";
-import { StatusToString, StatusToColor } from "../../enums";
+import {updateRequestStatus} from "../../actions/";
+import {ItemStatus, RequestedItem} from "../inventory/HardwareItem";
+import {StatusToColor, StatusToString} from "../../enums";
+import {User} from "../../types/User";
 
 interface RequestsListsPassedProps {
     filter: string;

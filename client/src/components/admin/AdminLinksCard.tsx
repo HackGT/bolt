@@ -1,8 +1,8 @@
 import React from "react";
 import {connect} from "react-redux";
 import {Card, List} from "semantic-ui-react";
-import {AppState} from "../../reducers/reducers";
 import {Link} from "react-router-dom";
+import {AppState} from "../../state/Store";
 
 export type AdminCardLink = {
     name: string;
@@ -44,7 +44,7 @@ class AdminLinksCard extends React.Component<Props, State> {
 
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user
+        user: state.account
     };
 }
 

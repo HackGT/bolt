@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
-import {Header, Icon, Segment, Card, Image, Button, Label, Grid, Divider, Container, Step} from "semantic-ui-react";
-import { RequestedItem } from "../inventory/HardwareItem"
-import { StatusToString, StatusToColor } from '../../enums';
+import React, {Component} from "react";
+import {Button, Card, Container, Header, Label, Segment} from "semantic-ui-react";
+import {RequestedItem} from "../inventory/HardwareItem";
+import {StatusToColor, StatusToString} from "../../enums";
 
-class RequestsList extends Component<{requestedItemsList: RequestedItem[], removeItem: (index: number) => void}>{
-    
-    render() {
+class RequestsList extends Component<{ requestedItemsList: RequestedItem[], removeItem: (index: number) => void }> {
+
+    public render() {
         const noRequest = (
             <Segment placeholder>
                 <Container textAlign="center">
@@ -14,8 +14,8 @@ class RequestsList extends Component<{requestedItemsList: RequestedItem[], remov
                         </Header>
                 </Container>
             </Segment>
-        )
-        const requestIsThere = <h1>YAS</h1>
+        );
+        const requestIsThere = <h1>YAS</h1>;
         return this.props.requestedItemsList.length == 0 ? noRequest : (
             <Segment placeholder>
                 <Card.Group>
@@ -31,14 +31,16 @@ class RequestsList extends Component<{requestedItemsList: RequestedItem[], remov
 
                                         <Label large color={StatusToColor(item.status)}>{StatusToString(item.status)}</Label>
 
-                                        <Button floated="right" basic color="red" onClick={() => {this.props.removeItem(index)}}>
+                                        <Button floated="right" basic color="red" onClick={() => {
+                                            this.props.removeItem(index);
+                                        }}>
                                             Cancel Request
                                         </Button>
 
                                     </Card.Description>
                                 </Card.Content>
                             </Card>
-                        )
+                        );
                     })}
                 </Card.Group>
             </Segment>

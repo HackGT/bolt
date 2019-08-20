@@ -30,6 +30,8 @@ export interface KnexRequest extends KnexSimpleRequest {
     phone: string;
     slackUsername: string;
     haveID: boolean;
+    qtyInStock: number;
+    qtyUnreserved: number;
 }
 
 
@@ -69,7 +71,9 @@ export function nestedRequest(request: KnexRequest, isAdmin: boolean) {
         hidden: request.hidden,
         returnRequired: request.returnRequired,
         approvalRequired: request.approvalRequired,
-        owner: onlyIfAdmin(request.owner, isAdmin)
+        owner: onlyIfAdmin(request.owner, isAdmin),
+        qtyInStock: request.qtyInStock || 0, // FIXME
+        qtyUnreserved: request.qtyUnreserved || 0 // FIXME
     };
 
 

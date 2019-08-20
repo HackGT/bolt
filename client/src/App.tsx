@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import Navigation from "./components/navigation/Navigation";
+import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
 import {ToastProvider} from "react-toast-notifications";
 import HomeContainer from "./components/HomeContainer";
@@ -7,9 +7,6 @@ import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import CSVWizard from "./components/csv/CSVWizard";
 import CheckinContainer from "./components/checkin/CheckinContainer";
 import ItemWrapper from "./components/item/ItemWrapper";
-import {setUser, User} from "./actions";
-import {store} from "./store";
-import {AppState} from "./reducers/reducers";
 import {connect} from "react-redux";
 import PrivateRoute from "./components/util/PrivateRoute";
 import AdminOverviewContainer from "./components/admin/AdminOverviewContainer";
@@ -17,11 +14,15 @@ import {bugsnagClient, bugsnagEnabled} from "./index";
 import AdminUsersListWrapper from "./components/admin/AdminUsersListWrapper";
 import UserProfileWrapper from "./components/users/UserProfileWrapper";
 import DeskContainer from "./components/desk/DeskContainer";
+import {User} from "./types/User";
+import {loginUser} from "./state/Account";
+import {AppState} from "./state/Store";
 
 export interface OwnProps {}
 
 interface StateProps {
     user: User|null;
+    loginUser: (user: User) => void;
 }
 
 type Props = StateProps & OwnProps;
@@ -50,7 +51,7 @@ class App extends Component<Props, {}> {
         if (json && json.data && json.data.user) {
             const user = json.data.user;
             if (user) {
-                store.dispatch(setUser(user));
+                this.props.loginUser(user);
                 if (bugsnagEnabled) {
                     bugsnagClient.user = user;
                 }
@@ -101,8 +102,16 @@ class App extends Component<Props, {}> {
 
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user
+        user: state.account
     };
 }
 
-export default connect(mapStateToProps) (App);
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        loginUser: (user: User) => {
+            dispatch(loginUser(user));
+        }
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

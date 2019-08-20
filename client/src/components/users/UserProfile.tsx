@@ -1,14 +1,13 @@
 import React, {ChangeEvent, Component, FormEvent, ReactNode} from "react";
 import {connect} from "react-redux";
-import {AppState} from "../../reducers/reducers";
 import {Button, CheckboxProps, Form, Header, Message, Popup} from "semantic-ui-react";
-import {User} from "../../actions";
-import {FullUser} from "../admin/AdminUsersListTable";
 import Cleave from "cleave.js/react";
 import {Link, Redirect} from "react-router-dom";
 import Mutation from "react-apollo/Mutation";
 import gql from "graphql-tag";
 import {withToastManager} from "react-toast-notifications";
+import {FullUser, User} from "../../types/User";
+import {AppState} from "../../state/Store";
 
 type UserProfileProps = {
     signedInUser: User | null;
@@ -254,7 +253,7 @@ class UserProfile extends Component<Props, UserProfileState> {
 
 function mapStateToProps(state: AppState) {
     return {
-        signedInUser: state.user
+        signedInUser: state.account
     };
 }
 
