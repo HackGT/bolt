@@ -69,7 +69,10 @@ process.on("unhandledRejection", err => {
 import {authRoutes, isAuthenticated} from "./auth/auth";
 app.use("/auth", authRoutes);
 
-import {apiRoutes} from "./api/api";
+import {apiRoutes, schema} from "./api/api";
+import {execute, subscribe} from "graphql";
+import {createServer} from "http";
+import {SubscriptionServer} from "subscriptions-transport-ws";
 app.use("/api", isAuthenticated, apiRoutes);
 
 app.route("/version").get((request, response) => {
@@ -85,6 +88,25 @@ app.get("*", isAuthenticated, (request, response) => {
     response.sendFile(path.join(__dirname, "../../client/build", "index.html"));
 });
 
-app.listen(PORT, () => {
+const server = createServer(app);
+
+// // const server = createServer(app);
+// websocketServer.listen(WS_PORT, () => console.log(
+//     `Websocket server is now running on http://localhost:${WS_PORT}`
+// ));
+
+
+server.listen(PORT, () => {
     console.log(`Bolt v${VERSION_NUMBER} started on port ${PORT}`);
+
+    // FIXME: websocket authentication
+    // tslint:disable-next-line:no-unused-expression
+    new SubscriptionServer({
+        execute,
+        subscribe,
+        schema
+    }, {
+        server,
+        path: "/api"
+    });
 });
