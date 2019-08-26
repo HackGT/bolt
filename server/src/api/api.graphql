@@ -26,6 +26,10 @@ type Mutation {
     updateUser(uuid: String!, updatedUser: UserUpdateInput!): User
 }
 
+type Subscription {
+	request_change: Int!
+}
+
 type User {
 	uuid: ID!
 	name: String!
@@ -130,7 +134,7 @@ input RequestSearch {
     item_id: Int,
     request_id: Int,
     user_id: String,
-    status: RequestStatus
+	statuses: [RequestStatus!]
 }
 
 input RequestInput {

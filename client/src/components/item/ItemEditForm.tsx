@@ -2,11 +2,10 @@ import React, {ChangeEvent, Component, FormEvent} from "react";
 import HardwareItem, {ItemNoId} from "../inventory/HardwareItem";
 import {Button, CheckboxProps, DropdownProps, Form, Grid, Header, Item, Label, Message, Popup} from "semantic-ui-react";
 import AddOptionDropdown from "../util/AddOptionDropdown";
-import Mutation from "react-apollo/Mutation";
 import {withToastManager} from "react-toast-notifications";
 import gql from "graphql-tag";
 import {Redirect} from "react-router";
-import {Query} from "react-apollo";
+import {Mutation, Query} from "@apollo/react-components";
 
 interface ItemDetails {
     approvalRequired: boolean;

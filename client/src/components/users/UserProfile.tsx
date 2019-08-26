@@ -3,11 +3,11 @@ import {connect} from "react-redux";
 import {Button, CheckboxProps, Form, Header, Message, Popup} from "semantic-ui-react";
 import Cleave from "cleave.js/react";
 import {Link, Redirect} from "react-router-dom";
-import Mutation from "react-apollo/Mutation";
 import gql from "graphql-tag";
 import {withToastManager} from "react-toast-notifications";
 import {FullUser, User} from "../../types/User";
 import {AppState} from "../../state/Store";
+import {Mutation} from "@apollo/react-components";
 
 type UserProfileProps = {
     signedInUser: User | null;

@@ -30,6 +30,7 @@ namespace IConfig {
     export interface Server {
         isProduction: boolean;
         port: number;
+        wsPort: number;
         cookieMaxAge: number;
         cookieSecureOnly: boolean;
         postgresURL: string;
@@ -64,13 +65,14 @@ class Config implements IConfig.Main {
     public server: IConfig.Server = {
         isProduction: false,
         port: 3000,
+        wsPort: 3001,
         cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
         cookieSecureOnly: false,
         postgresURL: "postgresql://localhost/bolt",
         defaultTimezone: "America/New_York"
     };
     public admins = {
-        domains: ["hack.gt"],
+        domains: [] as string[],
         emails: [] as string[]
     };
     public eventName = "Untitled Event";
@@ -159,6 +161,12 @@ class Config implements IConfig.Main {
                 this.server.port = port;
             }
         }
+        if (process.env.WS_PORT) {
+            const wsPort = parseInt(process.env.WS_PORT!, 10);
+            if (!isNaN(wsPort) && wsPort > 0) {
+                this.server.wsPort = wsPort;
+            }
+        }
         if (process.env.COOKIE_MAX_AGE) {
             const maxAge = parseInt(process.env.COOKIE_MAX_AGE, 10);
             if (!isNaN(maxAge) && maxAge > 0) {
@@ -193,6 +201,7 @@ export let config = new Config();
 // Constants
 //
 export const PORT = config.server.port;
+export const WS_PORT = config.server.wsPort;
 export const STATIC_ROOT = path.resolve(__dirname, "../client");
 export const VERSION_NUMBER = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./package.json"), "utf8")).version;
 export const COOKIE_OPTIONS = {

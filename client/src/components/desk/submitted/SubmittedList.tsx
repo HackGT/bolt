@@ -18,7 +18,7 @@ class SubmittedList extends Component {
         return (
             <Query query={gql`
                 query {
-                  requests(search:{status: SUBMITTED}) {
+                  requests(search:{statuses: [SUBMITTED]}) {
                     request_id
                     user {
                         name

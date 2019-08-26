@@ -1,13 +1,13 @@
 import * as crypto from "crypto";
 import * as http from "http";
 import * as https from "https";
-import { URL } from "url";
+import {URL} from "url";
 import * as passport from "passport";
-import { Strategy as OAuthStrategy } from "passport-oauth2";
+import {Strategy as OAuthStrategy} from "passport-oauth2";
 
-import { IUser, findUserByID, createRecord, DB } from "../database";
-import { config } from "../common";
-import { Request, Response, NextFunction } from "express";
+import {createRecord, DB, findUserByID, IUser} from "../database";
+import {config} from "../common";
+import {NextFunction, Request, Response} from "express";
 
 type PassportDone = (err: Error | null, user?: IUser | false, errMessage?: { message: string }) => void;
 type PassportProfileDone = (err: Error | null, profile?: IProfile) => void;
@@ -186,13 +186,28 @@ export function validateAndCacheHostName(request: Request, response: Response, n
     }
 }
 
-export function createLink(request: Request, link: string): string {
+// export function createLink(request: Request, link: string): string {
+//     if (link[0] === "/") {
+//         link = link.substring(1);
+//     }
+//     if ((request.secure && getExternalPort(request) === 443) || (!request.secure && getExternalPort(request) === 80)) {
+//         return `http${request.secure ? "s" : ""}://${request.hostname}/${link}`;
+//     } else {
+//         return `http${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/${link}`;
+//     }
+// }
+
+export function createLink(request: Request, link: string, proto?: string): string {
+    if (!proto) {
+        proto = "http";
+    }
     if (link[0] === "/") {
         link = link.substring(1);
     }
-    if ((request.secure && getExternalPort(request) === 443) || (!request.secure && getExternalPort(request) === 80)) {
-        return `http${request.secure ? "s" : ""}://${request.hostname}/${link}`;
+    if ((request.secure && getExternalPort(request) === 443)
+        || (!request.secure && getExternalPort(request) === 80)) {
+        return `${proto}${request.secure ? "s" : ""}://${request.hostname}/${link}`;
     } else {
-        return `http${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/${link}`;
+        return `${proto}${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/${link}`;
     }
 }

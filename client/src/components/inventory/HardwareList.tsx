@@ -3,12 +3,12 @@ import HardwareItem, {RequestedItem} from "./HardwareItem";
 import {Button, Header, Icon, Item, Message} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
 import {connect} from "react-redux";
-import Query from "react-apollo/Query";
 import {HwItem} from "../../types/Hardware";
 import gql from "graphql-tag";
 import {Link} from "react-router-dom";
 import {User} from "../../types/User";
 import {AppState} from "../../state/Store";
+import {Query} from "@apollo/react-components";
 
 export interface OwnProps {
     requestsEnabled: boolean;
