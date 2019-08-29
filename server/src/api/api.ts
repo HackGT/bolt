@@ -469,7 +469,15 @@ const resolvers: any = {
             return numRowsAffected !== 0;
         },
         updateRequest: async (root, args, context): Promise<SimpleRequest | null> => {
-            pubsub.publish(REQUEST_CHANGE, {[REQUEST_CHANGE]: 5});
+            // pubsub.publish(REQUEST_CHANGE, {
+            //     [REQUEST_CHANGE]:   { request_id: 34,
+            //         status: "SUBMITTED",
+            //         quantity: 1,
+            //         createdAt: "2019-08-15T00:01:56.136-04:00",
+            //         updatedAt: "2019-08-28T22:54:13.807-04:00" }
+            // });
+
+
             if (!context.user.admin) {
                 throw new GraphQLError("You do not have permission to access the updateRequest endpoint.");
             }
@@ -498,11 +506,19 @@ const resolvers: any = {
                     .update(updateObj)
                     .returning(["request_id", "quantity", "status", "created_at", "updated_at"]);
 
+                const simpleRequest = toSimpleRequest(updatedRequest[0]);
+                console.log(simpleRequest);
+                pubsub.publish(REQUEST_CHANGE, {
+                    [REQUEST_CHANGE]: simpleRequest
+                });
+
+
                 if (updatedRequest.length === 0) {
                     return null;
                 }
 
-                return toSimpleRequest(updatedRequest[0]);
+
+                return simpleRequest;
             }
 
             return null;
@@ -553,7 +569,11 @@ const resolvers: any = {
             subscribe: () => {
                 console.log("new request_change subscriber");
                 return pubsub.asyncIterator(REQUEST_CHANGE);
-            }
+            },
+            resolve: payload => {
+                console.log("payload", payload);
+                return payload[REQUEST_CHANGE];
+            },
         }
     }
 };

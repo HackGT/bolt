@@ -23,7 +23,8 @@ if (!config.server.isProduction) {
 if (!config.sessionSecretSet) {
     console.warn("No session secret set; sessions won't carry over server restarts");
 }
-app.use(session({
+
+export const sessionMiddleware = session({
     secret: config.secrets.session,
     cookie: COOKIE_OPTIONS,
     resave: false,
@@ -31,7 +32,9 @@ app.use(session({
         conString: config.server.postgresURL
     }),
     saveUninitialized: false
-}));
+});
+app.use(sessionMiddleware);
+
 passport.serializeUser<IUser, string>((user, done) => {
     done(null, user.uuid);
 });

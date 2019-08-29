@@ -8,6 +8,19 @@ import * as cookieSignature from "cookie-signature";
 import * as chalk from "chalk";
 import morgan from "morgan";
 import {config, COOKIE_OPTIONS, PORT, VERSION_NUMBER} from "./common";
+// *** The placement of these imports is very important; ensure that your editor does not optimize the imports or otherwise
+// reformat this file as it will cause errors (most likely similar to
+//         "/usr/src/bolt/server/build/auth/auth.js:37
+//          app_1.app.enable("trust proxy");
+//          TypeError: Cannot read property 'enable' of undefined")
+//     if they are moved to the top of this file
+// Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
+import {authRoutes, isAuthenticated, sessionMiddleware} from "./auth/auth";
+import {apiRoutes, schema} from "./api/api";
+import {execute, subscribe} from "graphql";
+import {SubscriptionServer} from "subscriptions-transport-ws";
+import {createServer} from "http";
+import {findUserByID} from "./database";
 import flash = require("connect-flash");
 
 // Set up Express and its middleware
@@ -59,20 +72,8 @@ process.on("unhandledRejection", err => {
     throw err;
 });
 
-// *** The placement of these imports is very important; ensure that your editor does not optimize the imports or otherwise
-// reformat this file as it will cause errors (most likely similar to
-//         "/usr/src/bolt/server/build/auth/auth.js:37
-//          app_1.app.enable("trust proxy");
-//          TypeError: Cannot read property 'enable' of undefined")
-//     if they are moved to the top of this file
-// Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
-import {authRoutes, isAuthenticated} from "./auth/auth";
 app.use("/auth", authRoutes);
 
-import {apiRoutes, schema} from "./api/api";
-import {execute, subscribe} from "graphql";
-import {createServer} from "http";
-import {SubscriptionServer} from "subscriptions-transport-ws";
 app.use("/api", isAuthenticated, apiRoutes);
 
 app.route("/version").get((request, response) => {
@@ -84,29 +85,50 @@ app.route("/version").get((request, response) => {
 
 // Serve React app
 app.use(isAuthenticated, serveStatic(path.join(__dirname, "../../client/build")));
+
+
 app.get("*", isAuthenticated, (request, response) => {
     response.sendFile(path.join(__dirname, "../../client/build", "index.html"));
 });
 
 const server = createServer(app);
 
-// // const server = createServer(app);
-// websocketServer.listen(WS_PORT, () => console.log(
-//     `Websocket server is now running on http://localhost:${WS_PORT}`
-// ));
-
 
 server.listen(PORT, () => {
     console.log(`Bolt v${VERSION_NUMBER} started on port ${PORT}`);
 
-    // FIXME: websocket authentication
     // tslint:disable-next-line:no-unused-expression
     new SubscriptionServer({
-        execute,
-        subscribe,
-        schema
-    }, {
-        server,
-        path: "/api"
-    });
+            execute,
+            subscribe,
+            schema,
+            onConnect: async (connectParams, webSocket, context) => {
+
+                const promise = new Promise((resolve, reject) => {
+                    // session is the Express library that creates the sessionMiddleware function that parses the session
+                    //    cookie.
+                    // sessionMiddleware is the actual function to call to parse a session cookie.  That's essentially
+                    //    what's happening below.
+
+                    // @ts-ignore
+                    sessionMiddleware(webSocket.upgradeReq, {}, () => {
+                        return resolve(webSocket.upgradeReq.session.passport);
+                    });
+                });
+
+                const {user}: any = await promise;
+                const fullUser = await findUserByID(user);
+
+                if (fullUser && fullUser.admin) {
+                    return true;
+                }
+
+                console.log("Rejecting websocket connection: user (", user, ") is not an admin, fullUser:", fullUser);
+                throw new Error("Websocket connection rejected: your account does not have permission access this endpoint");
+            }
+        },
+        {
+            server,
+            path: "/api"
+        });
 });

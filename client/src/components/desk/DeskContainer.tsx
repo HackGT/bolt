@@ -16,7 +16,13 @@ function mapDispatchToProps(dispatch: any) {
 
 const REQUEST_CHANGE_SUBSCRIPTION = gql`
     subscription rc {
-        request_change
+        request_change {
+            request_id
+            status
+            quantity
+            createdAt
+            updatedAt
+        }
     }
 `;
 

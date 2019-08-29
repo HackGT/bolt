@@ -27,7 +27,7 @@ type Mutation {
 }
 
 type Subscription {
-	request_change: Int!
+    request_change: SimpleRequest!
 }
 
 type User {
