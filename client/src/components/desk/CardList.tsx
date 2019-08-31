@@ -1,31 +1,24 @@
-import React, {Component} from "react";
-import {Container, Grid, Segment} from "semantic-ui-react";
+import React from "react";
+import {Container, Grid, Loader, Segment} from "semantic-ui-react";
 
 interface CardListProps {
     title: string;
     length: number;
+    loading?: boolean;
 }
 
-interface CardListState {
+const CardList: React.FunctionComponent<CardListProps> = props => {
+    const spinner = <Loader active inline="centered" content="Just a sec!"/>;
 
-}
-
-class CardList extends Component<CardListProps, CardListState> {
-    constructor(props: CardListProps) {
-        super(props);
-    }
-
-    public render() {
-        return (
-            <Grid.Column>
-                <h2>{this.props.title}</h2>
-                <Segment attached="top">{this.props.length} request{this.props.length === 1 ? "" : "s"}</Segment>
-                <Container placeholder className="hw-list">
-                    {this.props.children}
-                </Container>
-            </Grid.Column>
-        );
-    }
-}
+    return (
+        <Grid.Column>
+            <h2>{props.title}</h2>
+            <Segment attached="top">{props.length} request{props.length === 1 ? "" : "s"}</Segment>
+            <Container className="hw-list">
+                {props.loading ? spinner : props.children}
+            </Container>
+        </Grid.Column>
+    );
+};
 
 export default CardList;

@@ -4,9 +4,9 @@ import {withToastManager} from "react-toast-notifications";
 import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
 import {updateRequestStatus} from "../../actions/";
-import {ItemStatus, RequestedItem} from "../inventory/HardwareItem";
 import {StatusToColor, StatusToString} from "../../enums";
 import {User} from "../../types/User";
+import {ItemStatus, RequestedItem} from "../../types/Hardware";
 
 interface RequestsListsPassedProps {
     filter: string;

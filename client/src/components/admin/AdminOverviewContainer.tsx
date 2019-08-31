@@ -1,8 +1,9 @@
 import React, {Component} from "react";
 import {connect} from "react-redux";
 import {AppState} from "../../state/Store";
-import AdminLinksCard, {AdminCardLink} from "./AdminLinksCard";
+import AdminLinksCard from "./AdminLinksCard";
 import {Grid, Header} from "semantic-ui-react";
+import {AdminCardLink} from "../../types/Admin";
 
 function adminCardLink(name: string, to: string = "#"): AdminCardLink {
     return { name, to };

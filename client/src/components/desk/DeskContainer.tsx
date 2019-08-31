@@ -3,8 +3,8 @@ import {connect} from "react-redux";
 import {Container, Grid, Header, Segment} from "semantic-ui-react";
 import CardList from "./CardList";
 import SubmittedList from "./submitted/SubmittedList";
-import gql from "graphql-tag";
 import {useSubscription} from "@apollo/react-hooks";
+import {REQUEST_CHANGE} from "../util/graphql/Subscriptions";
 
 function mapStateToProps(state: any) {
     return {};
@@ -14,22 +14,9 @@ function mapDispatchToProps(dispatch: any) {
     return {};
 }
 
-const REQUEST_CHANGE_SUBSCRIPTION = gql`
-    subscription rc {
-        request_change {
-            request_id
-            status
-            quantity
-            createdAt
-            updatedAt
-        }
-    }
-`;
-
-
 function DeskContainer() {
     const {data, loading} = useSubscription(
-        REQUEST_CHANGE_SUBSCRIPTION
+        REQUEST_CHANGE
     );
     console.log("data, loading", data, loading);
     return (

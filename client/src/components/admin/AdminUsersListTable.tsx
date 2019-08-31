@@ -3,11 +3,11 @@ import {connect} from "react-redux";
 import {AppState} from "../../state/Store";
 import {Button, Icon, Input, Table, TableHeaderCell} from "semantic-ui-react";
 import {Mutation} from "react-apollo";
-import gql from "graphql-tag";
-import {usersQuery} from "./AdminUsersListWrapper";
 import {Link} from "react-router-dom";
 import {withToastManager} from "react-toast-notifications";
 import {FullUser, User} from "../../types/User";
+import {ALL_USERS} from "../util/graphql/Queries";
+import {UPDATE_USER} from "../util/graphql/Mutations";
 
 type UsersListProps = {
     users: FullUser[];
@@ -72,18 +72,9 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
             </Table.Row>];
         }
 
-        const UPDATE_USER = gql`
-            mutation updateUser($uuid: String!, $updatedUser: UserUpdateInput!) {
-                updateUser(uuid:$uuid, updatedUser:$updatedUser) {
-                    uuid
-                }
-            }
-        `;
-
-
         return (
             <Mutation mutation={UPDATE_USER}
-                      refetchQueries={[{query: usersQuery}]}
+                      refetchQueries={[{query: ALL_USERS}]}
                       awaitRefetchQueries={true}
             >
                 {(changeAdmin: any, {loading, data}: any) => (

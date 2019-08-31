@@ -1,4 +1,4 @@
-import { ItemStatus } from "./components/inventory/HardwareItem";
+import {ItemStatus} from "./types/Hardware";
 
 export const StatusToString = (status: ItemStatus) => {
     switch(status) {

@@ -3,23 +3,10 @@ import {connect} from "react-redux";
 import {AppState} from "../../state/Store";
 import {Header, Loader, Message} from "semantic-ui-react";
 import {Query} from "react-apollo";
-import gql from "graphql-tag";
 import AdminUsersListTable from "./AdminUsersListTable";
 import {FullUser} from "../../types/User";
+import {ALL_USERS} from "../util/graphql/Queries";
 
-export const usersQuery = gql`
-    query users {
-        users(search: {}) {
-            uuid
-            name
-            email
-            phone
-            slackUsername
-            haveID
-            admin
-        }
-    }
-`;
 
 class AdminUsersListWrapper extends Component {
     public render() {
@@ -27,7 +14,7 @@ class AdminUsersListWrapper extends Component {
         return <div>
             <Header as="h1">Users</Header>
             <Query
-                query={usersQuery}
+                query={ALL_USERS}
                 fetchPolicy="cache-and-network"
             >
                 {

@@ -1,6 +1,6 @@
-import {GenericAction, RequestsAndUsersAction, RequestStatusAction, SetUserAction, types,} from "../actions/";
-import {RequestedItem} from "../components/inventory/HardwareItem";
+import {GenericAction, RequestsAndUsersAction, RequestStatusAction, SetUserAction, types} from "../actions/";
 import {User} from "../types/User";
+import {RequestedItem} from "../types/Hardware";
 
 export interface AppState {
     user: User | null;

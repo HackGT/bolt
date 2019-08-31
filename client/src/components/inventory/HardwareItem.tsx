@@ -2,54 +2,7 @@ import React, {ChangeEvent} from "react";
 import {Button, Form, Icon, Input, Item, Label, Popup} from "semantic-ui-react";
 import {withToastManager} from "react-toast-notifications";
 import {Link} from "react-router-dom";
-import {User} from "../../types/User";
-
-export interface ItemId {
-    id: number;
-}
-
-export type Item = ItemId & ItemNoId;
-
-export interface ItemNoId {
-    item_name: string; // name of this item
-    description: string; // brief description
-    totalAvailable: number;
-    maxRequestQty: number; // max number of a specific item you can request at once
-    category: string;
-    imageUrl: string;
-}
-
-export interface RequestedItem {
-    id: number;
-    user: string;
-    name: string;
-    qtyRequested: number;
-    category: string;
-    status: ItemStatus;
-    cancelled: boolean;
-}
-
-export enum ItemStatus {
-    SUBMITTED = "submitted",
-    APPROVED = "approved",
-    DECLINED = "declined",
-    CANCELLED = "cancelled",
-    READY = "ready",
-    FULFILLED = "fulfilled",
-    RETURNED = "returned",
-    LOST = "lost",
-    DAMAGED = "damaged"
-}
-
-interface HardwareItem {
-    qtyRemaining: number; // # of this item remaining in our stock
-    inStock: boolean;
-    requestsEnabled: boolean; // whether hardware requests can be made at this time
-    toastManager: any; // for making toast notifications
-    addItem: (item: RequestedItem) => void;
-    qtyUpdate: RequestedItem | null;
-    user: User|null;
-}
+import {HwListItem, ItemStatus, RequestedItem} from "../../types/Hardware";
 
 interface HardwareItemState {
     qtyRequested: number;
@@ -57,8 +10,8 @@ interface HardwareItemState {
 }
 
 
-class HardwareItemBase extends React.Component<Item & HardwareItem, HardwareItemState> {
-    constructor(props: Item & HardwareItem) {
+class HardwareItemBase extends React.Component<HwListItem, HardwareItemState> {
+    constructor(props: HwListItem) {
         super(props);
         this.state = {
             qtyRequested: 1,

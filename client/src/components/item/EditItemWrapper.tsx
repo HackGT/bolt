@@ -1,9 +1,9 @@
 import React, {Component} from "react";
 import {match} from "react-router";
 import {Query} from "react-apollo";
-import gql from "graphql-tag";
 import ItemEditForm from "./ItemEditForm";
 import {Header, Loader, Message} from "semantic-ui-react";
+import {ITEM_EDIT_GET_ITEM} from "../util/graphql/Queries";
 
 interface EditItemProps {
     match: match & EditItemParams;
@@ -16,23 +16,6 @@ interface EditItemParams {
 interface EditItemState {
     item_name: string;
 }
-
-const ITEM_QUERY = gql`
-    query getItem($itemId: Int!) {
-        item(id: $itemId) {
-            item_name
-            description
-            imageUrl
-            category
-            totalAvailable
-            maxRequestQty
-            price
-            approvalRequired
-            returnRequired
-            hidden
-            owner
-        }
-    }`;
 
 class EditItemWrapper extends Component<EditItemProps, EditItemState> {
     constructor(props: EditItemProps) {
@@ -50,7 +33,7 @@ class EditItemWrapper extends Component<EditItemProps, EditItemState> {
             <div>
                 <Header as="h1">Edit item</Header>
                 <Query
-                    query={ITEM_QUERY}
+                    query={ITEM_EDIT_GET_ITEM}
                     variables={
                         {itemId}
                     }

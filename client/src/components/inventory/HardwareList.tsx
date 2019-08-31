@@ -1,14 +1,14 @@
 import React from "react";
-import HardwareItem, {RequestedItem} from "./HardwareItem";
+import HardwareItem from "./HardwareItem";
 import {Button, Header, Icon, Item, Message} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
 import {connect} from "react-redux";
-import {HwItem} from "../../types/Hardware";
-import gql from "graphql-tag";
+import {HwItem, RequestedItem} from "../../types/Hardware";
 import {Link} from "react-router-dom";
 import {User} from "../../types/User";
 import {AppState} from "../../state/Store";
 import {Query} from "@apollo/react-components";
+import {ALL_ITEMS} from "../util/graphql/Queries";
 
 export interface OwnProps {
     requestsEnabled: boolean;
@@ -49,24 +49,7 @@ export class HardwareList extends React.Component<Props, { isLoading: boolean }>
         </Message>) : "";
 
         const query = <Query
-            query={gql`
-                        query {
-                            items {
-                                id
-                                item_name
-                                description
-                                imageUrl
-                                category
-                                totalAvailable
-                                maxRequestQty
-                                hidden
-                                approvalRequired
-                                returnRequired
-                                owner
-                                qtyUnreserved
-                            }
-                        }
-                    `}>
+            query={ALL_ITEMS}>
             {({loading, error, data}: any) => {
                 if (error) {
                     console.error(error);
@@ -140,6 +123,5 @@ function mapStateToProps(state: AppState) {
         user: state.account
     };
 }
-
 
 export default connect(mapStateToProps) (HardwareList);

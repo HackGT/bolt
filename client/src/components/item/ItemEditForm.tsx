@@ -1,11 +1,13 @@
 import React, {ChangeEvent, Component, FormEvent} from "react";
-import HardwareItem, {ItemNoId} from "../inventory/HardwareItem";
+import HardwareItem from "../inventory/HardwareItem";
 import {Button, CheckboxProps, DropdownProps, Form, Grid, Header, Item, Label, Message, Popup} from "semantic-ui-react";
 import AddOptionDropdown from "../util/AddOptionDropdown";
 import {withToastManager} from "react-toast-notifications";
-import gql from "graphql-tag";
 import {Redirect} from "react-router";
 import {Mutation, Query} from "@apollo/react-components";
+import {CREATE_ITEM, UPDATE_ITEM} from "../util/graphql/Mutations";
+import {ALL_CATEGORIES, ITEM_EDIT_GET_ITEMS} from "../util/graphql/Queries";
+import {ItemNoId} from "../../types/Hardware";
 
 interface ItemDetails {
     approvalRequired: boolean;
@@ -41,71 +43,6 @@ interface ItemEditState {
     ownerError: boolean;
     qtyPerRequestTooLargeError: boolean;
 }
-
-const GET_ITEMS = gql`
-    query {
-        items {
-            id
-            item_name
-            description
-            imageUrl
-            category
-            totalAvailable
-            maxRequestQty
-            hidden
-            approvalRequired
-            returnRequired
-            owner
-        }
-    }
-`;
-
-const CREATE_ITEM = gql`
-    mutation createItem ($newItem: ItemInput!) {
-        createItem(newItem: $newItem) {
-            id
-            item_name
-            description
-            imageUrl
-            category
-            totalAvailable
-            maxRequestQty
-            hidden
-            approvalRequired
-            returnRequired
-            owner
-        }
-    }
-`;
-
-// Having this mutation return the item metadata (everything except ID) is
-// what makes the cache update when an item is updated!
-const UPDATE_ITEM = gql`
-    mutation updateItem ($itemId: Int!, $updatedItem: ItemInput!) {
-        updateItem(id: $itemId, updatedItem: $updatedItem) {
-            id
-            item_name
-            description
-            imageUrl
-            category
-            totalAvailable
-            maxRequestQty
-            hidden
-            approvalRequired
-            returnRequired
-            owner
-        }
-    }
-`;
-
-const CATEGORIES_QUERY = gql`
-    query categories {
-        categories {
-            category_id
-            category_name
-        }
-    }
-`;
 
 class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
     constructor(props: ItemEditProps) {
@@ -211,16 +148,16 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                     <Grid.Column width={11}>
                         <Mutation mutation={this.props.createItem ? CREATE_ITEM : UPDATE_ITEM}
                                   update={this.props.createItem ? (cache: any, {data: {createItem}}: any): any => {
-                                      const {items} = cache.readQuery({query: GET_ITEMS});
+                                      const {items} = cache.readQuery({query: ITEM_EDIT_GET_ITEMS});
                                       cache.writeQuery({
-                                          query: GET_ITEMS,
+                                          query: ITEM_EDIT_GET_ITEMS,
                                           data: {
                                               items: items.concat([createItem])
                                           }
                                       });
                                   } : undefined}
                                   refetchQueries={[{
-                                      query: CATEGORIES_QUERY
+                                      query: ALL_CATEGORIES
                                   }]}>
                             {(submitForm: any, {loading, error, data}: any) => (
                                 <Form loading={this.state.loading || loading || this.props.loading}
@@ -265,8 +202,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                   placement: "top-center"
                                               });
                                           });
-
-
                                       }}>
 
                                     {data && !error ? <Redirect to="/"/> : ""}
@@ -297,7 +232,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                     <Form.Group>
                                         <Form.Input label="Category" required
                                         >
-                                            <Query query={CATEGORIES_QUERY}>
+                                            <Query query={ALL_CATEGORIES}>
 
                                                 {(result: any) => {
                                                     const queryLoading = result.loading;

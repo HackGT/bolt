@@ -3,11 +3,7 @@ import {connect} from "react-redux";
 import {Card, List} from "semantic-ui-react";
 import {Link} from "react-router-dom";
 import {AppState} from "../../state/Store";
-
-export type AdminCardLink = {
-    name: string;
-    to: string;
-};
+import {AdminCardLink} from "../../types/Admin";
 
 export interface OwnProps {
     title: string;

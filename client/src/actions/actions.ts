@@ -1,7 +1,7 @@
 import {ActionCreator} from "redux";
 import {types} from "./";
-import {ItemStatus, RequestedItem} from "../components/inventory/HardwareItem";
 import {User} from "../types/User";
+import {ItemStatus, RequestedItem} from "../types/Hardware";
 
 export interface TestAction {
     type: string;
@@ -33,7 +33,7 @@ interface RequestsAndUsers {
 
 export type RequestsAndUsersAction = RequestsAndUsers & GenericAction;
 
-interface RequestStatus {
+interface RequestStatus { // Remove this in the future
     requestId: number;
     status: ItemStatus;
 }
@@ -78,7 +78,7 @@ interface AckResponse {
     message: string;
 }
 
-export const updateRequestStatus = (requestId: string, status: ItemStatus, resolve: any) => {
+export const updateRequestStatus = (requestId: string, status: RequestStatus, resolve: any) => {
     return (dispatch: any) => {
         return new Promise<AckResponse>((resolve) => {
             const mock = {

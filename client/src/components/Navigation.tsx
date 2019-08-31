@@ -1,5 +1,5 @@
 import React from "react";
-import {Icon, Menu} from "semantic-ui-react";
+import {Icon, Menu, Popup} from "semantic-ui-react";
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
 import {User} from "../types/User";
@@ -26,7 +26,9 @@ class Navigation extends React.Component<Props, {}> {
         const loginLink = !user && <Menu.Item href="/auth/login">Sign in</Menu.Item>;
 
         const userProfile = user &&
-            <Menu.Item as={Link} to="/user/me"><Icon name="user"/> {user.name}</Menu.Item>;
+            <Popup inverted={true}
+                   trigger={<Menu.Item as={Link} to="/user/me"><Icon name="user"/> {user.name}</Menu.Item>}
+                   content="Edit your profile"/>;
 
         const adminLink = this.isAdmin() &&
             <Menu.Item as={Link} to="/admin">

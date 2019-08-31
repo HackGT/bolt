@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {Button, Card, Container, Header, Label, Segment} from "semantic-ui-react";
-import {RequestedItem} from "../inventory/HardwareItem";
 import {StatusToColor, StatusToString} from "../../enums";
+import {RequestedItem} from "../../types/Hardware";
 
 class RequestsList extends Component<{ requestedItemsList: RequestedItem[], removeItem: (index: number) => void }> {
 
