@@ -161,12 +161,6 @@ class Config implements IConfig.Main {
                 this.server.port = port;
             }
         }
-        if (process.env.WS_PORT) {
-            const wsPort = parseInt(process.env.WS_PORT!, 10);
-            if (!isNaN(wsPort) && wsPort > 0) {
-                this.server.wsPort = wsPort;
-            }
-        }
         if (process.env.COOKIE_MAX_AGE) {
             const maxAge = parseInt(process.env.COOKIE_MAX_AGE, 10);
             if (!isNaN(maxAge) && maxAge > 0) {
@@ -201,8 +195,6 @@ export let config = new Config();
 // Constants
 //
 export const PORT = config.server.port;
-export const WS_PORT = config.server.wsPort;
-export const STATIC_ROOT = path.resolve(__dirname, "../client");
 export const VERSION_NUMBER = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./package.json"), "utf8")).version;
 export const COOKIE_OPTIONS = {
     path: "/",
