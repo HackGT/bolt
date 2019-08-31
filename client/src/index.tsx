@@ -23,8 +23,9 @@ const httpLink = createHttpLink({
 });
 
 const wsProtocol = location.protocol === "http:" ? "ws" : "wss";
-// FIXME: URL needs to be dynamic
-const wsClient = new SubscriptionClient(`${wsProtocol}://localhost:3000/api`, {
+const wsHost = (!process.env.NODE_ENV || process.env.NODE_ENV === "development") ? "localhost:3000" : window.location.host;
+const wsUrl = `${wsProtocol}://${wsHost}/api`;
+const wsClient = new SubscriptionClient(wsUrl, {
     reconnect: true
 });
 const wsLink = new WebSocketLink(wsClient);
@@ -41,25 +42,6 @@ const link = split(
     httpLink
 );
 
-// old error handling code
-// : ApolloLink.from([
-//     onError(({graphQLErrors, networkError}) => {
-//         if (graphQLErrors) {
-//             graphQLErrors.map(({message, locations, path}) =>
-//                 console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
-//             );
-//         }
-//         if (networkError) {
-//             console.log(`[Network error]: ${networkError}`);
-//         }
-//     }),
-//     new HttpLink({
-//         uri: "/api",
-//         credentials: "include"
-//     })
-// ]),
-
-// @ts-ignore
 export const client = new ApolloClient({
     link,
     cache: new InMemoryCache(),
@@ -69,6 +51,7 @@ export const client = new ApolloClient({
         }
     }
 });
+
 export const bugsnagEnabled = process.env.REACT_APP_ENABLE_BUGSNAG!.toLowerCase() === "true";
 export let bugsnagClient: any;
 if (bugsnagEnabled) {
