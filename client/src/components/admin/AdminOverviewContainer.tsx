@@ -3,7 +3,11 @@ import {connect} from "react-redux";
 import {AppState} from "../../state/Store";
 import AdminLinksCard from "./AdminLinksCard";
 import {Grid, Header} from "semantic-ui-react";
-import {AdminCardLink} from "../../types/Admin";
+
+export type AdminCardLink = {
+    name: string;
+    to: string;
+};
 
 function adminCardLink(name: string, to: string = "#"): AdminCardLink {
     return { name, to };

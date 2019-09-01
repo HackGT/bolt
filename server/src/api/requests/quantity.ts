@@ -57,10 +57,10 @@ export class Quantity {
         for (const id in totalAvailable) {
             if (totalAvailable.hasOwnProperty(id)) {
                 if (quantities.hasOwnProperty(id)) {
-                    const item = quantities[id];
-                    let quantity: number = totalAvailable[id];
+                    const itemStatusCounts = quantities[id];
+                    let quantity = totalAvailable[id];
                     for (let i = 0; i < statuses.length; i++) {
-                        quantity -= item[statuses[i]];
+                        quantity -= itemStatusCounts[statuses[i]];
                     }
                     result[id] = quantity;
                 } else { // no requests for this item with statuses provided, so just return totalAvailable
