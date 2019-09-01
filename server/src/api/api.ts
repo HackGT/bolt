@@ -11,6 +11,7 @@ import {localTimestamp, nestedRequest, onlyIfAdmin, toSimpleRequest} from "./req
 import {makeExecutableSchema} from "graphql-tools";
 import {Category, Item, Request, RequestStatus, SimpleRequest, User, UserUpdateInput} from "./graphql.types";
 import {PubSub} from "graphql-subscriptions";
+import {Quantity} from "./requests/quantity";
 
 export const apiRoutes = express.Router();
 export const pubsub = new PubSub();
@@ -135,64 +136,18 @@ const resolvers: any = {
             const items = await DB.from("items")
                 .join("categories", "items.category_id", "=", "categories.category_id");
 
-            // select request_item_id, count(request_id) as "qty reserved partial" -- 7
-            // from requests
-            // where status in ('SUBMITTED', 'APPROVED', 'READY_FOR_PICKUP') and request_item_id = 32
-            // group by request_item_id
-            // order by request_item_id;
-            //
-            // select request_item_id, count(request_id) as "qty reserved partial" -- 7
-            // from requests
-            // where status in ('SUBMITTED', 'APPROVED', 'READY_FOR_PICKUP')
-            // group by request_item_id
-            // order by request_item_id;
-
-            // the lesser of two evils.  These 2 partial queries give us all the info we need to calculate the two different quantity values
-            const qtyNotAtDesk = await DB.from("requests")
-                .whereIn("status", ["FULFILLED", "LOST", "DAMAGED"])
-                .groupBy("request_item_id")
-                .orderBy("request_item_id")
-                .select("request_item_id")
-                .count("request_id");
-
-            const qtyNotAtDeskObj = {};
-
-            qtyNotAtDesk.forEach((value, index, arr) => {
-                qtyNotAtDeskObj[value.request_item_id.toString()] = parseInt(value.count, 10);
-            });
-
-            console.log(qtyNotAtDeskObj);
-
-            const qtyPartialReserved = await DB.from("requests")
-                .whereIn("status", ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP"])
-                .groupBy("request_item_id")
-                .orderBy("request_item_id")
-                .select("request_item_id")
-                .count("request_id");
-
-            const qtyPartialReservedObj = {};
-
-            qtyPartialReserved.forEach((value, index, arr) => {
-                qtyPartialReservedObj[value.request_item_id.toString()] = parseInt(value.count, 10);
-            });
-
-            console.log("qtyPartialReserved", qtyPartialReservedObj);
-
+            const {qtyInStock, qtyUnreserved, qtyAvailableForApproval} = await Quantity.all();
 
             return items.map(item => {
-                const totalAvailable: number = item.totalAvailable;
-                console.log(totalAvailable);
-                const qtyUnreserved: number = totalAvailable - ((qtyNotAtDeskObj[item.item_id.toString()] || 0) + (qtyPartialReservedObj[item.item_id.toString()] || 0));
-                const qtyInStock: number = totalAvailable - (qtyNotAtDeskObj[item.item_id.toString()] || 0);
-                console.log(qtyUnreserved, qtyInStock);
                 return {
                     ...item,
                     id: item.item_id,
                     category: item.category_name,
                     price: onlyIfAdmin(item.price, context.user.admin),
                     owner: onlyIfAdmin(item.owner, context.user.admin),
-                    qtyInStock,
-                    qtyUnreserved
+                    qtyInStock: qtyInStock[item.item_id],
+                    qtyUnreserved: qtyUnreserved[item.item_id],
+                    qtyAvailableForApproval: qtyAvailableForApproval[item.item_id]
                 };
             });
         },
@@ -469,15 +424,6 @@ const resolvers: any = {
             return numRowsAffected !== 0;
         },
         updateRequest: async (root, args, context): Promise<SimpleRequest | null> => {
-            // pubsub.publish(REQUEST_CHANGE, {
-            //     [REQUEST_CHANGE]:   { request_id: 34,
-            //         status: "SUBMITTED",
-            //         quantity: 1,
-            //         createdAt: "2019-08-15T00:01:56.136-04:00",
-            //         updatedAt: "2019-08-28T22:54:13.807-04:00" }
-            // });
-
-
             if (!context.user.admin) {
                 throw new GraphQLError("You do not have permission to access the updateRequest endpoint.");
             }
@@ -567,11 +513,9 @@ const resolvers: any = {
     Subscription: {
         request_change: {
             subscribe: () => {
-                console.log("new request_change subscriber");
                 return pubsub.asyncIterator(REQUEST_CHANGE);
             },
             resolve: payload => {
-                console.log("payload", payload);
                 return payload[REQUEST_CHANGE];
             },
         }

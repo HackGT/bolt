@@ -50,10 +50,12 @@ type Item {
 	category: String!
 	# Total number of this item in the hardware inventory
 	totalAvailable: Int!
-    # The number of an item that is not reserved.  TODO make not nullable
-    qtyInStock: Int
+	# The number of an item that is not reserved
+	qtyInStock: Int!
     # The number of an item that should be physically at the hardware desk
-    qtyUnreserved: Int
+	qtyUnreserved: Int!
+	# The number of an item that is available to be allocated to requests waiting to be approved
+	qtyAvailableForApproval: Int
 	# The largest quantity of this item that can be requested in one request
 	maxRequestQty: Int!
     # The value of this item to replace it if lost or damaged (only visible to admins)
