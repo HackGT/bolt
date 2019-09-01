@@ -1,6 +1,7 @@
 {
   "extends": "tslint:recommended",
   "rules": {
+    "array-type": false,
     "max-line-length": [false],
     "no-unnecessary-initializer": false,
     "no-var-requires": false,

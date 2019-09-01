@@ -4,35 +4,46 @@ import "./index.scss";
 import App from "./App";
 import {Provider} from "react-redux";
 import * as serviceWorker from "./serviceWorker";
-import {store} from "./store";
-import ApolloProvider from "react-apollo/ApolloProvider";
+import {store} from "./state/Store";
 import {ApolloClient} from "apollo-client";
-import {ApolloLink} from "apollo-link";
-import {onError} from "apollo-link-error";
-import {HttpLink} from "apollo-link-http";
+import {split} from "apollo-link";
+import {createHttpLink} from "apollo-link-http";
 import {InMemoryCache} from "apollo-cache-inmemory";
 import bugsnag from "@bugsnag/js";
 import bugsnagReact from "@bugsnag/plugin-react";
 import packageJson from "../package.json";
+import {WebSocketLink} from "apollo-link-ws";
+import {SubscriptionClient} from "subscriptions-transport-ws";
+import {getMainDefinition} from "apollo-utilities";
+import {ApolloProvider} from "@apollo/react-common";
 
-// @ts-ignore
-const client = new ApolloClient({
-    link: ApolloLink.from([
-        onError(({graphQLErrors, networkError}) => {
-            if (graphQLErrors) {
-                graphQLErrors.map(({message, locations, path}) =>
-                    console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
-                );
-            }
-            if (networkError) {
-                console.log(`[Network error]: ${networkError}`);
-            }
-        }),
-        new HttpLink({
-            uri: "/api",
-            credentials: "include"
-        })
-    ]),
+const httpLink = createHttpLink({
+    uri: "/api",
+    credentials: "include"
+});
+
+const wsProtocol = location.protocol === "http:" ? "ws" : "wss";
+const wsHost = (!process.env.NODE_ENV || process.env.NODE_ENV === "development") ? "localhost:3000" : window.location.host;
+const wsUrl = `${wsProtocol}://${wsHost}/api`;
+const wsClient = new SubscriptionClient(wsUrl, {
+    reconnect: true
+});
+const wsLink = new WebSocketLink(wsClient);
+const link = split(
+    // split based on operation type
+    ({query}) => {
+        const definition = getMainDefinition(query);
+        return (
+            definition.kind === "OperationDefinition" &&
+            definition.operation === "subscription"
+        );
+    },
+    wsLink,
+    httpLink
+);
+
+export const client = new ApolloClient({
+    link,
     cache: new InMemoryCache(),
     defaultOptions: {
         query: {
@@ -40,6 +51,7 @@ const client = new ApolloClient({
         }
     }
 });
+
 export const bugsnagEnabled = process.env.REACT_APP_ENABLE_BUGSNAG!.toLowerCase() === "true";
 export let bugsnagClient: any;
 if (bugsnagEnabled) {

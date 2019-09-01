@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {connect} from "react-redux";
-import {AppState} from "../../reducers/reducers";
+import {AppState} from "../../state/Store";
 import ItemEditForm from "./ItemEditForm";
 import {match} from "react-router";
 import {Header} from "semantic-ui-react";
@@ -35,7 +35,7 @@ class CreateItemWrapper extends Component<CreateItemProps, CreateItemState> {
 
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user
+        user: state.account
     };
 }
 

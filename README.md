@@ -8,6 +8,16 @@ Required items:
  - Install dependencies: `npm install`
  - Configure the required environment variables in `configs/config.json`.  You can copy and rename `configs/configs.json.example`.
  
+# Client setup
+
+Note: the hardware desk page (/admin/desk) relies on a WebSocket connection to the server. The client assumes that you are
+running the server on port 3000.  If this isn't right, then you'll need to update the port in
+
+1. The `proxy` property in the **client's** package.json file
+2. The local development WebSocket URL in `client/index.tsx`
+
+to use the correct server port.
+ 
 Required environment variables
 -----
 

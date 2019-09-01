@@ -1,14 +1,19 @@
 import React, {Component} from "react";
 import {connect} from "react-redux";
-import {AppState} from "../../reducers/reducers";
-import AdminLinksCard, {AdminCardLink} from "./AdminLinksCard";
+import {AppState} from "../../state/Store";
+import AdminLinksCard from "./AdminLinksCard";
 import {Grid, Header} from "semantic-ui-react";
+
+export type AdminCardLink = {
+    name: string;
+    to: string;
+};
 
 function adminCardLink(name: string, to: string = "#"): AdminCardLink {
     return { name, to };
 }
 const hardwareDesk: AdminCardLink[] = [
-    adminCardLink("Work hardware desk"),
+    adminCardLink("Work hardware desk", "/admin/desk"),
     adminCardLink("Item check-in", "/admin/checkin")
 ];
 
@@ -70,7 +75,7 @@ class AdminOverviewContainer extends Component {
 
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user
+        user: state.account
     };
 }
 

@@ -1,12 +1,12 @@
 import React, {Component} from "react";
 import {match} from "react-router";
 import {Query} from "react-apollo";
-import gql from "graphql-tag";
 import {Header, Loader, Message} from "semantic-ui-react";
-import {User} from "../../actions";
 import UserProfile from "./UserProfile";
-import {AppState} from "../../reducers/reducers";
 import {connect} from "react-redux";
+import {User} from "../../types/User";
+import {AppState} from "../../state/Store";
+import {USER_PROFILE} from "../util/graphql/Queries";
 
 
 interface EditUserProps {
@@ -18,20 +18,6 @@ interface EditUserParams {
     params: { userId?: string };
 }
 
-
-const USER_QUERY = gql`
-    query users($uuid:String!) {
-        users(search:{uuid:$uuid}) {
-            uuid
-            name
-            email
-            phone
-            slackUsername
-            haveID
-            admin
-        }
-    }
-`;
 
 class EditUserProfileWrapper extends Component<EditUserProps, {}> {
     constructor(props: EditUserProps) {
@@ -64,7 +50,7 @@ class EditUserProfileWrapper extends Component<EditUserProps, {}> {
         return (
             <div>
                 <Query
-                    query={USER_QUERY}
+                    query={USER_PROFILE}
                     variables={
                         {
                             uuid: userId
@@ -94,7 +80,7 @@ class EditUserProfileWrapper extends Component<EditUserProps, {}> {
 
 function mapStateToProps(state: AppState) {
     return {
-        user: state.user
+        user: state.account
     };
 }
 

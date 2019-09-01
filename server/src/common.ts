@@ -30,6 +30,7 @@ namespace IConfig {
     export interface Server {
         isProduction: boolean;
         port: number;
+        wsPort: number;
         cookieMaxAge: number;
         cookieSecureOnly: boolean;
         postgresURL: string;
@@ -64,13 +65,14 @@ class Config implements IConfig.Main {
     public server: IConfig.Server = {
         isProduction: false,
         port: 3000,
+        wsPort: 3001,
         cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
         cookieSecureOnly: false,
         postgresURL: "postgresql://localhost/bolt",
         defaultTimezone: "America/New_York"
     };
     public admins = {
-        domains: ["hack.gt"],
+        domains: [] as string[],
         emails: [] as string[]
     };
     public eventName = "Untitled Event";
@@ -193,7 +195,6 @@ export let config = new Config();
 // Constants
 //
 export const PORT = config.server.port;
-export const STATIC_ROOT = path.resolve(__dirname, "../client");
 export const VERSION_NUMBER = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./package.json"), "utf8")).version;
 export const COOKIE_OPTIONS = {
     path: "/",

@@ -1,0 +1,24 @@
+.hw-card:not(:last-child) {
+  margin-bottom: 15px;
+}
+
+.hw-qty {
+  margin-left: 0 !important;
+}
+
+.hw-positive {
+  color: #28a745;
+}
+
+.hw-negative {
+  color: #dc3545;
+}
+
+.hw-list {
+  min-height: 5rem;
+  max-height: 40rem;
+  overflow-y: scroll;
+  background: #eaeaea;
+  overflow-x: hidden;
+  padding: 15px;
+};

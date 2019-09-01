@@ -1,14 +1,13 @@
 import React, {ChangeEvent, Component, FormEvent, ReactNode} from "react";
 import {connect} from "react-redux";
-import {AppState} from "../../reducers/reducers";
 import {Button, CheckboxProps, Form, Header, Message, Popup} from "semantic-ui-react";
-import {User} from "../../actions";
-import {FullUser} from "../admin/AdminUsersListTable";
 import Cleave from "cleave.js/react";
 import {Link, Redirect} from "react-router-dom";
-import Mutation from "react-apollo/Mutation";
-import gql from "graphql-tag";
 import {withToastManager} from "react-toast-notifications";
+import {FullUser, User} from "../../types/User";
+import {AppState} from "../../state/Store";
+import {Mutation} from "@apollo/react-components";
+import {UPDATE_USER} from "../util/graphql/Mutations";
 
 type UserProfileProps = {
     signedInUser: User | null;
@@ -26,14 +25,6 @@ type UserProfileState = {
     user: FullUser;
     submitClicked: boolean;
 };
-
-const UPDATE_USER = gql`
-    mutation updateUser($uuid: String!, $updatedUser: UserUpdateInput!) {
-        updateUser(uuid:$uuid, updatedUser:$updatedUser) {
-            uuid
-        }
-    }
-`;
 
 class UserProfile extends Component<Props, UserProfileState> {
     constructor(props: Props) {
@@ -254,7 +245,7 @@ class UserProfile extends Component<Props, UserProfileState> {
 
 function mapStateToProps(state: AppState) {
     return {
-        signedInUser: state.user
+        signedInUser: state.account
     };
 }
 
