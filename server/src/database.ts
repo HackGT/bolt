@@ -3,11 +3,18 @@ import {config} from "./common";
 // Database connection
 //
 import knex from "knex";
+import * as path from "path";
+
+const migrations = {
+    tableName: "knex_migrations",
+    directory: path.normalize(path.join(__dirname, "/migrations"))
+};
 
 const DBConfig: knex.Config = {
     client: "pg",
     connection: config.server.postgresURL,
-    searchPath: ["knex", "public"]
+    searchPath: ["knex", "public"],
+    migrations
 };
 
 export const DB = knex(DBConfig);
@@ -98,29 +105,7 @@ createTable("users", table => {
         table.text("owner").notNullable();
     });
 }).then(() => {
-    const REQUEST_STATUSES: string[] = [
-        "SUBMITTED",
-        "APPROVED",
-        "DENIED",
-        "ABANDONED",
-        "CANCELLED",
-        "READY_FOR_PICKUP",
-        "FULFILLED",
-        "RETURNED",
-        "LOST",
-        "DAMAGED"
-    ];
 
-    createTable("requests", table => {
-        table.increments("request_id"); // use of increments also makes this the primary key
-        table.integer("request_item_id").unsigned().references("item_id").inTable("items").notNullable();
-        table.integer("quantity").unsigned().notNullable();
-        table.uuid("user_id").references("uuid").inTable("users").notNullable();
-        table.enum("status", REQUEST_STATUSES);
-        table.timestamps(true, true); // adds timestamps with timezones to requests,
-        //     the caveat is that as of 2019 the TIMESTAMP  type will overflow in 2038... FYI future Earthlings working
-        //     on this project.  http://code.openark.org/blog/mysql/timestamp-vs-datetime-which-should-i-be-using
-    });
 }).catch(err => { throw err; });
 
 //
