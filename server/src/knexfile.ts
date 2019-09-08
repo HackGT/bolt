@@ -1,4 +1,4 @@
-require("ts-node/register");
+require("ts-node/register"); // this line is what makes Knex migrations work with TypeScript!  Thanks to https://gist.github.com/tukkajukka/9893e5f111862d06044b73fa944a8741
 const fs = require("fs");
 
 
