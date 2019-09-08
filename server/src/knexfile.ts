@@ -38,7 +38,7 @@ const migrations = {
 };
 
 module.exports[NODE_ENV] = {
-    client: 'pg',
+    client: "pg",
     connection: URL,
     migrations
 };
