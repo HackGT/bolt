@@ -38,14 +38,6 @@ async function setUpSessionsTable() {
 }
 setUpSessionsTable().catch(err => { throw err; });
 
-async function createTable(tableName: string, callback: (builder: knex.CreateTableBuilder) => any) {
-    const exists = await DB.schema.withSchema("public").hasTable(tableName);
-    if (!exists) {
-        await DB.schema.withSchema("public").createTable(tableName, callback);
-        console.log(`Created table ${tableName}`);
-    }
-}
-
 export async function findUserByID(id: string): Promise<IUser | null> {
     const rows = await DB.from("users").where({ uuid: id });
     if (rows[0]) {
@@ -74,39 +66,6 @@ export interface IUser {
     haveID: boolean;
     admin: boolean;
 }
-createTable("users", table => {
-    table.uuid("uuid").notNullable().unique().primary();
-    table.string("token", 256);
-
-    table.text("name").notNullable();
-    table.text("email").notNullable();
-    table.text("phone").notNullable();
-    table.text("slackUsername").notNullable();
-    table.boolean("haveID").notNullable().defaultTo(false);
-    table.boolean("admin").notNullable().defaultTo(false);
-}).then(() => {
-    createTable("categories", table => {
-        table.increments("category_id"); // use of increments also makes this the primary key
-        table.text("category_name").notNullable().unique();
-    });
-}).then(() => {
-    createTable("items", table => {
-        table.increments("item_id"); // use of increments also makes this the primary key
-        table.text("item_name").notNullable();
-        table.text("description").notNullable();
-        table.text("imageUrl").notNullable();
-        table.integer("category_id").unsigned().references("category_id").inTable("categories").notNullable();
-        table.integer("totalAvailable").notNullable();
-        table.integer("maxRequestQty").notNullable();
-        table.decimal("price", 6, 2).nullable().defaultTo(0);
-        table.boolean("hidden").notNullable().defaultTo(false);
-        table.boolean("returnRequired").notNullable().defaultTo(true);
-        table.boolean("approvalRequired").notNullable().defaultTo(true);
-        table.text("owner").notNullable();
-    });
-}).then(() => {
-
-}).catch(err => { throw err; });
 
 //
 // Items

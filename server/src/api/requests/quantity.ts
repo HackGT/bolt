@@ -91,7 +91,7 @@ export class Quantity {
                 "DAMAGED"];
         }
 
-        const DBQuantities = await DB.from("requests")
+        const DBQuantities: any = await DB.from("requests")
             .whereIn("status", statuses)
             .andWhere(searchObj)
             .groupBy(["request_item_id", "status"])

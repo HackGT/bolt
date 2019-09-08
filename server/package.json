@@ -9,7 +9,7 @@
     "serve": "node ./build/app.js",
     "build": "gulp build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "npm run generate-gql-types",
+    "postinstall": "npm run generate-gql-types && npm run knex:migrate:latest",
     "generate-api": "node ./node_modules/@graphql-codegen/cli/dist/commonjs/cli.js --config graphql-gen.yml",
     "generate-gql-types": "node ./node_modules/graphql-schema-typescript/lib/cli.js generate-ts src/api --output src/api/graphql.types.ts --typePrefix \"\" --asyncResult true --requireResolverTypes true --noStringEnum true",
     "prestart": "npm run generate-api && npm run generate-gql-types",
