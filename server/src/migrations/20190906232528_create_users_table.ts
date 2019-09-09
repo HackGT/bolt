@@ -2,7 +2,6 @@ import * as Knex from "knex";
 
 
 export async function up(knex: Knex): Promise<any> {
-    await knex.schema.dropTableIfExists("users");
     return knex.schema.createTable("users", table => {
         table.uuid("uuid").notNullable().unique().primary();
         table.string("token", 256);
