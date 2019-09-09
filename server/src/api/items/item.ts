@@ -1,13 +1,11 @@
 import {DB} from "../../database";
 
 export class Item {
-    public static async getTotalAvailable(itemId: number = -1) {
-        const searchObj: { item_id?: number } = {};
-        if (itemId !== -1) {
-            searchObj.item_id = itemId;
-        }
+    public static async getTotalAvailable(itemIds: number[] = []) {
         const result = await DB.from("items")
-            .where(searchObj)
+            .where((builder) => {
+                builder.whereIn("item_id", itemIds);
+            })
             .select(["item_id", "totalAvailable"]);
 
         if (!result.length) {

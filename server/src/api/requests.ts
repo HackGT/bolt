@@ -1,5 +1,6 @@
 import moment from "moment";
 import {RequestStatus} from "./graphql.types";
+import {ItemQtyAvailable} from "./requests/quantity";
 
 export interface KnexSimpleRequest {
     request_id: number;
@@ -32,6 +33,7 @@ export interface KnexRequest extends KnexSimpleRequest {
     haveID: boolean;
     qtyInStock: number;
     qtyUnreserved: number;
+    qtyAvailableForApproval: number;
 }
 
 
@@ -48,7 +50,7 @@ export function onlyIfAdmin(val: any, isAdmin: boolean) {
     return (isAdmin) ? val : null;
 }
 
-export function nestedRequest(request: KnexRequest, isAdmin: boolean) {
+export function nestedRequest(request: KnexRequest, isAdmin: boolean, qtyInStock: ItemQtyAvailable, qtyAvailableForApproval: ItemQtyAvailable, qtyUnreserved: ItemQtyAvailable) {
     const user = {
         uuid: request.uuid,
         admin: request.admin,
@@ -72,8 +74,9 @@ export function nestedRequest(request: KnexRequest, isAdmin: boolean) {
         returnRequired: request.returnRequired,
         approvalRequired: request.approvalRequired,
         owner: onlyIfAdmin(request.owner, isAdmin),
-        qtyInStock: request.qtyInStock || 0, // FIXME
-        qtyUnreserved: request.qtyUnreserved || 0 // FIXME
+        qtyInStock: qtyInStock[request.item_id],
+        qtyAvailableForApproval: qtyAvailableForApproval[request.item_id],
+        qtyUnreserved: qtyUnreserved[request.item_id]
     };
 
 

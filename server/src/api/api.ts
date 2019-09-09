@@ -30,7 +30,7 @@ async function getItem(itemId: number, isAdmin: boolean): Promise<Item|null> {
     }
     const actualItem: any = item[0];
     const {item_id} = actualItem;
-    const {qtyInStock, qtyUnreserved, qtyAvailableForApproval} = await Quantity.all(item_id);
+    const {qtyInStock, qtyUnreserved, qtyAvailableForApproval} = await Quantity.all([item_id]);
 
 
     return {
@@ -178,7 +178,18 @@ const resolvers: any = {
                 .join("categories", "categories.category_id", "=", "items.category_id")
                 .orderBy("requests.created_at", "desc");
 
-            return requests.map(request => nestedRequest(request, context.user.admin));
+
+            const items: number[] = [];
+
+            requests.forEach((value) => {
+                if (items.indexOf(value.request_item_id) === -1) {
+                    items.push(value.request_item_id);
+                }
+            });
+
+            const {qtyInStock, qtyUnreserved, qtyAvailableForApproval} = await Quantity.all(items);
+
+            return requests.map(request => nestedRequest(request, context.user.admin, qtyInStock, qtyAvailableForApproval, qtyUnreserved));
         }
     },
     Mutation: {
