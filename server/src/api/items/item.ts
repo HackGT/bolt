@@ -4,7 +4,9 @@ export class Item {
     public static async getTotalAvailable(itemIds: number[] = []) {
         const result = await DB.from("items")
             .where((builder) => {
-                builder.whereIn("item_id", itemIds);
+                if (itemIds.length) {
+                    builder.whereIn("item_id", itemIds);
+                }
             })
             .select(["item_id", "totalAvailable"]);
 
