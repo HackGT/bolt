@@ -1,16 +1,20 @@
 import React from "react";
-import {Button, Card, Header, Icon, Label, Progress} from "semantic-ui-react";
+import {Button, Card, Header, Icon, Label, Popup, Progress} from "semantic-ui-react";
 import TimeAgo from "react-timeago";
 import {Request} from "../../../types/Request";
+import ItemAndQuantity from "../ItemAndQuantity";
 
 interface SubmittedCardProps {
     request: Request;
 }
 
-function SubmittedCard({request}: SubmittedCardProps) {
-    const noStockWarning = <Card.Content className="hw-negative">
-        <Icon name="wrench"/>Insufficient stock (0 left)
+function noStockWarning(remaining: number) {
+    return <Card.Content className="hw-negative">
+        <Icon name="wrench"/>{`Insufficient stock (${remaining} available for approval)`}
     </Card.Content>;
+}
+
+function SubmittedCard({request}: SubmittedCardProps) {
 
     const noIssues = <Card.Content className="hw-positive">
         <Icon name="check circle"/> No issues found
@@ -20,12 +24,10 @@ function SubmittedCard({request}: SubmittedCardProps) {
         <Card className="hw-card">
             <Card.Content>
                 <Header size="medium">
-                    <Label pointing="right" color="blue" className="hw-qty">
-                        {request.quantity}x
-                    </Label> {request.item.item_name}
+                    <ItemAndQuantity itemName={request.item.item_name} quantity={request.quantity}/>
                 </Header>
             </Card.Content>
-            {Math.random() > .5 ? noIssues : noStockWarning}
+            {request.item.qtyAvailableForApproval >= request.quantity ? noIssues : noStockWarning(request.item.qtyAvailableForApproval)}
             <Card.Content>
                 <Icon name="user"/> {request.user.name}
             </Card.Content>
@@ -33,13 +35,23 @@ function SubmittedCard({request}: SubmittedCardProps) {
                 <Icon name="clock outline"/> <TimeAgo date={request.createdAt}/>
             </Card.Content>
             <Card.Content extra>
-                <div className="ui two buttons">
-                    <Button color="red">
-                        Decline
-                    </Button>
-                    <Button color="green">
-                        Approve
-                    </Button>
+                <div className="ui two buttons right aligned">
+                    <Button.Group floated={"right"}>
+                        <Popup inverted trigger={
+                            <Button icon>
+                                <Icon className="hw-negative" name="times circle"/>
+                            </Button>}
+                               content="Deny request"
+                        />
+                        <Popup inverted trigger={
+                            <Button icon labelPosition="right" color="green">
+                                <Icon name="checkmark"/>
+                                Approve
+                            </Button>}
+                               content="Approve request"
+                        />
+
+                    </Button.Group>
                 </div>
             </Card.Content>
             <Progress attached="top" percent={5} active={true} color={"green"}/>

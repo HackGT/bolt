@@ -3,8 +3,9 @@ import {connect} from "react-redux";
 import {Container, Grid, Header, Segment} from "semantic-ui-react";
 import CardList from "./CardList";
 import SubmittedList from "./submitted/SubmittedList";
-import {useSubscription} from "@apollo/react-hooks";
+import {useQuery, useSubscription} from "@apollo/react-hooks";
 import {REQUEST_CHANGE} from "../util/graphql/Subscriptions";
+import ReadyToPrepareList from "./fulfillment/ReadyToPrepareList";
 
 function mapStateToProps(state: any) {
     return {};
@@ -15,6 +16,8 @@ function mapDispatchToProps(dispatch: any) {
 }
 
 function DeskContainer() {
+    //const query = useQuery(HARDWARE_DESK_REQUESTS)
+
     const {data, loading} = useSubscription(
         REQUEST_CHANGE
     );
@@ -25,15 +28,7 @@ function DeskContainer() {
             <Grid stackable>
                 <Grid.Row columns={3}>
                     <SubmittedList/>
-                    <CardList title="Ready to Prepare" length={0}>
-                        <Segment placeholder>
-                            <Container textAlign="center">
-                                <Header>
-                                    Nothing to prepare. Take a break!
-                                </Header>
-                            </Container>
-                        </Segment>
-                    </CardList>
+                    <ReadyToPrepareList cards={[]}/>
                     <CardList title="Ready for Pickup" length={0}>
                         <Segment placeholder>
                             <Container textAlign="center">

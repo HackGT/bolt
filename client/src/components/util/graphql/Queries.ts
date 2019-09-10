@@ -87,8 +87,7 @@ export const SUBMITTED_REQUESTS = gql`
             }
             item {
                 item_name
-                qtyUnreserved
-                qtyInStock
+                qtyAvailableForApproval
             }
             status
             quantity

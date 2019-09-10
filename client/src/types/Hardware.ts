@@ -15,6 +15,7 @@ export type HwItem = {
     owner: string;
     qtyUnreserved: number;
     qtyInstock: number;
+    qtyAvailableForApproval: number;
 };
 
 export interface ItemCore {
