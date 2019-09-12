@@ -8,7 +8,7 @@ import {store} from "./state/Store";
 import {ApolloClient} from "apollo-client";
 import {split} from "apollo-link";
 import {createHttpLink} from "apollo-link-http";
-import {InMemoryCache} from "apollo-cache-inmemory";
+import {defaultDataIdFromObject, InMemoryCache} from "apollo-cache-inmemory";
 import bugsnag from "@bugsnag/js";
 import bugsnagReact from "@bugsnag/plugin-react";
 import packageJson from "../package.json";
@@ -44,7 +44,16 @@ const link = split(
 
 export const client = new ApolloClient({
     link,
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+        dataIdFromObject: (object: any) => {
+            switch (object.__typename) {
+                case 'Request':
+                    return object.request_id; // use `request_id` as the primary key
+                default:
+                    return defaultDataIdFromObject(object); // fall back to default handling
+            }
+        }
+    }),
     defaultOptions: {
         query: {
             errorPolicy: "all"

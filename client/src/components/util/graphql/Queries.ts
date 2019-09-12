@@ -96,6 +96,27 @@ export const SUBMITTED_REQUESTS = gql`
     }
 `;
 
+export const DESK_REQUESTS = gql`
+    query {
+        requests(search:{statuses: [SUBMITTED, APPROVED, READY_FOR_PICKUP]}) {
+            request_id
+            user {
+                uuid
+                name
+            }
+            item {
+                id
+                item_name
+                qtyAvailableForApproval
+            }
+            status
+            quantity
+            createdAt
+            updatedAt
+        }
+    }
+`;
+
 export const USER_PROFILE = gql`
     query users($uuid:String!) {
         users(search:{uuid:$uuid}) {

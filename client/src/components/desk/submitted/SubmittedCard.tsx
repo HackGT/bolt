@@ -21,10 +21,13 @@ function SubmittedCard({request}: SubmittedCardProps) {
     </Card.Content>;
 
     return (
+
         <Card className="hw-card">
+            {console.log("sc rendered")}
             <Card.Content>
                 <Header size="medium">
                     <ItemAndQuantity itemName={request.item.item_name} quantity={request.quantity}/>
+                    <Label>{request.status}</Label>
                 </Header>
             </Card.Content>
             {request.item.qtyAvailableForApproval >= request.quantity ? noIssues : noStockWarning(request.item.qtyAvailableForApproval)}
@@ -53,6 +56,9 @@ function SubmittedCard({request}: SubmittedCardProps) {
 
                     </Button.Group>
                 </div>
+            </Card.Content>
+            <Card.Content>
+                #{request.request_id}
             </Card.Content>
             <Progress attached="top" percent={5} active={true} color={"green"}/>
         </Card>
