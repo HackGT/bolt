@@ -61,33 +61,34 @@ export function nestedRequest(request: KnexRequest, isAdmin: boolean, qtyInStock
         haveID: request.haveID
     };
 
-    const item = {
-        id: request.item_id,
-        item_name: request.item_name,
-        description: request.description,
-        imageUrl: request.imageUrl,
-        category: request.category_name,
-        totalAvailable: request.totalAvailable,
-        maxRequestQty: request.maxRequestQty,
-        price: onlyIfAdmin(request.price, isAdmin),
-        hidden: request.hidden,
-        returnRequired: request.returnRequired,
-        approvalRequired: request.approvalRequired,
-        owner: onlyIfAdmin(request.owner, isAdmin),
-        qtyInStock: qtyInStock[request.item_id],
-        qtyAvailableForApproval: qtyAvailableForApproval[request.item_id],
-        qtyUnreserved: qtyUnreserved[request.item_id]
-    };
-
-
     return {
         user,
-        item,
+        item: redactedItem(request, isAdmin, qtyInStock, qtyAvailableForApproval, qtyUnreserved),
         request_id: request.request_id,
         status: request.status,
         quantity: request.quantity,
         createdAt: localTimestamp(request.created_at),
         updatedAt: localTimestamp(request.updated_at)
+    };
+}
+
+export function redactedItem(item, isAdmin: boolean, qtyInStock: ItemQtyAvailable, qtyAvailableForApproval: ItemQtyAvailable, qtyUnreserved: ItemQtyAvailable) {
+    return {
+        id: item.item_id,
+        item_name: item.item_name,
+        description: item.description,
+        imageUrl: item.imageUrl,
+        category: item.category_name,
+        totalAvailable: item.totalAvailable,
+        maxRequestQty: item.maxRequestQty,
+        price: onlyIfAdmin(item.price, isAdmin),
+        hidden: item.hidden,
+        returnRequired: item.returnRequired,
+        approvalRequired: item.approvalRequired,
+        owner: onlyIfAdmin(item.owner, isAdmin),
+        qtyInStock: qtyInStock[item.item_id],
+        qtyAvailableForApproval: qtyAvailableForApproval[item.item_id],
+        qtyUnreserved: qtyUnreserved[item.item_id]
     };
 }
 
