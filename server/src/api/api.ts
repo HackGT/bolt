@@ -9,7 +9,7 @@ import {DB, IItem} from "../database";
 import {isAdminNoAuthCheck} from "../auth/auth";
 import {localTimestamp, nestedRequest, onlyIfAdmin, toSimpleRequest} from "./requests";
 import {makeExecutableSchema} from "graphql-tools";
-import {Category, Item, Request, RequestStatus, SimpleRequest, User, UserUpdateInput} from "./graphql.types";
+import {Category, Item, Request, RequestStatus, User, UserUpdateInput} from "./graphql.types";
 import {PubSub} from "graphql-subscriptions";
 import {Quantity} from "./requests/quantity";
 
@@ -46,6 +46,19 @@ async function getItem(itemId: number, isAdmin: boolean): Promise<Item|null> {
 }
 
 const REQUEST_CHANGE = "request_change";
+
+async function getUser(userId) {
+    const users: User[] = await DB.from("users").where({
+        uuid: userId
+    }).select("name", "email", "uuid", "phone", "slackUsername", "haveID", "admin");
+
+    if (users.length === 0) {
+        throw new GraphQLError("Unable to create this request because no user with the UUID provided was found");
+    }
+
+    return users[0];
+}
+
 const resolvers: any = {
     Query: {
         /* Queries */
@@ -341,16 +354,7 @@ const resolvers: any = {
                     "does not match the UUID of the user this request is for");
             }
 
-            // make sure the user the request is for exists
-            const users: User[] = await DB.from("users").where({
-                uuid: args.newRequest.user_id
-            }).select("name", "email", "uuid", "phone", "slackUsername", "haveID", "admin");
-
-            if (users.length === 0) {
-                throw new GraphQLError("Unable to create this request because no user with the UUID provided was found");
-            }
-
-            const user: User = users[0];
+            const user = await getUser(args.newRequest.user_id);
 
             // fetch the item
             const item: Item | null = await getItem(args.newRequest.request_item_id, context.user.admin);
@@ -406,7 +410,7 @@ const resolvers: any = {
 
             return numRowsAffected !== 0;
         },
-        updateRequest: async (root, args, context): Promise<SimpleRequest | null> => {
+        updateRequest: async (root, args, context): Promise<Request | null> => {
             if (!context.user.admin) {
                 throw new GraphQLError("You do not have permission to access the updateRequest endpoint.");
             }
@@ -425,6 +429,10 @@ const resolvers: any = {
                 updateObj.status = args.updatedRequest.new_status;
             }
 
+            if (args.updatedRequest.new_quantity) {
+                updateObj.quantity = args.updatedRequest.new_quantity;
+            }
+
             if (Object.keys(updateObj).length >= 1) {
                 updateObj.updated_at = new Date();
 
@@ -433,21 +441,35 @@ const resolvers: any = {
                         request_id: args.updatedRequest.request_id,
                     })
                     .update(updateObj)
-                    .returning(["request_id", "quantity", "status", "created_at", "updated_at"]);
+                    .returning(["request_id", "quantity", "status", "created_at", "updated_at", "user_id", "request_item_id"]);
 
                 const simpleRequest = toSimpleRequest(updatedRequest[0]);
                 console.log(simpleRequest);
-                pubsub.publish(REQUEST_CHANGE, {
-                    [REQUEST_CHANGE]: simpleRequest
-                });
 
+                const user = await getUser(updatedRequest[0].user_id);
+
+                // fetch the item
+                const item: Item | null = await getItem(updatedRequest[0].request_item_id, context.user.admin);
+
+                if (!item) {
+                    throw new GraphQLError(`Can't create request for item that doesn't exist!  Item ID provided: ${args.newRequest.request_item_id}`);
+                }
 
                 if (updatedRequest.length === 0) {
                     return null;
                 }
 
+                const result: Request = {
+                    ...simpleRequest,
+                    user,
+                    item
+                };
 
-                return simpleRequest;
+                pubsub.publish(REQUEST_CHANGE, {
+                    [REQUEST_CHANGE]: result
+                });
+
+                return result;
             }
 
             return null;
