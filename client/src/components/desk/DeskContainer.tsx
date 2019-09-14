@@ -1,48 +1,43 @@
-import React, {useState} from "react";
+import React from "react";
 import {connect} from "react-redux";
 import {Container, Grid, Header, Segment} from "semantic-ui-react";
 import CardList from "./CardList";
 import SubmittedList from "./submitted/SubmittedList";
-import {useQuery, useSubscription} from "@apollo/react-hooks";
+import {useQuery} from "@apollo/react-hooks";
 import {REQUEST_CHANGE} from "../util/graphql/Subscriptions";
 import ReadyToPrepareList from "./fulfillment/ReadyToPrepareList";
 import {DESK_REQUESTS} from "../util/graphql/Queries";
-import {fillRequests} from "../../state/Desk";
+import {Request, RequestStatus} from "../../types/Request";
+import {APPROVED, READY_FOR_PICKUP, SUBMITTED} from "../../types/Hardware";
 
 function mapStateToProps(state: any) {
     return {};
 }
 
-// function mapDispatchToProps(dispatch: any) {
-//     return {
-//         fillRequests: requests => dispatch(fillRequests(requets))
-//     };
-// }
+function getRequestsWithStatus(requests: Request[], status: RequestStatus) {
+    return requests.filter((r: Request) => r.status === status);
+}
 
 function DeskContainer() {
     const {subscribeToMore, ...query} = useQuery(DESK_REQUESTS);
 
-    const [requests, setRequests] = useState({});
-    //console.log(query.data, query.loading, query.error);
-
-    // const {data, loading} = useSubscription(
-    //     REQUEST_CHANGE
-    // );
-    // console.log("data, loading", data, loading);
-    console.log(query.data);
     if (query.loading) {
         return <p>Loading...</p>;
     }
     if (query.error) {
         return <p>Error!</p>
     }
+    const requests = query.data.requests;
+    const submitted = getRequestsWithStatus(requests, SUBMITTED);
+    const approved = getRequestsWithStatus(requests, APPROVED);
+    const readyForPickup = getRequestsWithStatus(requests, READY_FOR_PICKUP);
 
     return (
         <div>
             <Header size="huge">Hardware Desk</Header>
             <Grid stackable>
                 <Grid.Row columns={3}>
-                    <SubmittedList data={query.data} subscribeToUpdatedRequests={() => {
+                    <SubmittedList loading={query.loading} requests={submitted} subscribeToUpdatedRequests={() => {
                         subscribeToMore({
                             document: REQUEST_CHANGE,
                             updateQuery: (prev, {subscriptionData}) => {
@@ -58,9 +53,7 @@ function DeskContainer() {
                                 console.log("the new request data is", updatedRequest);
                                 console.log("index is", index);
                                 const requests = prev.requests;
-                                // if (prev.requests.length > 0) {
-                                //     requests.splice(index, 1)
-                                // }
+
                                 requests[index] = updatedRequest.request_change;
                                 console.log("changed requests", requests);
                                 return {requests};

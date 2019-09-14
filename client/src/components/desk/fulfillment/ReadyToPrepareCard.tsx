@@ -5,10 +5,10 @@ import {Request} from "../../../types/Request";
 import ItemAndQuantity from "../ItemAndQuantity";
 
 interface ReadyToFulfillCardProps {
-    requests?: [Request];
+    card?: [Request];
 }
 
-function ReadyToPrepareCard({requests}: ReadyToFulfillCardProps) {
+function ReadyToPrepareCard({card}: ReadyToFulfillCardProps) {
     // const reqDate = new Date();
     // const dueDate = new Date().setMinutes(reqDate.getMinutes() + 15);
     //
