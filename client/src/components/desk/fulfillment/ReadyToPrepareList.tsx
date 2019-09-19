@@ -14,7 +14,7 @@ function ReadyToPrepareList({cards}: any) {
 
     return (
         <CardList title="Ready to Prepare" length={cards.length}>
-            {cards.map((card: any) => <ReadyToPrepareCard card={card}/>)}
+            {cards.map((card: any) => <ReadyToPrepareCard key={card.user.uuid} card={card}/>)}
             {!cards.length ? empty : ""}
         </CardList>
     );

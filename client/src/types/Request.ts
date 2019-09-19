@@ -1,4 +1,4 @@
-import {FullUser} from "./User";
+import {BaseUser, FullUser} from "./User";
 import {HwItem} from "./Hardware";
 
 export type RequestStatus =
@@ -21,4 +21,9 @@ export interface Request {
     quantity: number;
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface UserAndRequests {
+    user: BaseUser,
+    requests: [Request]
 }

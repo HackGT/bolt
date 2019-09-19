@@ -18,6 +18,25 @@ function getRequestsWithStatus(requests: Request[], status: RequestStatus) {
     return requests.filter((r: Request) => r.status === status);
 }
 
+function getConsolidatedRequestsWithStatus(requests: Request[], status: RequestStatus) {
+    const filteredRequests = getRequestsWithStatus(requests, status);
+    const requestsByUser: any = {};
+
+    for (let i = 0; i < filteredRequests.length; i++) {
+        const req = filteredRequests[i];
+        if (!requestsByUser.hasOwnProperty(req.user.uuid)) {
+            requestsByUser[req.user.uuid] = {
+                user: req.user,
+                requests: []
+            };
+        }
+
+        requestsByUser[req.user.uuid].requests.push(req);
+    }
+    console.log("rbu", Object.values(requestsByUser));
+    return Object.values(requestsByUser);
+}
+
 function DeskContainer() {
     const {subscribeToMore, ...query} = useQuery(DESK_REQUESTS);
 
@@ -29,8 +48,8 @@ function DeskContainer() {
     }
     const requests = query.data.requests;
     const submitted = getRequestsWithStatus(requests, SUBMITTED);
-    const approved = getRequestsWithStatus(requests, APPROVED);
-    const readyForPickup = getRequestsWithStatus(requests, READY_FOR_PICKUP);
+    const approved = getConsolidatedRequestsWithStatus(requests, APPROVED);
+    const readyForPickup = getConsolidatedRequestsWithStatus(requests, READY_FOR_PICKUP);
 
     return (
         <div>
@@ -44,23 +63,28 @@ function DeskContainer() {
                                 if (!subscriptionData.data) {
                                     return prev;
                                 }
-                                console.log("original requests", prev.requests);
+                                console.log("Original requests array", prev.requests);
                                 const updatedRequest = subscriptionData.data;
                                 const index = prev.requests.findIndex((x: any) => {
-                                    console.log("comparing", x.request_id, updatedRequest.request_change.request_id);
-                                    return x.id === updatedRequest.request_change.id;
+                                    return x.request_id === updatedRequest.request_change.request_id;
                                 });
-                                console.log("the new request data is", updatedRequest);
-                                console.log("index is", index);
+
+                                console.log("Found request #", updatedRequest.request_change.request_id, " at index", index, ", new status is", updatedRequest.request_change.status);
                                 const requests = prev.requests;
 
-                                requests[index] = updatedRequest.request_change;
-                                console.log("changed requests", requests);
+                                if (index === -1) { // request wasn't returned with original query; add it to array of requests
+                                    requests.push(updatedRequest.request_change);
+                                    console.log("Saved new request");
+                                } else { // request was returned with original query; update it
+                                    requests[index] = updatedRequest.request_change;
+                                    console.log("Updated existing request");
+                                }
+                                console.log("New requests array", requests);
                                 return {requests};
                             }
                         });
                     }}/>
-                    <ReadyToPrepareList cards={[]}/>
+                    <ReadyToPrepareList cards={approved}/>
                     <CardList title="Ready for Pickup" length={0}>
                         <Segment placeholder>
                             <Container textAlign="center">

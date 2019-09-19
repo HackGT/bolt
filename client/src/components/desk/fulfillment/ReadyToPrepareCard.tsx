@@ -1,11 +1,12 @@
 import React, {useState} from "react";
 import {Button, Card, Header, Icon, Image, Label, List, Popup, Progress} from "semantic-ui-react";
 import TimeAgo from "react-timeago";
-import {Request} from "../../../types/Request";
+import {Request, UserAndRequests} from "../../../types/Request";
 import ItemAndQuantity from "../ItemAndQuantity";
 
+
 interface ReadyToFulfillCardProps {
-    card?: [Request];
+    card: UserAndRequests
 }
 
 function ReadyToPrepareCard({card}: ReadyToFulfillCardProps) {
@@ -25,73 +26,42 @@ function ReadyToPrepareCard({card}: ReadyToFulfillCardProps) {
     //     console.log(elapsed);
     // }, 5000)
 
+    console.log("card", card.requests[0].updatedAt);
+    // @ts-ignore
+    card.requests.sort((a: Request, b: Request) => new Date(a.updatedAt) - new Date(b.updatedAt));
 
     return (
         <Card className="hw-card">
             <Card.Content>
                 <Header size="medium">
-                    George Burdell <Label>APPROVED</Label>
+                    {card.user.name}
                 </Header>
             </Card.Content>
+            {
+                card.requests.map(request => <Card.Content key={request.request_id}>
+                    <strong>
+                        <ItemAndQuantity quantity={request.quantity} itemName={request.item.item_name}/></strong>&nbsp;
+                    <span style={{color: "gray"}}>#{request.request_id}</span>
+
+                    <div style={{display: "inline", float: "right"}}>
+                        <Popup inverted position={"top center"}
+                               trigger={<Button icon basic size={"tiny"}>
+                                   <Icon className="hw-negative" name="arrow left"/>
+                               </Button>}
+                               content="Return to Submitted"
+                        />
+                        <Popup inverted position={"top right"} trigger={
+                            <Button icon basic size={"tiny"}>
+                                <Icon className="hw-positive" name="arrow right"/>
+                            </Button>}
+                               content="Mark Ready for Pickup"
+                        />
+                    </div>
+                </Card.Content>)
+            }
+
             <Card.Content>
-                <strong>
-                    <ItemAndQuantity quantity={1} itemName={"Dell XPS 13"}/>
-                </strong>
-                <div style={{display: "inline", float: "right"}}>
-                    <Popup inverted position={"top center"}
-                           trigger={<Button icon basic size={"tiny"}>
-                               <Icon className="hw-negative" name="arrow left"/>
-                           </Button>}
-                           content="Return to Submitted"
-                    />
-                    <Popup inverted position={"top right"} trigger={
-                        <Button icon basic size={"tiny"}>
-                            <Icon className="hw-positive" name="arrow right"/>
-                        </Button>}
-                           content="Mark Ready for Pickup"
-                    />
-                </div>
-            </Card.Content>
-            <Card.Content>
-                <strong>
-                    <ItemAndQuantity quantity={3} itemName={"Super Arduino Mini Uno"}/>
-                </strong>
-                <div style={{display: "inline", float: "right"}}>
-                    <Popup inverted position={"top center"}
-                           trigger={<Button icon basic size={"tiny"}>
-                               <Icon className="hw-negative" name="arrow left"/>
-                           </Button>}
-                           content="Return to Submitted"
-                    />
-                    <Popup inverted position={"top right"} trigger={
-                        <Button icon basic size={"tiny"}>
-                            <Icon className="hw-positive" name="arrow right"/>
-                        </Button>}
-                           content="Mark Ready for Pickup"
-                    />
-                </div>
-            </Card.Content>
-            <Card.Content>
-                <strong>
-                    <ItemAndQuantity quantity={1} itemName={"Raspberry Pi 3 B+"}/>
-                </strong>
-                <div style={{display: "inline", float: "right"}}>
-                    <Popup inverted position={"top center"}
-                           trigger={<Button icon basic size={"tiny"}>
-                               <Icon className="hw-negative" name="arrow left"/>
-                           </Button>}
-                           content="Return to Submitted"
-                    />
-                    <Popup inverted position={"top right"} trigger={
-                        <Button icon basic size={"tiny"}>
-                            <Icon className="hw-positive" name="arrow right"/>
-                        </Button>}
-                           content="Mark Ready for Pickup"
-                    />
-                </div>
-            </Card.Content>
-            <Card.Content>
-                <Icon name="clock outline"/> <TimeAgo date={new Date()}/>
+                <Icon name="clock outline"/> <TimeAgo date={card.requests[0].updatedAt}/>
             </Card.Content>
             <Card.Content extra>
                 <div className="ui two buttons right aligned">

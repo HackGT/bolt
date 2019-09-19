@@ -23,17 +23,20 @@ function SubmittedCard({request}: SubmittedCardProps) {
     return (
 
         <Card className="hw-card">
+
             {console.log("sc rendered")}
             <Card.Content>
-                <Header size="medium">
+                <Label attached="top left">
+                    #{request.request_id}
+                </Label>
+                <Label attached="top right">
+                    <Icon name={"user"}/>{request.user.name}
+                </Label>
+                <Header style={{display: "inline-block"}} size="medium">
                     <ItemAndQuantity itemName={request.item.item_name} quantity={request.quantity}/>
-                    <Label>{request.status}</Label>
                 </Header>
             </Card.Content>
             {request.item.qtyAvailableForApproval >= request.quantity ? noIssues : noStockWarning(request.item.qtyAvailableForApproval)}
-            <Card.Content>
-                <Icon name="user"/> {request.user.name}
-            </Card.Content>
             <Card.Content>
                 <Icon name="clock outline"/> <TimeAgo date={request.createdAt}/>
             </Card.Content>
@@ -56,9 +59,6 @@ function SubmittedCard({request}: SubmittedCardProps) {
 
                     </Button.Group>
                 </div>
-            </Card.Content>
-            <Card.Content>
-                #{request.request_id}
             </Card.Content>
             <Progress attached="top" percent={5} active={true} color={"green"}/>
         </Card>
