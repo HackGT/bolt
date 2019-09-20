@@ -3,27 +3,17 @@ import {Button, Card, Header, Icon, Image, Label, List, Popup, Progress} from "s
 import TimeAgo from "react-timeago";
 import {Request, UserAndRequests} from "../../../types/Request";
 import ItemAndQuantity from "../ItemAndQuantity";
-import {APPROVED, DENIED, READY_FOR_PICKUP, SUBMITTED} from "../../../types/Hardware";
+import {APPROVED, DENIED, FULFILLED, READY_FOR_PICKUP, SUBMITTED} from "../../../types/Hardware";
 import {useMutation} from "@apollo/react-hooks";
 import {UPDATE_REQUEST} from "../../util/graphql/Mutations";
+import {updateRequestStatus} from "../fulfillment/ReadyToPrepareCard";
 
 
-interface ReadyToFulfillCardProps {
+interface ReadyForPickupCardProps {
     card: UserAndRequests
 }
 
-export function updateRequestStatus(updateRequest: any, request: Request, newStatus: any) {
-    return updateRequest({
-        variables: {
-            updatedRequest: {
-                request_id: request.request_id,
-                new_status: newStatus
-            }
-        }
-    });
-}
-
-function ReadyToPrepareCard({card}: ReadyToFulfillCardProps) {
+function ReadyForPickupCard({card}: ReadyForPickupCardProps) {
     const [updateRequest, {data, loading, error}] = useMutation(UPDATE_REQUEST);
 
     // const reqDate = new Date();
@@ -62,17 +52,17 @@ function ReadyToPrepareCard({card}: ReadyToFulfillCardProps) {
                     <div style={{display: "inline", float: "right"}}>
                         <Popup inverted position={"top center"}
                                trigger={<Button icon basic size={"tiny"}
-                                                onClick={event => updateRequestStatus(updateRequest, request, SUBMITTED)}>
+                                                onClick={event => updateRequestStatus(updateRequest, request, APPROVED)}>
                                    <Icon className="hw-negative" name="arrow left"/>
                                </Button>}
-                               content="Return to Submitted"
+                               content="Return to Preparing"
                         />
                         <Popup inverted position={"top right"} trigger={
                             <Button icon basic size={"tiny"}
-                                    onClick={event => updateRequestStatus(updateRequest, request, READY_FOR_PICKUP)}>
-                                <Icon className="hw-positive" name="arrow right"/>
+                                    onClick={event => updateRequestStatus(updateRequest, request, FULFILLED)}>
+                                <Icon className="hw-positive" name="checkmark"/>
                             </Button>}
-                               content="Mark Ready for Pickup"
+                               content="Mark Fulfilled"
                         />
                     </div>
                 </Card.Content>)
@@ -87,23 +77,23 @@ function ReadyToPrepareCard({card}: ReadyToFulfillCardProps) {
                         <Popup inverted trigger={
                             <Button icon onClick={event =>
                                 card.requests.forEach(request =>
-                                    updateRequestStatus(updateRequest, request, SUBMITTED)
+                                    updateRequestStatus(updateRequest, request, APPROVED)
                                 )
                             }>
                                 <Icon className="hw-negative" name="arrow left"/>
                             </Button>}
-                               content="Return all to Submitted"
+                               content="Return all to Ready to Prepare"
                         />
                         <Popup inverted trigger={
                             <Button icon labelPosition="right" color="green" onClick={event =>
                                 card.requests.forEach(request =>
-                                    updateRequestStatus(updateRequest, request, READY_FOR_PICKUP)
+                                    updateRequestStatus(updateRequest, request, FULFILLED)
                                 )
                             }>
-                                <Icon name="arrow right"/>
-                                RFP
+                                <Icon name="checkmark"/>
+                                Fulfilled
                             </Button>}
-                               content="Mark all Ready for Pickup"
+                               content="Mark all Fulfilled"
                         />
 
                     </Button.Group>
@@ -114,4 +104,4 @@ function ReadyToPrepareCard({card}: ReadyToFulfillCardProps) {
     );
 }
 
-export default ReadyToPrepareCard;
+export default ReadyForPickupCard;

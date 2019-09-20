@@ -60,7 +60,7 @@ export enum ItemStatus {
 
 export const SUBMITTED = "SUBMITTED";
 export const APPROVED = "APPROVED";
-export const DECLINED = "DECLINED";
+export const DENIED = "DENIED";
 export const CANCELLED = "CANCELLED";
 export const READY_FOR_PICKUP = "READY_FOR_PICKUP";
 export const FULFILLED = "FULFILLED";

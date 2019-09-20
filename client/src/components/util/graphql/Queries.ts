@@ -77,25 +77,6 @@ export const ALL_USERS = gql`
     }
 `;
 
-
-export const SUBMITTED_REQUESTS = gql`
-    query {
-        requests(search:{statuses: [SUBMITTED]}) {
-            request_id
-            user {
-                name
-            }
-            item {
-                item_name
-                qtyAvailableForApproval
-            }
-            status
-            quantity
-            createdAt
-        }
-    }
-`;
-
 export const DESK_REQUESTS = gql`
     query {
         requests(search:{statuses: [SUBMITTED, APPROVED, READY_FOR_PICKUP]}) {

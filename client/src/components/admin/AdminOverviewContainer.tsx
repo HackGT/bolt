@@ -29,9 +29,10 @@ const reports: AdminCardLink[] = [
     adminCardLink("Popular items"),
 ];
 
+const baseUrl = (process.env.NODE_ENV === "production") ? "" : "http://localhost:3000";
+
 const utilities: AdminCardLink[] = [
-    adminCardLink("Import items"),
-    adminCardLink("Export items"),
+    adminCardLink("GraphiQL", `${baseUrl}/api/graphiql`)
 ];
 
 const funPhrases: string[] = [
@@ -48,7 +49,7 @@ const funPhrases: string[] = [
     "A developer somewhere spent multiple minutes adding these random phrases"
 ];
 
-function pickRandomElement<T>(arr: T[]): T {
+export function pickRandomElement<T>(arr: T[]): T {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
@@ -65,6 +66,7 @@ class AdminOverviewContainer extends Component {
                             <AdminLinksCard title="Hardware Desk" links={hardwareDesk}/>
                             <AdminLinksCard title="Manage..." links={manage}/>
                             <AdminLinksCard title="Reports" links={reports}/>
+                            <AdminLinksCard title="Utilities" links={utilities}/>
                         </div>
                     </Grid.Column>
                 </Grid.Row>

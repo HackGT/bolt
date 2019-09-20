@@ -21,8 +21,9 @@ running the server on port 3000.  If this isn't right, then you'll need to updat
 
 1. The `proxy` property in the **client's** package.json file
 2. The local development WebSocket URL in `client/index.tsx`
+3. `baseUrl` in `client/src/components/admin/AdminOverviewContainer.tsx`
 
-to use the correct server port.
+to use the correct server port.  Make sure you don't commit the files with the changed port!
  
 Required environment variables
 -----

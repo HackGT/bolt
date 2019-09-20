@@ -45,3 +45,24 @@ export const UPDATE_ITEM = gql`
         }
     }
 `;
+
+export const UPDATE_REQUEST = gql`
+    mutation updateRequest($updatedRequest: RequestUpdateInput!) {
+        updateRequest(updatedRequest: $updatedRequest) {
+            request_id
+            user {
+                uuid
+                name
+            }
+            item {
+                id
+                item_name
+                qtyAvailableForApproval
+            }
+            status
+            quantity
+            createdAt
+            updatedAt
+        }
+    }
+`;

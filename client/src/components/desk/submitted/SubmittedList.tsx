@@ -3,14 +3,7 @@ import {connect} from "react-redux";
 import CardList from "../CardList";
 import SubmittedCard from "./SubmittedCard";
 import {Request} from "../../../types/Request";
-
-function mapStateToProps(state: any) {
-    return {};
-}
-
-function mapDispatchToProps(dispatch: any) {
-    return {};
-}
+import {Container, Header, Segment} from "semantic-ui-react";
 
 interface SubmittedListProps {
     loading: boolean;
@@ -24,26 +17,19 @@ class SubmittedList extends Component<SubmittedListProps> {
     }
 
     render() {
+        const empty = <Segment placeholder>
+            <Container textAlign="center">
+                <Header>
+                    Nothing to approve. Take a break!
+                </Header>
+            </Container>
+        </Segment>;
 
-        // if (loading) {
-        //     return <CardList loading={true} title="Submitted" length={0}/>;
-        //
-        // }
-        //
-        // if (error) {
-        //     return <p>Error!</p>;
-        // }
-
-        return <CardList loading={false} title="Submitted" length={this.props.requests.length}>
-            {console.log("rendered")}
-            {this.props.requests.map((request: any) => {
-                console.log(request.request_id);
-                return <SubmittedCard key={request.request_id} request={request}/>;
-            })}
+        return <CardList title="Submitted" length={this.props.requests.length}>
+            {this.props.requests.map((request: any) => <SubmittedCard key={request.request_id} request={request}/>)}
+            {!this.props.requests.length ? empty : ""}
         </CardList>;
     }
 }
 
-export default connect(
-    mapStateToProps
-)(SubmittedList);
+export default SubmittedList;

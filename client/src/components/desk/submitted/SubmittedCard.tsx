@@ -3,6 +3,9 @@ import {Button, Card, Header, Icon, Label, Popup, Progress} from "semantic-ui-re
 import TimeAgo from "react-timeago";
 import {Request} from "../../../types/Request";
 import ItemAndQuantity from "../ItemAndQuantity";
+import {useMutation} from "@apollo/react-hooks";
+import {UPDATE_REQUEST} from "../../util/graphql/Mutations";
+import {APPROVED, DENIED} from "../../../types/Hardware";
 
 interface SubmittedCardProps {
     request: Request;
@@ -15,6 +18,8 @@ function noStockWarning(remaining: number) {
 }
 
 function SubmittedCard({request}: SubmittedCardProps) {
+    const [updateRequest, {data, loading, error}] = useMutation(UPDATE_REQUEST);
+
 
     const noIssues = <Card.Content className="hw-positive">
         <Icon name="check circle"/> No issues found
@@ -44,13 +49,28 @@ function SubmittedCard({request}: SubmittedCardProps) {
                 <div className="ui two buttons right aligned">
                     <Button.Group floated={"right"}>
                         <Popup inverted trigger={
-                            <Button icon>
+                            <Button icon loading={loading} onClick={event => updateRequest({
+                                variables: {
+                                    updatedRequest: {
+                                        request_id: request.request_id,
+                                        new_status: DENIED
+                                    }
+                                }
+                            })}>
                                 <Icon className="hw-negative" name="times circle"/>
                             </Button>}
                                content="Deny request"
                         />
                         <Popup inverted trigger={
-                            <Button icon labelPosition="right" color="green">
+                            <Button icon labelPosition="right" color="green" loading={loading}
+                                    onClick={event => updateRequest({
+                                        variables: {
+                                            updatedRequest: {
+                                                request_id: request.request_id,
+                                                new_status: APPROVED
+                                            }
+                                        }
+                                    })}>
                                 <Icon name="checkmark"/>
                                 Approve
                             </Button>}

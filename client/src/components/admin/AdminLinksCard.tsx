@@ -19,23 +19,17 @@ interface State {
 
 }
 
-class AdminLinksCard extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-    }
-
-    public render() {
-        const content = (
-            <List>
-                {this.props.links.map(value => (
-                    <List.Item key={value.name}>
-                        <Link to={value.to}>{value.name}</Link>
-                    </List.Item>))}
-            </List>);
-        return (
-            <Card header={this.props.title} description={content}/>
-        );
-    }
+function AdminLinksCard(props: Props) {
+    const content = (
+        <List>
+            {props.links.map(value => (
+                <List.Item key={value.name}>
+                    <a href={value.to}>{value.name}</a>
+                </List.Item>))}
+        </List>);
+    return (
+        <Card header={props.title} description={content}/>
+    );
 }
 
 function mapStateToProps(state: AppState) {
