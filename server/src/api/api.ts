@@ -189,7 +189,7 @@ const resolvers: any = {
                 .join("users", "requests.user_id", "=", "users.uuid")
                 .join("items", "requests.request_item_id", "=", "items.item_id")
                 .join("categories", "categories.category_id", "=", "items.category_id")
-                .orderBy("requests.created_at", "desc");
+                .orderBy("requests.created_at", "asc");
 
 
             const items: number[] = [];
