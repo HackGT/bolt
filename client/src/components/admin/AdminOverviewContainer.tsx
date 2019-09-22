@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {useState} from "react";
 import {connect} from "react-redux";
 import {AppState} from "../../state/Store";
 import AdminLinksCard from "./AdminLinksCard";
@@ -7,10 +7,11 @@ import {Grid, Header} from "semantic-ui-react";
 export type AdminCardLink = {
     name: string;
     to: string;
+    external: boolean;
 };
 
-function adminCardLink(name: string, to: string = "#"): AdminCardLink {
-    return { name, to };
+function adminCardLink(name: string, to: string = "#", external: boolean = false): AdminCardLink {
+    return {name, to, external};
 }
 const hardwareDesk: AdminCardLink[] = [
     adminCardLink("Work hardware desk", "/admin/desk"),
@@ -32,7 +33,7 @@ const reports: AdminCardLink[] = [
 const baseUrl = (process.env.NODE_ENV === "production") ? "" : "http://localhost:3000";
 
 const utilities: AdminCardLink[] = [
-    adminCardLink("GraphiQL", `${baseUrl}/api/graphiql`)
+    adminCardLink("GraphiQL", `${baseUrl}/api/graphiql`, true)
 ];
 
 const funPhrases: string[] = [
@@ -46,33 +47,32 @@ const funPhrases: string[] = [
     "Millions of hardware items look up to you",
     "We go together like a nut and a bolt",
     "Did you know: Bolt is held together with 1,482 bolts",
-    "A developer somewhere spent multiple minutes adding these random phrases"
+    "A developer somewhere spent multiple minutes adding these random phrases",
 ];
 
 export function pickRandomElement<T>(arr: T[]): T {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-class AdminOverviewContainer extends Component {
-    public render() {
-        return (
-            <Grid stackable columns={1}>
-                <Grid.Row>
-                    <Grid.Column>
-                        <Header as="h1">Administration
-                            <Header.Subheader>{pickRandomElement(funPhrases)}</Header.Subheader>
-                        </Header>
-                        <div className="ui centered cards">
-                            <AdminLinksCard title="Hardware Desk" links={hardwareDesk}/>
-                            <AdminLinksCard title="Manage..." links={manage}/>
-                            <AdminLinksCard title="Reports" links={reports}/>
-                            <AdminLinksCard title="Utilities" links={utilities}/>
-                        </div>
-                    </Grid.Column>
-                </Grid.Row>
-            </Grid>
-        );
-    }
+function AdminOverviewContainer() {
+    const randomPhrase = useState(pickRandomElement(funPhrases));
+    return (
+        <Grid stackable columns={1}>
+            <Grid.Row>
+                <Grid.Column>
+                    <Header as="h1">Administration
+                        <Header.Subheader>{randomPhrase}</Header.Subheader>
+                    </Header>
+                    <div className="ui centered cards">
+                        <AdminLinksCard title="Hardware Desk" links={hardwareDesk}/>
+                        <AdminLinksCard title="Manage..." links={manage}/>
+                        <AdminLinksCard title="Reports" links={reports} notice="COMING SOON"/>
+                        <AdminLinksCard title="Utilities" links={utilities} notice="NEW"/>
+                    </div>
+                </Grid.Column>
+            </Grid.Row>
+        </Grid>
+    );
 }
 
 function mapStateToProps(state: AppState) {

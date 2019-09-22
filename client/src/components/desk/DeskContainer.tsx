@@ -1,7 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import {connect} from "react-redux";
-import {Container, Grid, Header, Segment} from "semantic-ui-react";
-import CardList from "./CardList";
+import {Grid, Header, Loader, Message} from "semantic-ui-react";
 import SubmittedList from "./submitted/SubmittedList";
 import {useQuery} from "@apollo/react-hooks";
 import {REQUEST_CHANGE} from "../util/graphql/Subscriptions";
@@ -70,12 +69,15 @@ const endings = [
 
 function DeskContainer() {
     const {subscribeToMore, ...query} = useQuery(DESK_REQUESTS);
-
+    const [randomPhrase, setRandomPhrase] = useState(`${pickRandomElement(starters)} ${Math.floor((Math.random() + 1) * 900)} ${pickRandomElement(funPhrases)} ${pickRandomElement(endings)}`);
     if (query.loading) {
-        return <p>Loading...</p>;
+        return <Loader active inline="centered" content="Loading requests..."/>;
     }
     if (query.error) {
-        return <p>Error!</p>
+        return <Message error visible={true}
+                        header="Can't fetch requests"
+                        content={`Hmm, an error is preventing us from displaying the hardware desk UI.  The error was: ${query.error.message}`}
+        />;
     }
     const requests = query.data.requests;
     const submitted = getRequestsWithStatus(requests, SUBMITTED);
@@ -86,7 +88,7 @@ function DeskContainer() {
         <div>
             <Header size="huge">
                 Hardware Desk
-                <Header.Subheader>{`${pickRandomElement(starters)} ${Math.floor((Math.random() + 1) * 900)} ${pickRandomElement(funPhrases)} ${pickRandomElement(endings)}`}</Header.Subheader>
+                <Header.Subheader>{randomPhrase}</Header.Subheader>
             </Header>
 
             <Grid stackable>

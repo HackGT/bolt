@@ -1,38 +1,32 @@
-import React, {useState} from "react";
-import {Button, Card, Header, Icon, Image, Label, List, Popup, Progress} from "semantic-ui-react";
+import React from "react";
+import {Button, Card, Header, Icon, Popup} from "semantic-ui-react";
 import TimeAgo from "react-timeago";
 import {Request, UserAndRequests} from "../../../types/Request";
 import ItemAndQuantity from "../ItemAndQuantity";
-import {APPROVED, DENIED, FULFILLED, READY_FOR_PICKUP, SUBMITTED} from "../../../types/Hardware";
+import {APPROVED} from "../../../types/Hardware";
 import {useMutation} from "@apollo/react-hooks";
 import {UPDATE_REQUEST} from "../../util/graphql/Mutations";
-import {updateRequestStatus} from "../fulfillment/ReadyToPrepareCard";
+import {updateRequestStatus} from "../DeskUtil";
+import PhotoIdCheck from "./PhotoIdCheck";
 
 
 interface ReadyForPickupCardProps {
     card: UserAndRequests
 }
 
+function returnRequired(requests: Request[]): boolean {
+    for (let i = 0; i < requests.length; i++) {
+        if (requests[i].item.returnRequired) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function ReadyForPickupCard({card}: ReadyForPickupCardProps) {
     const [updateRequest, {data, loading, error}] = useMutation(UPDATE_REQUEST);
 
-    // const reqDate = new Date();
-    // const dueDate = new Date().setMinutes(reqDate.getMinutes() + 15);
-    //
-    // const totalTime = dueDate.valueOf() - reqDate.valueOf();
-    //
-    // const [time, setTime] = useState(0)
-    //
-    // setInterval(() => {
-    //     console.log(reqDate, dueDate);
-    //     const newTime = new Date();
-    //     const elapsed = dueDate.valueOf() - newTime.valueOf();
-    //     const percent = elapsed / totalTime;
-    //     console.log(elapsed, totalTime);
-    //     console.log(elapsed);
-    // }, 5000)
-
-    console.log("card", card.requests[0].updatedAt);
     // @ts-ignore
     card.requests.sort((a: Request, b: Request) => new Date(a.updatedAt) - new Date(b.updatedAt));
 
@@ -43,6 +37,11 @@ function ReadyForPickupCard({card}: ReadyForPickupCardProps) {
                     {card.user.name}
                 </Header>
             </Card.Content>
+            {!card.user.haveID && returnRequired(card.requests) ?
+                <Card.Content className="highlight">
+                    <Icon name="id badge"/> Photo ID required
+                </Card.Content> : ""
+            }
             {
                 card.requests.map(request => <Card.Content key={request.request_id}>
                     <strong>
@@ -51,18 +50,22 @@ function ReadyForPickupCard({card}: ReadyForPickupCardProps) {
 
                     <div style={{display: "inline", float: "right"}}>
                         <Popup inverted position={"top center"}
-                               trigger={<Button icon basic size={"tiny"}
-                                                onClick={event => updateRequestStatus(updateRequest, request, APPROVED)}>
+                               trigger={<Button icon basic loading={loading} size={"tiny"}
+                                                onClick={event => updateRequestStatus(updateRequest, request.request_id, APPROVED)}>
                                    <Icon className="hw-negative" name="arrow left"/>
                                </Button>}
                                content="Return to Preparing"
                         />
-                        <Popup inverted position={"top right"} trigger={
-                            <Button icon basic size={"tiny"}
-                                    onClick={event => updateRequestStatus(updateRequest, request, FULFILLED)}>
+                        <Popup position={"bottom right"} on="click" trigger={
+                            <Button icon basic loading={loading} size={"tiny"}>
                                 <Icon className="hw-positive" name="checkmark"/>
                             </Button>}
-                               content="Mark Fulfilled"
+                               content={<PhotoIdCheck userName={card.user.name} loading={loading} error={error}
+                                                      updateRequest={updateRequest}
+                                                      returnRequired={returnRequired([request])}
+                                                      haveID={card.user.haveID}
+                                                      requests={[request]}
+                               />}
                         />
                     </div>
                 </Card.Content>)
@@ -71,35 +74,38 @@ function ReadyForPickupCard({card}: ReadyForPickupCardProps) {
             <Card.Content>
                 <Icon name="clock outline"/> <TimeAgo date={card.requests[0].updatedAt}/>
             </Card.Content>
+            {error ? <Card.Content className="hw-negative">
+                <Icon name="warning sign"/>Unable to change request status: {error.message}
+            </Card.Content> : ""}
             <Card.Content extra>
                 <div className="ui two buttons right aligned">
                     <Button.Group floated={"right"}>
                         <Popup inverted trigger={
-                            <Button icon onClick={event =>
+                            <Button icon loading={loading} onClick={event =>
                                 card.requests.forEach(request =>
-                                    updateRequestStatus(updateRequest, request, APPROVED)
+                                    updateRequestStatus(updateRequest, request.request_id, APPROVED)
                                 )
                             }>
                                 <Icon className="hw-negative" name="arrow left"/>
                             </Button>}
                                content="Return all to Ready to Prepare"
                         />
-                        <Popup inverted trigger={
-                            <Button icon labelPosition="right" color="green" onClick={event =>
-                                card.requests.forEach(request =>
-                                    updateRequestStatus(updateRequest, request, FULFILLED)
-                                )
-                            }>
+                        <Popup on="click" position={"bottom center"} trigger={
+                            <Button icon loading={loading} labelPosition="right" color="green">
                                 <Icon name="checkmark"/>
                                 Fulfilled
                             </Button>}
-                               content="Mark all Fulfilled"
+                               content={<PhotoIdCheck userName={card.user.name} loading={loading} error={error}
+                                                      updateRequest={updateRequest}
+                                                      returnRequired={returnRequired(card.requests)}
+                                                      haveID={card.user.haveID}
+                                                      requests={card.requests}
+                               />}
                         />
 
                     </Button.Group>
                 </div>
             </Card.Content>
-            <Progress attached="top" percent={5} active={true} color={"green"}/>
         </Card>
     );
 }

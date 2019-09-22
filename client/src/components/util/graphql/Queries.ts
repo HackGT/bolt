@@ -84,11 +84,13 @@ export const DESK_REQUESTS = gql`
             user {
                 uuid
                 name
+                haveID
             }
             item {
                 id
                 item_name
                 qtyAvailableForApproval
+                returnRequired
             }
             status
             quantity

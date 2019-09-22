@@ -3,6 +3,10 @@ export interface BaseUser {
     name: string;
 }
 
+export interface BaseUserWithID extends BaseUser {
+    haveID: boolean;
+}
+
 export interface User extends BaseUser {
     admin: boolean;
 }

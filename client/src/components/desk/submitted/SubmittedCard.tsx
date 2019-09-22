@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Card, Header, Icon, Label, Popup, Progress} from "semantic-ui-react";
+import {Button, Card, Header, Icon, Label, Popup} from "semantic-ui-react";
 import TimeAgo from "react-timeago";
 import {Request} from "../../../types/Request";
 import ItemAndQuantity from "../ItemAndQuantity";
@@ -28,8 +28,6 @@ function SubmittedCard({request}: SubmittedCardProps) {
     return (
 
         <Card className="hw-card">
-
-            {console.log("sc rendered")}
             <Card.Content>
                 <Label attached="top left">
                     #{request.request_id}
@@ -45,11 +43,14 @@ function SubmittedCard({request}: SubmittedCardProps) {
             <Card.Content>
                 <Icon name="clock outline"/> <TimeAgo date={request.createdAt}/>
             </Card.Content>
+            {error ? <Card.Content className="hw-negative">
+                <Icon name="warning sign"/>Unable to change request status: {error.message}
+            </Card.Content> : ""}
             <Card.Content extra>
                 <div className="ui two buttons right aligned">
                     <Button.Group floated={"right"}>
                         <Popup inverted trigger={
-                            <Button icon loading={loading} onClick={event => updateRequest({
+                            <Button icon loading={loading} disabled={loading} onClick={event => updateRequest({
                                 variables: {
                                     updatedRequest: {
                                         request_id: request.request_id,
@@ -62,7 +63,7 @@ function SubmittedCard({request}: SubmittedCardProps) {
                                content="Deny request"
                         />
                         <Popup inverted trigger={
-                            <Button icon labelPosition="right" color="green" loading={loading}
+                            <Button icon labelPosition="right" color="green" loading={loading} disabled={loading}
                                     onClick={event => updateRequest({
                                         variables: {
                                             updatedRequest: {
@@ -76,11 +77,9 @@ function SubmittedCard({request}: SubmittedCardProps) {
                             </Button>}
                                content="Approve request"
                         />
-
                     </Button.Group>
                 </div>
             </Card.Content>
-            <Progress attached="top" percent={5} active={true} color={"green"}/>
         </Card>
     );
 }

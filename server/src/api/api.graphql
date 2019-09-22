@@ -148,7 +148,8 @@ input RequestInput {
 input RequestUpdateInput {
 	request_id: Int!,
 	new_quantity: Int,
-	new_status: RequestStatus
+    new_status: RequestStatus,
+    user_haveID: Boolean
 }
 
 input UserSearch {

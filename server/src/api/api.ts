@@ -59,6 +59,50 @@ async function getUser(userId) {
     return users[0];
 }
 
+async function updateUser(args, context) {
+    const searchObj: UserUpdateInput = args.updatedUser;
+
+    if (!context.user.admin && args.uuid !== context.user.uuid) {
+        throw new GraphQLError("You do not have permission to update users other than yourself.");
+    }
+
+    // non-admins can't change these properties
+    if (!context.user.admin) {
+        console.log("updateUser: user is not admin");
+        delete searchObj.admin;
+        delete searchObj.haveID;
+    }
+
+    // don't let an admin remove their own admin permissions
+    if (context.user.admin && args.uuid === context.user.uuid) {
+        delete searchObj.admin;
+    }
+
+    // stop if no properties are going to be updated
+    if (!Object.keys(searchObj).length) {
+        console.log("updateUser: stopping as no properties will be updated");
+        return null;
+    }
+
+    if (searchObj.phone && !(/^\((\d){3}\) (\d){3}-(\d){4}$/).test(searchObj.phone)) {
+        throw new GraphQLError("User not updated because phone number format is invalid");
+    }
+
+    console.log("searchObj is", searchObj);
+    const updatedUser: User[] = await DB.from("users")
+        .where({
+            uuid: args.uuid,
+        })
+        .update(searchObj)
+        .returning(["uuid", "name", "email", "phone", "slackUsername", "haveID", "admin"]);
+
+    if (!updatedUser.length) {
+        return null;
+    }
+
+    return updatedUser[0];
+}
+
 const resolvers: any = {
     Query: {
         /* Queries */
@@ -433,6 +477,11 @@ const resolvers: any = {
                 updateObj.quantity = args.updatedRequest.new_quantity;
             }
 
+            let updatedUserHaveID = null;
+            if (typeof args.updatedRequest.user_haveID !== "undefined") {
+                updatedUserHaveID = args.updatedRequest.user_haveID;
+            }
+
             if (Object.keys(updateObj).length >= 1) {
                 updateObj.updated_at = new Date();
 
@@ -446,7 +495,17 @@ const resolvers: any = {
                 const simpleRequest = toSimpleRequest(updatedRequest[0]);
                 console.log(simpleRequest);
 
-                const user = await getUser(updatedRequest[0].user_id);
+                let user;
+                if (updatedUserHaveID !== null) {
+                    user = await updateUser({
+                        uuid: updatedRequest[0].user_id,
+                        updatedUser: {
+                            haveID: updatedUserHaveID
+                        }
+                    }, context);
+                } else {
+                    user = await getUser(updatedRequest[0].user_id);
+                }
 
                 // fetch the item
                 const item: Item | null = await getItem(updatedRequest[0].request_item_id, context.user.admin);
@@ -475,44 +534,7 @@ const resolvers: any = {
             return null;
         },
         updateUser: async (root, args, context): Promise<User | null> => {
-            const searchObj: UserUpdateInput = args.updatedUser;
-
-            if (!context.user.admin && args.uuid !== context.user.uuid) {
-                throw new GraphQLError("You do not have permission to update users other than yourself.");
-            }
-
-            // non-admins can't change these properties
-            if (!context.user.admin) {
-                delete searchObj.admin;
-                delete searchObj.haveID;
-            }
-
-            // don't let an admin remove their own admin permissions
-            if (context.user.admin && args.uuid === context.user.uuid) {
-                delete searchObj.admin;
-            }
-
-            // stop if no properties are going to be updated
-            if (!Object.keys(searchObj).length) {
-                return null;
-            }
-
-            if (searchObj.phone && !(/^\((\d){3}\) (\d){3}-(\d){4}$/).test(searchObj.phone)) {
-                throw new GraphQLError("User not updated because phone number format is invalid");
-            }
-
-            const updatedUser: User[] = await DB.from("users")
-                .where({
-                    uuid: args.uuid,
-                })
-                .update(searchObj)
-                .returning(["uuid", "name", "email", "phone", "slackUsername", "haveID", "admin"]);
-
-            if (!updatedUser.length) {
-                return null;
-            }
-
-            return updatedUser[0];
+            return await updateUser(args, context);
         },
     },
     Subscription: {
