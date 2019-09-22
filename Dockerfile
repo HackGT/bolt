@@ -16,4 +16,5 @@ COPY --from=0 /usr/src/bolt/client/ /usr/src/bolt/client/
 WORKDIR /usr/src/bolt
 EXPOSE 3000
 WORKDIR /usr/src/bolt/server
+RUN npm install -g knex --unsafe-perm
 CMD ["npm", "run", "knex:migrate:latest", "&&", "node", "server/build/app.js"]
