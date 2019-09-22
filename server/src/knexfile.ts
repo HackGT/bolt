@@ -6,7 +6,6 @@ const fs = require("fs");
 const path = require("path");
 
 let URL;
-let NODE_ENV = "development";
 if (!(process.env.PRODUCTION && process.env.PRODUCTION.toLowerCase() === "true")) {
     let config;
     try {
@@ -17,28 +16,14 @@ if (!(process.env.PRODUCTION && process.env.PRODUCTION.toLowerCase() === "true")
         }
     }
 
-    if (config.server) {
-        if (config.server.postgresURL) {
-            URL = config.server.postgresURL;
-        }
-        if (config.server.isProduction) {
-            NODE_ENV = "production";
-        }
+    if (config.server && config.server.postgresURL) {
+        URL = config.server.postgresURL;
     }
 }
 
 if (process.env.POSTGRES_URL) {
-    console.log("Setting URL");
     URL = process.env.POSTGRES_URL;
 }
-
-if (process.env.PRODUCTION && process.env.PRODUCTION.toLowerCase() === "true") {
-    console.log("Setting production environment");
-    NODE_ENV = "production";
-}
-
-console.log("NODE_ENV:", NODE_ENV);
-console.log("URL length: ", URL.length);
 
 const migrations = {
     tableName: "knex_migrations",
