@@ -30,7 +30,6 @@ namespace IConfig {
     export interface Server {
         isProduction: boolean;
         port: number;
-        wsPort: number;
         cookieMaxAge: number;
         cookieSecureOnly: boolean;
         postgresURL: string;
@@ -65,7 +64,6 @@ class Config implements IConfig.Main {
     public server: IConfig.Server = {
         isProduction: false,
         port: 3000,
-        wsPort: 3001,
         cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
         cookieSecureOnly: false,
         postgresURL: "postgresql://localhost/bolt",

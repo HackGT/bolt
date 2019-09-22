@@ -25,51 +25,23 @@ async function getItem(itemId: number, isAdmin: boolean): Promise<Item|null> {
         .join("categories", "items.category_id", "=", "categories.category_id")
         .where({item_id: itemId});
 
-
-    // the lesser of two evils.  These 2 partial queries give us all the info we need to calculate the two different quantity values
-    const qtyNotAtDesk: number = parseInt((await DB.from("requests")
-        .whereIn("status", ["FULFILLED", "LOST", "DAMAGED"])
-        .andWhere({
-            request_item_id: itemId
-        })
-        .count("request_id"))[0].count, 10);
-
-    console.log(qtyNotAtDesk);
-
-    const qtyPartialReserved: number = parseInt((await DB.from("requests")
-        .whereIn("status", ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP"])
-        .andWhere({
-            request_item_id: itemId
-        })
-        .count("request_id"))[0].count, 10);
-
-
     if (item.length === 0) {
         return null;
     }
     const actualItem: any = item[0];
-
-    const totalAvailable: number = actualItem.totalAvailable;
-    const unreservedQty: number = totalAvailable - (qtyNotAtDesk + qtyPartialReserved);
-    const qtyInStock: number = totalAvailable - qtyNotAtDesk;
-
-    // select count(request_id) as "qty NOT in stock" -- 1
-    // from requests
-    // where status in ('FULFILLED', 'LOST', 'DAMAGED') and request_item_id = 32;
-
-    // select count(request_id) as "qty reserved partial" -- 7
-    // from requests
-    // where status in ('SUBMITTED', 'APPROVED', 'READY_FOR_PICKUP') and request_item_id = 32;
+    const {item_id} = actualItem;
+    const {qtyInStock, qtyUnreserved, qtyAvailableForApproval} = await Quantity.all(item_id);
 
 
     return {
         ...actualItem,
-        id: actualItem.item_id,
+        id: item_id,
         category: actualItem.category_name,
         price: onlyIfAdmin(actualItem.price, isAdmin),
         owner: onlyIfAdmin(actualItem.owner, isAdmin),
-        qtyUnreserved: unreservedQty,
-        qtyInStock
+        qtyInStock: qtyInStock[item_id],
+        qtyUnreserved: qtyUnreserved[item_id],
+        qtyAvailableForApproval: qtyAvailableForApproval[item_id]
     };
 }
 
@@ -388,7 +360,7 @@ const resolvers: any = {
             const initialStatus: RequestStatus = item.approvalRequired ? "SUBMITTED" : "APPROVED";
 
             // return the request object with the item, censoring price/owner for non-admins
-            let newRequest = await DB.from("requests").insert({
+            let newRequest: any = await DB.from("requests").insert({
                 ...args.newRequest,
                 status: initialStatus
             })

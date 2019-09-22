@@ -6,8 +6,14 @@ Required items:
 
  - A postrgesql server and database
  - Install dependencies: `npm install`
+    - **NOTE:** For server deployments, the `postinstall` NPM script, which will also run when you run `npm install`, will
+    try to run the Knex (database abstraction layer) migrations.  Since you probably haven't added your database configuration,
+    this step will fail.  Just ignore the error for now and follow the steps after this to properly run the migrations. 
  - Configure the required environment variables in `configs/config.json`.  You can copy and rename `configs/configs.json.example`.
- 
+ - Re-run the database migrations using `npm run knex:migrate:latest`.
+
+By default, DB migrations will run automatically if you run `npm start`.  To avoid this, you can start the server using `npm run dev` or `npm run start:no-migration` and database migrations will *not* run before you start the server.
+
 # Client setup
 
 Note: the hardware desk page (/admin/desk) relies on a WebSocket connection to the server. The client assumes that you are
