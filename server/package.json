@@ -7,6 +7,7 @@
   "scripts": {
     "prestart": "npm run generate-api && npm run generate-gql-types && npm run knex:migrate:latest",
     "start": "gulp",
+    "start:server": "npm run knex:migrate:latest && npm run serve",
     "start:no-migration": "npm run generate-api && npm run generate-gql-types && gulp",
     "dev": "npm run start:no-migration",
     "serve": "node ./build/app.js",
