@@ -15,4 +15,5 @@ COPY --from=0 /usr/src/bolt/server/ /usr/src/bolt/server/
 COPY --from=0 /usr/src/bolt/client/ /usr/src/bolt/client/
 WORKDIR /usr/src/bolt
 EXPOSE 3000
-CMD ["node", "server/build/app.js"]
+WORKDIR /usr/src/bolt/server
+CMD ["npm", "run", "start:server"]
