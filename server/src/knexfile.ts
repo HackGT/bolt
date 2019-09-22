@@ -45,7 +45,7 @@ const migrations = {
     directory: path.normalize(path.join(__dirname, "/migrations"))
 };
 
-module.exports[NODE_ENV] = {
+module.exports = {
     client: "pg",
     connection: URL,
     migrations
