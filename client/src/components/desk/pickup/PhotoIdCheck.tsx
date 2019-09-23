@@ -4,7 +4,7 @@ import {updateRequestStatus} from "../DeskUtil";
 import {FULFILLED} from "../../../types/Hardware";
 
 function generateCard({title, content, button, error}: any) {
-    return <Card style={{maxWidth: 200}}>
+    return (<Card style={{maxWidth: 200}}>
         <Card.Content>
             <strong>{title}</strong>
         </Card.Content>
@@ -15,14 +15,14 @@ function generateCard({title, content, button, error}: any) {
             <Icon name="warning sign"/>Unable to change request status: {error.message}
         </Card.Content> : ""}
         {button}
-    </Card>;
+    </Card>);
 }
 
 function PhotoIdCheck({userName, loading, updateRequest, requests, returnRequired, haveID, error}: any) {
-    const idRequired = generateCard({
+    const idRequired = {
         title: <><Icon name="id badge"/>Photo ID required</>,
         content: `Did you collect ${userName}'s photo ID?`,
-        button: <Button.Group>
+        button: (<Button.Group>
             <Button loading={loading} onClick={event =>
                 requests.forEach((request: any) =>
                     updateRequestStatus(updateRequest, request.request_id, FULFILLED)
@@ -33,9 +33,9 @@ function PhotoIdCheck({userName, loading, updateRequest, requests, returnRequire
                     updateRequestStatus(updateRequest, request.request_id, FULFILLED, true)
                 )
             }>Yes</Button>
-        </Button.Group>,
+        </Button.Group>),
         error
-    });
+    };
 
     const noIdRequiredButton = <Button color="green" loading={loading} onClick={event =>
         requests.forEach((request: any) =>
@@ -43,29 +43,29 @@ function PhotoIdCheck({userName, loading, updateRequest, requests, returnRequire
         )
     }>Complete pickup</Button>;
 
-    const idAlreadyCollected = generateCard({
+    const idAlreadyCollected = {
         title: <><Icon name="check circle"/>All set!</>,
         content: `You already have ${userName}'s photo ID`,
         button: noIdRequiredButton,
         error
-    });
+    };
 
-    const idNotRequired = generateCard({
+    const idNotRequired = {
         title: <><Icon name="check circle"/>All set!</>,
         content: `${requests.length === 1 ? "This item doesn't" : "None of these items"} require return, so no photo ID is required for pickup`,
         button: noIdRequiredButton,
         error
-    });
+    };
 
     if (!returnRequired) {
-        return idNotRequired;
+        return generateCard(idNotRequired);
     }
 
     if (returnRequired && !haveID) {
-        return idRequired;
+        return generateCard(idRequired);
     }
 
-    return idAlreadyCollected; // returnRequired && haveID
+    return generateCard(idAlreadyCollected); // returnRequired && haveID
 }
 
 export default PhotoIdCheck;

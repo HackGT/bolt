@@ -15,13 +15,7 @@ interface ReadyForPickupCardProps {
 }
 
 function returnRequired(requests: Request[]): boolean {
-    for (let i = 0; i < requests.length; i++) {
-        if (requests[i].item.returnRequired) {
-            return true;
-        }
-    }
-
-    return false;
+    return requests.some(request => request.item.returnRequired);
 }
 
 function ReadyForPickupCard({card}: ReadyForPickupCardProps) {

@@ -416,25 +416,36 @@ const resolvers: any = {
             }
 
             const initialStatus: RequestStatus = item.approvalRequired ? "SUBMITTED" : "APPROVED";
-
             // return the request object with the item, censoring price/owner for non-admins
             let newRequest: any = await DB.from("requests").insert({
                 ...args.newRequest,
                 status: initialStatus
             })
-                .returning(["request_id", "created_at", "updated_at"]);
+                .returning(["request_id", "quantity", "status", "created_at", "updated_at"]);
 
             newRequest = newRequest[0];
-
-            if (item.qtyUnreserved || item.qtyUnreserved === 0) {
-                item.qtyUnreserved -= args.newRequest.quantity;
+            const updatedItem = await getItem(args.newRequest.request_item_id, context.user.admin);
+            if (!updatedItem) {
+                throw new GraphQLError("Unable to retrieve the new item information after creating request");
             }
+
+            const simpleRequest = toSimpleRequest(newRequest);
+
+            const result: Request = {
+                ...simpleRequest,
+                user,
+                item: updatedItem
+            };
+
+            pubsub.publish(REQUEST_CHANGE, {
+                [REQUEST_CHANGE]: result
+            });
 
             return {
                 request_id: newRequest.request_id,
                 quantity: args.newRequest.quantity,
                 status: initialStatus,
-                item,
+                item: updatedItem,
                 user,
                 createdAt: localTimestamp(newRequest.created_at),
                 updatedAt: localTimestamp(newRequest.updated_at)
