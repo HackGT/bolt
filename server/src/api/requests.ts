@@ -1,5 +1,6 @@
 import moment from "moment";
 import {RequestStatus} from "./graphql.types";
+import {ItemQtyAvailable} from "./requests/quantity";
 
 export interface KnexSimpleRequest {
     request_id: number;
@@ -32,6 +33,7 @@ export interface KnexRequest extends KnexSimpleRequest {
     haveID: boolean;
     qtyInStock: number;
     qtyUnreserved: number;
+    qtyAvailableForApproval: number;
 }
 
 
@@ -48,7 +50,7 @@ export function onlyIfAdmin(val: any, isAdmin: boolean) {
     return (isAdmin) ? val : null;
 }
 
-export function nestedRequest(request: KnexRequest, isAdmin: boolean) {
+export function nestedRequest(request: KnexRequest, isAdmin: boolean, qtyInStock: ItemQtyAvailable, qtyAvailableForApproval: ItemQtyAvailable, qtyUnreserved: ItemQtyAvailable) {
     const user = {
         uuid: request.uuid,
         admin: request.admin,
@@ -59,32 +61,34 @@ export function nestedRequest(request: KnexRequest, isAdmin: boolean) {
         haveID: request.haveID
     };
 
-    const item = {
-        id: request.item_id,
-        item_name: request.item_name,
-        description: request.description,
-        imageUrl: request.imageUrl,
-        category: request.category_name,
-        totalAvailable: request.totalAvailable,
-        maxRequestQty: request.maxRequestQty,
-        price: onlyIfAdmin(request.price, isAdmin),
-        hidden: request.hidden,
-        returnRequired: request.returnRequired,
-        approvalRequired: request.approvalRequired,
-        owner: onlyIfAdmin(request.owner, isAdmin),
-        qtyInStock: request.qtyInStock || 0, // FIXME
-        qtyUnreserved: request.qtyUnreserved || 0 // FIXME
-    };
-
-
     return {
         user,
-        item,
+        item: redactedItem(request, isAdmin, qtyInStock, qtyAvailableForApproval, qtyUnreserved),
         request_id: request.request_id,
         status: request.status,
         quantity: request.quantity,
         createdAt: localTimestamp(request.created_at),
         updatedAt: localTimestamp(request.updated_at)
+    };
+}
+
+export function redactedItem(item, isAdmin: boolean, qtyInStock: ItemQtyAvailable, qtyAvailableForApproval: ItemQtyAvailable, qtyUnreserved: ItemQtyAvailable) {
+    return {
+        id: item.item_id,
+        item_name: item.item_name,
+        description: item.description,
+        imageUrl: item.imageUrl,
+        category: item.category_name,
+        totalAvailable: item.totalAvailable,
+        maxRequestQty: item.maxRequestQty,
+        price: onlyIfAdmin(item.price, isAdmin),
+        hidden: item.hidden,
+        returnRequired: item.returnRequired,
+        approvalRequired: item.approvalRequired,
+        owner: onlyIfAdmin(item.owner, isAdmin),
+        qtyInStock: qtyInStock[item.item_id],
+        qtyAvailableForApproval: qtyAvailableForApproval[item.item_id],
+        qtyUnreserved: qtyUnreserved[item.item_id]
     };
 }
 

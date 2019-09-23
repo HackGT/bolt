@@ -1,7 +1,14 @@
-export interface User {
+export interface BaseUser {
     uuid: string;
-    admin: boolean;
     name: string;
+}
+
+export interface BaseUserWithID extends BaseUser {
+    haveID: boolean;
+}
+
+export interface User extends BaseUser {
+    admin: boolean;
 }
 
 export interface FullUser extends User {

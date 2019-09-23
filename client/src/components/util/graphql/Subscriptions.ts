@@ -4,6 +4,17 @@ export const REQUEST_CHANGE = gql`
     subscription rc {
         request_change {
             request_id
+            user {
+                uuid
+                name
+                haveID
+            }
+            item {
+                id
+                item_name
+                qtyAvailableForApproval
+                returnRequired
+            }
             status
             quantity
             createdAt

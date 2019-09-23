@@ -15,6 +15,7 @@ export type HwItem = {
     owner: string;
     qtyUnreserved: number;
     qtyInstock: number;
+    qtyAvailableForApproval: number;
 };
 
 export interface ItemCore {
@@ -56,6 +57,16 @@ export enum ItemStatus {
     LOST = "lost",
     DAMAGED = "damaged"
 }
+
+export const SUBMITTED = "SUBMITTED";
+export const APPROVED = "APPROVED";
+export const DENIED = "DENIED";
+export const CANCELLED = "CANCELLED";
+export const READY_FOR_PICKUP = "READY_FOR_PICKUP";
+export const FULFILLED = "FULFILLED";
+export const RETURNED = "RETURNED";
+export const LOST = "LOST";
+export const DAMAGED = "DAMAGED";
 
 export interface HwListItem extends ItemCore {
     id: number;

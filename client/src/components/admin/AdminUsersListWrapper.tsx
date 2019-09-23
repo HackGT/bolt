@@ -21,7 +21,8 @@ class AdminUsersListWrapper extends Component {
                     ({loading, error, data}: any) => {
                         if (loading) {
                             return <Loader active inline="centered" content="Just a sec!"/>;
-                        } else if (error) {
+                        }
+                        if (error) {
                             return <Message error visible={true}
                                             header="Can't fetch users"
                                             content={`Hmm, an error is preventing us from displaying the list of users.  The error was: ${error.message}`}
