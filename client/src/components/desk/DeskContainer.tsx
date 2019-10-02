@@ -7,9 +7,10 @@ import {REQUEST_CHANGE} from "../util/graphql/Subscriptions";
 import ReadyToPrepareList from "./fulfillment/ReadyToPrepareList";
 import {DESK_REQUESTS} from "../util/graphql/Queries";
 import {Request, RequestStatus} from "../../types/Request";
-import {APPROVED, READY_FOR_PICKUP, SUBMITTED} from "../../types/Hardware";
+import {APPROVED, FULFILLED, READY_FOR_PICKUP, SUBMITTED} from "../../types/Hardware";
 import {pickRandomElement} from "../admin/AdminOverviewContainer";
 import ReadyForPickupList from "./pickup/ReadyForPickupList";
+import ReadyForReturnList from "./returns/ReadyForReturnList";
 
 function mapStateToProps(state: any) {
     return {};
@@ -66,6 +67,34 @@ const endings = [
 ];
 
 
+function getUpdateQuery() {
+    return (prev: any, {subscriptionData}: any) => {
+        if (!subscriptionData.data) {
+            return prev;
+        }
+        console.log("Original requests array");
+        prev.requests.forEach((x: any) => console.log(x));
+        const updatedRequest = subscriptionData.data;
+        const index = prev.requests.findIndex((x: any) => {
+            return x.request_id === updatedRequest.request_change.request_id;
+        });
+
+        console.log("Found request #", updatedRequest.request_change.request_id, " at index", index, ", new status is", updatedRequest.request_change.status);
+        const requests = prev.requests;
+
+        if (index === -1) { // request wasn't returned with original query; add it to array of requests
+            // If adding a new request to the array of requests, you have to do it this way rather than just pushing to the array
+            return Object.assign({}, prev, {
+                requests: [updatedRequest.request_change, ...prev.requests]
+            });
+        } else { // request was returned with original query; update it
+            requests[index] = updatedRequest.request_change;
+            console.log("Updated existing request");
+        }
+        console.log("New requests array", requests);
+        return {requests};
+    };
+}
 
 function DeskContainer() {
     const {subscribeToMore, ...query} = useQuery(DESK_REQUESTS);
@@ -83,7 +112,7 @@ function DeskContainer() {
     const submitted = getRequestsWithStatus(requests, SUBMITTED);
     const approved = getConsolidatedRequestsWithStatus(requests, APPROVED);
     const readyForPickup = getConsolidatedRequestsWithStatus(requests, READY_FOR_PICKUP);
-
+    const readyForReturn = getConsolidatedRequestsWithStatus(requests, FULFILLED);
     return (
         <div>
             <Header size="huge">
@@ -92,40 +121,16 @@ function DeskContainer() {
             </Header>
 
             <Grid stackable>
-                <Grid.Row columns={3}>
+                <Grid.Row columns={4}>
                     <SubmittedList loading={query.loading} requests={submitted} subscribeToUpdatedRequests={() => {
                         subscribeToMore({
                             document: REQUEST_CHANGE,
-                            updateQuery: (prev, {subscriptionData}) => {
-                                if (!subscriptionData.data) {
-                                    return prev;
-                                }
-                                console.log("Original requests array");
-                                prev.requests.forEach((x: any) => console.log(x));
-                                const updatedRequest = subscriptionData.data;
-                                const index = prev.requests.findIndex((x: any) => {
-                                    return x.request_id === updatedRequest.request_change.request_id;
-                                });
-
-                                console.log("Found request #", updatedRequest.request_change.request_id, " at index", index, ", new status is", updatedRequest.request_change.status);
-                                const requests = prev.requests;
-
-                                if (index === -1) { // request wasn't returned with original query; add it to array of requests
-                                    // If adding a new request to the array of requests, you have to do it this way rather than just pushing to the array
-                                    return Object.assign({}, prev, {
-                                        requests: [updatedRequest.request_change, ...prev.requests]
-                                    });
-                                } else { // request was returned with original query; update it
-                                    requests[index] = updatedRequest.request_change;
-                                    console.log("Updated existing request");
-                                }
-                                console.log("New requests array", requests);
-                                return {requests};
-                            }
+                            updateQuery: getUpdateQuery()
                         });
                     }}/>
                     <ReadyToPrepareList cards={approved}/>
                     <ReadyForPickupList cards={readyForPickup}/>
+                    <ReadyForReturnList cards={readyForReturn}/>
                 </Grid.Row>
             </Grid>
         </div>
