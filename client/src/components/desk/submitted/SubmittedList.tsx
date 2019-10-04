@@ -1,5 +1,4 @@
 import React, {Component} from "react";
-import {connect} from "react-redux";
 import CardList from "../CardList";
 import SubmittedCard from "./SubmittedCard";
 import {Request} from "../../../types/Request";
@@ -8,7 +7,8 @@ import {Container, Header, Segment} from "semantic-ui-react";
 interface SubmittedListProps {
     loading: boolean;
     requests: Request[];
-    subscribeToUpdatedRequests: any
+    subscribeToUpdatedRequests: any;
+    hidden?: boolean;
 }
 
 class SubmittedList extends Component<SubmittedListProps> {
@@ -17,6 +17,10 @@ class SubmittedList extends Component<SubmittedListProps> {
     }
 
     render() {
+        if (this.props.hidden) { // This is used to hide the submitted list but still call subscribeToUpdatedRequests
+            return "";
+        }
+
         const empty = <Segment placeholder>
             <Container textAlign="center">
                 <Header>

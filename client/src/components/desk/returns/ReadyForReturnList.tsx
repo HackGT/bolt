@@ -1,6 +1,7 @@
 import React from 'react';
 import {Container, Header, Segment} from "semantic-ui-react";
 import CardList from "../CardList";
+import ReadyForReturnCard from "./ReadyForReturnCard";
 
 function ReadyForReturnList({cards}: any) {
     const empty = (<Segment placeholder>
@@ -13,7 +14,8 @@ function ReadyForReturnList({cards}: any) {
 
     return (
         <CardList title="Ready for Return" length={cards.length}>
-            {cards.map((card: any) => <p>{card.user.name}</p>)}
+            {cards.sort((a: any, b: any) => a.user.name.localeCompare(b.user.name)).map((card: any) =>
+                <ReadyForReturnCard key={card.user.uuid} card={card}/>)}
             {!cards.length ? empty : ""}
         </CardList>
     );

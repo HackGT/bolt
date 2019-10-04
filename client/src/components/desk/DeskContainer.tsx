@@ -1,13 +1,13 @@
 import React, {useState} from "react";
 import {connect} from "react-redux";
-import {Grid, Header, Loader, Message} from "semantic-ui-react";
+import {Checkbox, Grid, Header, Loader, Message} from "semantic-ui-react";
 import SubmittedList from "./submitted/SubmittedList";
 import {useQuery} from "@apollo/react-hooks";
 import {REQUEST_CHANGE} from "../util/graphql/Subscriptions";
 import ReadyToPrepareList from "./fulfillment/ReadyToPrepareList";
 import {DESK_REQUESTS} from "../util/graphql/Queries";
 import {Request, RequestStatus} from "../../types/Request";
-import {APPROVED, FULFILLED, READY_FOR_PICKUP, SUBMITTED} from "../../types/Hardware";
+import {APPROVED, DAMAGED, FULFILLED, LOST, READY_FOR_PICKUP, SUBMITTED} from "../../types/Hardware";
 import {pickRandomElement} from "../admin/AdminOverviewContainer";
 import ReadyForPickupList from "./pickup/ReadyForPickupList";
 import ReadyForReturnList from "./returns/ReadyForReturnList";
@@ -16,13 +16,13 @@ function mapStateToProps(state: any) {
     return {};
 }
 
-function getRequestsWithStatus(requests: Request[], status: RequestStatus) {
+function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[]) {
     console.log("Getting requests with status", status);
-    return requests.filter((r: Request) => r.status === status);
+    return requests.filter((r: Request) => statuses.some(status => r.status === status));
 }
 
-function getConsolidatedRequestsWithStatus(requests: Request[], status: RequestStatus) {
-    const filteredRequests = getRequestsWithStatus(requests, status);
+function getConsolidatedRequestsWithStatus(requests: Request[], statuses: RequestStatus[]) {
+    const filteredRequests = getRequestsWithStatus(requests, statuses);
     const requestsByUser: any = {};
 
     for (let i = 0; i < filteredRequests.length; i++) {
@@ -99,6 +99,7 @@ function getUpdateQuery() {
 function DeskContainer() {
     const {subscribeToMore, ...query} = useQuery(DESK_REQUESTS);
     const [randomPhrase, setRandomPhrase] = useState(`${pickRandomElement(starters)} ${Math.floor((Math.random() + 1) * 900)} ${pickRandomElement(funPhrases)} ${pickRandomElement(endings)}`);
+    const [returnsMode, setReturnsMode] = useState(false);
     if (query.loading) {
         return <Loader active inline="centered" content="Loading requests..."/>;
     }
@@ -109,10 +110,10 @@ function DeskContainer() {
         />;
     }
     const requests = query.data.requests;
-    const submitted = getRequestsWithStatus(requests, SUBMITTED);
-    const approved = getConsolidatedRequestsWithStatus(requests, APPROVED);
-    const readyForPickup = getConsolidatedRequestsWithStatus(requests, READY_FOR_PICKUP);
-    const readyForReturn = getConsolidatedRequestsWithStatus(requests, FULFILLED);
+    const submitted = getRequestsWithStatus(requests, [SUBMITTED]);
+    const approved = getConsolidatedRequestsWithStatus(requests, [APPROVED]);
+    const readyForPickup = getConsolidatedRequestsWithStatus(requests, [READY_FOR_PICKUP]);
+    const readyForReturn = getConsolidatedRequestsWithStatus(requests, [FULFILLED, LOST, DAMAGED]);
     return (
         <div>
             <Header size="huge">
@@ -121,16 +122,25 @@ function DeskContainer() {
             </Header>
 
             <Grid stackable>
-                <Grid.Row columns={4}>
-                    <SubmittedList loading={query.loading} requests={submitted} subscribeToUpdatedRequests={() => {
+                <Grid.Row columns={1}>
+                    <Grid.Column>
+                        <Checkbox toggle
+                                  label={"Returns mode"}
+                                  onChange={((event, {checked}): any => setReturnsMode(checked!))}
+                        />
+                    </Grid.Column>
+                </Grid.Row>
+                <Grid.Row columns={3}>
+                    <SubmittedList hidden={returnsMode} loading={query.loading} requests={submitted}
+                                   subscribeToUpdatedRequests={() => {
                         subscribeToMore({
                             document: REQUEST_CHANGE,
                             updateQuery: getUpdateQuery()
                         });
                     }}/>
-                    <ReadyToPrepareList cards={approved}/>
-                    <ReadyForPickupList cards={readyForPickup}/>
-                    <ReadyForReturnList cards={readyForReturn}/>
+                    {!returnsMode && <ReadyToPrepareList cards={approved}/>}
+                    {!returnsMode && <ReadyForPickupList cards={readyForPickup}/>}
+                    {returnsMode && <ReadyForReturnList cards={readyForReturn}/>}
                 </Grid.Row>
             </Grid>
         </div>
