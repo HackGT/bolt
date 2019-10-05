@@ -14,9 +14,23 @@ import {SubscriptionServer} from "subscriptions-transport-ws";
 import {createServer} from "http";
 import {findUserByID} from "./database";
 import flash = require("connect-flash");
+const fetch = require('isomorphic-fetch')
+const bodyParser = require('body-parser')
 
 // Set up Express and its middleware
 export let app = express();
+
+app.post("/api/slack/feedback", bodyParser.json(), (req, res) => {
+  fetch("https://hooks.slack.com/services/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", {
+    method: "POST",
+    body: JSON.stringify(req.body)
+  }).then(response => {
+    return res.status(response.status).send({
+      status: response.status,
+      statusText: response.statusText
+    });
+  });
+});
 
 app.use(compression());
 const cookieParserInstance = cookieParser(undefined, COOKIE_OPTIONS as cookieParser.CookieParseOptions);
@@ -92,6 +106,7 @@ app.use(isAuthenticated, serveStatic(path.join(__dirname, "../../client/build"))
 app.get("*", isAuthenticated, (request, response) => {
     response.sendFile(path.join(__dirname, "../../client/build", "index.html"));
 });
+
 
 const server = createServer(app);
 
