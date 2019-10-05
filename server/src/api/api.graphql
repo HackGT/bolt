@@ -6,7 +6,7 @@ type Query {
     # Get information about a specific item, given its ID
 	item(id: Int!): Item
     # Get an array of every item in the database
-	items: [Item!]
+	allItems: [ItemsByCategory!]
     # Get a list containing each category that is on at least one item
     categories: [Category!]
 	# Return request(s) matching the search query provided and that the user has permission to see
@@ -68,6 +68,11 @@ type Item {
 	approvalRequired: Boolean!
     # The person or organization that owns this item (only visible to admins)
     owner: String
+}
+
+type ItemsByCategory {
+	category: Category!
+	items: [Item!]
 }
 
 input ItemInput {

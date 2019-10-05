@@ -132,24 +132,42 @@ const resolvers: any = {
          * @param args
          * @param context
          */
-        items: async (root, args, context): Promise<Item[]> => {
+        allItems: async (root, args, context): Promise<Item[]> => {
+            const searchObj: any = {};
+            if (!context.user.admin) {
+                searchObj.hidden = false;
+            }
             const items = await DB.from("items")
+                .where(searchObj)
                 .join("categories", "items.category_id", "=", "categories.category_id");
 
             const {qtyInStock, qtyUnreserved, qtyAvailableForApproval} = await Quantity.all();
-
-            return items.map(item => {
-                return {
-                    ...item,
-                    id: item.item_id,
-                    category: item.category_name,
-                    price: onlyIfAdmin(item.price, context.user.admin),
-                    owner: onlyIfAdmin(item.owner, context.user.admin),
-                    qtyInStock: qtyInStock[item.item_id],
-                    qtyUnreserved: qtyUnreserved[item.item_id],
-                    qtyAvailableForApproval: qtyAvailableForApproval[item.item_id]
-                };
-            });
+            const itemsByCategory = {};
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (!itemsByCategory.hasOwnProperty(item.category_id)) {
+                    itemsByCategory[item.category_id] = {
+                        category: {
+                            category_id: item.category_id,
+                            category_name: item.category_name,
+                        },
+                        items: []
+                    };
+                }
+                itemsByCategory[item.category_id].items.push(
+                    {
+                        ...item,
+                        id: item.item_id,
+                        category: item.category_name,
+                        price: onlyIfAdmin(item.price, context.user.admin),
+                        owner: onlyIfAdmin(item.owner, context.user.admin),
+                        qtyInStock: qtyInStock[item.item_id],
+                        qtyUnreserved: qtyUnreserved[item.item_id],
+                        qtyAvailableForApproval: qtyAvailableForApproval[item.item_id]
+                    }
+                );
+            }
+            return Object.values(itemsByCategory);
         },
         categories: async (root, args, context): Promise<Category[]> => {
             return await DB.from("categories");

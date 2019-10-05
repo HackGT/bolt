@@ -3,6 +3,7 @@ import {Button, Form, Icon, Input, Item, Label, Popup} from "semantic-ui-react";
 import {withToastManager} from "react-toast-notifications";
 import {Link} from "react-router-dom";
 import {HwListItem, ItemStatus, RequestedItem} from "../../types/Hardware";
+import {log} from "util";
 
 interface HardwareItemState {
     qtyRequested: number;
@@ -106,7 +107,7 @@ class HardwareItemBase extends React.Component<HwListItem, HardwareItemState> {
         const requestBtn = (
             <Button primary
                     icon
-                    disabled={this.state.qtyRequested <= 0}
+                    disabled={this.state.qtyRequested <= 0 || this.state.loading}
                     loading={this.state.loading}
                     onClick={this.handleItemRequest}
                     labelPosition="right"
@@ -145,14 +146,14 @@ class HardwareItemBase extends React.Component<HwListItem, HardwareItemState> {
         ) : "";
         return (
             <Item>
-                <Item.Image draggable={false} className="hw-image" size="tiny" src="http://placekitten.com/300/300"/>
+                <Item.Image draggable={false} className="hw-image" size="tiny" src={this.props.imageUrl || "http://placekitten.com/300/300"}/>
                 <Item.Content>
                     <Item.Header>{editBtn} {this.props.item_name}</Item.Header>
-                    {!this.props.inStock ? <Item.Meta style={{color: "#dc3545"}}>Out of stock</Item.Meta> : ""}
+                    {!(this.props.qtyUnreserved > 0) ? <Item.Meta style={{color: "#dc3545"}}>Out of stock</Item.Meta> : ""}
                     <Item.Meta>{maxPerRequest}</Item.Meta>
                     <Item.Meta><Label>{this.props.category}</Label></Item.Meta>
                     <Item.Description>{this.props.description}</Item.Description>
-                    <Item.Extra>{qtyRequest2}</Item.Extra>
+                    {(this.props.qtyUnreserved > 0) ? <Item.Extra>{qtyRequest2}</Item.Extra>:""}
                 </Item.Content>
             </Item>
         );
