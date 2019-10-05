@@ -17,7 +17,6 @@ function mapStateToProps(state: any) {
 }
 
 function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[]) {
-    console.log("Getting requests with status", status);
     return requests.filter((r: Request) => statuses.some(status => r.status === status));
 }
 
@@ -36,7 +35,6 @@ function getConsolidatedRequestsWithStatus(requests: Request[], statuses: Reques
 
         requestsByUser[req.user.uuid].requests.push(req);
     }
-    console.log("rbu", Object.values(requestsByUser));
     return Object.values(requestsByUser);
 }
 
@@ -72,14 +70,12 @@ function getUpdateQuery() {
         if (!subscriptionData.data) {
             return prev;
         }
-        console.log("Original requests array");
         prev.requests.forEach((x: any) => console.log(x));
         const updatedRequest = subscriptionData.data;
         const index = prev.requests.findIndex((x: any) => {
             return x.request_id === updatedRequest.request_change.request_id;
         });
 
-        console.log("Found request #", updatedRequest.request_change.request_id, " at index", index, ", new status is", updatedRequest.request_change.status);
         const requests = prev.requests;
 
         if (index === -1) { // request wasn't returned with original query; add it to array of requests
@@ -89,9 +85,7 @@ function getUpdateQuery() {
             });
         } else { // request was returned with original query; update it
             requests[index] = updatedRequest.request_change;
-            console.log("Updated existing request");
         }
-        console.log("New requests array", requests);
         return {requests};
     };
 }

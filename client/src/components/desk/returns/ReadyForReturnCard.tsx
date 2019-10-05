@@ -14,8 +14,12 @@ interface ReadyForReturnCardProps {
     card: UserAndRequests
 }
 
-function returnRequired(requests: Request[]): boolean {
-    return requests.some(request => request.item.returnRequired);
+function returnRequiredFulfilledRequests(requests: Request[]): Request[] {
+    return requests.filter(request => request.item.returnRequired && request.status === FULFILLED);
+}
+
+function numReturnRequired(requests: Request[]): number {
+    return returnRequiredFulfilledRequests(requests).length;
 }
 
 function WarningLabel({text}: { text: string }) {
@@ -34,7 +38,7 @@ function ControlledPopup(props: any) {
                                           returnRequired={props.returnRequired}
                                           haveID={props.user.haveID}
                                           requests={props.requests}
-                                          optional={props.optional}
+                                          numReturnRequired={props.numReturnRequired}
                                           setOpen={setOpen}
                   />}
     />;
@@ -45,7 +49,7 @@ function ReadyForPickupCard({card}: ReadyForReturnCardProps) {
 
     // @ts-ignore
     card.requests.sort((a: Request, b: Request) => a.item.returnRequired - b.item.returnRequired || a.request_id - b.request_id);
-
+    const requiredRequests = returnRequiredFulfilledRequests(card.requests);
     return (
         <Card className="hw-card">
             <Card.Content>
@@ -71,8 +75,8 @@ function ReadyForPickupCard({card}: ReadyForReturnCardProps) {
 
                         &nbsp;
                         <ControlledPopup loading={loading} user={card.user} error={error} updateRequest={updateRequest}
-                                         returnRequired={card.requests.length > 1 && returnRequired(card.requests)}
-                                         optional={request.status === FULFILLED && !request.item.returnRequired}
+                                         returnRequired={request.item.returnRequired}
+                                         numReturnRequired={numReturnRequired(card.requests)}
                                          requests={[request]}>
                             <Button icon basic loading={loading} size={"tiny"}>
                                 <Icon name="gavel"/>
@@ -102,12 +106,13 @@ function ReadyForPickupCard({card}: ReadyForReturnCardProps) {
                                content="Return all to Ready for Pickup"
                         />
                         <ControlledPopup loading={loading} user={card.user} error={error} updateRequest={updateRequest}
-                                         requests={card.requests}
-                                         returnRequired={false}
+                                         requests={requiredRequests}
+                                         returnRequired={numReturnRequired(requiredRequests) >= 1}
+                                         numReturnRequired={numReturnRequired(requiredRequests)}
                         >
                             <Button icon loading={loading} labelPosition="right" color="green">
                                 <Icon name="checkmark"/>
-                                All Returned
+                                All required
                             </Button>
                         </ControlledPopup>
 

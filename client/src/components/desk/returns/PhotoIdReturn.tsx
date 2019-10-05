@@ -13,38 +13,13 @@ function toDropdownOptions(options: string[]) {
 }
 
 function generateCard({title, content, button, error, returnRequired, returnType, setReturnType, optional}: any) {
-    let dropdownOptions = [RETURNED, LOST, DAMAGED];
-    console.log(returnRequired, optional);
-    if (optional) {
-        dropdownOptions = [RETURNED];
-    }
 
-    return (<Card style={{maxWidth: 200}}>
-        <Card.Content>
-            <strong>{title}</strong>
-        </Card.Content>
-        <Card.Content>
-            {content}
-        </Card.Content>
-        <Card.Content>
-            New status: <Dropdown upward floating
-                                  inline
-                                  disabled={optional}
-                                  value={returnType}
-                                  onChange={(event, {value}) => setReturnType(value)}
-                                  options={toDropdownOptions(dropdownOptions)}/>
-        </Card.Content>
-        {error ? <Card.Content className="hw-negative">
-            <Icon name="warning sign"/>Unable to change request status: {error.message}
-        </Card.Content> : ""}
-        {button}
-    </Card>);
 }
 
-function PhotoIdCheck({userName, loading, updateRequest, requests, returnRequired, haveID, error, setOpen, optional}: any) {
+function PhotoIdCheck({userName, loading, updateRequest, requests, returnRequired, haveID, error, setOpen, optional, numReturnRequired}: any) {
     const [returnType, setReturnType] = useState(RETURNED);
 
-    const returnId = {
+    const returnID = {
         title: <><Icon name="id badge"/>Return photo ID</>,
         content: `Did you return ${userName}'s photo ID?`,
         button: (<Button.Group>
@@ -63,14 +38,10 @@ function PhotoIdCheck({userName, loading, updateRequest, requests, returnRequire
             }
             }>Yes</Button>
         </Button.Group>),
-        error,
-        setReturnType,
-        returnType,
-        returnRequired,
-        optional
+        highlightTitle: true
     };
 
-    const noIdReturnButton = <Button color="green" loading={loading} onClick={event => {
+    const keepIDButton = <Button color="green" loading={loading} onClick={event => {
         requests.forEach((request: any) =>
             updateRequestStatus(updateRequest, request.request_id, returnType)
         );
@@ -78,37 +49,74 @@ function PhotoIdCheck({userName, loading, updateRequest, requests, returnRequire
     }
     }>{returnType === RETURNED ? "Complete return" : `Mark ${returnType.toLowerCase()}`}</Button>;
 
-    const idAlreadyReturned = {
+    let dropdownOptions = [RETURNED, LOST, DAMAGED];
+    const alreadyReturnedID = {
         title: <span className={"hw-positive"}><Icon name="check circle"/>All set!</span>,
         content: `${userName} should already have their photo ID`,
-        button: noIdReturnButton,
-        error,
-        setReturnType,
-        returnType,
-        returnRequired,
-        optional
+        button: keepIDButton,
+        highlightTitle: false
     };
 
-    const cantReturnId = {
+    const keepID = {
         title: <span className={"hw-negative"}><Icon name="exclamation triangle"/>Keep photo ID!</span>,
         content: `${userName} has at least one other request that requires return, so keep their photo ID`,
-        button: noIdReturnButton,
-        error,
-        setReturnType,
-        returnType,
-        returnRequired,
-        optional
+        button: keepIDButton,
+        highlightTitle: false
     };
 
-    if (returnRequired) {
-        return generateCard(cantReturnId);
+    let card;
+
+    // Top secret machine learning to decide whether to keep or return photo ID or indicate if we already returned it
+    if (!returnRequired) {
+        if (!numReturnRequired) {
+            if (haveID) {
+                card = returnID;
+            } else {
+                card = alreadyReturnedID;
+            }
+        } else {
+            if (haveID) {
+                card = keepID;
+            } else {
+                card = alreadyReturnedID;
+            }
+        }
+    } else {
+        if (numReturnRequired === 1 || numReturnRequired === requests.length) {
+            if (haveID) {
+                card = returnID;
+            } else {
+                card = alreadyReturnedID;
+            }
+        } else {
+            if (haveID) {
+                card = keepID;
+            } else {
+                card = alreadyReturnedID;
+            }
+        }
     }
 
-    if (!returnRequired && haveID) {
-        return generateCard(returnId);
-    }
+    return (<Card style={{maxWidth: 200}}>
+        <Card.Content className={card.highlightTitle ? "highlight" : ""}>
+            <strong>{card.title}</strong>
+        </Card.Content>
+        <Card.Content>
+            {card.content}
+        </Card.Content>
+        {returnRequired && <Card.Content>
+            New status: <Dropdown upward floating
+                                  inline
+                                  value={returnType}
+                                  onChange={(event, {value}: any) => setReturnType(value)}
+                                  options={toDropdownOptions(dropdownOptions)}/>
+        </Card.Content>}
+        {error && <Card.Content className="hw-negative">
+            <Icon name="warning sign"/>Unable to change request status: {error.message}
+        </Card.Content>}
+        {card.button}
+    </Card>);
 
-    return generateCard(idAlreadyReturned); // !returnRequired && !haveID
 }
 
 export default PhotoIdCheck;

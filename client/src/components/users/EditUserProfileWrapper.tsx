@@ -32,7 +32,6 @@ class EditUserProfileWrapper extends Component<EditUserProps, {}> {
         const title = (userId === undefined) ? "My Profile" : "Edit User";
 
         const header = <Header size="huge">{title}</Header>;
-        console.log("user", userId === undefined, this.props.user);
         if (userId === undefined && !this.props.user) {
             return (
                 <div>
