@@ -1,6 +1,6 @@
 import React from "react";
 import {connect} from "react-redux";
-import {Card, List} from "semantic-ui-react";
+import {Card, Header, Label, List} from "semantic-ui-react";
 import {Link} from "react-router-dom";
 import {AppState} from "../../state/Store";
 import {AdminCardLink} from "./AdminOverviewContainer";
@@ -8,6 +8,7 @@ import {AdminCardLink} from "./AdminOverviewContainer";
 export interface OwnProps {
     title: string;
     links: AdminCardLink[];
+    notice?: string;
 }
 
 interface StateProps {
@@ -19,23 +20,23 @@ interface State {
 
 }
 
-class AdminLinksCard extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-    }
-
-    public render() {
-        const content = (
-            <List>
-                {this.props.links.map(value => (
-                    <List.Item key={value.name}>
-                        <Link to={value.to}>{value.name}</Link>
-                    </List.Item>))}
-            </List>);
-        return (
-            <Card header={this.props.title} description={content}/>
-        );
-    }
+function AdminLinksCard(props: Props) {
+    const content = (
+        <List>
+            {props.links.map(value => (
+                <List.Item key={value.name}>
+                    {value.external ? <a href={value.to}>{value.name}</a>
+                        : <Link to={value.to}>{value.name}</Link>}
+                </List.Item>))}
+        </List>);
+    return (
+        <Card>
+            <Card.Content>
+                <Header>{props.title} {props.notice ? <Label color={"blue"}>{props.notice}</Label> : ""}</Header>
+                {content}
+            </Card.Content>
+        </Card>
+    );
 }
 
 function mapStateToProps(state: AppState) {

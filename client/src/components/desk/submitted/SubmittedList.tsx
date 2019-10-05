@@ -2,42 +2,34 @@ import React, {Component} from "react";
 import {connect} from "react-redux";
 import CardList from "../CardList";
 import SubmittedCard from "./SubmittedCard";
-import {Query} from "react-apollo";
-import {SUBMITTED_REQUESTS} from "../../util/graphql/Queries";
+import {Request} from "../../../types/Request";
+import {Container, Header, Segment} from "semantic-ui-react";
 
-function mapStateToProps(state: any) {
-    return {};
+interface SubmittedListProps {
+    loading: boolean;
+    requests: Request[];
+    subscribeToUpdatedRequests: any
 }
 
-function mapDispatchToProps(dispatch: any) {
-    return {};
-}
+class SubmittedList extends Component<SubmittedListProps> {
+    componentDidMount(): void {
+        this.props.subscribeToUpdatedRequests();
+    }
 
-class SubmittedList extends Component {
-    public render() {
+    render() {
+        const empty = <Segment placeholder>
+            <Container textAlign="center">
+                <Header>
+                    Nothing to approve. Take a break!
+                </Header>
+            </Container>
+        </Segment>;
 
-        return (
-            <Query query={SUBMITTED_REQUESTS}>
-                {
-                    ({loading, error, data}: any) => {
-                        if (loading) {
-                            return <CardList loading={true} title="Submitted" length={0}/>;
-                        }
-
-                        if (error) {
-                            return <p>Error!</p>;
-                        }
-
-                        return <CardList loading={loading} title="Submitted" length={data.requests.length}>
-                            {data.requests.map((request: any) => <SubmittedCard request={request}/>)}
-                        </CardList>;
-                    }
-                }
-            </Query>
-        );
+        return <CardList title="Submitted" length={this.props.requests.length}>
+            {this.props.requests.map((request: any) => <SubmittedCard key={request.request_id} request={request}/>)}
+            {!this.props.requests.length ? empty : ""}
+        </CardList>;
     }
 }
 
-export default connect(
-    mapStateToProps
-)(SubmittedList);
+export default SubmittedList;

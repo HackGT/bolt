@@ -20,14 +20,14 @@ type Mutation {
     #    all fields must be included
     updateItem(id: Int!, updatedItem: ItemInput!): Item
 	createRequest(newRequest: RequestInput!):  Request!
-	updateRequest(updatedRequest: RequestUpdateInput!): SimpleRequest
+	updateRequest(updatedRequest: RequestUpdateInput!): Request
     # Delete the request with the specified ID.  Returns true if successful; otherwise, false
     deleteRequest(id: Int!): Boolean!
     updateUser(uuid: String!, updatedUser: UserUpdateInput!): User
 }
 
 type Subscription {
-    request_change: SimpleRequest!
+	request_change: Request!
 }
 
 type User {
@@ -153,7 +153,8 @@ input RequestInput {
 input RequestUpdateInput {
 	request_id: Int!,
 	new_quantity: Int,
-	new_status: RequestStatus
+    new_status: RequestStatus,
+    user_haveID: Boolean
 }
 
 input UserSearch {

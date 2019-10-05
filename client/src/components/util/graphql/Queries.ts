@@ -83,22 +83,25 @@ export const ALL_USERS = gql`
     }
 `;
 
-
-export const SUBMITTED_REQUESTS = gql`
+export const DESK_REQUESTS = gql`
     query {
-        requests(search:{statuses: [SUBMITTED]}) {
+        requests(search:{statuses: [SUBMITTED, APPROVED, READY_FOR_PICKUP]}) {
             request_id
             user {
+                uuid
                 name
+                haveID
             }
             item {
+                id
                 item_name
-                qtyUnreserved
-                qtyInStock
+                qtyAvailableForApproval
+                returnRequired
             }
             status
             quantity
             createdAt
+            updatedAt
         }
     }
 `;
