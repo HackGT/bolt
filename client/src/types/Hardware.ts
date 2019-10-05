@@ -14,10 +14,12 @@ export type HwItem = {
     approvalRequired: boolean;
     owner: string;
     qtyUnreserved: number;
+    qtyInStock: number;
+    qtyAvailableForApproval: number;
 };
 
 export type Category = {
-    category_id: number,
+    category_id: number
     category_name: string
 }
 
