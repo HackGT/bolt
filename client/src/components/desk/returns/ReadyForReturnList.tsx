@@ -15,7 +15,7 @@ function ReadyForReturnList({cards}: { cards: any }) {
 
     let [searchQuery, setSearchQuery] = useState("");
 
-    // FIXME type is wrong { user, requests } it's a card
+    // TODO make this a part of CardList
     const filteredCards = cards.filter((r: Request) => {
         console.log(r);
         return r.user.name.indexOf(searchQuery) >= 0;
