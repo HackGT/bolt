@@ -1,3 +1,5 @@
+import {Request} from "../../types/Request";
+
 export function updateRequestStatus(updateRequest: any, request_id: number, newStatus: any, updatedHaveID: boolean | null = null) {
     const updatedRequest: any = {
         request_id,
@@ -12,4 +14,11 @@ export function updateRequestStatus(updateRequest: any, request_id: number, newS
             updatedRequest
         }
     });
+}
+
+export function requestSearch(r: Request, searchQuery: string): boolean {
+    return r.user.name.toLowerCase().indexOf(searchQuery) >= 0
+        || r.user.slackUsername.toLowerCase().indexOf(searchQuery) >= 0
+        || r.user.email.toLowerCase().indexOf(searchQuery) >= 0
+        || r.user.phone.indexOf(searchQuery) >= 0;
 }

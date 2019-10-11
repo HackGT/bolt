@@ -85,6 +85,9 @@ export const DESK_REQUESTS = gql`
                 uuid
                 name
                 haveID
+                slackUsername
+                phone
+                email
             }
             item {
                 id

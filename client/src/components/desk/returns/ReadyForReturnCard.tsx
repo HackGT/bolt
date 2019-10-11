@@ -89,6 +89,9 @@ function ReadyForPickupCard({card}: ReadyForReturnCardProps) {
             <Card.Content>
                 <Icon name="clock outline"/> <TimeAgo date={card.requests[0].updatedAt}/>
             </Card.Content>
+            <Card.Content>
+                <Icon name={"slack hash"}/>{card.user.slackUsername}
+            </Card.Content>
             {error ? <Card.Content className="hw-negative">
                 <Icon name="warning sign"/>Unable to change request status: {error.message}
             </Card.Content> : ""}
@@ -110,10 +113,11 @@ function ReadyForPickupCard({card}: ReadyForReturnCardProps) {
                                          returnRequired={numReturnRequired(requiredRequests) >= 1}
                                          numReturnRequired={numReturnRequired(requiredRequests)}
                         >
+                            {numReturnRequired(requiredRequests) >= 1 &&
                             <Button icon loading={loading} labelPosition="right" color="green">
                                 <Icon name="checkmark"/>
                                 All required
-                            </Button>
+                            </Button>}
                         </ControlledPopup>
 
                     </Button.Group>

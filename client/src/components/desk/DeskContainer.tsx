@@ -70,7 +70,6 @@ function getUpdateQuery() {
         if (!subscriptionData.data) {
             return prev;
         }
-        prev.requests.forEach((x: any) => console.log(x));
         const updatedRequest = subscriptionData.data;
         const index = prev.requests.findIndex((x: any) => {
             return x.request_id === updatedRequest.request_change.request_id;

@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
-import {Container, Grid, Header, Input, Segment} from "semantic-ui-react";
+import React from 'react';
+import {Container, Grid, Header, Segment} from "semantic-ui-react";
 import CardList from "../CardList";
 import ReadyForReturnCard from "./ReadyForReturnCard";
-import {Request} from "../../../types/Request";
+import {requestSearch} from "../DeskUtil";
 
 function ReadyForReturnList({cards}: { cards: any }) {
     const empty = (<Segment placeholder>
@@ -13,30 +13,20 @@ function ReadyForReturnList({cards}: { cards: any }) {
         </Container>
     </Segment>);
 
-    let [searchQuery, setSearchQuery] = useState("");
 
-    // TODO make this a part of CardList
-    const filteredCards = cards.filter((r: Request) => {
-        console.log(r);
-        return r.user.name.indexOf(searchQuery) >= 0;
-    });
+    const allCards = cards.sort((a: any, b: any) => a.user.name.localeCompare(b.user.name));
 
     return (
         <Grid>
             <Grid.Row columns={3}>
                 <Grid.Column>
-                    <Input type="text"
-                           label="Search users"
-                           name="searchQuery"
-                           onChange={(e, {value}) => {
-                               setSearchQuery(value.trim().toLowerCase());
-                           }}
+                    <CardList title="Ready for Return" length={allCards.length}
+                              cards={cards}
+                              render={(card: any) =>
+                                  <ReadyForReturnCard key={card.user.uuid} card={card}/>}
+                              filter={requestSearch}
+                              empty={empty}
                     />
-                    <CardList title="Ready for Return" length={filteredCards.length}>
-                        {filteredCards.sort((a: any, b: any) => a.user.name.localeCompare(b.user.name)).map((card: any) =>
-                            <ReadyForReturnCard key={card.user.uuid} card={card}/>)}
-                        {!cards.length ? empty : ""}
-                    </CardList>
                 </Grid.Column>
             </Grid.Row>
         </Grid>
