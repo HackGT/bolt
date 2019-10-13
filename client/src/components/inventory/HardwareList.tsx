@@ -13,7 +13,7 @@ import {
 } from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
 import {connect} from "react-redux";
-import {HwItem, ItemByCat, RequestedItem} from "../../types/Hardware";
+import {Category, HwItem, ItemByCat, RequestedItem} from "../../types/Hardware";
 import {Link} from "react-router-dom";
 import {FullUser, User} from "../../types/User";
 import {AppState} from "../../state/Store";
@@ -67,9 +67,8 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
 
     private containsSearchQuery(item: HwItem) {
         const query: string = this.state.searchQuery;
-        let res = item.item_name.toLowerCase().indexOf(query) !== -1
+        return item.item_name.toLowerCase().indexOf(query) !== -1
             || item.category.toLowerCase().indexOf(query) !== -1;
-        return res;
     }
 
 
@@ -82,8 +81,8 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
         }
 
         const addItemLink = (this.props.user && this.props.user.admin ?
-            <Button primary icon labelPosition='left'> <Icon
-                name='plus circle'/> Create Item </Button> : "")
+            <Button primary icon labelPosition='left' as={Link} to="/admin/items/new"> <Icon
+                name='plus circle'/> Create item </Button> : "")
 
         const noRequestsMessage = !this.props.requestsEnabled || !this.props.user ? (
             <Message
@@ -94,7 +93,7 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
             </Message>) : "";
 
         const filterButton = <Query
-            query={ALL_ITEMS}>
+            query={ALL_CATEGORIES}>
             {({loading, error, data}: any) => {
                 if (loading) {
                     return (
@@ -131,7 +130,8 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
                         </Dropdown.Menu>
                     </Dropdown>);
 
-                if (data && data.allItems.length > 0) {
+                if (data && data.categories.length > 0) {
+                    console.log(data);
                     filterButton = (
                         <Dropdown
                             text='Filter'
@@ -145,11 +145,11 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
                                 <Dropdown.Header icon='tags'
                                                  content='Filter by category'/>
                                 <Dropdown.Menu scrolling>
-                                    {data.allItems.map((cat: ItemByCat) => (
+                                    {data.categories.map((cat: Category) => (
                                         <Dropdown.Item
-                                            key={cat.category.category_id}
-                                            text={cat.category.category_name}
-                                            value={cat.category.category_name} {...cat} />
+                                            key={cat.category_id}
+                                            text={cat.category_name}
+                                            value={cat.category_name} {...cat} />
                                     ))}
                                 </Dropdown.Menu>
                             </Dropdown.Menu>
@@ -189,9 +189,9 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
                     <Message>
                         <Message.Header>Oops, there's no items!</Message.Header>
                         <p>Well, this is awkward.</p>
-                        {this.props.user && this.props.user.admin ?
+                        {this.props.user && this.props.user.admin &&
                             <Button as={Link} to="/admin/items/new">Create your
-                                first item</Button> : ""}
+                                first item</Button>}
                     </Message>
                 );
 
@@ -262,12 +262,12 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
                             ))}
                         </Accordion>);
                 }
-                return (normalContent);
+                return normalContent;
             }}
         </Query>;
 
-        const searchBar = this.props.user ? (
-            <Input type="text"
+        const searchBar = this.props.user &&
+            (<Input type="text"
                    label="Search items"
                    name="searchQuery"
                    onChange={(e, {value}) => {
@@ -280,7 +280,7 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
                        }
                    }
                    }
-            />) : "";
+            />);
 
         return (
             <div>
@@ -293,7 +293,7 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
                     </Grid.Column>
                 </Grid>
                 <Grid columns='equal' padded>
-                    <Grid.Column width={10}>
+                    <Grid.Column width={11}>
                         {searchBar}
                     </Grid.Column>
                     <Grid.Column>

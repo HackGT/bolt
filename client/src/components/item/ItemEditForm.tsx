@@ -6,7 +6,10 @@ import {withToastManager} from "react-toast-notifications";
 import {Redirect} from "react-router";
 import {Mutation, Query} from "@apollo/react-components";
 import {CREATE_ITEM, UPDATE_ITEM} from "../util/graphql/Mutations";
-import {ALL_CATEGORIES, ITEM_EDIT_GET_ITEMS} from "../util/graphql/Queries";
+import {
+    ALL_CATEGORIES,
+    ALL_ITEMS
+} from "../util/graphql/Queries";
 import {ItemNoId} from "../../types/Hardware";
 
 interface ItemDetails {
@@ -148,9 +151,9 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                     <Grid.Column width={11}>
                         <Mutation mutation={this.props.createItem ? CREATE_ITEM : UPDATE_ITEM}
                                   update={this.props.createItem ? (cache: any, {data: {createItem}}: any): any => {
-                                      const {items} = cache.readQuery({query: ITEM_EDIT_GET_ITEMS});
+                                      const {items} = cache.readQuery({query: ALL_ITEMS});
                                       cache.writeQuery({
-                                          query: ITEM_EDIT_GET_ITEMS,
+                                          query: ALL_ITEMS,
                                           data: {
                                               items: items.concat([createItem])
                                           }

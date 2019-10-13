@@ -9,6 +9,8 @@ type Query {
 	allItems: [ItemsByCategory!]
     # Get a list containing each category that is on at least one item
     categories: [Category!]
+	# Get an array of every item in the database
+	items: [Item!]
 	# Return request(s) matching the search query provided and that the user has permission to see
     requests(search: RequestSearch!): [Request!]
 }

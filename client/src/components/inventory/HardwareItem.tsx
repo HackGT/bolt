@@ -3,7 +3,6 @@ import {Button, Form, Icon, Input, Item, Label, Popup} from "semantic-ui-react";
 import {withToastManager} from "react-toast-notifications";
 import {Link} from "react-router-dom";
 import {HwListItem, ItemStatus, RequestedItem} from "../../types/Hardware";
-import {log} from "util";
 
 interface HardwareItemState {
     qtyRequested: number;
@@ -151,9 +150,8 @@ class HardwareItemBase extends React.Component<HwListItem, HardwareItemState> {
                     <Item.Header>{editBtn} {this.props.item_name}</Item.Header>
                     {!(this.props.qtyUnreserved > 0) ? <Item.Meta style={{color: "#dc3545"}}>Out of stock</Item.Meta> : ""}
                     <Item.Meta>{maxPerRequest}</Item.Meta>
-                    <Item.Meta><Label>{this.props.category}</Label></Item.Meta>
                     <Item.Description>{this.props.description}</Item.Description>
-                    {(this.props.qtyUnreserved > 0) ? <Item.Extra>{qtyRequest2}</Item.Extra>:""}
+                    <Item.Extra>{qtyRequest2}</Item.Extra>
                 </Item.Content>
             </Item>
         );

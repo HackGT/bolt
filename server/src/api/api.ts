@@ -200,6 +200,25 @@ const resolvers: any = {
         categories: async (root, args, context): Promise<Category[]> => {
             return await DB.from("categories");
         },
+        items: async (root, args, context): Promise<Item[]> => {
+            const items = await DB.from("items")
+                .join("categories", "items.category_id", "=", "categories.category_id");
+
+            const {qtyInStock, qtyUnreserved, qtyAvailableForApproval} = await Quantity.all();
+
+            return items.map(item => {
+                return {
+                    ...item,
+                    id: item.item_id,
+                    category: item.category_name,
+                    price: onlyIfAdmin(item.price, context.user.admin),
+                    owner: onlyIfAdmin(item.owner, context.user.admin),
+                    qtyInStock: qtyInStock[item.item_id],
+                    qtyUnreserved: qtyUnreserved[item.item_id],
+                    qtyAvailableForApproval: qtyAvailableForApproval[item.item_id]
+                };
+            });
+        },
         requests: async (root, args, context): Promise<Request[]> => {
             const searchObj: any = {};
 

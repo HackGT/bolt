@@ -22,7 +22,7 @@ const httpLink = createHttpLink({
     credentials: "include"
 });
 
-const wsProtocol = location.protocol === "http:" ? "ws" : "wss";
+const wsProtocol = window.location.protocol === "http:" ? "ws" : "wss";
 const wsHost = (!process.env.NODE_ENV || process.env.NODE_ENV === "development") ? "localhost:3000" : window.location.host;
 const wsUrl = `${wsProtocol}://${wsHost}/api`;
 const wsClient = new SubscriptionClient(wsUrl, {
