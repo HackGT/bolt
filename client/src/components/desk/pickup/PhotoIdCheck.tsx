@@ -3,9 +3,9 @@ import {Button, Card, Icon} from "semantic-ui-react";
 import {updateRequestStatus} from "../DeskUtil";
 import {FULFILLED} from "../../../types/Hardware";
 
-function generateCard({title, content, button, error}: any) {
+function generateCard({title, content, button, error, highlightTitle}: any) {
     return (<Card style={{maxWidth: 200}}>
-        <Card.Content>
+        <Card.Content className={highlightTitle ? "highlight" : ""}>
             <strong>{title}</strong>
         </Card.Content>
         <Card.Content>
@@ -34,7 +34,8 @@ function PhotoIdCheck({userName, loading, updateRequest, requests, returnRequire
                 )
             }>Yes</Button>
         </Button.Group>),
-        error
+        error,
+        highlightTitle: true
     };
 
     const noIdRequiredButton = <Button color="green" loading={loading} onClick={event =>
@@ -44,17 +45,19 @@ function PhotoIdCheck({userName, loading, updateRequest, requests, returnRequire
     }>Complete pickup</Button>;
 
     const idAlreadyCollected = {
-        title: <><Icon name="check circle"/>All set!</>,
+        title: <span className="hw-positive"><Icon name="check circle"/>All set!</span>,
         content: `You already have ${userName}'s photo ID`,
         button: noIdRequiredButton,
-        error
+        error,
+        highlightTitle: false
     };
 
     const idNotRequired = {
-        title: <><Icon name="check circle"/>All set!</>,
+        title: <span className="hw-positive"><Icon name="check circle"/>All set!</span>,
         content: `${requests.length === 1 ? "This item doesn't" : "None of these items"} require return, so no photo ID is required for pickup`,
         button: noIdRequiredButton,
-        error
+        error,
+        highlightTitle: false
     };
 
     if (!returnRequired) {

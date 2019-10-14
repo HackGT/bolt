@@ -15,7 +15,6 @@ function adminCardLink(name: string, to: string = "#", external: boolean = false
 }
 const hardwareDesk: AdminCardLink[] = [
     adminCardLink("Work hardware desk", "/admin/desk"),
-    adminCardLink("Item check-in", "/admin/checkin")
 ];
 
 const manage: AdminCardLink[] = [
@@ -67,7 +66,7 @@ function AdminOverviewContainer() {
                         <AdminLinksCard title="Hardware Desk" links={hardwareDesk}/>
                         <AdminLinksCard title="Manage..." links={manage}/>
                         <AdminLinksCard title="Reports" links={reports} notice="COMING SOON"/>
-                        <AdminLinksCard title="Utilities" links={utilities} notice="NEW"/>
+                        <AdminLinksCard title="Utilities" links={utilities}/>
                     </div>
                 </Grid.Column>
             </Grid.Row>

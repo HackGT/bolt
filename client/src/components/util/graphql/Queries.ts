@@ -79,12 +79,15 @@ export const ALL_USERS = gql`
 
 export const DESK_REQUESTS = gql`
     query {
-        requests(search:{statuses: [SUBMITTED, APPROVED, READY_FOR_PICKUP]}) {
+        requests(search:{statuses: [SUBMITTED, APPROVED, READY_FOR_PICKUP, FULFILLED, LOST, DAMAGED]}) {
             request_id
             user {
                 uuid
                 name
                 haveID
+                slackUsername
+                phone
+                email
             }
             item {
                 id

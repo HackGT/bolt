@@ -1,10 +1,10 @@
 import React from "react";
-import {Container, Dimmer, Header, Input, Loader, Segment, Divider} from "semantic-ui-react";
-import { withToastManager } from "react-toast-notifications";
+import {Container, Dimmer, Header, Input, Loader, Segment} from "semantic-ui-react";
+import {withToastManager} from "react-toast-notifications";
 import {withRouter} from "react-router-dom";
-import { connect } from "react-redux";
+import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
-import { fetchRequestsAndUsers } from "../../actions/";
+import {fetchRequestsAndUsers} from "../../actions/";
 import AdminRequests from "./AdminRequests";
 
 interface CheckinContainerProps {
