@@ -44,7 +44,7 @@ function ControlledPopup(props: any) {
     />;
 }
 
-function ReadyForPickupCard({card}: ReadyForReturnCardProps) {
+function ReadyForReturnCard({card}: ReadyForReturnCardProps) {
     const [updateRequest, {data, loading, error}] = useMutation(UPDATE_REQUEST);
 
     // @ts-ignore
@@ -127,4 +127,4 @@ function ReadyForPickupCard({card}: ReadyForReturnCardProps) {
     );
 }
 
-export default ReadyForPickupCard;
+export default ReadyForReturnCard;

@@ -17,8 +17,8 @@ export function updateRequestStatus(updateRequest: any, request_id: number, newS
 }
 
 export function requestSearch(r: Request, searchQuery: string): boolean {
-    return r.user.name.toLowerCase().indexOf(searchQuery) >= 0
-        || r.user.slackUsername.toLowerCase().indexOf(searchQuery) >= 0
-        || r.user.email.toLowerCase().indexOf(searchQuery) >= 0
-        || r.user.phone.indexOf(searchQuery) >= 0;
+    return r.user.name.toLowerCase().includes(searchQuery)
+        || r.user.slackUsername.toLowerCase().includes(searchQuery)
+        || r.user.email.toLowerCase().includes(searchQuery)
+        || r.user.phone.includes(searchQuery);
 }
