@@ -86,5 +86,6 @@ export interface HwListItem extends ItemCore {
     toastManager: any; // for making toast notifications
     addItem: (item: RequestedItem) => void;
     qtyUpdate: RequestedItem | null;
+    hidden: boolean;
     user: User | null;
 }

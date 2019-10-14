@@ -1,5 +1,5 @@
 import React, {ChangeEvent} from "react";
-import {Button, Form, Icon, Input, Item, Label, Popup} from "semantic-ui-react";
+import {Button, Form, Icon, Input, Item, Popup} from "semantic-ui-react";
 import {withToastManager} from "react-toast-notifications";
 import {Link} from "react-router-dom";
 import {HwListItem, ItemStatus, RequestedItem} from "../../types/Hardware";
@@ -143,11 +143,20 @@ class HardwareItemBase extends React.Component<HwListItem, HardwareItemState> {
                    </Button>}>
             </Popup>
         ) : "";
+
+        const hidden = this.props.user && this.props.hidden ? (
+            <Popup content="Item is not visible to non-admins" inverted
+                   trigger={<Icon style={{color: "gray"}} name="eye slash outline"/>}>
+            </Popup>
+        ) : "";
+
+        console.log("imageURL", this.props.imageUrl);
+
         return (
             <Item>
                 <Item.Image draggable={false} className="hw-image" size="tiny" src={this.props.imageUrl || "http://placekitten.com/300/300"}/>
                 <Item.Content>
-                    <Item.Header>{editBtn} {this.props.item_name}</Item.Header>
+                    <Item.Header>{editBtn} {hidden} {this.props.item_name}</Item.Header>
                     {!(this.props.qtyUnreserved > 0) ? <Item.Meta style={{color: "#dc3545"}}>Out of stock</Item.Meta> : ""}
                     <Item.Meta>{maxPerRequest}</Item.Meta>
                     <Item.Description>{this.props.description}</Item.Description>

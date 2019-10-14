@@ -70,6 +70,7 @@ export const ALL_ITEMS = gql`
                 approvalRequired
                 returnRequired
                 owner
+                hidden
             }
         }
     }
