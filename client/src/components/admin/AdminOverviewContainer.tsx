@@ -66,7 +66,7 @@ function AdminOverviewContainer() {
                         <AdminLinksCard title="Hardware Desk" links={hardwareDesk}/>
                         <AdminLinksCard title="Manage..." links={manage}/>
                         <AdminLinksCard title="Reports" links={reports} notice="COMING SOON"/>
-                        <AdminLinksCard title="Utilities" links={utilities} notice="NEW"/>
+                        <AdminLinksCard title="Utilities" links={utilities}/>
                     </div>
                 </Grid.Column>
             </Grid.Row>

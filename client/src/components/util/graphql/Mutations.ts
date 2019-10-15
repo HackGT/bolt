@@ -55,6 +55,9 @@ export const UPDATE_REQUEST = gql`
                 uuid
                 name
                 haveID
+                slackUsername
+                phone
+                email
             }
             item {
                 id

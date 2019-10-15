@@ -1,14 +1,15 @@
 import React, {Component} from "react";
-import {connect} from "react-redux";
 import CardList from "../CardList";
 import SubmittedCard from "./SubmittedCard";
 import {Request} from "../../../types/Request";
 import {Container, Header, Segment} from "semantic-ui-react";
+import {requestSearch} from "../DeskUtil";
 
 interface SubmittedListProps {
     loading: boolean;
     requests: Request[];
-    subscribeToUpdatedRequests: any
+    subscribeToUpdatedRequests: any;
+    hidden?: boolean;
 }
 
 class SubmittedList extends Component<SubmittedListProps> {
@@ -17,6 +18,10 @@ class SubmittedList extends Component<SubmittedListProps> {
     }
 
     render() {
+        if (this.props.hidden) { // This is used to hide the submitted list but still call subscribeToUpdatedRequests
+            return "";
+        }
+
         const empty = <Segment placeholder>
             <Container textAlign="center">
                 <Header>
@@ -25,10 +30,13 @@ class SubmittedList extends Component<SubmittedListProps> {
             </Container>
         </Segment>;
 
-        return <CardList title="Submitted" length={this.props.requests.length}>
-            {this.props.requests.map((request: any) => <SubmittedCard key={request.request_id} request={request}/>)}
-            {!this.props.requests.length ? empty : ""}
-        </CardList>;
+        return <CardList title="Submitted"
+                         length={this.props.requests.length}
+                         filter={requestSearch}
+                         cards={this.props.requests}
+                         render={(request: any) => <SubmittedCard key={request.request_id} request={request}/>}
+                         empty={empty}/>;
+
     }
 }
 

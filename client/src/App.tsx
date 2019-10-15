@@ -17,7 +17,9 @@ import {User} from "./types/User";
 import {loginUser} from "./state/Account";
 import {AppState} from "./state/Store";
 
-export interface OwnProps {}
+export interface OwnProps {
+
+}
 
 interface StateProps {
     user: User|null;

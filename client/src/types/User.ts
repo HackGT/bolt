@@ -5,6 +5,7 @@ export interface BaseUser {
 
 export interface BaseUserWithID extends BaseUser {
     haveID: boolean;
+    slackUsername: string
 }
 
 export interface User extends BaseUser {
