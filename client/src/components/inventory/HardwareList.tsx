@@ -119,11 +119,6 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
                     data.allItems.sort((a: ItemByCat, b: ItemByCat) => {
                         return a.category.category_name.toLocaleLowerCase().localeCompare(b.category.category_name.toLocaleLowerCase());
                     });
-                    data.allItems.map((cat: ItemByCat) =>
-                        cat.items.sort((a: HwItem, b: HwItem) => {
-                            return b.qtyInStock - a.qtyInStock;
-                        })
-                    );
 
                     // Get a list of all items (across categories) to search through
                     const searchableItems = data.allItems.reduce((accumulator: any[], value: any) => accumulator.concat(value.items), []);
@@ -142,7 +137,15 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
                     normalContent = (
                         <Accordion>
                             {data.allItems.map((cat: ItemByCat, index: number) => {
-                                    const filtered = cat.items.filter(searchInput => this.containsSearchQuery(searchInput));
+                                const filtered = cat.items.filter(searchInput => this.containsSearchQuery(searchInput));
+
+                                console.log(filtered);
+                                // @ts-ignore
+                                filtered.sort((a: any, b: any) => (b.qtyUnreserved > 0) - (a.qtyUnreserved > 0)
+                                    || b.item_name - a.item_name
+                                );
+                                console.log(filtered);
+
                                     if (!filtered.length) {
                                         return "";
                                     }
