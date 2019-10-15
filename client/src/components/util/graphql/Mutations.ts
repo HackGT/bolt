@@ -42,6 +42,7 @@ export const UPDATE_ITEM = gql`
             approvalRequired
             returnRequired
             owner
+            hidden
         }
     }
 `;

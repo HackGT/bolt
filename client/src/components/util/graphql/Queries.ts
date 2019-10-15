@@ -17,24 +17,6 @@ export const ITEM_EDIT_GET_ITEM = gql`
         }
     }`;
 
-export const ITEM_EDIT_GET_ITEMS = gql`
-    query {
-        items {
-            id
-            item_name
-            description
-            imageUrl
-            category
-            totalAvailable
-            maxRequestQty
-            hidden
-            approvalRequired
-            returnRequired
-            owner
-        }
-    }
-`;
-
 export const ALL_CATEGORIES = gql`
     query categories {
         categories {
@@ -46,19 +28,26 @@ export const ALL_CATEGORIES = gql`
 
 export const ALL_ITEMS = gql`
     query {
-        items {
-            id
-            item_name
-            description
-            imageUrl
-            category
-            totalAvailable
-            maxRequestQty
-            hidden
-            approvalRequired
-            returnRequired
-            owner
-            qtyUnreserved
+        allItems {
+            category {
+                category_id
+                category_name
+            }
+            items {
+                id
+                qtyUnreserved
+                item_name
+                description
+                imageUrl
+                category
+                totalAvailable
+                maxRequestQty
+                hidden
+                approvalRequired
+                returnRequired
+                owner
+                hidden
+            }
         }
     }
 `;
