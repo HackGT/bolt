@@ -17,30 +17,6 @@ export const ITEM_EDIT_GET_ITEM = gql`
         }
     }`;
 
-export const ITEM_EDIT_GET_ITEMS = gql`
-    query {
-        allItems {
-            category {
-                category_id
-                category_name
-            }
-            items {
-                id
-                item_name
-                description
-                imageUrl
-                category
-                totalAvailable
-                maxRequestQty
-                hidden
-                approvalRequired
-                returnRequired
-                owner
-            }
-        }
-    }
-`;
-
 export const ALL_CATEGORIES = gql`
     query categories {
         categories {
