@@ -1,17 +1,39 @@
 import React, {ChangeEvent} from "react";
-import {Button, Form, Icon, Input, Item, Popup} from "semantic-ui-react";
+import {Button, Icon, Input, Item, Popup} from "semantic-ui-react";
 import {withToastManager} from "react-toast-notifications";
 import {Link} from "react-router-dom";
-import {HwListItem, ItemStatus, RequestedItem} from "../../types/Hardware";
+import {HwItem, ItemStatus, RequestedItem} from "../../types/Hardware";
+import {AppState} from "../../state/Store";
+import {connect} from "react-redux";
+import {User} from "../../types/User";
 
 interface HardwareItemState {
     qtyRequested: number;
     loading: boolean;
 }
 
+interface HardwareItemProps {
+    item: HwItem;
+    toastManager: any;
+    requestsEnabled: boolean;
+    user: User | null;
+    preview?: boolean;
+}
 
-class HardwareItemBase extends React.Component<HwListItem, HardwareItemState> {
-    constructor(props: HwListItem) {
+function itemImage(src: string, outOfStock: boolean = false) {
+
+    return <Item.Image draggable={false} size="tiny"
+                       src={src || "http://placekitten.com/300/300"}
+                       label={outOfStock && {
+                           color: "red",
+                           content: "Out of stock",
+                           ribbon: true
+                       }}
+    />;
+}
+
+class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState> {
+    constructor(props: HardwareItemProps) {
         super(props);
         this.state = {
             qtyRequested: 1,
@@ -21,7 +43,7 @@ class HardwareItemBase extends React.Component<HwListItem, HardwareItemState> {
 
     public finishedLoading = () => {
         const {toastManager} = this.props;
-        toastManager.add(`Successfully requested ${this.state.qtyRequested}x ${this.props.item_name}`,
+        toastManager.add(`Successfully requested ${this.state.qtyRequested}x ${this.props.item.item_name}`,
             {
                 appearance: "success",
                 autoDismiss: true,
@@ -32,15 +54,14 @@ class HardwareItemBase extends React.Component<HwListItem, HardwareItemState> {
             loading: false,
         });
         const newRequest: RequestedItem = {
-            id: this.props.id,
+            id: this.props.item.id,
             user: "Beardell",
-            name: this.props.item_name,
+            name: this.props.item.item_name,
             qtyRequested: this.state.qtyRequested,
-            category: this.props.category,
+            category: this.props.item.category,
             status: ItemStatus.SUBMITTED,
             cancelled: false
         };
-        this.props.addItem(newRequest);
     }
 
     public incrementQty = () => {
@@ -74,7 +95,7 @@ class HardwareItemBase extends React.Component<HwListItem, HardwareItemState> {
         }
 
         // Clip qtyRequested to between 0 and maxRequestQty (inclusive)
-        qtyRequested = Math.min(Math.max(qtyRequested, 0), this.props.maxRequestQty);
+        qtyRequested = Math.min(Math.max(qtyRequested, 0), this.props.item.maxRequestQty);
 
         this.setState({
             qtyRequested
@@ -82,27 +103,6 @@ class HardwareItemBase extends React.Component<HwListItem, HardwareItemState> {
     }
 
     public render() {
-        const qtyRequest = this.props.requestsEnabled ? (<Form.Group>
-            <Input type="number"
-                   placeholder="Quantity"
-                   floated="right"
-                   style={{
-                       width: 75
-                   }}
-                   action={{
-                       color: "blue",
-                       labelPosition: "right",
-                       icon: "arrow alternate circle right outline",
-                       content: this.props.inStock ? "Request" : "Add to waitlist",
-                       disabled: this.state.qtyRequested <= 0,
-                       loading: this.state.loading,
-                       onClick: this.handleItemRequest
-                   }}
-                   disabled={this.state.loading}
-                   value={this.state.qtyRequested}>
-            </Input>
-        </Form.Group>) : "";
-
         const requestBtn = (
             <Button primary
                     icon
@@ -119,8 +119,8 @@ class HardwareItemBase extends React.Component<HwListItem, HardwareItemState> {
 
         const plusBtn = (<Button icon="plus"
                                  onClick={this.incrementQty}
-                                 disabled={this.state.loading || this.state.qtyRequested === this.props.maxRequestQty}/>);
-        const qtyRequest2 = this.props.requestsEnabled ? (
+                                 disabled={this.state.loading || this.state.qtyRequested === this.props.item.maxRequestQty}/>);
+        const qtyRequest = this.props.requestsEnabled ? (
             <Input action>
                 <input style={{width: 50, textAlign: "center"}}
                        value={this.state.qtyRequested}
@@ -134,39 +134,47 @@ class HardwareItemBase extends React.Component<HwListItem, HardwareItemState> {
             </Input>) : "";
 
 
-        const maxPerRequest = `Request up to ${this.props.maxRequestQty} at a time`;
+        const maxPerRequest = `Request up to ${this.props.item.maxRequestQty} at a time`;
 
         const editBtn = this.props.user && this.props.user.admin ? (
             <Popup content="Edit this item" inverted
-                   trigger={<Button size="mini" basic primary icon as={Link} to={`admin/items/${this.props.id}`}>
+                   trigger={<Button size="mini"
+                                    basic primary
+                                    disabled={this.props.preview}
+                                    icon as={Link} to={`admin/items/${this.props.item.id}`}>
                        <Icon name="pencil"/>
                    </Button>}>
             </Popup>
         ) : "";
 
-        const hidden = this.props.user && this.props.hidden ? (
+        const hidden = this.props.user && this.props.item.hidden ? (
             <Popup content="Item is not visible to non-admins" inverted
                    trigger={<Icon style={{color: "gray"}} name="eye slash outline"/>}>
             </Popup>
         ) : "";
 
-        console.log("imageURL", this.props.imageUrl);
-
         return (
             <Item>
-                <Item.Image draggable={false} className="hw-image" size="tiny" src={this.props.imageUrl || "http://placekitten.com/300/300"}/>
+                {itemImage(this.props.item.imageUrl, this.props.item.qtyUnreserved <= 0)}
                 <Item.Content>
-                    <Item.Header>{editBtn} {hidden} {this.props.item_name}</Item.Header>
-                    {!(this.props.qtyUnreserved > 0) ? <Item.Meta style={{color: "#dc3545"}}>Out of stock</Item.Meta> : ""}
+                    <Item.Header>{editBtn} {hidden} {this.props.item.item_name || (this.props.preview && "Item Name")}</Item.Header>
                     <Item.Meta>{maxPerRequest}</Item.Meta>
-                    <Item.Description>{this.props.description}</Item.Description>
-                    <Item.Extra>{qtyRequest2}</Item.Extra>
+                    <Item.Description>{this.props.item.description || (this.props.preview && "Description")}</Item.Description>
+                    <Item.Extra>{qtyRequest}</Item.Extra>
                 </Item.Content>
             </Item>
         );
     }
 }
 
-const HardwareItem = withToastManager(HardwareItemBase);
+function mapStateToProps(state: AppState) {
+    return {
+        user: state.account
+    };
+}
 
-export default HardwareItem;
+
+export default withToastManager(connect(mapStateToProps)(HardwareItem));
+
+
+

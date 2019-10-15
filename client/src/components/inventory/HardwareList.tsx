@@ -1,6 +1,6 @@
 import React from "react";
 import HardwareItem from "./HardwareItem";
-import {Accordion, Button, Grid, Header, Icon, Input, Item, Message} from "semantic-ui-react";
+import {Accordion, Button, Grid, Header, Icon, Input, Item, Message, Segment} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
 import {connect} from "react-redux";
 import {HwItem, ItemByCat, RequestedItem} from "../../types/Hardware";
@@ -58,7 +58,7 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
     private containsSearchQuery(item: HwItem) {
         const query: string = this.state.searchQuery;
         return item.item_name.toLowerCase().includes(query)
-            || item.category.toLowerCase().includes(query);
+            || item.description.toLowerCase().includes(query);
     }
 
 
@@ -125,20 +125,18 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
                         })
                     );
 
-                    var items = [];
+                    // Get a list of all items (across categories) to search through
+                    const searchableItems = data.allItems.reduce((accumulator: any[], value: any) => accumulator.concat(value.items), []);
 
-                    for (var i = 0; i < data.allItems.length; i++) {
-                        items.push(data.allItems[i].items);
-                    }
-
-                    items = [].concat.apply([], items);
-                    if (items.filter((searchInput => this.containsSearchQuery(searchInput))).length === 0) {
-                        normalContent = (
-                            <Message>
-                                <Message.Header>No items found</Message.Header>
-                            </Message>
-                        );
-                        return normalContent;
+                    if (searchableItems.filter(((searchInput: HwItem) => this.containsSearchQuery(searchInput))).length === 0) {
+                        return <Segment placeholder textAlign="center">
+                            <Header icon>
+                                <Icon name="frown outline"/>
+                                No matching items were found
+                            </Header>
+                            If you're trying to find something specific, you can ask a staff member at the HackGT
+                            hardware desk staff for help!
+                        </Segment>;
                     }
 
                     normalContent = (
@@ -163,19 +161,9 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
                                             active={this.state.activeIndices.includes(index) || this.state.searchQuery.length >= 3}>
                                             <Item.Group>
                                                 {filtered.map((it: HwItem) => <HardwareItem
-                                                    item_name={it.item_name}
-                                                    description={it.description}
-                                                    imageUrl={it.imageUrl}
+                                                    item={it}
                                                     requestsEnabled={this.props.requestsEnabled && this.props.user}
-                                                    totalAvailable={it.totalAvailable}
-                                                    maxRequestQty={it.maxRequestQty}
-                                                    qtyUnreserved={it.qtyUnreserved}
-                                                    category={it.category}
                                                     key={it.id}
-                                                    hidden={it.hidden}
-                                                    id={it.id}
-                                                    addItem={this.props.handleAddItem} // prop that invokes the handleAddItem method of parent container to update its state
-                                                    qtyUpdate={this.props.qtyUpdate} // this prop is the object whose request has been cancelled
                                                     user={this.props.user}
                                                 />)}
                                             </Item.Group>
