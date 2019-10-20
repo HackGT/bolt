@@ -79,6 +79,11 @@ export function redactedItem(item, isAdmin: boolean, qtyInStock: ItemQtyAvailabl
         description: item.description,
         imageUrl: item.imageUrl,
         category: item.category_name,
+        location: {
+            location_id: item.location_id,
+            location_name: item.location_name,
+            location_hidden: item.location_hidden
+        },
         totalAvailable: item.totalAvailable,
         maxRequestQty: item.maxRequestQty,
         price: onlyIfAdmin(item.price, isAdmin),

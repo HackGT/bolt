@@ -24,3 +24,11 @@ export class Item {
         return resultObj;
     }
 }
+
+export function getItemLocation(item) {
+    return {
+        location_id: item.location_id,
+        location_name: item.location_name,
+        location_hidden: item.location_hidden
+    };
+}

@@ -1,11 +1,11 @@
 import React, {Component} from "react";
 import {Grid} from "semantic-ui-react";
-import HardwareList from "./inventory/HardwareList";
 import RequestsList from "./requests/RequestsList";
 import {connect} from "react-redux";
 import {User} from "../types/User";
 import {AppState} from "../state/Store";
 import {RequestedItem} from "../types/Hardware";
+import NewHardwareList from "./inventory/NewHardwareList";
 
 export interface OwnProps {}
 
@@ -57,8 +57,9 @@ class HomeContainer extends Component<Props, State> {
             <Grid stackable columns={2} style={{maxWidth: "960px"}}>
                 <Grid.Row>
                     <Grid.Column>
-                        <HardwareList requestsEnabled={true} handleAddItem={this.handleAddItem} qtyUpdate={this.state.item}>
-                        </HardwareList>
+                        {/*<HardwareList requestsEnabled={true} handleAddItem={this.handleAddItem} qtyUpdate={this.state.item}>*/}
+                        {/*</HardwareList>*/}
+                        <NewHardwareList/>
                     </Grid.Column>
                     {myRequests}
                 </Grid.Row>

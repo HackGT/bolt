@@ -29,24 +29,31 @@ export const ALL_CATEGORIES = gql`
 export const ALL_ITEMS = gql`
     query {
         allItems {
-            category {
-                category_id
-                category_name
+            location {
+                location_id
+                location_name
+                location_hidden
             }
-            items {
-                id
-                qtyUnreserved
-                item_name
-                description
-                imageUrl
-                category
-                totalAvailable
-                maxRequestQty
-                hidden
-                approvalRequired
-                returnRequired
-                owner
-                hidden
+            categories {
+                category {
+                    category_id
+                    category_name
+                }
+                items {
+                    id
+                    qtyUnreserved
+                    item_name
+                    description
+                    imageUrl
+                    category
+                    totalAvailable
+                    maxRequestQty
+                    hidden
+                    approvalRequired
+                    returnRequired
+                    owner
+                    hidden
+                }
             }
         }
     }

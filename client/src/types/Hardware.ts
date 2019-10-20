@@ -23,6 +23,17 @@ export type Category = {
     category_name: string
 }
 
+export type Location = {
+    location_id: number
+    location_name: string
+    location_hidden: boolean
+}
+
+export type ItemByLocation = {
+    location: Location
+    categories: ItemByCat[]
+}
+
 export type ItemByCat = {
     category: Category,
     items: HwItem[];

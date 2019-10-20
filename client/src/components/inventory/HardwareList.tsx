@@ -3,7 +3,7 @@ import HardwareItem from "./HardwareItem";
 import {Accordion, Button, Grid, Header, Icon, Input, Item, Message, Segment} from "semantic-ui-react";
 import PlaceholderItem from "./PlaceholderItem";
 import {connect} from "react-redux";
-import {HwItem, ItemByCat, RequestedItem} from "../../types/Hardware";
+import {HwItem, ItemByCat, ItemByLocation, RequestedItem} from "../../types/Hardware";
 import {Link} from "react-router-dom";
 import {User} from "../../types/User";
 import {AppState} from "../../state/Store";
@@ -116,8 +116,9 @@ export class HardwareList extends React.Component<Props, ItemsListState> {
                 );
 
                 if (data && data.allItems.length > 0) {
-                    data.allItems.sort((a: ItemByCat, b: ItemByCat) => {
-                        return a.category.category_name.toLocaleLowerCase().localeCompare(b.category.category_name.toLocaleLowerCase());
+                    console.log(data);
+                    data.allItems.sort((a: ItemByLocation, b: ItemByLocation) => {
+                        return a.location.location_name.toLocaleLowerCase().localeCompare(b.location.location_name.toLocaleLowerCase());
                     });
 
                     // Get a list of all items (across categories) to search through
