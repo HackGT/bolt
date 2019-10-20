@@ -13,6 +13,9 @@ import {Category, Item, Request, RequestStatus, User, UserUpdateInput} from "./g
 import {PubSub} from "graphql-subscriptions";
 import {Quantity} from "./requests/quantity";
 
+const fetch = require('isomorphic-fetch')
+const bodyParser = require('body-parser')
+
 export const apiRoutes = express.Router();
 export const pubsub = new PubSub();
 
@@ -611,3 +614,15 @@ apiRoutes.all("/graphiql", isAdminNoAuthCheck, graphqlHTTP({
     schema,
     graphiql: true
 }));
+
+apiRoutes.post("/slack/feedback", bodyParser.json(), (req, res) => {
+  fetch("https://hooks.slack.com/services/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", {
+    method: "POST",
+    body: JSON.stringify(req.body)
+  }).then(response => {
+    return res.status(response.status).send({
+      status: response.status,
+      statusText: response.statusText
+    });
+  });
+});

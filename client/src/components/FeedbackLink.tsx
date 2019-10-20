@@ -1,6 +1,5 @@
 import React from 'react';
 import packageJson from "../../package.json";
-// @ts-ignore
 import SlackFeedback, { themes } from 'react-slack-feedback';
 
 const FeedbackLink = () => {
@@ -18,7 +17,8 @@ const FeedbackLink = () => {
 
     return <SlackFeedback
     channel="#bot-spam"
-    theme={themes.dark}
+    showChannel={false}
+    showIcon={false}
     user="Slack Feedback"
     feedbackTypes={[{value: "bug", label: "Bug"}, {value: "feature_request", label: "Feature Request"}, {value: "question", label: "Question"}]}
     // @ts-ignore
