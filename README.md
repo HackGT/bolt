@@ -29,7 +29,6 @@ Required environment variables
 -----
 
 ### Backend
-
 | Variable | Description |
 |----|----|
 | secrets.adminKey | Random string of letters and numbers
@@ -44,7 +43,6 @@ Required environment variables
 | secrets.server.defaultTimezone | Default server timezone
 
 ### Frontend
-
 In /client, .env contains defaults for required variables.  Create .env.local to override these environment
 variables, or define them as temporary environment variables in your shell.
 

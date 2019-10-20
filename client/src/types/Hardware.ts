@@ -14,8 +14,18 @@ export type HwItem = {
     approvalRequired: boolean;
     owner: string;
     qtyUnreserved: number;
-    qtyInstock: number;
+    qtyInStock: number;
     qtyAvailableForApproval: number;
+};
+
+export type Category = {
+    category_id: number
+    category_name: string
+}
+
+export type ItemByCat = {
+    category: Category,
+    items: HwItem[];
 };
 
 export interface ItemCore {
@@ -70,11 +80,12 @@ export const DAMAGED = "DAMAGED";
 
 export interface HwListItem extends ItemCore {
     id: number;
-    qtyRemaining: number; // # of this item remaining in our stock
+    qtyUnreserved: number; // # of this item remaining in our stock
     inStock: boolean;
     requestsEnabled: boolean; // whether hardware requests can be made at this time
     toastManager: any; // for making toast notifications
     addItem: (item: RequestedItem) => void;
     qtyUpdate: RequestedItem | null;
+    hidden: boolean;
     user: User | null;
 }

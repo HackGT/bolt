@@ -5,7 +5,6 @@ import {ToastProvider} from "react-toast-notifications";
 import HomeContainer from "./components/HomeContainer";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import CSVWizard from "./components/csv/CSVWizard";
-import CheckinContainer from "./components/checkin/CheckinContainer";
 import ItemWrapper from "./components/item/ItemWrapper";
 import {connect} from "react-redux";
 import PrivateRoute from "./components/util/PrivateRoute";
@@ -18,7 +17,9 @@ import {User} from "./types/User";
 import {loginUser} from "./state/Account";
 import {AppState} from "./state/Store";
 
-export interface OwnProps {}
+export interface OwnProps {
+
+}
 
 interface StateProps {
     user: User|null;
@@ -88,7 +89,6 @@ class App extends Component<Props, {}> {
                             <PrivateRoute exact path="/admin/desk" component={DeskContainer}/>
                             <PrivateRoute path="/admin/items" component={ItemWrapper}/>
                             <PrivateRoute exact path="/admin/csv" component={CSVWizard}/>
-                            <PrivateRoute exact path="/admin/checkin" component={CheckinContainer}/>
                             <PrivateRoute exact path="/admin/users" component={AdminUsersListWrapper}/>
                             <Route component={HomeContainer}/>
                         </Switch>

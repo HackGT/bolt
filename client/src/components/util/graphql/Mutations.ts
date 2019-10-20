@@ -42,6 +42,7 @@ export const UPDATE_ITEM = gql`
             approvalRequired
             returnRequired
             owner
+            hidden
         }
     }
 `;
@@ -54,6 +55,9 @@ export const UPDATE_REQUEST = gql`
                 uuid
                 name
                 haveID
+                slackUsername
+                phone
+                email
             }
             item {
                 id

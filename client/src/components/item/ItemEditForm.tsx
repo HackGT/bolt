@@ -6,7 +6,7 @@ import {withToastManager} from "react-toast-notifications";
 import {Redirect} from "react-router";
 import {Mutation, Query} from "@apollo/react-components";
 import {CREATE_ITEM, UPDATE_ITEM} from "../util/graphql/Mutations";
-import {ALL_CATEGORIES, ITEM_EDIT_GET_ITEMS} from "../util/graphql/Queries";
+import {ALL_CATEGORIES, ALL_ITEMS} from "../util/graphql/Queries";
 import {ItemNoId} from "../../types/Hardware";
 
 interface ItemDetails {
@@ -147,18 +147,12 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                 <Grid.Row>
                     <Grid.Column width={11}>
                         <Mutation mutation={this.props.createItem ? CREATE_ITEM : UPDATE_ITEM}
-                                  update={this.props.createItem ? (cache: any, {data: {createItem}}: any): any => {
-                                      const {items} = cache.readQuery({query: ITEM_EDIT_GET_ITEMS});
-                                      cache.writeQuery({
-                                          query: ITEM_EDIT_GET_ITEMS,
-                                          data: {
-                                              items: items.concat([createItem])
-                                          }
-                                      });
-                                  } : undefined}
-                                  refetchQueries={[{
-                                      query: ALL_CATEGORIES
-                                  }]}>
+                                  refetchQueries={
+                                      [
+                                          {query: ALL_ITEMS},
+                                          {query: ALL_CATEGORIES}
+                                      ]
+                                  }>
                             {(submitForm: any, {loading, error, data}: any) => (
                                 <Form loading={this.state.loading || loading || this.props.loading}
                                       onChange={this.handleInputChange}
@@ -179,8 +173,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                           }
                                           let variables: any = {newItem: this.state.item};
                                           if (!this.props.createItem) {
-                                              const itemCopy = this.state.item;
-                                              delete itemCopy.__typename;
                                               variables = {
                                                   itemId: this.props.preloadItemId,
                                                   updatedItem: this.state.item
@@ -350,18 +342,11 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                     <Grid.Column width={5}>
                         <Header>Preview</Header>
                         <Item.Group>
-                            <HardwareItem item_name={this.state.item.item_name || "Item Name"}
-                                          description={this.state.item.description}
+                            <HardwareItem item={this.state.item}
                                           requestsEnabled={false}
-                                          qtyRemaining={this.state.item.totalAvailable}
-                                          totalAvailable={this.state.item.totalAvailable}
-                                          maxRequestQty={this.state.item.maxRequestQty || 1}
-                                          category={this.state.item.category || "Category"}
                                           key={this.state.itemPreviewKey}
-                                          id={1}
-                                          addItem={null}
-                                          qtyUpdate={null}
                                           user={null}
+                                          preview={true}
                             />
                         </Item.Group>
                     </Grid.Column>

@@ -28,7 +28,6 @@ class EditItemWrapper extends Component<EditItemProps, EditItemState> {
 
     public render() {
         const itemId: number = parseInt(this.props.match.params.itemId, 10);
-        console.log(itemId);
         return (
             <div>
                 <Header as="h1">Edit item</Header>

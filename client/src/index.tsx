@@ -22,7 +22,7 @@ const httpLink = createHttpLink({
     credentials: "include"
 });
 
-const wsProtocol = location.protocol === "http:" ? "ws" : "wss";
+const wsProtocol = window.location.protocol === "http:" ? "ws" : "wss";
 const wsHost = (!process.env.NODE_ENV || process.env.NODE_ENV === "development") ? "localhost:3000" : window.location.host;
 const wsUrl = `${wsProtocol}://${wsHost}/api`;
 const wsClient = new SubscriptionClient(wsUrl, {
@@ -47,8 +47,10 @@ export const client = new ApolloClient({
     cache: new InMemoryCache({
         dataIdFromObject: (object: any) => {
             switch (object.__typename) {
+                case 'Category':
+                    return object.category_id; // use `category_id` as the primary key
                 case 'User':
-                    return object.uuid; // use 'uuid' as the primary key
+                    return object.uuid; // use `uuid` as the primary key
                 case 'Request':
                     return object.request_id; // use `request_id` as the primary key
                 default:

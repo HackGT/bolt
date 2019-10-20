@@ -30,18 +30,21 @@ function SubmittedCard({request}: SubmittedCardProps) {
         <Card className="hw-card">
             <Card.Content>
                 <Label attached="top left">
-                    #{request.request_id}
-                </Label>
-                <Label attached="top right">
                     <Icon name={"user"}/>{request.user.name}
                 </Label>
+                <Label attached="top right">
+                    <Icon name={"slack hash"}/>{request.user.slackUsername}
+                </Label>
+
                 <Header style={{display: "inline-block"}} size="medium">
                     <ItemAndQuantity itemName={request.item.item_name} quantity={request.quantity}/>
+                    &nbsp;<span style={{color: "gray", fontSize: 14, fontWeight: "normal"}}>#{request.request_id}</span>
                 </Header>
             </Card.Content>
             {request.item.qtyAvailableForApproval >= request.quantity ? noIssues : noStockWarning(request.item.qtyAvailableForApproval)}
             <Card.Content>
-                <Icon name="clock outline"/> <TimeAgo date={request.createdAt}/>
+                <Icon name="clock outline"/> <TimeAgo date={request.createdAt}/> <span
+                style={{color: "gray"}}>#{request.request_id}</span>
             </Card.Content>
             {error ? <Card.Content className="hw-negative">
                 <Icon name="warning sign"/>Unable to change request status: {error.message}

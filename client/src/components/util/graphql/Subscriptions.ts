@@ -8,6 +8,9 @@ export const REQUEST_CHANGE = gql`
                 uuid
                 name
                 haveID
+                slackUsername
+                phone
+                email
             }
             item {
                 id
