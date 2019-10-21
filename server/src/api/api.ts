@@ -10,11 +10,12 @@ import {isAdminNoAuthCheck} from "../auth/auth";
 import {localTimestamp, nestedRequest, onlyIfAdmin, toSimpleRequest} from "./requests";
 import {makeExecutableSchema} from "graphql-tools";
 import {Category, Item, Request, RequestStatus, User, UserUpdateInput} from "./graphql.types";
+import {config} from "../common";
 import {PubSub} from "graphql-subscriptions";
 import {Quantity} from "./requests/quantity";
 
-const fetch = require('isomorphic-fetch')
-const bodyParser = require('body-parser')
+const fetch = require("isomorphic-fetch");
+const bodyParser = require("body-parser");
 
 export const apiRoutes = express.Router();
 export const pubsub = new PubSub();
@@ -616,13 +617,53 @@ apiRoutes.all("/graphiql", isAdminNoAuthCheck, graphqlHTTP({
 }));
 
 apiRoutes.post("/slack/feedback", bodyParser.json(), (req, res) => {
-  fetch("https://hooks.slack.com/services/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", {
+  fetch(config.server.slackURL, {
     method: "POST",
-    body: JSON.stringify(req.body)
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      attachments: [
+        {
+          fallback: req.body.fallback,
+          color: req.body.color,
+          fields: [
+            {
+              title: "Feedback Type",
+              value: req.body.title,
+            },
+            {
+              title: "Comment",
+              value: req.body.text,
+            },
+            {
+              title: "URL",
+              value: req.body.title_link,
+            },
+            {
+              title: "Name",
+              value: req.user.name,
+            },
+            {
+              title: "UUID",
+              value: req.user.uuid,
+            },
+            {
+              title: "Email",
+              value: req.user.email,
+            },
+            {
+              title: "Slack Username",
+              value: req.user.slackUsername,
+            }
+          ]
+        }
+      ],
+    }),
   }).then(response => {
     return res.status(response.status).send({
       status: response.status,
       statusText: response.statusText
     });
+  }).catch(error => {
+    return res.status(500).send(error.toString());
   });
 });

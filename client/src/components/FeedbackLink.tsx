@@ -3,13 +3,12 @@ import packageJson from "../../package.json";
 import SlackFeedback, { themes } from 'react-slack-feedback';
 
 const FeedbackLink = () => {
-    const url = `https://docs.google.com/forms/d/e/1FAIpQLSdtXkj0IUjKbfGD8tZ0MKRpjTKOjBi4cbfCxwmRiDe1ZRG11Q/viewform?usp=pp_url&entry.1073143569=${window.location}&entry.1453252368=${packageJson.version}`;
     // @ts-ignore
     function sendToServer(payload, success, error) {
       return fetch('/api/slack/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload['attachments'][0])
       })
       .then(success)
       .catch(error)
@@ -19,8 +18,7 @@ const FeedbackLink = () => {
     channel="#bot-spam"
     showChannel={false}
     showIcon={false}
-    user="Slack Feedback"
-    feedbackTypes={[{value: "bug", label: "Bug"}, {value: "feature_request", label: "Feature Request"}, {value: "question", label: "Question"}]}
+    feedbackTypes={[{value: "Bug", label: "Bug"}, {value: "Feature Request", label: "Feature Request"}, {value: "Question", label: "Question"}]}
     // @ts-ignore
     onSubmit={(payload, success, error) =>
       // @ts-ignore
