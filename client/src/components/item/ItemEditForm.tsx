@@ -57,6 +57,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                 description: "",
                 imageUrl: "",
                 category: "",
+                location: "HackGT Hardware Desk",
                 totalAvailable: 0,
                 maxRequestQty: 0,
                 price: 0,
@@ -193,6 +194,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                   autoDismiss: false,
                                                   placement: "top-center"
                                               });
+                                              console.error(err);
                                           });
                                       }}>
 

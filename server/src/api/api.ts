@@ -208,7 +208,6 @@ const resolvers: any = {
                             items: []
                         };
                     }
-                    console.log(item);
                     itemsByCategory[item.category_id].items.push(
                         {
                             ...item,
@@ -222,11 +221,15 @@ const resolvers: any = {
                             qtyAvailableForApproval: qtyAvailableForApproval[item.item_id]
                         }
                     );
-                    itemsByLocation[loc.location_id] = {
-                        location: loc,
-                        categories: Object.values(itemsByCategory)
-                    };
                 }
+
+                itemsByLocation[loc.location_id] = {
+                    location: loc,
+                    categories: Object.values(itemsByCategory).sort((a: any, b: any) => {
+                        return a.category.category_name.localeCompare(b.category.category_name);
+                    })
+                };
+
             }
 
             return Object.values(itemsByLocation);
