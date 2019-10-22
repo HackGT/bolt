@@ -180,7 +180,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                   variables.newItem.location = variables.newItem.location.location_name;
                                               }
                                               delete variables.newItem.__typename;
-
                                           }
 
                                           const categoryError = this.state.item.category === "";
