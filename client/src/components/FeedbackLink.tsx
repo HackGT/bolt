@@ -8,14 +8,13 @@ const FeedbackLink = () => {
       return fetch('/api/slack/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload['attachments'][0])
+        body: JSON.stringify(payload.attachments[0])
       })
       .then(success)
       .catch(error)
     }
 
     return <SlackFeedback
-    channel="#bot-spam"
     showChannel={false}
     showIcon={false}
     feedbackTypes={[{value: "Bug", label: "Bug"}, {value: "Feature Request", label: "Feature Request"}, {value: "Question", label: "Question"}]}
