@@ -16,6 +16,7 @@ export type HwItem = {
     qtyUnreserved: number;
     qtyInStock: number;
     qtyAvailableForApproval: number;
+    location: Location;
 };
 
 export type Category = {

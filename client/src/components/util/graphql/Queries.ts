@@ -14,6 +14,11 @@ export const ITEM_EDIT_GET_ITEM = gql`
             returnRequired
             hidden
             owner
+            location {
+                location_id
+                location_name
+                location_hidden
+            }
         }
     }`;
 
@@ -22,6 +27,16 @@ export const ALL_CATEGORIES = gql`
         categories {
             category_id
             category_name
+        }
+    }
+`;
+
+export const ALL_LOCATIONS = gql`
+    query locations {
+        locations {
+            location_id
+            location_name
+            location_hidden
         }
     }
 `;
@@ -53,6 +68,11 @@ export const ALL_ITEMS = gql`
                     returnRequired
                     owner
                     hidden
+                    location {
+                        location_id
+                        location_name
+                        location_hidden
+                    }
                 }
             }
         }
@@ -75,6 +95,11 @@ export const ALL_USERS = gql`
 
 export const DESK_REQUESTS = gql`
     query {
+        locations {
+            location_id
+            location_name
+            location_hidden
+        }
         requests(search:{statuses: [SUBMITTED, APPROVED, READY_FOR_PICKUP, FULFILLED, LOST, DAMAGED]}) {
             request_id
             user {
@@ -90,6 +115,11 @@ export const DESK_REQUESTS = gql`
                 item_name
                 qtyAvailableForApproval
                 returnRequired
+                location {
+                    location_id
+                    location_name
+                    location_hidden
+                }
             }
             status
             quantity

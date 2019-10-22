@@ -6,8 +6,8 @@ import {withToastManager} from "react-toast-notifications";
 import {Redirect} from "react-router";
 import {Mutation, Query} from "@apollo/react-components";
 import {CREATE_ITEM, UPDATE_ITEM} from "../util/graphql/Mutations";
-import {ALL_CATEGORIES, ALL_ITEMS} from "../util/graphql/Queries";
-import {ItemNoId} from "../../types/Hardware";
+import {ALL_CATEGORIES, ALL_ITEMS, ALL_LOCATIONS} from "../util/graphql/Queries";
+import {ItemNoId, Location} from "../../types/Hardware";
 
 interface ItemDetails {
     approvalRequired: boolean;
@@ -41,6 +41,7 @@ interface ItemEditState {
     itemPreviewKey: number;
     categoryError: boolean;
     ownerError: boolean;
+    locationError: boolean;
     qtyPerRequestTooLargeError: boolean;
 }
 
@@ -50,6 +51,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
         this.state = {
             categoryError: false,
             ownerError: false,
+            locationError: false,
             qtyPerRequestTooLargeError: false,
             loading: false,
             item: this.props.createItem ? {
@@ -57,7 +59,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                 description: "",
                 imageUrl: "",
                 category: "",
-                location: "HackGT Hardware Desk",
+                location: "",
                 totalAvailable: 0,
                 maxRequestQty: 0,
                 price: 0,
@@ -161,23 +163,40 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                       onSubmit={e => {
                                           e.preventDefault();
                                           const {toastManager} = this.props;
-                                          const categoryError = this.state.item.category === "";
-                                          const ownerError = this.state.item.owner === "";
-                                          const qtyPerRequestTooLargeError = this.state.item.maxRequestQty > this.state.item.totalAvailable;
-                                          this.setState({
-                                              categoryError,
-                                              ownerError,
-                                              qtyPerRequestTooLargeError
-                                          });
-                                          if (categoryError || ownerError || qtyPerRequestTooLargeError) {
-                                              return;
-                                          }
+
                                           let variables: any = {newItem: this.state.item};
+
                                           if (!this.props.createItem) {
                                               variables = {
                                                   itemId: this.props.preloadItemId,
                                                   updatedItem: this.state.item
                                               };
+                                              if (typeof variables.updatedItem.location === "object") { // Transform location from the object from server into just the location name
+                                                  variables.updatedItem.location = variables.updatedItem.location.location_name;
+                                              }
+                                              delete variables.updatedItem.__typename;
+                                          } else {
+                                              if (typeof variables.newItem.location === "object") { // Transform location from the object from server into just the location name
+                                                  variables.newItem.location = variables.newItem.location.location_name;
+                                              }
+                                              delete variables.newItem.__typename;
+
+                                          }
+
+                                          const categoryError = this.state.item.category === "";
+                                          const locationError = this.state.item.location === "";
+                                          const ownerError = this.state.item.owner === "";
+                                          const qtyPerRequestTooLargeError = this.state.item.maxRequestQty > this.state.item.totalAvailable;
+
+                                          this.setState({
+                                              categoryError,
+                                              locationError,
+                                              ownerError,
+                                              qtyPerRequestTooLargeError
+                                          });
+
+                                          if (categoryError || locationError || ownerError || qtyPerRequestTooLargeError) {
+                                              return;
                                           }
 
                                           submitForm({
@@ -281,6 +300,46 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                                error={this.state.ownerError}
                                                                key={this.state.itemPreviewKey}
                                                                onChange={this.handleInputChangeDropdown}/>
+                                        </Form.Input>
+                                    </Form.Group>
+
+                                    <Form.Group>
+                                        <Form.Input label="Location" required
+                                        >
+                                            <Query query={ALL_LOCATIONS}>
+
+                                                {(result: any) => {
+                                                    const queryLoading = result.loading;
+                                                    const queryError = result.error;
+                                                    const queryData = result.data;
+                                                    let locationsList: string[] = [];
+                                                    let dataLoadedKey = 0; // this allows us to "reset" the AddOptionDropdown when we
+                                                    // have the list of existing locations it should show.
+                                                    // See https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key
+                                                    // for more information on why this is necessary and why it works.
+                                                    if (queryData && queryData.locations) {
+                                                        locationsList = queryData.locations.map((item: Location) => item.location_name);
+                                                        dataLoadedKey = 1;
+                                                    }
+                                                    const queryErrorMsg = <Message error visible={queryError}
+                                                                                   size="small"
+                                                                                   content="Error loading locations list from server.  You can still enter a location by hand."/>;
+
+                                                    return (<div>
+                                                        {queryError ? queryErrorMsg : ""}
+                                                        <AddOptionDropdown name="location" required
+                                                                           placeholder="Milky Way"
+                                                                           loading={queryLoading}
+                                                                           disabled={queryLoading}
+                                                                           key={dataLoadedKey}
+                                                                           value={this.state.item.location.location_name}
+                                                                           options={locationsList}
+                                                                           error={this.state.locationError}
+                                                                           onChange={this.handleInputChangeDropdown}/>
+                                                    </div>);
+                                                }}
+                                            </Query>
+
                                         </Form.Input>
                                     </Form.Group>
 

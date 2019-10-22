@@ -361,6 +361,10 @@ const resolvers: any = {
                 throw new GraphQLError("The category for this item can't be blank.");
             }
 
+            if (!args.newItem.location.trim().length) {
+                throw new GraphQLError("The location for this item can't be blank.");
+            }
+
             if (args.newItem.totalAvailable < 0) {
                 throw new GraphQLError(`The total quantity available (totalQtyAvailable) for a new item can't be less than 0.  Value provided: ${args.newItem.totalAvailable}`);
             }
@@ -384,6 +388,8 @@ const resolvers: any = {
             delete args.newItem.category; // Remove the category property from the input item so knex won't try to add it to the database
             delete args.newItem.location;
 
+            console.log("args.newItem", args.newItem, "location_id", location_id);
+
             const newObjId = await DB.from("items").insert({
                 category_id,
                 location_id,
@@ -402,7 +408,7 @@ const resolvers: any = {
          * @param args
          * @param context
          */
-        updateItem: async (root, args, context): Promise<Item> => {
+        updateItem: async (root, args, context): Promise<Item | null> => {
             // Restrict endpoint to admins
             if (!context.user.admin) {
                 throw new GraphQLError("You do not have permission to access the updateItem endpoint");
@@ -420,6 +426,10 @@ const resolvers: any = {
                 throw new GraphQLError("The category for this item can't be blank.");
             }
 
+            if (!args.updatedItem.location.trim().length) {
+                throw new GraphQLError("The location for this item can't be blank.");
+            }
+
             if (args.updatedItem.totalAvailable < 0) {
                 throw new GraphQLError(`The total quantity available (totalQtyAvailable) for a new item can't be less than 0.  Value provided: ${args.updatedItem.totalAvailable}`);
             }
@@ -432,39 +442,25 @@ const resolvers: any = {
                 throw new GraphQLError(`The max request quantity (maxRequestQty) can't be greater than the total quantity of this item (totalAvailable) that is available.  maxRequestQty: ${args.updatedItem.maxRequestQty}, totalAvailable: ${args.updatedItem.totalAvailable}`);
             }
 
-            const matchingCategories = await DB.from("categories").where({
-                category_name: args.updatedItem.category
-            });
+            const categoryObj = {category_name: args.updatedItem.category};
+            const category_id = await findOrCreate("categories", categoryObj, categoryObj, "category_id");
 
-            let categoryId;
-            if (!matchingCategories.length) {
-                // TODO: what if there's an error here?
-                // TODO: currently the category name must be an exact match
-                categoryId = await DB.from("categories").insert({
-                    category_name: args.updatedItem.category
-                }).returning("category_id");
-                categoryId = categoryId[0];
-                console.log(`No existing category named "${args.updatedItem.category}".  Created a new category with ID ${categoryId}.`);
-            } else {
-                categoryId = matchingCategories[0].category_id;
-                console.log(`Existing category named "${args.updatedItem.category}" found with ID ${categoryId}.`);
-            }
+            const locationObj = {
+                location_name: args.updatedItem.location
+            };
+            const location_id = await findOrCreate("locations", locationObj, locationObj, "location_id");
 
-            const savedCategory: string = args.updatedItem.category;
             delete args.updatedItem.category; // Remove the category property from the input item so knex won't try to add it to the database
-
+            delete args.updatedItem.location;
             await DB.from("items")
                 .where({item_id: args.id})
                 .update({
-                    category_id: categoryId,
+                    category_id,
+                    location_id,
                     ...args.updatedItem
                 });
 
-            return {
-                id: args.id,
-                category: savedCategory,
-                ...args.updatedItem
-            };
+            return await getItem(args.id, context.user.admin);
         },
         createRequest: async (root, args, context): Promise<Request> => {
             // if non-admin, user on request must be user signed in
