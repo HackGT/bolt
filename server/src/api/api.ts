@@ -653,6 +653,10 @@ apiRoutes.post("/slack/feedback", bodyParser.json(), (req, res) => {
             {
               title: "Slack Username",
               value: req.user.slackUsername,
+            },
+            {
+              title: "Admin",
+              value: req.user.admin ? "Yes" : "No",
             }
           ]
         }
