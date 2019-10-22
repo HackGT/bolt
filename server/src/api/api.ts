@@ -386,7 +386,6 @@ const resolvers: any = {
 
             delete args.newItem.category; // Remove the category property from the input item so knex won't try to add it to the database
             delete args.newItem.location;
-            console.log("args.newItem", args.newItem, "location_id", location_id);
 
             const newObjId = await DB.from("items").insert({
                 category_id,
