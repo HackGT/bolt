@@ -29,7 +29,13 @@ function combinedAndFilteredItemsByCategory(categories: any, searchQuery: string
     return filteredItems(categories.reduce((acc: any, val: any) => acc.concat(val.items), []), searchQuery);
 }
 
-const HardwareLocationContents = ({itemsByLocation, searchQuery}: { itemsByLocation: ItemByLocation, searchQuery: string }) => {
+interface HardwareListProps {
+    itemsByLocation: ItemByLocation,
+    searchQuery: string,
+    requestsEnabled: boolean
+}
+
+const HardwareLocationContents = ({itemsByLocation, searchQuery, requestsEnabled}: HardwareListProps) => {
     const [accordionState, setAccordionState] = useState([0]);
 
     return (
@@ -58,6 +64,7 @@ const HardwareLocationContents = ({itemsByLocation, searchQuery}: { itemsByLocat
                                            index={index}>
                             <HardwareCategory key={itemByCat.category.category_id}
                                               items={filteredItems(itemByCat.items, searchQuery)}
+                                              requestsEnabled={requestsEnabled}
                                               name={itemByCat.category.category_name}/>
                         </Accordion.Content></> : ""}
                 </>)}

@@ -16,16 +16,16 @@ function mapStateToProps(state: any) {
     return {};
 }
 
-function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], location_id: number) {
+function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], location_id: number = 0) {
 
     return requests.filter((r: Request) => {
         console.log(r.item, location_id);
-        return r.item.location.location_id === location_id
+        return (location_id === 0 || r.item.location.location_id === location_id)
             && statuses.some(status => r.status === status);
     });
 }
 
-function getConsolidatedRequestsWithStatus(requests: Request[], statuses: RequestStatus[], location_id: number) {
+function getConsolidatedRequestsWithStatus(requests: Request[], statuses: RequestStatus[], location_id: number = 0) {
     const filteredRequests = getRequestsWithStatus(requests, statuses, location_id);
     const requestsByUser: any = {};
 
@@ -138,7 +138,8 @@ function DeskContainer() {
     const submitted = getRequestsWithStatus(requests, [SUBMITTED], location);
     const approved = getConsolidatedRequestsWithStatus(requests, [APPROVED], location);
     const readyForPickup = getConsolidatedRequestsWithStatus(requests, [READY_FOR_PICKUP], location);
-    const readyForReturn = getConsolidatedRequestsWithStatus(requests, [FULFILLED, LOST, DAMAGED], location);
+    const readyForReturn = getConsolidatedRequestsWithStatus(requests, [FULFILLED, LOST, DAMAGED]);
+
     return (
         <div>
             <Header size="huge">

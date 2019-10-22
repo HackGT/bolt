@@ -43,8 +43,7 @@ function SubmittedCard({request}: SubmittedCardProps) {
             </Card.Content>
             {request.item.qtyAvailableForApproval >= request.quantity ? noIssues : noStockWarning(request.item.qtyAvailableForApproval)}
             <Card.Content>
-                <Icon name="clock outline"/> <TimeAgo date={request.createdAt}/> <span
-                style={{color: "gray"}}>#{request.request_id}</span>
+                <Icon name="clock outline"/> <TimeAgo date={request.createdAt}/>
             </Card.Content>
             {error ? <Card.Content className="hw-negative">
                 <Icon name="warning sign"/>Unable to change request status: {error.message}

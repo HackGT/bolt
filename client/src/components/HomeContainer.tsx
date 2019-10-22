@@ -57,8 +57,6 @@ class HomeContainer extends Component<Props, State> {
             <Grid stackable columns={2} style={{maxWidth: "960px"}}>
                 <Grid.Row>
                     <Grid.Column>
-                        {/*<HardwareList requestsEnabled={true} handleAddItem={this.handleAddItem} qtyUpdate={this.state.item}>*/}
-                        {/*</HardwareList>*/}
                         <NewHardwareList/>
                     </Grid.Column>
                     {myRequests}
