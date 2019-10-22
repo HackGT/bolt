@@ -1,50 +1,22 @@
 import React from "react";
 import {
-    Button,
     Card,
     Container,
     Header,
     Label,
-    Segment, Step
+    Step
 } from "semantic-ui-react";
 import {RequestedItem} from "../../types/Hardware";
-import {useMutation, useQuery} from "@apollo/react-hooks";
+import {useQuery} from "@apollo/react-hooks";
 import {DESK_REQUESTS} from "../util/graphql/Queries";
 import {Request} from "../../types/Request";
-import {DELETE_REQUEST} from "../util/graphql/Mutations";
 
 interface RequestedListProps {
     requestedItemsList: RequestedItem[],
 }
 
-// function cancelRequestButton(requestId: number) {
-//     const [deleteRequest, {data, loading, error}] = useMutation(DELETE_REQUEST);
-//     return <Button floated="right" basic
-//                    color="red"
-//                    onClick={event => deleteRequest({
-//                        variables: {
-//                            deleteRequest: {
-//                                id: requestId
-//                            }
-//                        }
-//                    })}>
-//         Cancel Request
-//     </Button>;
-// }
-
 function RequestedList({requestedItemsList}: RequestedListProps) {
-    const noRequest = (
-        <Segment placeholder>
-            <Container textAlign="center">
-                <Header>
-                    You haven't requested any hardware yet.
-                </Header>
-            </Container>
-        </Segment>
-    );
-    const requestIsThere = <h1>YAS</h1>;
     const {loading, error, data} = useQuery(DESK_REQUESTS);
-    const [deleteRequest] = useMutation(DELETE_REQUEST);
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error :(</p>;
     let steps = (
@@ -56,6 +28,16 @@ function RequestedList({requestedItemsList}: RequestedListProps) {
             </Step>
         </Step.Group>
     );
+
+    if (data.requests.length === 0) {
+        return (
+            <Container textAlign="center">
+                <Header>
+                    You haven't requested any hardware yet.
+                </Header>
+            </Container>
+        );
+    }
 
     return data.requests.map((r: Request, index: number) => {
         if (r.status === 'SUBMITTED') {
@@ -156,20 +138,9 @@ function RequestedList({requestedItemsList}: RequestedListProps) {
                             {r.quantity}
                         </Label>
                         {" " + r.item.item_name}
-                        <Button floated="right" basic
-                                color="red"
-                                onClick={event => deleteRequest({
-                                    variables: {
-                                        deleteRequest: {
-                                            id: r.request_id
-                                        }
-                                    }
-                                })}>
-                            Cancel Request
-                        </Button>
                     </Card.Header>
-                    {steps}
                     <Card.Description>
+                        {steps}
                     </Card.Description>
                 </Card.Content>
             </Card>
