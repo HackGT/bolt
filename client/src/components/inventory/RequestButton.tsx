@@ -4,12 +4,14 @@ import {useMutation, useQuery} from "@apollo/react-hooks";
 import {CREATE_REQUEST} from "../util/graphql/Mutations";
 import {RequestedItem} from "../../types/Hardware";
 import {GET_USER} from "../util/graphql/Queries";
+import {withToastManager} from "react-toast-notifications";
 
 interface RequestButtonProps {
     request: RequestedItem,
+    toastManager: any
 }
 
-function RequestButton({request}: RequestButtonProps) {
+function RequestButton({request, toastManager}: RequestButtonProps) {
     const {subscribeToMore, ...query} = useQuery(GET_USER);
     const [createRequest, {data, loading, error}] = useMutation(CREATE_REQUEST);
 
@@ -27,7 +29,11 @@ function RequestButton({request}: RequestButtonProps) {
                             quantity: request.qtyRequested
                         }
                     }
-                })}
+                }).then(toastManager.add(`Successfully requested ${request.qtyRequested}x ${request.name}`, {
+                    appearance: "success",
+                    autoDismiss: true,
+                    placement: "top-center"
+                }))}
                 labelPosition="right">
             Request {request.qtyRequested}
             <Icon name="arrow alternate circle right outline"/>
@@ -35,4 +41,4 @@ function RequestButton({request}: RequestButtonProps) {
     );
 }
 
-export default RequestButton;
+export default withToastManager(RequestButton);

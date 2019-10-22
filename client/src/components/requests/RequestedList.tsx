@@ -16,7 +16,9 @@ interface RequestedListProps {
 }
 
 function RequestedList({requestedItemsList}: RequestedListProps) {
-    const {loading, error, data} = useQuery(DESK_REQUESTS);
+    const {loading, error, data} = useQuery(DESK_REQUESTS, {
+        pollInterval: 500
+    });
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error :(</p>;
     let steps = (

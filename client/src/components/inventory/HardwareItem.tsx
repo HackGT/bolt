@@ -52,29 +52,6 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
         };
     }
 
-    public finishedLoading = () => {
-        const {toastManager} = this.props;
-        toastManager.add(`Successfully requested ${this.state.qtyRequested}x ${this.props.item.item_name}`,
-            {
-                appearance: "success",
-                autoDismiss: true,
-                placement: "top-center"
-            });
-
-        this.setState({
-            loading: false,
-        });
-        const request: RequestedItem = {
-            id: this.props.item.id,
-            user: "Beardell",
-            name: this.props.item.item_name,
-            qtyRequested: this.state.qtyRequested,
-            category: this.props.item.category,
-            status: ItemStatus.SUBMITTED,
-            cancelled: false
-        };
-    }
-
     public incrementQty = () => {
         this.setState({
             qtyRequested: this.state.qtyRequested + 1
@@ -85,13 +62,6 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
         this.setState({
             qtyRequested: this.state.qtyRequested - 1
         });
-    }
-
-    public handleItemRequest = () => {
-        this.setState({
-            loading: true
-        });
-        setTimeout(this.finishedLoading, 3000);
     }
 
     public handleQtyUpdate = (qtyInput: ChangeEvent<HTMLInputElement>) => {
@@ -123,17 +93,6 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
             status: ItemStatus.SUBMITTED,
             cancelled: false
         };
-
-        const requestBtn = (
-            <Button primary
-                    icon
-                    disabled={this.state.qtyRequested <= 0 || this.state.loading}
-                    loading={this.state.loading}
-                    onClick={this.handleItemRequest}
-                    labelPosition="right"
-            > Request {this.state.qtyRequested} <Icon
-                name="arrow alternate circle right outline"/></Button>
-        );
 
         const minusBtn = (<Button icon="minus"
                                   onClick={this.decrementQty}
@@ -198,7 +157,6 @@ function mapStateToProps(state: AppState) {
         user: state.account
     };
 }
-
 
 export default withToastManager(connect(mapStateToProps)(HardwareItem));
 
