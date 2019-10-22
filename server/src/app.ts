@@ -93,6 +93,7 @@ app.get("*", isAuthenticated, (request, response) => {
     response.sendFile(path.join(__dirname, "../../client/build", "index.html"));
 });
 
+
 const server = createServer(app);
 
 

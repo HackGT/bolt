@@ -4,7 +4,9 @@
     "gulp-install": "^1.1.0",
     "gulp-shell": "^0.7.0",
     "gulp-util": "^3.0.8",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "react-slack-feedback": "^2.1.0",
+    "styled-components": "^4.4.0"
   },
   "devDependencies": {},
   "name": "bolt",
