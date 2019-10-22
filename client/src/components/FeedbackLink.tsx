@@ -1,10 +1,31 @@
 import React from 'react';
 import packageJson from "../../package.json";
+import SlackFeedback, { themes } from 'react-slack-feedback';
 
 const FeedbackLink = () => {
-    const url = `https://docs.google.com/forms/d/e/1FAIpQLSdtXkj0IUjKbfGD8tZ0MKRpjTKOjBi4cbfCxwmRiDe1ZRG11Q/viewform?usp=pp_url&entry.1073143569=${window.location}&entry.1453252368=${packageJson.version}`;
+    // @ts-ignore
+    function sendToServer(payload, success, error) {
+      return fetch('/api/slack/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload.attachments[0])
+      })
+      .then(success)
+      .catch(error)
+    }
 
-    return <a href={url} target="_blank">Send feedback</a>;
+    return <SlackFeedback
+    showChannel={false}
+    showIcon={false}
+    feedbackTypes={[{value: "Bug", label: "Bug"}, {value: "Feature Request", label: "Feature Request"}, {value: "Question", label: "Question"}]}
+    // @ts-ignore
+    onSubmit={(payload, success, error) =>
+      // @ts-ignore
+      sendToServer(payload)
+        .then(success)
+        .catch(error)
+     }
+  />;
 };
 
 export default FeedbackLink;
