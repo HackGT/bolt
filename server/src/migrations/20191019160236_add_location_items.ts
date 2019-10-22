@@ -3,7 +3,6 @@ import * as Knex from "knex";
 
 export async function up(knex: Knex): Promise<any> {
     const existingLocations = await knex.from("locations");
-    console.log(existingLocations);
     let defaultLocation;
     if (!existingLocations.length) { // create a default location if one doesn't exist
         defaultLocation = await knex("locations").insert({location_name: "HackGT Hardware Desk"}).returning(["location_id", "location_name"]);
@@ -25,7 +24,7 @@ export async function up(knex: Knex): Promise<any> {
 
 export async function down(knex: Knex): Promise<any> {
     return knex.schema.table("locations", table => {
-        table.dropColumns("location_id", "location_name");
+        table.dropColumns("location_id", "location_name", "location_hidden");
     });
 }
 

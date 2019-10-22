@@ -183,7 +183,7 @@ function DeskContainer() {
                     }}/>
                     {!returnsMode && <ReadyToPrepareList cards={approved}/>}
                     {!returnsMode && <ReadyForPickupList cards={readyForPickup}/>}
-                    {returnsMode && (<ReadyForReturnList cards={readyForReturn}/>)}
+                    {returnsMode && <ReadyForReturnList cards={readyForReturn}/>}
                 </Grid.Row>
             </Grid>
         </div>

@@ -50,7 +50,6 @@ const NewHardwareList = ({user}: { user: User | null }) => {
                     warning>
                     <Message.Header>Look, but do not touch</Message.Header>
                     {noRequestsMessageText}
-
                 </Message>
             </Grid.Column>
         </Grid.Row>) : "";
