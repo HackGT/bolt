@@ -1,13 +1,14 @@
 import React, {Component} from "react";
-import {Grid} from "semantic-ui-react";
+import {Grid, Segment} from "semantic-ui-react";
 import HardwareList from "./inventory/HardwareList";
-import RequestsList from "./requests/RequestsList";
+import RequestedList from "./requests/RequestedList";
 import {connect} from "react-redux";
 import {User} from "../types/User";
 import {AppState} from "../state/Store";
 import {RequestedItem} from "../types/Hardware";
 
-export interface OwnProps {}
+export interface OwnProps {
+}
 
 interface StateProps {
     user: User | null;
@@ -50,14 +51,18 @@ class HomeContainer extends Component<Props, State> {
     public render() {
         const myRequests = this.props.user ? (<Grid.Column>
             <h1>My Requests</h1>
-            <RequestsList requestedItemsList={this.state.requestedItemsList} removeItem={this.handleRemoveItem}/>
+            <Segment placeholder>
+                <RequestedList requestedItemsList={this.state.requestedItemsList}/>
+            </Segment>
         </Grid.Column>) : "";
 
         return (
             <Grid stackable columns={2} style={{maxWidth: "960px"}}>
                 <Grid.Row>
                     <Grid.Column>
-                        <HardwareList requestsEnabled={true} handleAddItem={this.handleAddItem} qtyUpdate={this.state.item}>
+                        <HardwareList requestsEnabled={true}
+                                      handleAddItem={this.handleAddItem}
+                                      qtyUpdate={this.state.item}>
                         </HardwareList>
                     </Grid.Column>
                     {myRequests}
@@ -74,4 +79,4 @@ function mapStateToProps(state: AppState) {
 }
 
 
-export default connect(mapStateToProps) (HomeContainer);
+export default connect(mapStateToProps)(HomeContainer);

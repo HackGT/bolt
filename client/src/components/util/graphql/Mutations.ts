@@ -47,6 +47,29 @@ export const UPDATE_ITEM = gql`
     }
 `;
 
+export const CREATE_REQUEST = gql`
+    mutation createRequest($newRequest: RequestInput!) {
+        createRequest(newRequest: $newRequest) {
+            request_id
+            user {
+                uuid
+                name
+                haveID
+            }
+            item {
+                id
+                item_name
+                qtyAvailableForApproval
+                returnRequired
+            }
+            status
+            quantity
+            createdAt
+            updatedAt
+        }
+    }
+`;
+
 export const UPDATE_REQUEST = gql`
     mutation updateRequest($updatedRequest: RequestUpdateInput!) {
         updateRequest(updatedRequest: $updatedRequest) {
@@ -70,5 +93,11 @@ export const UPDATE_REQUEST = gql`
             createdAt
             updatedAt
         }
+    }
+`;
+
+export const DELETE_REQUEST = gql`
+    mutation deleteRequest($requestId: Int!) {
+        deleteRequest(id: $requestId)
     }
 `;
