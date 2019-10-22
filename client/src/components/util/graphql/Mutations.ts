@@ -95,9 +95,3 @@ export const UPDATE_REQUEST = gql`
         }
     }
 `;
-
-export const DELETE_REQUEST = gql`
-    mutation deleteRequest($requestId: Int!) {
-        deleteRequest(id: $requestId)
-    }
-`;

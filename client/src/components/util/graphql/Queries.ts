@@ -66,15 +66,6 @@ export const ALL_USERS = gql`
     }
 `;
 
-export const GET_USER = gql`
-    query user {
-        user{
-            uuid,
-            slackUsername
-        }
-    }
-`;
-
 export const DESK_REQUESTS = gql`
     query {
         requests(search:{statuses: [SUBMITTED, APPROVED, READY_FOR_PICKUP, FULFILLED, LOST, DAMAGED]}) {

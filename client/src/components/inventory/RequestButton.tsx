@@ -5,14 +5,15 @@ import {CREATE_REQUEST} from "../util/graphql/Mutations";
 import {RequestedItem} from "../../types/Hardware";
 import {GET_USER} from "../util/graphql/Queries";
 import {withToastManager} from "react-toast-notifications";
+import {User} from "../../types/User";
 
 interface RequestButtonProps {
-    request: RequestedItem,
+    requestedItem: RequestedItem,
+    user: User
     toastManager: any
 }
 
-function RequestButton({request, toastManager}: RequestButtonProps) {
-    const {subscribeToMore, ...query} = useQuery(GET_USER);
+function RequestButton({requestedItem, user, toastManager}: RequestButtonProps) {
     const [createRequest, {data, loading, error}] = useMutation(CREATE_REQUEST);
 
     return (
@@ -24,18 +25,18 @@ function RequestButton({request, toastManager}: RequestButtonProps) {
                 onClick={event => createRequest({
                     variables: {
                         newRequest: {
-                            user_id: query.data.user.uuid,
-                            request_item_id: request.id,
-                            quantity: request.qtyRequested
+                            user_id: user.uuid,
+                            request_item_id: requestedItem.id,
+                            quantity: requestedItem.qtyRequested
                         }
                     }
-                }).then(toastManager.add(`Successfully requested ${request.qtyRequested}x ${request.name}`, {
+                }).then(toastManager.add(`Successfully requested ${requestedItem.qtyRequested}x ${requestedItem.name}`, {
                     appearance: "success",
                     autoDismiss: true,
                     placement: "top-center"
                 }))}
                 labelPosition="right">
-            Request {request.qtyRequested}
+            Request {requestedItem.qtyRequested}
             <Icon name="arrow alternate circle right outline"/>
         </Button>
     );

@@ -113,7 +113,7 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
                 <Popup disabled={this.state.loading} inverted
                        trigger={plusBtn} content="Request another"/>
                 {/*{requestBtn}*/}
-                <RequestButton request={newRequest}/>
+                <RequestButton requestedItem={newRequest} user={this.props.user}/>
             </Input>) : "";
 
 
