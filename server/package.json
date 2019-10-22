@@ -44,7 +44,7 @@
     "gulp-tslint": "^8.1.4",
     "gulp-typescript": "^5.0.1",
     "http": "0.0.0",
-    "knex": "^0.19.3",
+    "knex": "^0.19.5",
     "marked": "^0.6.1",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.23",
