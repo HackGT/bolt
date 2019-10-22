@@ -33,7 +33,6 @@ async function getItem(itemId: number, isAdmin: boolean): Promise<Item|null> {
     const actualItem: any = item[0];
     const {item_id} = actualItem;
     const {qtyInStock, qtyUnreserved, qtyAvailableForApproval} = await Quantity.all([item_id]);
-    console.log(actualItem);
     return {
         ...actualItem,
         id: item_id,
