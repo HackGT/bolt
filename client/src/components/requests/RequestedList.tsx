@@ -102,6 +102,7 @@ function RequestedList({requestedItemsList}: RequestedListProps) {
                         <Card.Header>
                             <ItemAndQuantity quantity={r.quantity}
                                              itemName={r.item.item_name}/>
+                            &nbsp;<span style={{color: "gray", fontSize: 14, fontWeight: "normal"}}>#{r.request_id}</span>
                         </Card.Header>
                         <Card.Description>
                             {steps}
