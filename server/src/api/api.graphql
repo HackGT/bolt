@@ -6,13 +6,14 @@ type Query {
     # Get information about a specific item, given its ID
 	item(id: Int!): Item
     # Get an array of every item in the database
-	allItems: [ItemsByCategory!]
+    allItems: [ItemsByLocation!]
     # Get a list containing each category that is on at least one item
     categories: [Category!]
 	# Get an array of every item in the database
 	items: [Item!]
 	# Return request(s) matching the search query provided and that the user has permission to see
     requests(search: RequestSearch!): [Request!]
+    locations: [Location!]
 }
 
 type Mutation {
@@ -50,6 +51,7 @@ type Item {
 	description: String!
 	imageUrl: String!
 	category: String!
+    location: Location!
 	# Total number of this item in the hardware inventory
 	totalAvailable: Int!
 	# The number of an item that is not reserved
@@ -72,6 +74,11 @@ type Item {
     owner: String
 }
 
+type ItemsByLocation {
+    location: Location!,
+    categories: [ItemsByCategory!]
+}
+
 type ItemsByCategory {
 	category: Category!
 	items: [Item!]
@@ -82,6 +89,7 @@ input ItemInput {
     description: String!
     imageUrl: String!
     category: String!
+    location: String!
     # Total number of this item in the hardware inventory
     totalAvailable: Int!
     # The largest quantity of this item that can be requested in one request
@@ -103,6 +111,12 @@ type Category {
     category_id: Int!
     # The human-readable, user-facing name for this category
     category_name: String!
+}
+
+type Location {
+    location_id: Int!
+    location_name: String!
+    location_hidden: Boolean!
 }
 
 enum RequestStatus {
