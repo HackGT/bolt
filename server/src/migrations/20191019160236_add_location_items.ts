@@ -7,8 +7,6 @@ export async function up(knex: Knex): Promise<any> {
     if (!existingLocations.length) { // create a default location if one doesn't exist
         defaultLocation = await knex("locations").insert({location_name: "HackGT Hardware Desk"}).returning(["location_id", "location_name"]);
         defaultLocation = defaultLocation[0];
-        console.log(defaultLocation);
-
     } else {
         defaultLocation = existingLocations[0];
 
