@@ -27,7 +27,7 @@ interface HardwareItemProps {
     item: HwItem;
     toastManager: any;
     requestsEnabled: boolean;
-    user: User | null;
+    user: User;
     preview?: boolean;
 }
 
@@ -86,7 +86,7 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
     public render() {
         const newRequest: RequestedItem = {
             id: this.props.item.id,
-            user: "Beardell",
+            user: this.props.user.uuid,
             name: this.props.item.item_name,
             qtyRequested: this.state.qtyRequested,
             category: this.props.item.category,
