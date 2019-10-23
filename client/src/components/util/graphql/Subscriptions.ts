@@ -17,6 +17,11 @@ export const REQUEST_CHANGE = gql`
                 item_name
                 qtyAvailableForApproval
                 returnRequired
+                location {
+                    location_id
+                    location_name
+                    location_hidden
+                }
             }
             status
             quantity

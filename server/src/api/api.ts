@@ -9,9 +9,14 @@ import {DB, IItem} from "../database";
 import {isAdminNoAuthCheck} from "../auth/auth";
 import {localTimestamp, nestedRequest, onlyIfAdmin, toSimpleRequest} from "./requests";
 import {makeExecutableSchema} from "graphql-tools";
-import {Category, Item, Request, RequestStatus, User, UserUpdateInput} from "./graphql.types";
+import {Category, Item, Location, Request, RequestStatus, User, UserUpdateInput} from "./graphql.types";
+import {config} from "../common";
 import {PubSub} from "graphql-subscriptions";
 import {Quantity} from "./requests/quantity";
+import {getItemLocation} from "./items/item";
+
+const fetch = require("isomorphic-fetch");
+const bodyParser = require("body-parser");
 
 export const apiRoutes = express.Router();
 export const pubsub = new PubSub();
@@ -23,6 +28,7 @@ async function getItem(itemId: number, isAdmin: boolean): Promise<Item|null> {
 
     const item: IItem[] = await DB.from("items")
         .join("categories", "items.category_id", "=", "categories.category_id")
+        .join("locations", "locations.location_id", "=", "items.location_id")
         .where({item_id: itemId});
 
     if (item.length === 0) {
@@ -31,11 +37,11 @@ async function getItem(itemId: number, isAdmin: boolean): Promise<Item|null> {
     const actualItem: any = item[0];
     const {item_id} = actualItem;
     const {qtyInStock, qtyUnreserved, qtyAvailableForApproval} = await Quantity.all([item_id]);
-
     return {
         ...actualItem,
         id: item_id,
         category: actualItem.category_name,
+        location: getItemLocation(actualItem),
         price: onlyIfAdmin(actualItem.price, isAdmin),
         owner: onlyIfAdmin(actualItem.owner, isAdmin),
         qtyInStock: qtyInStock[item_id],
@@ -87,7 +93,6 @@ async function updateUser(args, context) {
         throw new GraphQLError("User not updated because phone number format is invalid");
     }
 
-    console.log("searchObj is", searchObj);
     const updatedUser: User[] = await DB.from("users")
         .where({
             uuid: args.uuid,
@@ -100,6 +105,17 @@ async function updateUser(args, context) {
     }
 
     return updatedUser[0];
+}
+
+async function findOrCreate(tableName, searchObj, data, idFieldName): Promise<number> {
+    const matchingRows = await DB.from(tableName).where(searchObj);
+
+    if (!matchingRows.length) {
+        // The result must be an exact match
+        const id = await DB.from(tableName).insert(data).returning(idFieldName);
+        return id[0];
+    }
+    return matchingRows[0][idFieldName];
 }
 
 const resolvers: any = {
@@ -161,48 +177,83 @@ const resolvers: any = {
          * @param context
          */
         allItems: async (root, args, context): Promise<Item[]> => {
-            const searchObj: any = {};
+            const itemsSearchObj: any = {};
+            const locationsSearchObj: any = {};
             if (!context.user.admin) {
-                searchObj.hidden = false;
+                itemsSearchObj.hidden = false;
+                locationsSearchObj.location_hidden = false;
             }
             const items = await DB.from("items")
-                .where(searchObj)
-                .join("categories", "items.category_id", "=", "categories.category_id");
+                .where(itemsSearchObj)
+                .join("categories", "items.category_id", "=", "categories.category_id")
+
+            const locations: Location[] = await DB.from("locations")
+                .where(locationsSearchObj);
 
             const {qtyInStock, qtyUnreserved, qtyAvailableForApproval} = await Quantity.all();
-            const itemsByCategory = {};
-            for (let i = 0; i < items.length; i++) {
-                const item = items[i];
-                if (!itemsByCategory.hasOwnProperty(item.category_id)) {
-                    itemsByCategory[item.category_id] = {
-                        category: {
-                            category_id: item.category_id,
-                            category_name: item.category_name,
-                        },
-                        items: []
-                    };
-                }
-                itemsByCategory[item.category_id].items.push(
-                    {
-                        ...item,
-                        id: item.item_id,
-                        category: item.category_name,
-                        price: onlyIfAdmin(item.price, context.user.admin),
-                        owner: onlyIfAdmin(item.owner, context.user.admin),
-                        qtyInStock: qtyInStock[item.item_id],
-                        qtyUnreserved: qtyUnreserved[item.item_id],
-                        qtyAvailableForApproval: qtyAvailableForApproval[item.item_id]
+            const itemsByLocation = {};
+            for (let i = 0; i < locations.length; i++) {
+                const loc = locations[i];
+
+
+                const itemsAtLocation = items.filter(predItem => predItem.location_id === loc.location_id);
+                const itemsByCategory = {};
+
+                for (let j = 0; j < itemsAtLocation.length; j++) {
+                    const item = itemsAtLocation[j];
+
+                    if (!itemsByCategory.hasOwnProperty(item.category_id)) {
+                        itemsByCategory[item.category_id] = {
+                            category: {
+                                category_id: item.category_id,
+                                category_name: item.category_name,
+                            },
+                            items: []
+                        };
                     }
-                );
+                    itemsByCategory[item.category_id].items.push(
+                        {
+                            ...item,
+                            id: item.item_id,
+                            category: item.category_name,
+                            location: loc,
+                            price: onlyIfAdmin(item.price, context.user.admin),
+                            owner: onlyIfAdmin(item.owner, context.user.admin),
+                            qtyInStock: qtyInStock[item.item_id],
+                            qtyUnreserved: qtyUnreserved[item.item_id],
+                            qtyAvailableForApproval: qtyAvailableForApproval[item.item_id]
+                        }
+                    );
+                }
+
+                itemsByLocation[loc.location_id] = {
+                    location: loc,
+                    categories: Object.values(itemsByCategory).sort((a: any, b: any) => {
+                        return a.category.category_name.localeCompare(b.category.category_name);
+                    })
+                };
+
             }
-            return Object.values(itemsByCategory);
+
+            return Object.values(itemsByLocation);
         },
         categories: async (root, args, context): Promise<Category[]> => {
             return await DB.from("categories");
         },
+        locations: async (root, args, context): Promise<Location[]> => {
+            return await DB.from("locations");
+        },
         items: async (root, args, context): Promise<Item[]> => {
+            const searchObj: any = {};
+
+            if (!context.user.admin) {
+                searchObj.hidden = false;
+            }
+
             const items = await DB.from("items")
-                .join("categories", "items.category_id", "=", "categories.category_id");
+                .where(searchObj)
+                .join("categories", "items.category_id", "=", "categories.category_id")
+                .join("locations", "locations.location_id", "=", "items.location_id");
 
             const {qtyInStock, qtyUnreserved, qtyAvailableForApproval} = await Quantity.all();
 
@@ -211,6 +262,7 @@ const resolvers: any = {
                     ...item,
                     id: item.item_id,
                     category: item.category_name,
+                    location: getItemLocation(item),
                     price: onlyIfAdmin(item.price, context.user.admin),
                     owner: onlyIfAdmin(item.owner, context.user.admin),
                     qtyInStock: qtyInStock[item.item_id],
@@ -261,6 +313,8 @@ const resolvers: any = {
 
                 // otherwise, restrict their results to just their user ID
                 searchObj.user_id = context.user.uuid;
+                searchObj.location_hidden = false; // don't show hidden locations
+                searchObj.hidden = false; // don't show hidden items
             }
 
             const requests = await DB.from("requests")
@@ -269,6 +323,7 @@ const resolvers: any = {
                 .join("users", "requests.user_id", "=", "users.uuid")
                 .join("items", "requests.request_item_id", "=", "items.item_id")
                 .join("categories", "categories.category_id", "=", "items.category_id")
+                .join("locations", "locations.location_id", "=", "items.location_id")
                 .orderBy("requests.created_at", "asc");
 
 
@@ -295,7 +350,7 @@ const resolvers: any = {
          * @param args
          * @param context
          */
-        createItem: async (root, args, context): Promise<Item> => {
+        createItem: async (root, args, context): Promise<Item | null> => {
             // Restrict endpoint to admins
             if (!context.user.admin) {
                 throw new GraphQLError("You do not have permission to access the createItem endpoint");
@@ -307,6 +362,10 @@ const resolvers: any = {
 
             if (!args.newItem.category.trim().length) {
                 throw new GraphQLError("The category for this item can't be blank.");
+            }
+
+            if (!args.newItem.location.trim().length) {
+                throw new GraphQLError("The location for this item can't be blank.");
             }
 
             if (args.newItem.totalAvailable < 0) {
@@ -321,39 +380,26 @@ const resolvers: any = {
                 throw new GraphQLError(`The max request quantity (maxRequestQty) can't be greater than the total quantity of this item (totalAvailable) that is available.  maxRequestQty: ${args.newItem.maxRequestQty}, totalAvailable: ${args.newItem.totalAvailable}`);
             }
 
-            const matchingCategories = await DB.from("categories").where({
-                category_name: args.newItem.category
-            });
+            const categoryObj = {category_name: args.newItem.category};
+            const category_id = await findOrCreate("categories", categoryObj, categoryObj, "category_id");
 
-            let categoryId;
-            if (!matchingCategories.length) {
-                // TODO: what if there's an error here?
-                // TODO: currently the category name must be an exact match
-                categoryId = await DB.from("categories").insert({
-                    category_name: args.newItem.category
-                }).returning("category_id");
-                categoryId = categoryId[0];
-                console.log(`No existing category named "${args.newItem.category}".  Created a new category with ID ${categoryId}.`);
-            } else {
-                categoryId = matchingCategories[0].category_id;
-                console.log(`Existing category named "${args.newItem.category}" found with ID ${categoryId}.`);
-            }
+            const locationObj = {
+                location_name: args.newItem.location
+            };
+            const location_id = await findOrCreate("locations", locationObj, locationObj, "location_id");
 
-            const savedCategory = args.newItem.category;
             delete args.newItem.category; // Remove the category property from the input item so knex won't try to add it to the database
+            delete args.newItem.location;
 
             const newObjId = await DB.from("items").insert({
-                category_id: categoryId,
+                category_id,
+                location_id,
                 ...args.newItem
             }).returning("item_id");
 
             console.log("The new item's ID is", newObjId[0]);
 
-            return {
-                id: newObjId[0],
-                category: savedCategory,
-                ...args.newItem
-            };
+            return await getItem(newObjId[0], context.user.admin);
         },
         /**
          * Update an existing item given its ID
@@ -363,7 +409,7 @@ const resolvers: any = {
          * @param args
          * @param context
          */
-        updateItem: async (root, args, context): Promise<Item> => {
+        updateItem: async (root, args, context): Promise<Item | null> => {
             // Restrict endpoint to admins
             if (!context.user.admin) {
                 throw new GraphQLError("You do not have permission to access the updateItem endpoint");
@@ -381,6 +427,10 @@ const resolvers: any = {
                 throw new GraphQLError("The category for this item can't be blank.");
             }
 
+            if (!args.updatedItem.location.trim().length) {
+                throw new GraphQLError("The location for this item can't be blank.");
+            }
+
             if (args.updatedItem.totalAvailable < 0) {
                 throw new GraphQLError(`The total quantity available (totalQtyAvailable) for a new item can't be less than 0.  Value provided: ${args.updatedItem.totalAvailable}`);
             }
@@ -393,39 +443,25 @@ const resolvers: any = {
                 throw new GraphQLError(`The max request quantity (maxRequestQty) can't be greater than the total quantity of this item (totalAvailable) that is available.  maxRequestQty: ${args.updatedItem.maxRequestQty}, totalAvailable: ${args.updatedItem.totalAvailable}`);
             }
 
-            const matchingCategories = await DB.from("categories").where({
-                category_name: args.updatedItem.category
-            });
+            const categoryObj = {category_name: args.updatedItem.category};
+            const category_id = await findOrCreate("categories", categoryObj, categoryObj, "category_id");
 
-            let categoryId;
-            if (!matchingCategories.length) {
-                // TODO: what if there's an error here?
-                // TODO: currently the category name must be an exact match
-                categoryId = await DB.from("categories").insert({
-                    category_name: args.updatedItem.category
-                }).returning("category_id");
-                categoryId = categoryId[0];
-                console.log(`No existing category named "${args.updatedItem.category}".  Created a new category with ID ${categoryId}.`);
-            } else {
-                categoryId = matchingCategories[0].category_id;
-                console.log(`Existing category named "${args.updatedItem.category}" found with ID ${categoryId}.`);
-            }
+            const locationObj = {
+                location_name: args.updatedItem.location
+            };
+            const location_id = await findOrCreate("locations", locationObj, locationObj, "location_id");
 
-            const savedCategory: string = args.updatedItem.category;
             delete args.updatedItem.category; // Remove the category property from the input item so knex won't try to add it to the database
-
+            delete args.updatedItem.location;
             await DB.from("items")
                 .where({item_id: args.id})
                 .update({
-                    category_id: categoryId,
+                    category_id,
+                    location_id,
                     ...args.updatedItem
                 });
 
-            return {
-                id: args.id,
-                category: savedCategory,
-                ...args.updatedItem
-            };
+            return await getItem(args.id, context.user.admin);
         },
         createRequest: async (root, args, context): Promise<Request> => {
             // if non-admin, user on request must be user signed in
@@ -452,8 +488,9 @@ const resolvers: any = {
                 args.newRequest.quantity = 1;
             }
 
-            const initialStatus: RequestStatus = item.approvalRequired ? "SUBMITTED" : "APPROVED";
-            // return the request object with the item, censoring price/owner for non-admins
+            const initialStatus: RequestStatus = !item.approvalRequired && item.qtyUnreserved >= args.newRequest.quantity
+                ? "APPROVED" : "SUBMITTED";
+
             let newRequest: any = await DB.from("requests").insert({
                 ...args.newRequest,
                 status: initialStatus
@@ -611,3 +648,59 @@ apiRoutes.all("/graphiql", isAdminNoAuthCheck, graphqlHTTP({
     schema,
     graphiql: true
 }));
+
+apiRoutes.post("/slack/feedback", bodyParser.json(), (req, res) => {
+  fetch(config.server.slackURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      attachments: [
+        {
+          fallback: req.body.fallback,
+          color: req.body.color,
+          fields: [
+            {
+              title: "Feedback Type",
+              value: req.body.title,
+            },
+            {
+              title: "Comment",
+              value: req.body.text,
+            },
+            {
+              title: "URL",
+              value: req.body.title_link,
+            },
+            {
+              title: "Name",
+              value: req.user.name,
+            },
+            {
+              title: "UUID",
+              value: req.user.uuid,
+            },
+            {
+              title: "Email",
+              value: req.user.email,
+            },
+            {
+              title: "Slack Username",
+              value: req.user.slackUsername,
+            },
+            {
+              title: "Admin",
+              value: req.user.admin ? "Yes" : "No",
+            }
+          ]
+        }
+      ],
+    }),
+  }).then(response => {
+    return res.status(response.status).send({
+      status: response.status,
+      statusText: response.statusText
+    });
+  }).catch(error => {
+    return res.status(500).send(error.toString());
+  });
+});

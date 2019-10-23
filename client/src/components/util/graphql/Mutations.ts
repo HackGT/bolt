@@ -22,6 +22,11 @@ export const CREATE_ITEM = gql`
             approvalRequired
             returnRequired
             owner
+            location {
+                location_id
+                location_name
+                location_hidden
+            }
         }
     }
 `;
@@ -43,6 +48,11 @@ export const UPDATE_ITEM = gql`
             returnRequired
             owner
             hidden
+            location {
+                location_id
+                location_name
+                location_hidden
+            }
         }
     }
 `;
@@ -87,6 +97,11 @@ export const UPDATE_REQUEST = gql`
                 item_name
                 qtyAvailableForApproval
                 returnRequired
+                location {
+                    location_id
+                    location_name
+                    location_hidden
+                }
             }
             status
             quantity

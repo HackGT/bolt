@@ -14,6 +14,11 @@ export const ITEM_EDIT_GET_ITEM = gql`
             returnRequired
             hidden
             owner
+            location {
+                location_id
+                location_name
+                location_hidden
+            }
         }
     }`;
 
@@ -26,27 +31,49 @@ export const ALL_CATEGORIES = gql`
     }
 `;
 
+export const ALL_LOCATIONS = gql`
+    query locations {
+        locations {
+            location_id
+            location_name
+            location_hidden
+        }
+    }
+`;
+
 export const ALL_ITEMS = gql`
     query {
         allItems {
-            category {
-                category_id
-                category_name
+            location {
+                location_id
+                location_name
+                location_hidden
             }
-            items {
-                id
-                qtyUnreserved
-                item_name
-                description
-                imageUrl
-                category
-                totalAvailable
-                maxRequestQty
-                hidden
-                approvalRequired
-                returnRequired
-                owner
-                hidden
+            categories {
+                category {
+                    category_id
+                    category_name
+                }
+                items {
+                    id
+                    qtyUnreserved
+                    item_name
+                    description
+                    imageUrl
+                    category
+                    totalAvailable
+                    maxRequestQty
+                    hidden
+                    approvalRequired
+                    returnRequired
+                    owner
+                    hidden
+                    location {
+                        location_id
+                        location_name
+                        location_hidden
+                    }
+                }
             }
         }
     }
@@ -68,6 +95,11 @@ export const ALL_USERS = gql`
 
 export const DESK_REQUESTS = gql`
     query {
+        locations {
+            location_id
+            location_name
+            location_hidden
+        }
         requests(search:{statuses: [SUBMITTED, APPROVED, READY_FOR_PICKUP, FULFILLED, LOST, DAMAGED]}) {
             request_id
             user {
@@ -83,6 +115,11 @@ export const DESK_REQUESTS = gql`
                 item_name
                 qtyAvailableForApproval
                 returnRequired
+                location {
+                    location_id
+                    location_name
+                    location_hidden
+                }
             }
             status
             quantity

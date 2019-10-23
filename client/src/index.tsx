@@ -47,6 +47,8 @@ export const client = new ApolloClient({
     cache: new InMemoryCache({
         dataIdFromObject: (object: any) => {
             switch (object.__typename) {
+                case 'Location':
+                    return object.location_id;
                 case 'Category':
                     return object.category_id; // use `category_id` as the primary key
                 case 'User':

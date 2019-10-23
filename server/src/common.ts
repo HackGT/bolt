@@ -34,6 +34,7 @@ namespace IConfig {
         cookieSecureOnly: boolean;
         postgresURL: string;
         defaultTimezone: string;
+        slackURL: string;
     }
 
     export interface Main {
@@ -67,7 +68,8 @@ class Config implements IConfig.Main {
         cookieMaxAge: 1000 * 60 * 60 * 24 * 30 * 6, // 6 months
         cookieSecureOnly: false,
         postgresURL: "postgresql://localhost/bolt",
-        defaultTimezone: "America/New_York"
+        defaultTimezone: "America/New_York",
+        slackURL: "",
     };
     public admins = {
         domains: [] as string[],

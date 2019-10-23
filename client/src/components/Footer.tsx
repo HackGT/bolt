@@ -8,8 +8,9 @@ const Footer: React.FunctionComponent<{}> = (props) => {
             textAlign: "center",
             margin: "50px 0",
         }}>
-            <p>Made with 🤖 by the HackGTeam - <FeedbackLink/> - HackGT Hardware Checkout is powered by <a
+            <p>Made with 🤖 by the HackGTeam - HackGT Hardware Checkout is powered by <a
                 href="https://github.com/hackgt/bolt">Bolt</a> v{packageJson.version}</p>
+        <FeedbackLink/>
         </footer>
     );
 };

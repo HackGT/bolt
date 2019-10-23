@@ -16,11 +16,23 @@ export type HwItem = {
     qtyUnreserved: number;
     qtyInStock: number;
     qtyAvailableForApproval: number;
+    location: Location;
 };
 
 export type Category = {
     category_id: number
     category_name: string
+}
+
+export type Location = {
+    location_id: number
+    location_name: string
+    location_hidden: boolean
+}
+
+export type ItemByLocation = {
+    location: Location
+    categories: ItemByCat[]
 }
 
 export type ItemByCat = {
