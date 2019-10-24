@@ -73,6 +73,7 @@ export enum ItemStatus {
     SUBMITTED = "submitted",
     APPROVED = "approved",
     DECLINED = "declined",
+    ABANDONED = "abandoned",
     CANCELLED = "cancelled",
     READY = "ready",
     FULFILLED = "fulfilled",
@@ -84,6 +85,7 @@ export enum ItemStatus {
 export const SUBMITTED = "SUBMITTED";
 export const APPROVED = "APPROVED";
 export const DENIED = "DENIED";
+export const ABANDONED = "ABANDONED";
 export const CANCELLED = "CANCELLED";
 export const READY_FOR_PICKUP = "READY_FOR_PICKUP";
 export const FULFILLED = "FULFILLED";

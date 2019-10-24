@@ -52,7 +52,7 @@ class HomeContainer extends Component<Props, State> {
         const myRequests = this.props.user ? (<Grid.Column>
             <h1>My Requests</h1>
             <Segment placeholder>
-                <RequestedList/>
+                <RequestedList user={this.props.user}/>
             </Segment>
         </Grid.Column>) : "";
 

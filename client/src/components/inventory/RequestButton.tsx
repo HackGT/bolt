@@ -4,14 +4,26 @@ import {useMutation} from "@apollo/react-hooks";
 import {CREATE_REQUEST} from "../util/graphql/Mutations";
 import {RequestedItem} from "../../types/Hardware";
 import {withToastManager} from "react-toast-notifications";
+import {USER_REQUESTS} from "../util/graphql/Queries";
+import {User} from "../../types/User";
 
 interface RequestButtonProps {
     requestedItem: RequestedItem,
+    user: User,
     toastManager: any
 }
 
-function RequestButton({requestedItem, toastManager}: RequestButtonProps) {
-    const [createRequest, {loading}] = useMutation(CREATE_REQUEST);
+function RequestButton({requestedItem, user, toastManager}: RequestButtonProps) {
+    const [createRequest, {data, loading, error}] = useMutation(CREATE_REQUEST, {
+        refetchQueries: [
+            {
+                query: USER_REQUESTS,
+                variables: {
+                    uuid: user.uuid
+                },
+            },
+        ],
+    });
 
     return (
         <Button primary
