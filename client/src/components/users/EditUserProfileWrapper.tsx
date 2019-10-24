@@ -20,11 +20,6 @@ interface EditUserParams {
 
 
 class EditUserProfileWrapper extends Component<EditUserProps, {}> {
-    constructor(props: EditUserProps) {
-        super(props);
-    }
-
-
     public render() {
         const loader = <Loader active inline="centered" content="Loading profile information..."/>;
 

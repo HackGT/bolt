@@ -22,6 +22,9 @@ const httpLink = createHttpLink({
     credentials: "include"
 });
 
+// @ts-ignore
+global.appVersion = packageJson.version;
+
 const wsProtocol = window.location.protocol === "http:" ? "ws" : "wss";
 const wsHost = (!process.env.NODE_ENV || process.env.NODE_ENV === "development") ? "localhost:3000" : window.location.host;
 const wsUrl = `${wsProtocol}://${wsHost}/api`;
@@ -46,16 +49,25 @@ export const client = new ApolloClient({
     link,
     cache: new InMemoryCache({
         dataIdFromObject: (object: any) => {
+            console.log("*** apollo cache for object", object.__typename);
             switch (object.__typename) {
                 case 'Location':
-                    return object.location_id;
+                    console.log("location", object);
+                    return "Location:" + object.location_id;
                 case 'Category':
-                    return object.category_id; // use `category_id` as the primary key
+                    console.log("category", object);
+                    return "Category:" + object.category_id; // use `category_id` as the primary key
                 case 'User':
-                    return object.uuid; // use `uuid` as the primary key
+                    console.log("user", object);
+                    return "User:" + object.uuid; // use `uuid` as the primary key
                 case 'Request':
-                    return object.request_id; // use `request_id` as the primary key
+                    console.log("request", object);
+                    return "Request:" + object.request_id; // use `request_id` as the primary key
+                case 'Item':
+                    console.log("item", object);
+                    return "Item:" + object.id;
                 default:
+                    console.warn("UNKNOWN CACHE OBJECT TYPE", object);
                     return defaultDataIdFromObject(object); // fall back to default handling
             }
         }

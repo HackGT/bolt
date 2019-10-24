@@ -27,17 +27,18 @@ const ReviewCard = (props: ReviewCardProps) => {
     const {
         item_name, description, totalAvailable, maxRequestQty,
             imageUrl, category, price, owner,
-        approvalRequired, returnRequired, hidden
+        approvalRequired, returnRequired, hidden, location
     } = item;
     return (
         <Item>
             <Item.Image size="tiny" src={imageUrl}/>
             <Item.Content>
                 <Item.Header as="h4">{item_name}</Item.Header>
-                <Item.Meta>Request up to {maxRequestQty} at a time | {totalAvailable} available, Owner: {owner}, Unit
+                <Item.Meta>Request up to {maxRequestQty} at a time | {totalAvailable} available, Location: {location},
+                    Owner: {owner}, Unit
                     Cost: ${price}</Item.Meta>
                 <Item.Meta>
-                    <Label>{category}</Label>
+                    <Label>Category: {category}</Label>
                     {hidden ? <Label tag color="red">Hidden</Label> : null}
                     {!approvalRequired ? <Label tag color="red">No Approval Required</Label> : null}
                     {!returnRequired ? <Label tag color="red">No Return Required</Label> : null}

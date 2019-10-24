@@ -8,6 +8,7 @@ import {Redirect, withRouter} from "react-router-dom";
 import {compose} from "redux";
 import {Mutation} from "@apollo/react-components";
 import {CREATE_ITEM} from "../util/graphql/Mutations";
+import 'react-circular-progressbar/dist/styles.css';
 
 interface CSVWizardProps {
     toastManager: any;
@@ -19,7 +20,7 @@ interface CSVWizardState {
     isStepComplete: boolean;
     isSubmitting: boolean;
     isComplete: boolean;
-    itemsSubmitted: number;
+    itemsCreated: number;
     totalItems: number;
 }
 
@@ -44,7 +45,7 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
             isStepComplete: false,
             isSubmitting: false,
             isComplete: false,
-            itemsSubmitted: 0,
+            itemsCreated: 0,
             totalItems: 0
         };
     }
@@ -65,7 +66,6 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
     }
 
     public setInventory = (inventory: ItemComplete[]) => {
-        console.log(inventory);
         this.setState({inventory, isStepComplete: true});
     }
 
@@ -83,9 +83,9 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
                     newItem: item
                 }
             }).then(() => {
-                const numSubmitted = this.state.itemsSubmitted;
+                const numSubmitted = this.state.itemsCreated;
                 this.setState({
-                    itemsSubmitted: numSubmitted + 1
+                    itemsCreated: numSubmitted + 1
                 });
             }).catch((err: Error) => {
                 console.error(err);
@@ -191,10 +191,10 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
         return (
             <div id="csv-upload-wrapper">
                 <Dimmer active={isSubmitting}>
-                    <Loader indeterminate
-                            content={`${this.state.itemsSubmitted} of ${this.state.totalItems} imported`}/>
+                    <Loader content={`${this.state.itemsCreated} of ${this.state.totalItems} items imported`}/>
                 </Dimmer>
                 <Container>
+                    <Header size={"huge"}>Import Items</Header>
                     <Step.Group items={steps} />
                     {wizardStep === stepsSrc.length - 1 ? submitButton : nextButton}
                 </Container>

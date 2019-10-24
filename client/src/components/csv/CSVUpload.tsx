@@ -84,7 +84,7 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
             const header = lines[0].split("\t").map(field => field.toLowerCase());
 
             // Hardcoded header assumption
-            if (header.length != templateHeader.length) {
+            if (header.length !== templateHeader.length) {
                 toastManager.add("Improper CSV formatting, header too long", {
                     appearance: "error",
                     autoDismiss: true,
@@ -133,7 +133,6 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
                 this.addLog(`${newItem.item_name} added: Quantity ${newItem.totalAvailable}`);
                 items.push(newItem as ItemComplete);
             }
-            console.log(items);
             setInventory(items);
         });
         

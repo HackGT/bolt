@@ -21,6 +21,7 @@ export const REQUEST_CHANGE = gql`
                     location_id
                     location_name
                     location_hidden
+                    __typename @skip(if: false)
                 }
             }
             status

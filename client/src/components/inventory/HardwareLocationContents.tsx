@@ -42,11 +42,10 @@ const HardwareLocationContents = ({itemsByLocation, searchQuery, requestsEnabled
         <div style={{
             marginTop: 10
         }}>
-            <HardwareLocation location_name={itemsByLocation.location.location_name}/>
-            <Accordion>
-                {console.log("ibl", itemsByLocation)}
+            <HardwareLocation key={`${itemsByLocation.location.location_id}-hardware_loc`}
+                              location_name={itemsByLocation.location.location_name}/>
+            <Accordion key={`${itemsByLocation.location.location_id}-accordion`}>
                 {itemsByLocation.categories.map((itemByCat: ItemByCat, index: number) => <>
-                    {console.log("location:", itemsByLocation.location.location_name, filteredItems(itemByCat.items, searchQuery))}
                     {filteredItems(itemByCat.items, searchQuery).length ? <>
                         <Accordion.Title key={`${index}-title`}
                                          active={accordionState.includes(index) || searchQuery.length >= 3}
@@ -70,7 +69,7 @@ const HardwareLocationContents = ({itemsByLocation, searchQuery, requestsEnabled
                 </>)}
                 {(!itemsByLocation.categories.length
                     || !combinedAndFilteredItemsByCategory(itemsByLocation.categories, searchQuery).length) &&
-                <NoItemsFound searchQuery={searchQuery}/>}
+                <NoItemsFound key={`${itemsByLocation.location.location_id}-no_items`} searchQuery={searchQuery}/>}
             </Accordion>
             <Divider/>
         </div>

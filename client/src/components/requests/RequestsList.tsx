@@ -15,8 +15,7 @@ class RequestsList extends Component<{ requestedItemsList: RequestedItem[], remo
                 </Container>
             </Segment>
         );
-        const requestIsThere = <h1>YAS</h1>;
-        return this.props.requestedItemsList.length == 0 ? noRequest : (
+        return !this.props.requestedItemsList.length ? noRequest : (
             <Segment placeholder>
                 <Card.Group>
                     {this.props.requestedItemsList.map((item, index ) => {

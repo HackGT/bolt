@@ -1,6 +1,5 @@
 import React from 'react';
-import packageJson from "../../package.json";
-import SlackFeedback, { themes } from 'react-slack-feedback';
+import SlackFeedback from 'react-slack-feedback';
 
 const FeedbackLink = () => {
     // @ts-ignore
