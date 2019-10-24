@@ -23,7 +23,7 @@ function filteredRequests(requests: Request[], locationFilter: string): Request[
 
 function RequestedList() {
     const {loading, error, data} = useQuery(DESK_REQUESTS, {
-        pollInterval: 500
+        pollInterval: 30000
     });
     if (loading) {
         return (
