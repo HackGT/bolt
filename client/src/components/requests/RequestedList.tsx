@@ -7,22 +7,32 @@ import {
     Step
 } from "semantic-ui-react";
 import {
-    APPROVED, FULFILLED,
-    READY_FOR_PICKUP,
+    ABANDONED,
+    APPROVED, CANCELLED, DAMAGED, DENIED, FULFILLED, LOST,
+    READY_FOR_PICKUP, RETURNED,
     SUBMITTED
 } from "../../types/Hardware";
 import {useQuery} from "@apollo/react-hooks";
-import {DESK_REQUESTS} from "../util/graphql/Queries";
+import {USER_REQUESTS} from "../util/graphql/Queries";
 import {Request} from "../../types/Request";
 import ItemAndQuantity from "../desk/ItemAndQuantity";
+import {User} from "../../types/User";
 
-function RequestedList() {
-    const {loading, error, data} = useQuery(DESK_REQUESTS, {
+interface RequestedListProps {
+    user: User
+}
+
+function RequestedList({user}: RequestedListProps) {
+    const {loading, error, data} = useQuery(USER_REQUESTS, {
+        variables: {
+            uuid: user.uuid
+        },
         pollInterval: 30000
     });
     if (loading) {
         return (
-            <Loader active inline="centered" content="Loading your requests..."/>
+            <Loader active inline="centered"
+                    content="Loading your requests..."/>
         );
     }
 
@@ -63,63 +73,70 @@ function RequestedList() {
     }
 
     if (data.requests.length > 0) {
-        return data.requests.sort((a:Request, b:Request) => a.item.item_name.localeCompare(b.item.item_name)).sort((a:Request, b:Request) => a.item.location.location_name.localeCompare(b.item.location.location_name)).map((r: Request) => {
+        return data.requests.sort((a: Request, b: Request) => a.item.item_name.localeCompare(b.item.item_name)).sort((a: Request, b: Request) => a.item.location.location_name.localeCompare(b.item.location.location_name)).map((r: Request) => {
             if (r.item.returnRequired) {
                 idInfo = (<Label as='a' color={'yellow'} attached='top right'>
-                    <Icon name='id badge' />
+                    <Icon name='id badge'/>
                     Return required
                 </Label>)
             }
 
-            let locationInfo = (<Label>
-                <Icon name='map marker alternate' />
-                Checked out at {r.item.location.location_name}
-            </Label>)
+            let locationInfo = (<Card.Content>
+                <Label attached='bottom'>
+                    <Icon name='map marker alternate'/>
+                    Checked out at {r.item.location.location_name}
+                </Label>
+            </Card.Content>);
 
-            steps = (
-                <Step.Group stackable='tablet' size='mini'>
-                    <Step active={r.status === SUBMITTED} disabled={r.status !== SUBMITTED}>
-                        <Step.Content>
-                            <Step.Title>Submitted</Step.Title>
-                        </Step.Content>
-                    </Step>
-                    <Step active={r.status === APPROVED} disabled={r.status !== APPROVED}>
-                        <Step.Content>
-                            <Step.Title>Approved</Step.Title>
-                        </Step.Content>
-                    </Step>
-                    <Step active={r.status === READY_FOR_PICKUP} disabled={r.status !== READY_FOR_PICKUP}>
-                        <Step.Content>
-                            <Step.Title>Ready for
-                                Pickup</Step.Title>
-                        </Step.Content>
-                    </Step>
-                </Step.Group>);
-
-            if (r.status === FULFILLED && r.item.returnRequired) {
+            if (r.status == SUBMITTED || r.status === APPROVED) {
                 steps = (
-                    <Step.Group stackable='tablet' size='mini'>
-                        <Step>
-                            <Step.Content>
-                                <Step.Title>Fulfilled</Step.Title>
-                            </Step.Content>
-                        </Step>
-                        <Step disabled>
-                            <Step.Content>
-                                <Step.Title>Returned</Step.Title>
-                            </Step.Content>
-                        </Step>
-                    </Step.Group>);
-            }
-            if (r.status === FULFILLED && !r.item.returnRequired) {
+                    <Label.Group size={'large'}>
+                        <Label
+                            color={(r.status === SUBMITTED) ? 'blue' : undefined}>
+                            Submitted
+                        </Label>
+                        <Label
+                            color={(r.status === APPROVED) ? 'blue' : undefined}>
+                            Approved
+                        </Label>
+                        <Label>
+                            Ready for Pickup
+                        </Label>
+                    </Label.Group>);
+            } else if (r.status === READY_FOR_PICKUP || r.status === FULFILLED) {
+                steps = (<Label.Group size={'large'}>
+                    <Label
+                        color={(r.status === READY_FOR_PICKUP) ? 'green' : undefined}>
+                        Ready for Pickup
+                    </Label>
+                    <Label
+                        color={(r.status === FULFILLED) ? 'blue' : undefined}>
+                        Fulfilled
+                    </Label>
+                    {(r.item.returnRequired) &&
+                    <Label disabled>
+                        Returned
+                    </Label>}
+                </Label.Group>);
+            } else {
                 steps = (
-                    <Step.Group stackable='tablet' size='mini'>
-                        <Step active>
-                            <Step.Content>
-                                <Step.Title>Fulfilled</Step.Title>
-                            </Step.Content>
-                        </Step>
-                    </Step.Group>);
+                    <Label.Group size={'large'}>
+                        {(r.status === RETURNED) &&
+                        <Label basic size={'large'} color={'green'}>
+                            <Icon name='check circle'/>
+                            Returned
+                        </Label>}
+                        {(r.status === DENIED || r.status === ABANDONED || r.status === CANCELLED) &&
+                        <Label size={'large'} color={'red'}>
+                            <Icon name='times circle'/>
+                            {r.status.charAt(0).toUpperCase() + r.status.substring(1).toLowerCase()}
+                        </Label>}
+                        {(r.status === LOST || r.status === DAMAGED) &&
+                        <Label size={'large'} color={'orange'}>
+                            <Icon name='exclamation circle'/>
+                            {r.status.charAt(0).toUpperCase() + r.status.substring(1).toLowerCase()}
+                        </Label>}
+                    </Label.Group>);
             }
 
             return (
@@ -128,7 +145,11 @@ function RequestedList() {
                         <Card.Header>
                             <ItemAndQuantity quantity={r.quantity}
                                              itemName={r.item.item_name}/>
-                            &nbsp;<span style={{color: "gray", fontSize: 14, fontWeight: "normal"}}>#{r.request_id}</span>
+                            &nbsp;<span style={{
+                            color: "gray",
+                            fontSize: 14,
+                            fontWeight: "normal"
+                        }}>#{r.request_id}</span>
                         </Card.Header>
                         <Card.Description>
                             {steps}
