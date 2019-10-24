@@ -1,7 +1,15 @@
 import React, {useState} from 'react';
 import {useQuery} from "@apollo/react-hooks";
 import {ALL_ITEMS} from "../util/graphql/Queries";
-import {Button, Grid, Header, Icon, Input, Loader, Message} from "semantic-ui-react";
+import {
+    Button,
+    Grid,
+    Header,
+    Icon,
+    Input,
+    Loader,
+    Message
+} from "semantic-ui-react";
 import {ItemByLocation} from "../../types/Hardware";
 import HardwareLocationContents from "./HardwareLocationContents";
 import {connect} from "react-redux";
@@ -56,11 +64,25 @@ const NewHardwareList = ({user}: { user: User | null }) => {
 
     return (
         <div>
-            <Header size={"huge"}>Inventory</Header>
+            <Grid columns='equal'>
+                <Grid.Column>
+                    <Header size={"huge"}>Inventory</Header>
+                </Grid.Column>
+                <Grid.Column>
+                    {user && user.admin ?
+                        <Button primary icon
+                            labelPosition='left'
+                                as={Link}
+                                to="/admin/items/new">
+                            <Icon name='plus circle'/>
+                            Create item
+                        </Button> : ""}
+                </Grid.Column>
+            </Grid>
             <Grid columns="equal">
                 {noRequestsMessage}
                 <Grid.Row>
-                    <Grid.Column>
+                    <Grid.Column width={9}>
                         <Input type="text"
                                label="Search items"
                                style={{
@@ -77,15 +99,13 @@ const NewHardwareList = ({user}: { user: User | null }) => {
                         />
                     </Grid.Column>
                 </Grid.Row>
-                {user && user.admin ?
-                    <Grid.Row><Grid.Column><Button primary icon labelPosition='left' as={Link} to="/admin/items/new">
-                        <Icon
-                            name='plus circle'/>Create item</Button></Grid.Column></Grid.Row> : ""}
             </Grid>
             {data.allItems.map((itemsByLocation: ItemByLocation) =>
-                <HardwareLocationContents key={itemsByLocation.location.location_id}
-                                          requestsEnabled={requestsEnabled}
-                                          itemsByLocation={itemsByLocation} searchQuery={searchQuery}/>
+                <HardwareLocationContents
+                    key={itemsByLocation.location.location_id}
+                    requestsEnabled={requestsEnabled}
+                    itemsByLocation={itemsByLocation}
+                    searchQuery={searchQuery}/>
             )
             }
         </div>

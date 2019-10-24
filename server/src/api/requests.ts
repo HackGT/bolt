@@ -66,6 +66,7 @@ export function nestedRequest(request: KnexRequest, isAdmin: boolean, qtyInStock
         item: redactedItem(request, isAdmin, qtyInStock, qtyAvailableForApproval, qtyUnreserved),
         request_id: request.request_id,
         status: request.status,
+        location: redactedItem(request, isAdmin, qtyInStock, qtyAvailableForApproval, qtyUnreserved).location,
         quantity: request.quantity,
         createdAt: localTimestamp(request.created_at),
         updatedAt: localTimestamp(request.updated_at)

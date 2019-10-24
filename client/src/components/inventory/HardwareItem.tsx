@@ -1,11 +1,22 @@
 import React, {ChangeEvent} from "react";
-import {Button, Icon, Input, Item, Popup} from "semantic-ui-react";
+import {
+    Button,
+    Icon,
+    Input,
+    Item,
+    Popup
+} from "semantic-ui-react";
 import {withToastManager} from "react-toast-notifications";
 import {Link} from "react-router-dom";
-import {HwItem, ItemStatus, RequestedItem} from "../../types/Hardware";
+import {
+    HwItem,
+    ItemStatus,
+    RequestedItem
+} from "../../types/Hardware";
 import {AppState} from "../../state/Store";
 import {connect} from "react-redux";
 import {User} from "../../types/User";
+import RequestButton from "./RequestButton";
 
 interface HardwareItemState {
     qtyRequested: number;
@@ -16,7 +27,7 @@ interface HardwareItemProps {
     item: HwItem;
     toastManager: any;
     requestsEnabled: boolean;
-    user: User | null;
+    user: User;
     preview?: boolean;
 }
 
@@ -41,29 +52,6 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
         };
     }
 
-    public finishedLoading = () => {
-        const {toastManager} = this.props;
-        toastManager.add(`Successfully requested ${this.state.qtyRequested}x ${this.props.item.item_name}`,
-            {
-                appearance: "success",
-                autoDismiss: true,
-                placement: "top-center"
-            });
-
-        this.setState({
-            loading: false,
-        });
-        const newRequest: RequestedItem = {
-            id: this.props.item.id,
-            user: "Beardell",
-            name: this.props.item.item_name,
-            qtyRequested: this.state.qtyRequested,
-            category: this.props.item.category,
-            status: ItemStatus.SUBMITTED,
-            cancelled: false
-        };
-    }
-
     public incrementQty = () => {
         this.setState({
             qtyRequested: this.state.qtyRequested + 1
@@ -74,13 +62,6 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
         this.setState({
             qtyRequested: this.state.qtyRequested - 1
         });
-    }
-
-    public handleItemRequest = () => {
-        this.setState({
-            loading: true
-        });
-        setTimeout(this.finishedLoading, 3000);
     }
 
     public handleQtyUpdate = (qtyInput: ChangeEvent<HTMLInputElement>) => {
@@ -103,15 +84,16 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
     }
 
     public render() {
-        const requestBtn = (
-            <Button primary
-                    icon
-                    disabled={this.state.qtyRequested <= 0 || this.state.loading}
-                    loading={this.state.loading}
-                    onClick={this.handleItemRequest}
-                    labelPosition="right"
-            >Request {this.state.qtyRequested}<Icon name="arrow alternate circle right outline"/></Button>
-        );
+        const newRequest: RequestedItem = {
+            id: this.props.item.id,
+            user: this.props.user.uuid,
+            name: this.props.item.item_name,
+            qtyRequested: this.state.qtyRequested,
+            category: this.props.item.category,
+            status: ItemStatus.SUBMITTED,
+            location: this.props.item.location,
+            cancelled: false
+        };
 
         const minusBtn = (<Button icon="minus"
                                   onClick={this.decrementQty}
@@ -126,11 +108,12 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
                        value={this.state.qtyRequested}
                        disabled={this.state.loading}
                        onChange={this.handleQtyUpdate}/>
-                <Popup disabled={this.state.loading || !this.state.qtyRequested} inverted trigger={minusBtn}
+                <Popup disabled={this.state.loading || !this.state.qtyRequested}
+                       inverted trigger={minusBtn}
                        content="Remove one from request"/>
                 <Popup disabled={this.state.loading} inverted
                        trigger={plusBtn} content="Request another"/>
-                {requestBtn}
+                <RequestButton requestedItem={newRequest} user={this.props.user}/>
             </Input>) : "";
 
 
@@ -141,7 +124,8 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
                    trigger={<Button size="mini"
                                     basic primary
                                     disabled={this.props.preview}
-                                    icon as={Link} to={`admin/items/${this.props.item.id}`}>
+                                    icon as={Link}
+                                    to={`admin/items/${this.props.item.id}`}>
                        <Icon name="pencil"/>
                    </Button>}>
             </Popup>
@@ -149,7 +133,8 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
 
         const hidden = this.props.user && this.props.item.hidden ? (
             <Popup content="Item is not visible to non-admins" inverted
-                   trigger={<Icon style={{color: "gray"}} name="eye slash outline"/>}>
+                   trigger={<Icon style={{color: "gray"}}
+                                  name="eye slash outline"/>}>
             </Popup>
         ) : "";
 
@@ -172,7 +157,6 @@ function mapStateToProps(state: AppState) {
         user: state.account
     };
 }
-
 
 export default withToastManager(connect(mapStateToProps)(HardwareItem));
 

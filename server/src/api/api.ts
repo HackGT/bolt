@@ -508,7 +508,8 @@ const resolvers: any = {
             const result: Request = {
                 ...simpleRequest,
                 user,
-                item: updatedItem
+                item: updatedItem,
+                location: updatedItem.location
             };
 
             pubsub.publish(REQUEST_CHANGE, {
@@ -520,6 +521,7 @@ const resolvers: any = {
                 quantity: args.newRequest.quantity,
                 status: initialStatus,
                 item: updatedItem,
+                location: updatedItem.location,
                 user,
                 createdAt: localTimestamp(newRequest.created_at),
                 updatedAt: localTimestamp(newRequest.updated_at)
@@ -594,6 +596,8 @@ const resolvers: any = {
                 // fetch the item
                 const item: Item | null = await getItem(updatedRequest[0].request_item_id, context.user.admin);
 
+                const location: Location | null = getItemLocation(item);
+
                 if (!item) {
                     throw new GraphQLError(`Can't create request for item that doesn't exist!  Item ID provided: ${args.newRequest.request_item_id}`);
                 }
@@ -605,7 +609,8 @@ const resolvers: any = {
                 const result: Request = {
                     ...simpleRequest,
                     user,
-                    item
+                    item,
+                    location
                 };
 
                 pubsub.publish(REQUEST_CHANGE, {

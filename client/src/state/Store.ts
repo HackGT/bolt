@@ -1,14 +1,10 @@
 import {applyMiddleware, combineReducers, compose, createStore} from "redux";
-import reducers from "../reducers/reducers";
 import thunk from "redux-thunk";
 import {User} from "../types/User";
 import account from "./Account";
-import desk from "./Desk";
 
 const reducer = combineReducers({
-    reducers,
-    account,
-    desk
+    account
 });
 
 // thanks https://github.com/reduxjs/redux/issues/2359#issuecomment-372609400
