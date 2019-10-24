@@ -1,5 +1,5 @@
 import React, {ReactElement, useState} from "react";
-import {Container, Grid, Header, Input, Loader, Segment} from "semantic-ui-react";
+import {Container, Grid, Header, Input, Segment} from "semantic-ui-react";
 
 interface CardListProps {
     title: string;
@@ -12,8 +12,7 @@ interface CardListProps {
 }
 
 const CardList: React.FunctionComponent<CardListProps> = props => {
-    const spinner = <Loader active inline="centered" content="Just a sec!"/>;
-    let [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
 
     const cards = props.cards.filter((elem: any) => props.filter(elem, searchQuery)).map((elem: any) => props.render(elem));
     const noResults = (<Segment placeholder>

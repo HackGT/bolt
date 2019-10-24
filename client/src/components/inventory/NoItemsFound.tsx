@@ -12,7 +12,10 @@ const NoItemsFound = ({searchQuery, user}: any) => {
             <p>This location doesn't have any items you can see. Try again later, or contact a HackGT staff member for
                 further assistance.</p>
             {user && user.admin &&
-            <Button primary as={Link} to="/admin/items/new">Create item</Button>}
+            <>
+                <Button primary as={Link} to="/admin/items/new">Create item</Button>
+                <Button as={Link} to="/admin/csv">Import items</Button>
+            </>}
         </Message>);
     }
 

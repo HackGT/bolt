@@ -1,18 +1,8 @@
 import React, {ChangeEvent} from "react";
-import {
-    Button,
-    Icon,
-    Input,
-    Item,
-    Popup
-} from "semantic-ui-react";
+import {Button, Icon, Input, Item, Popup} from "semantic-ui-react";
 import {withToastManager} from "react-toast-notifications";
 import {Link} from "react-router-dom";
-import {
-    HwItem,
-    ItemStatus,
-    RequestedItem
-} from "../../types/Hardware";
+import {HwItem, ItemStatus, RequestedItem} from "../../types/Hardware";
 import {AppState} from "../../state/Store";
 import {connect} from "react-redux";
 import {User} from "../../types/User";

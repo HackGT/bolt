@@ -19,7 +19,7 @@ function returnRequired(requests: Request[]): boolean {
 }
 
 function ReadyForPickupCard({card}: ReadyForPickupCardProps) {
-    const [updateRequest, {data, loading, error}] = useMutation(UPDATE_REQUEST);
+    const [updateRequest, {loading, error}] = useMutation(UPDATE_REQUEST);
 
     // @ts-ignore
     card.requests.sort((a: Request, b: Request) => new Date(a.updatedAt) - new Date(b.updatedAt));

@@ -19,8 +19,6 @@ const hardwareDesk: AdminCardLink[] = [
 
 const manage: AdminCardLink[] = [
     adminCardLink("Users", "/admin/users"),
-    adminCardLink("Requests"),
-    adminCardLink("Items")
 ];
 
 const reports: AdminCardLink[] = [
@@ -32,6 +30,7 @@ const reports: AdminCardLink[] = [
 const baseUrl = (process.env.NODE_ENV === "production") ? "" : "http://localhost:3000";
 
 const utilities: AdminCardLink[] = [
+    adminCardLink("Import items", "/admin/csv"),
     adminCardLink("GraphiQL", `${baseUrl}/api/graphiql`, true)
 ];
 
