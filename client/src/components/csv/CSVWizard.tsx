@@ -8,7 +8,6 @@ import {Redirect, withRouter} from "react-router-dom";
 import {compose} from "redux";
 import {Mutation} from "@apollo/react-components";
 import {CREATE_ITEM} from "../util/graphql/Mutations";
-import 'react-circular-progressbar/dist/styles.css';
 
 interface CSVWizardProps {
     toastManager: any;
