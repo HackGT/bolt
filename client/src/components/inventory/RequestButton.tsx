@@ -1,6 +1,6 @@
 import React from "react";
 import {Button, Icon} from "semantic-ui-react";
-import {useMutation, useQuery} from "@apollo/react-hooks";
+import {useMutation} from "@apollo/react-hooks";
 import {CREATE_REQUEST} from "../util/graphql/Mutations";
 import {RequestedItem} from "../../types/Hardware";
 import {withToastManager} from "react-toast-notifications";
@@ -11,7 +11,7 @@ interface RequestButtonProps {
 }
 
 function RequestButton({requestedItem, toastManager}: RequestButtonProps) {
-    const [createRequest, {data, loading, error}] = useMutation(CREATE_REQUEST);
+    const [createRequest, {loading}] = useMutation(CREATE_REQUEST);
 
     return (
         <Button primary
