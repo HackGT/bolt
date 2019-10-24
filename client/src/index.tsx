@@ -49,25 +49,18 @@ export const client = new ApolloClient({
     link,
     cache: new InMemoryCache({
         dataIdFromObject: (object: any) => {
-            console.log("*** apollo cache for object", object.__typename);
             switch (object.__typename) {
                 case 'Location':
-                    console.log("location", object);
                     return "Location:" + object.location_id;
                 case 'Category':
-                    console.log("category", object);
                     return "Category:" + object.category_id; // use `category_id` as the primary key
                 case 'User':
-                    console.log("user", object);
                     return "User:" + object.uuid; // use `uuid` as the primary key
                 case 'Request':
-                    console.log("request", object);
                     return "Request:" + object.request_id; // use `request_id` as the primary key
                 case 'Item':
-                    console.log("item", object);
                     return "Item:" + object.id;
                 default:
-                    console.warn("UNKNOWN CACHE OBJECT TYPE", object);
                     return defaultDataIdFromObject(object); // fall back to default handling
             }
         }
