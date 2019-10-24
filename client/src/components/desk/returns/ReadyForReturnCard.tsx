@@ -45,7 +45,7 @@ function ControlledPopup(props: any) {
 }
 
 function ReadyForReturnCard({card}: ReadyForReturnCardProps) {
-    const [updateRequest, {data, loading, error}] = useMutation(UPDATE_REQUEST);
+    const [updateRequest, {loading, error}] = useMutation(UPDATE_REQUEST);
 
     // @ts-ignore
     card.requests.sort((a: Request, b: Request) => a.item.returnRequired - b.item.returnRequired || a.request_id - b.request_id);

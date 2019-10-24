@@ -187,6 +187,10 @@ class Config implements IConfig.Main {
         if (process.env.EVENT_NAME) {
             this.eventName = process.env.EVENT_NAME;
         }
+
+        if (process.env.SLACK_WEBHOOK_URL) {
+            this.server.slackURL = process.env.SLACK_WEBHOOK_URL;
+        }
     }
 }
 export let config = new Config();

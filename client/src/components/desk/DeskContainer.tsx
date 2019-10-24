@@ -19,7 +19,6 @@ function mapStateToProps(state: any) {
 function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], location_id: number = 0) {
 
     return requests.filter((r: Request) => {
-        console.log(r.item, location_id);
         return (location_id === 0 || r.item.location.location_id === location_id)
             && statuses.some(status => r.status === status);
     });
@@ -96,7 +95,7 @@ function getUpdateQuery() {
 
 function DeskContainer() {
     const {subscribeToMore, ...query} = useQuery(DESK_REQUESTS);
-    const [randomPhrase, setRandomPhrase] = useState(`${pickRandomElement(starters)} ${Math.floor((Math.random() + 1) * 900)} ${pickRandomElement(funPhrases)} ${pickRandomElement(endings)}`);
+    const randomPhrase = useState(`${pickRandomElement(starters)} ${Math.floor((Math.random() + 1) * 900)} ${pickRandomElement(funPhrases)} ${pickRandomElement(endings)}`);
     const [returnsMode, setReturnsMode] = useState(false);
     const [location, setLocation] = useState();
 
