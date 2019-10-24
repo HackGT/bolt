@@ -22,6 +22,9 @@ const httpLink = createHttpLink({
     credentials: "include"
 });
 
+// @ts-ignore
+global.appVersion = packageJson.version;
+
 const wsProtocol = window.location.protocol === "http:" ? "ws" : "wss";
 const wsHost = (!process.env.NODE_ENV || process.env.NODE_ENV === "development") ? "localhost:3000" : window.location.host;
 const wsUrl = `${wsProtocol}://${wsHost}/api`;
@@ -48,13 +51,15 @@ export const client = new ApolloClient({
         dataIdFromObject: (object: any) => {
             switch (object.__typename) {
                 case 'Location':
-                    return object.location_id;
+                    return "Location:" + object.location_id;
                 case 'Category':
-                    return object.category_id; // use `category_id` as the primary key
+                    return "Category:" + object.category_id; // use `category_id` as the primary key
                 case 'User':
-                    return object.uuid; // use `uuid` as the primary key
+                    return "User:" + object.uuid; // use `uuid` as the primary key
                 case 'Request':
-                    return object.request_id; // use `request_id` as the primary key
+                    return "Request:" + object.request_id; // use `request_id` as the primary key
+                case 'Item':
+                    return "Item:" + object.id;
                 default:
                     return defaultDataIdFromObject(object); // fall back to default handling
             }

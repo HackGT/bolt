@@ -16,6 +16,7 @@ import DeskContainer from "./components/desk/DeskContainer";
 import {User} from "./types/User";
 import {loginUser} from "./state/Account";
 import {AppState} from "./state/Store";
+import CacheBuster from "./components/util/CacheBuster";
 
 export interface OwnProps {
 
@@ -95,6 +96,18 @@ class App extends Component<Props, {}> {
                         <Footer/>
                     </ToastProvider>
                 </Router>
+                <CacheBuster>
+                    {({loading, isLatestVersion, refreshCacheAndReload}: any) => {
+                        if (loading) {
+                            return null;
+                        }
+                        if (!loading && !isLatestVersion) {
+                            // You can decide how and when you want to force reload
+                            refreshCacheAndReload();
+                        }
+                        return null;
+                    }}
+                </CacheBuster>
             </div>
         );
     }

@@ -6,6 +6,8 @@ import {ItemComplete} from "../item/ItemEditForm";
 import {withToastManager} from "react-toast-notifications";
 import {Redirect, withRouter} from "react-router-dom";
 import {compose} from "redux";
+import {Mutation} from "@apollo/react-components";
+import {CREATE_ITEM} from "../util/graphql/Mutations";
 
 interface CSVWizardProps {
     toastManager: any;
@@ -17,6 +19,8 @@ interface CSVWizardState {
     isStepComplete: boolean;
     isSubmitting: boolean;
     isComplete: boolean;
+    itemsCreated: number;
+    totalItems: number;
 }
 
 interface StepInterface {
@@ -39,7 +43,9 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
             inventory: [],
             isStepComplete: false,
             isSubmitting: false,
-            isComplete: false
+            isComplete: false,
+            itemsCreated: 0,
+            totalItems: 0
         };
     }
 
@@ -62,16 +68,45 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
         this.setState({inventory, isStepComplete: true});
     }
 
-    public uploadInventory = () => {
-        this.setState({isSubmitting: true});
-        window.alert("Unimplemented");
-        window.setTimeout(this.onInventorySubmitted, 2000);
+    public uploadInventory = (createItem: any) => {
+        const totalItems = this.state.inventory.length;
+        this.setState({
+            isSubmitting: true,
+            totalItems
+        });
+
+        Promise.all(this.state.inventory.map((item) => {
+
+            return createItem({
+                variables: {
+                    newItem: item
+                }
+            }).then(() => {
+                const numSubmitted = this.state.itemsCreated;
+                this.setState({
+                    itemsCreated: numSubmitted + 1
+                });
+            }).catch((err: Error) => {
+                console.error(err);
+            });
+        })).then(() => this.onInventorySubmitted())
+            .catch((error) => {
+                const {toastManager} = this.props;
+                this.setState({isComplete: true, isSubmitting: false});
+                toastManager.add(`Error submitted one or more items: ${error.message}`, {
+                    appearance: "error",
+                    autoDismiss: false,
+                    placement: "top-center"
+                });
+            });
+
+
     }
 
     public onInventorySubmitted = () => {
         const { toastManager } = this.props;
         this.setState({isComplete: true, isSubmitting: false});
-        toastManager.add("CSV Submitted! Redirecting", {
+        toastManager.add("Import successful!  You may need to refresh the page to see the new items", {
             appearance: "success",
             autoDismiss: true,
             placement: "top-center"
@@ -96,14 +131,21 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
         );
 
         const submitButton = (
-            <Button
-                onClick={this.uploadInventory}
-                floated="right"
-                color="green"
-                disabled={this.state.isSubmitting}
-                    >
-                Submit
-            </Button>
+            <Mutation mutation={CREATE_ITEM}>
+                {
+                    (createItem: any, {loading, error, data}: any) => (
+                        <Button
+                            onClick={() => this.uploadInventory(createItem)}
+                            floated="right"
+                            color="green"
+                            disabled={this.state.isSubmitting}
+                        >
+                            Submit
+                        </Button>
+                    )
+                }
+
+            </Mutation>
         );
 
         const defaultStep = (
@@ -148,9 +190,10 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
         return (
             <div id="csv-upload-wrapper">
                 <Dimmer active={isSubmitting}>
-                    <Loader />
+                    <Loader content={`${this.state.itemsCreated} of ${this.state.totalItems} items imported`}/>
                 </Dimmer>
                 <Container>
+                    <Header size={"huge"}>Import Items</Header>
                     <Step.Group items={steps} />
                     {wizardStep === stepsSrc.length - 1 ? submitButton : nextButton}
                 </Container>

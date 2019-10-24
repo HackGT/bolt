@@ -18,15 +18,13 @@ function noStockWarning(remaining: number) {
 }
 
 function SubmittedCard({request}: SubmittedCardProps) {
-    const [updateRequest, {data, loading, error}] = useMutation(UPDATE_REQUEST);
-
+    const [updateRequest, {loading, error}] = useMutation(UPDATE_REQUEST);
 
     const noIssues = <Card.Content className="hw-positive">
         <Icon name="check circle"/> No issues found
     </Card.Content>;
 
     return (
-
         <Card className="hw-card">
             <Card.Content>
                 <Label attached="top left">

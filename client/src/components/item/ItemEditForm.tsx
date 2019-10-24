@@ -127,17 +127,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
     }
 
     public render() {
-        const categories = ["Extension Cords", "Laptops", "Microcontrollers", "Robotics"];
-
-        const categoryChoices = categories.map(item => {
-            return {
-                key: item.replace(" ", "_").toLowerCase(),
-                value: item,
-                text: item
-            };
-        });
-        const editing = !this.props.createItem;
-
         const itemOwnerChoices = ["HackGT", "The Hive", "Invention Studio"];
 
         const qtyPerRequestTooBigErrorMessage = <Message error visible={this.state.qtyPerRequestTooLargeError}

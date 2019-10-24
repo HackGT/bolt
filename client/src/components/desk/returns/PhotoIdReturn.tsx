@@ -12,10 +12,6 @@ function toDropdownOptions(options: string[]) {
     });
 }
 
-function generateCard({title, content, button, error, returnRequired, returnType, setReturnType, optional}: any) {
-
-}
-
 function PhotoIdCheck({userName, loading, updateRequest, requests, returnRequired, haveID, error, setOpen, optional, numReturnRequired}: any) {
     const [returnType, setReturnType] = useState(RETURNED);
 
