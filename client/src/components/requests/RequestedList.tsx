@@ -56,11 +56,6 @@ function RequestedList({user}: RequestedListProps) {
         </Step.Group>
     );
 
-    let idInfo = (
-        <Label as='a'>
-        </Label>
-    )
-
     if (data.requests.length === 0) {
         return (
             <Container textAlign="center">
@@ -73,13 +68,14 @@ function RequestedList({user}: RequestedListProps) {
     }
 
     if (data.requests.length > 0) {
-        return data.requests.sort((a: Request, b: Request) => a.item.item_name.localeCompare(b.item.item_name)).sort((a: Request, b: Request) => a.item.location.location_name.localeCompare(b.item.location.location_name)).map((r: Request) => {
-            if (r.item.returnRequired) {
-                idInfo = (<Label as='a' color={'yellow'} attached='top right'>
+        return data.requests.sort((a: Request, b: Request) => a.item.location.location_name.localeCompare(b.item.location.location_name) || a.item.item_name.localeCompare(b.item.item_name) || a.request_id - b.request_id).map((r: Request) => {
+
+            let idInfo = (r.item.returnRequired) && (
+                <Label as='a' color={'yellow'} attached='top right'>
                     <Icon name='id badge'/>
                     Return required
-                </Label>)
-            }
+                </Label>
+            )
 
             let locationInfo = (<Card.Content>
                 <Label attached='bottom'>
