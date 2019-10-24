@@ -14,7 +14,6 @@ function RequestButton({requestedItem, toastManager}: RequestButtonProps) {
     const [createRequest, {data, loading, error}] = useMutation(CREATE_REQUEST);
 
     return (
-
         <Button primary
                 icon
                 disabled={loading}

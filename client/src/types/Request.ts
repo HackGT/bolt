@@ -1,5 +1,5 @@
 import {BaseUserWithID, FullUser} from "./User";
-import {HwItem} from "./Hardware";
+import {HwItem, Location} from "./Hardware";
 
 export type RequestStatus =
     "SUBMITTED" |
@@ -18,6 +18,7 @@ export interface Request {
     user: FullUser;
     item: HwItem;
     status: RequestStatus;
+    location: Location;
     quantity: number;
     createdAt: Date;
     updatedAt: Date;

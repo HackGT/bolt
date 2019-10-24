@@ -64,6 +64,7 @@ export interface RequestedItem {
     name: string;
     qtyRequested: number;
     category: string;
+    location: Location;
     status: ItemStatus;
     cancelled: boolean;
 }

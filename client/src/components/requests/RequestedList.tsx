@@ -9,7 +9,7 @@ import {
 import {
     APPROVED, FULFILLED,
     READY_FOR_PICKUP,
-    RequestedItem,
+    Location,
     SUBMITTED
 } from "../../types/Hardware";
 import {useQuery} from "@apollo/react-hooks";
@@ -17,17 +17,17 @@ import {DESK_REQUESTS} from "../util/graphql/Queries";
 import {Request} from "../../types/Request";
 import ItemAndQuantity from "../desk/ItemAndQuantity";
 
-interface RequestedListProps {
-    requestedItemsList: RequestedItem[]
+function filteredRequests(requests: Request[], locationFilter: string): Request[] {
+    return requests.filter((r: Request) => r.item.location.location_name === locationFilter);
 }
 
-function RequestedList({requestedItemsList}: RequestedListProps) {
+function RequestedList() {
     const {loading, error, data} = useQuery(DESK_REQUESTS, {
         pollInterval: 500
     });
     if (loading) {
         return (
-            <Loader active inline="centered" content="Please wait..."/>
+            <Loader active inline="centered" content="Loading your requests..."/>
         );
     }
 
@@ -68,13 +68,20 @@ function RequestedList({requestedItemsList}: RequestedListProps) {
     }
 
     if (data.requests.length > 0) {
-        return data.requests.map((r: Request, index: number) => {
+        const locations:Location[] = data.locations;
+        locations.sort((a:Location, b:Location) => a.location_name.localeCompare(b.location_name))
+        return data.requests.sort((a:Request, b:Request) => a.item.item_name.localeCompare(b.item.item_name)).sort((a:Request, b:Request) => a.item.location.location_name.localeCompare(b.item.location.location_name)).map((r: Request) => {
             if (r.item.returnRequired) {
                 idInfo = (<Label as='a' color={'yellow'} attached='top right'>
                     <Icon name='id badge' />
                     Return required
                 </Label>)
             }
+
+            let locationInfo = (<Label>
+                <Icon name='map marker alternate' />
+                Checked out at {r.item.location.location_name}
+            </Label>)
 
             steps = (
                 <Step.Group stackable='tablet' size='mini'>
@@ -96,8 +103,34 @@ function RequestedList({requestedItemsList}: RequestedListProps) {
                     </Step>
                 </Step.Group>);
 
-            return (<Card.Group>
-                <Card key={index} fluid>
+            if (r.status === FULFILLED && r.item.returnRequired) {
+                steps = (
+                    <Step.Group stackable='tablet' size='mini'>
+                        <Step>
+                            <Step.Content>
+                                <Step.Title>Fulfilled</Step.Title>
+                            </Step.Content>
+                        </Step>
+                        <Step disabled>
+                            <Step.Content>
+                                <Step.Title>Returned</Step.Title>
+                            </Step.Content>
+                        </Step>
+                    </Step.Group>);
+            }
+            if (r.status === FULFILLED && !r.item.returnRequired) {
+                steps = (
+                    <Step.Group stackable='tablet' size='mini'>
+                        <Step active>
+                            <Step.Content>
+                                <Step.Title>Fulfilled</Step.Title>
+                            </Step.Content>
+                        </Step>
+                    </Step.Group>);
+            }
+
+            return (
+                <Card fluid>
                     <Card.Content>
                         <Card.Header>
                             <ItemAndQuantity quantity={r.quantity}
@@ -109,8 +142,9 @@ function RequestedList({requestedItemsList}: RequestedListProps) {
                         </Card.Description>
                     </Card.Content>
                     {idInfo}
+                    {locationInfo}
                 </Card>
-            </Card.Group>);
+            );
         });
     }
 }

@@ -42,6 +42,7 @@ export type RequestStatusAction = RequestStatus & GenericAction;
 
 export const fetchRequestsAndUsers = () => {
     return (dispatch: any, getState: any) => {
+        const loc = {location_id: 1, location_name: "GECH", location_hidden: false}
         return new Promise<RequestsAndUsers>((resolve) => {
             const mock = {
                 users: [{
@@ -54,6 +55,7 @@ export const fetchRequestsAndUsers = () => {
                     qtyRequested: 3,
                     category: "hardware lol",
                     status: ItemStatus.FULFILLED,
+                    location: loc,
                     cancelled: false
                 }]
             };

@@ -520,6 +520,7 @@ const resolvers: any = {
                 quantity: args.newRequest.quantity,
                 status: initialStatus,
                 item: updatedItem,
+                location: updatedItem.location,
                 user,
                 createdAt: localTimestamp(newRequest.created_at),
                 updatedAt: localTimestamp(newRequest.updated_at)

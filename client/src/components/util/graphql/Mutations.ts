@@ -72,6 +72,11 @@ export const CREATE_REQUEST = gql`
                 qtyAvailableForApproval
                 returnRequired
             }
+            location {
+                location_id
+                location_name
+                location_hidden
+            }
             status
             quantity
             createdAt

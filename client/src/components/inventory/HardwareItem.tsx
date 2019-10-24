@@ -91,6 +91,7 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
             qtyRequested: this.state.qtyRequested,
             category: this.props.item.category,
             status: ItemStatus.SUBMITTED,
+            location: this.props.item.location,
             cancelled: false
         };
 
@@ -112,7 +113,6 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
                        content="Remove one from request"/>
                 <Popup disabled={this.state.loading} inverted
                        trigger={plusBtn} content="Request another"/>
-                {/*{requestBtn}*/}
                 <RequestButton requestedItem={newRequest} user={this.props.user}/>
             </Input>) : "";
 
