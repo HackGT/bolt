@@ -9,17 +9,12 @@ import {
 import {
     APPROVED, FULFILLED,
     READY_FOR_PICKUP,
-    Location,
     SUBMITTED
 } from "../../types/Hardware";
 import {useQuery} from "@apollo/react-hooks";
 import {DESK_REQUESTS} from "../util/graphql/Queries";
 import {Request} from "../../types/Request";
 import ItemAndQuantity from "../desk/ItemAndQuantity";
-
-function filteredRequests(requests: Request[], locationFilter: string): Request[] {
-    return requests.filter((r: Request) => r.item.location.location_name === locationFilter);
-}
 
 function RequestedList() {
     const {loading, error, data} = useQuery(DESK_REQUESTS, {
@@ -68,8 +63,6 @@ function RequestedList() {
     }
 
     if (data.requests.length > 0) {
-        const locations:Location[] = data.locations;
-        locations.sort((a:Location, b:Location) => a.location_name.localeCompare(b.location_name))
         return data.requests.sort((a:Request, b:Request) => a.item.item_name.localeCompare(b.item.item_name)).sort((a:Request, b:Request) => a.item.location.location_name.localeCompare(b.item.location.location_name)).map((r: Request) => {
             if (r.item.returnRequired) {
                 idInfo = (<Label as='a' color={'yellow'} attached='top right'>

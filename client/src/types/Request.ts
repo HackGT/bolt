@@ -1,5 +1,5 @@
 import {BaseUserWithID, FullUser} from "./User";
-import {HwItem, Location} from "./Hardware";
+import {HwItem} from "./Hardware";
 
 export type RequestStatus =
     "SUBMITTED" |
