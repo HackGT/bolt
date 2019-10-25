@@ -125,7 +125,7 @@ function RequestedList({user}: RequestedListProps) {
                         {(r.status === DENIED || r.status === ABANDONED || r.status === CANCELLED) &&
                         <Label size={'large'} color={'red'}>
                             <Icon name='times circle'/>
-                            {r.status.charAt(0).toUpperCase() + r.status.substring(1).toLowerCase()}
+                            {r.status === DENIED ? "Declined" : r.status.charAt(0).toUpperCase() + r.status.substring(1).toLowerCase()}
                         </Label>}
                         {(r.status === LOST || r.status === DAMAGED) &&
                         <Label size={'large'} color={'orange'}>
