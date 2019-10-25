@@ -3,7 +3,12 @@ import {Button, Card, Header, Icon, Label, Popup} from "semantic-ui-react";
 import TimeAgo from "react-timeago";
 import {Request, UserAndRequests} from "../../../types/Request";
 import ItemAndQuantity from "../ItemAndQuantity";
-import {DAMAGED, FULFILLED, LOST, READY_FOR_PICKUP} from "../../../types/Hardware";
+import {
+    DAMAGED,
+    FULFILLED,
+    LOST,
+    READY_FOR_PICKUP
+} from "../../../types/Hardware";
 import {useMutation} from "@apollo/react-hooks";
 import {UPDATE_REQUEST} from "../../util/graphql/Mutations";
 import {updateRequestStatus} from "../DeskUtil";
@@ -23,7 +28,8 @@ function numReturnRequired(requests: Request[]): number {
 }
 
 function WarningLabel({text}: { text: string }) {
-    return <Label><span className={"hw-negative"}><Icon name={"exclamation triangle"}/>{text}</span></Label>;
+    return <Label><span className={"hw-negative"}><Icon
+        name={"exclamation triangle"}/>{text}</span></Label>;
 }
 
 function ControlledPopup(props: any) {
@@ -33,7 +39,9 @@ function ControlledPopup(props: any) {
                   onOpen={() => setOpen(true)}
                   onClose={() => setOpen(false)}
                   trigger={props.children}
-                  content={<PhotoIdReturn userName={props.user.name} loading={props.loading} error={props.error}
+                  content={<PhotoIdReturn userName={props.user.name}
+                                          loading={props.loading}
+                                          error={props.error}
                                           updateRequest={props.updateRequest}
                                           returnRequired={props.returnRequired}
                                           haveID={props.user.haveID}
@@ -58,23 +66,29 @@ function ReadyForReturnCard({card}: ReadyForReturnCardProps) {
                 </Header>
             </Card.Content>
             {
-                card.requests.map(request => <Card.Content key={request.request_id}>
+                card.requests.map(request => <Card.Content key={request.request_id}
+                                                  description>
                     <strong>
-                        <ItemAndQuantity quantity={request.quantity} itemName={request.item.item_name}/>
+                        <ItemAndQuantity quantity={request.quantity}
+                                         itemName={request.item.item_name}/>
                     </strong>&nbsp;
                     <span style={{color: "gray"}}>#{request.request_id}</span>
 
                     <div style={{display: "inline", float: "right"}}>
                         {request.status === LOST && <WarningLabel text="LOST"/>}
-                        {request.status === DAMAGED && <WarningLabel text="DAMAGED"/>}
+                        {request.status === DAMAGED &&
+                        <WarningLabel text="DAMAGED"/>}
                         {request.status === FULFILLED && !request.item.returnRequired &&
                         <Popup inverted position={"top center"}
-                               trigger={<Label><span className={"hw-positive"}>Optional</span></Label>}
+                               trigger={<Label><span
+                                   className={"hw-positive"}>Optional</span></Label>}
                                content={`${card.user.name} is not required to return this item`}
                         />}
 
                         &nbsp;
-                        <ControlledPopup loading={loading} user={card.user} error={error} updateRequest={updateRequest}
+                        <ControlledPopup loading={loading} user={card.user}
+                                         error={error}
+                                         updateRequest={updateRequest}
                                          returnRequired={request.item.returnRequired}
                                          numReturnRequired={numReturnRequired(card.requests)}
                                          requests={[request]}>
@@ -83,17 +97,22 @@ function ReadyForReturnCard({card}: ReadyForReturnCardProps) {
                             </Button>
                         </ControlledPopup>
                     </div>
+                    <Card.Content>
+                        <Icon name={"map marker alternate"}/>{request.item.location.location_name}
+                    </Card.Content>
                 </Card.Content>)
             }
 
             <Card.Content>
-                <Icon name="clock outline"/> <TimeAgo date={card.requests[0].updatedAt}/>
+                <Icon name="clock outline"/> <TimeAgo
+                date={card.requests[0].updatedAt}/>
             </Card.Content>
             <Card.Content>
                 <Icon name={"slack hash"}/>{card.user.slackUsername}
             </Card.Content>
             {error ? <Card.Content className="hw-negative">
-                <Icon name="warning sign"/>Unable to change request status: {error.message}
+                <Icon name="warning sign"/>Unable to change request
+                status: {error.message}
             </Card.Content> : ""}
             <Card.Content extra>
                 <div className="ui two buttons right aligned">
@@ -104,17 +123,21 @@ function ReadyForReturnCard({card}: ReadyForReturnCardProps) {
                                     updateRequestStatus(updateRequest, request.request_id, READY_FOR_PICKUP)
                                 )
                             }>
-                                <Icon className="hw-negative" name="arrow left"/>
+                                <Icon className="hw-negative"
+                                      name="arrow left"/>
                             </Button>}
                                content="Return all to Ready for Pickup"
                         />
-                        <ControlledPopup loading={loading} user={card.user} error={error} updateRequest={updateRequest}
+                        <ControlledPopup loading={loading} user={card.user}
+                                         error={error}
+                                         updateRequest={updateRequest}
                                          requests={requiredRequests}
                                          returnRequired={numReturnRequired(requiredRequests) >= 1}
                                          numReturnRequired={numReturnRequired(requiredRequests)}
                         >
                             {numReturnRequired(requiredRequests) >= 1 &&
-                            <Button icon loading={loading} labelPosition="right" color="green">
+                            <Button icon loading={loading} labelPosition="right"
+                                    color="green">
                                 <Icon name="checkmark"/>
                                 All required
                             </Button>}
