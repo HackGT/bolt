@@ -60,6 +60,8 @@ export const client = new ApolloClient({
                     return "Request:" + object.request_id; // use `request_id` as the primary key
                 case 'Item':
                     return "Item:" + object.id;
+                case 'Setting':
+                    return "Setting:" + object.name;
                 default:
                     return defaultDataIdFromObject(object); // fall back to default handling
             }
