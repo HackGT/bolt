@@ -113,7 +113,7 @@ async function getSetting(settingName) {
     }).select("name", "value");
 
     if (settings.length === 0) {
-        return 0;
+        throw new GraphQLError("No setting found");
     }
     return settings[0];
 }
@@ -487,8 +487,13 @@ const resolvers: any = {
             const user = await getUser(args.newRequest.user_id);
 
             // check requests_allowed setting status
-            const requests_allowed = await getSetting("requests_allowed");
-            if (requests_allowed !== 0 && requests_allowed.value == "false") {
+            let requests_allowed;
+            try {
+              requests_allowed = await getSetting("requests_allowed");
+            } catch(error) {
+              console.log("Could not find requests_allowed setting");
+            }
+            if (requests_allowed !== undefined && requests_allowed.value == "false") {
               console.log("Requests are disabled at this time");
               throw new GraphQLError("Requests are disabled at this time");
             }

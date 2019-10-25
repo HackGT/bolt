@@ -46,7 +46,7 @@ function RequestButton({requestedItem, user, toastManager}: RequestButtonProps) 
                 if (loading) {
                     return <Loader active inline="centered" content="Just a sec!"/>;
                 }
-                if (!error) {
+                if (!error && data.setting !== undefined) {
                   requests_allowed = data.setting.value;
                 }
                 return <Button primary
