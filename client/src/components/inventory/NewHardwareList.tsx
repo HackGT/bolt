@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useQuery} from "@apollo/react-hooks";
-import {ALL_ITEMS} from "../util/graphql/Queries";
+import {ALL_ITEMS, GET_SETTING} from "../util/graphql/Queries";
 import {
     Button,
     Grid,
@@ -21,9 +21,11 @@ const NewHardwareList = ({user}: { user: User | null }) => {
     const {data, loading, error} = useQuery(ALL_ITEMS);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const requestsEnabled = true;
+    const setting = useQuery(GET_SETTING, {
+      variables: {settingName: "requests_allowed"}
+    });
 
-    if (loading) {
+    if (loading || setting.loading) {
         return (
             <>
                 <Header size={"huge"}>Inventory</Header>
@@ -42,6 +44,11 @@ const NewHardwareList = ({user}: { user: User | null }) => {
                     assistance.</p>
             </Message>
         </>;
+    }
+
+    let requestsEnabled = true;
+    if(!setting.error && setting.data.setting !== undefined) {
+      requestsEnabled = (setting.data.setting.value === "true");
     }
 
     let noRequestsMessageText = "";

@@ -1,11 +1,13 @@
 import React from "react";
 import {Button, Icon} from "semantic-ui-react";
 import {useMutation} from "@apollo/react-hooks";
+import {Query} from "react-apollo";
 import {CREATE_REQUEST} from "../util/graphql/Mutations";
 import {RequestedItem} from "../../types/Hardware";
 import {withToastManager} from "react-toast-notifications";
-import {USER_REQUESTS} from "../util/graphql/Queries";
+import {USER_REQUESTS, GET_SETTING} from "../util/graphql/Queries";
 import {User} from "../../types/User";
+import {Loader, Message} from "semantic-ui-react";
 
 interface RequestButtonProps {
     requestedItem: RequestedItem,
@@ -24,36 +26,60 @@ function RequestButton({requestedItem, user, toastManager}: RequestButtonProps) 
             },
         ],
     });
-
+    if (loading) {
+        return <Loader active inline="centered" content="Just a sec!"/>;
+    }
+    if (error) {
+        return <Message error visible={true}
+                        header="Can't load button"
+                        content={`Hmm, an error is preventing us from displaying the button.  The error was: ${error.message}`}
+        />;
+    }
+    let requests_allowed = "true";
     return (
-        <Button primary
-                icon
-                disabled={loading}
-                loading={loading}
-                onClick={event => createRequest({
-                    variables: {
-                        newRequest: {
-                            user_id: requestedItem.user,
-                            request_item_id: requestedItem.id,
-                            quantity: requestedItem.qtyRequested
-                        }
-                    }
-                }).then(toastManager.add(`Successfully requested ${requestedItem.qtyRequested}x ${requestedItem.name}`, {
-                    appearance: "success",
-                    autoDismiss: true,
-                    placement: "top-center"
-                })).catch((err: Error) => {
-                    toastManager.add(`Successfully requested ${requestedItem.qtyRequested}x ${requestedItem.name}`, {
-                        appearance: "error",
-                        autoDismiss: true,
-                        placement: "top-center"
-                    })
-                })
+        <Query
+            query={GET_SETTING}
+            variables={{settingName: "requests_allowed"}}
+        >
+          {
+              ({loading, error, data}: any) => {
+                if (loading) {
+                    return <Loader active inline="centered" content="Just a sec!"/>;
                 }
-                labelPosition="right">
-            Request {requestedItem.qtyRequested}
-            <Icon name="arrow alternate circle right outline"/>
-        </Button>
+                if (!error && data.setting !== undefined) {
+                  requests_allowed = data.setting.value;
+                }
+                return <Button primary
+                        icon
+                        disabled={loading || (requests_allowed === "false")}
+                        loading={loading}
+                        onClick={event => createRequest({
+                            variables: {
+                                newRequest: {
+                                    user_id: requestedItem.user,
+                                    request_item_id: requestedItem.id,
+                                    quantity: requestedItem.qtyRequested
+                                }
+                            }
+                        }).then(toastManager.add(`Successfully requested ${requestedItem.qtyRequested}x ${requestedItem.name}`, {
+                            appearance: "success",
+                            autoDismiss: true,
+                            placement: "top-center"
+                        })).catch((err: Error) => {
+                            toastManager.add(`Successfully requested ${requestedItem.qtyRequested}x ${requestedItem.name}`, {
+                                appearance: "error",
+                                autoDismiss: true,
+                                placement: "top-center"
+                            })
+                        })
+                        }
+                        labelPosition="right">
+                    Request {requestedItem.qtyRequested}
+                    <Icon name="arrow alternate circle right outline"/>
+                </Button>
+              }
+          }
+        </Query>
     );
 }
 
