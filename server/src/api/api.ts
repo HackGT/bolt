@@ -9,7 +9,7 @@ import {DB, IItem} from "../database";
 import {isAdminNoAuthCheck} from "../auth/auth";
 import {localTimestamp, nestedRequest, onlyIfAdmin, toSimpleRequest} from "./requests";
 import {makeExecutableSchema} from "graphql-tools";
-import {Category, Item, Location, Request, RequestStatus, User, UserUpdateInput} from "./graphql.types";
+import {Category, Item, Location, Request, RequestStatus, Setting, User, UserUpdateInput} from "./graphql.types";
 import {config} from "../common";
 import {PubSub} from "graphql-subscriptions";
 import {Quantity} from "./requests/quantity";
@@ -105,6 +105,17 @@ async function updateUser(args, context) {
     }
 
     return updatedUser[0];
+}
+
+async function getSetting(settingName) {
+    const settings: Setting[] = await DB.from("settings").where({
+        name: settingName
+    }).select("name", "value");
+
+    if (settings.length === 0) {
+        return 0;
+    }
+    return settings[0];
 }
 
 async function findOrCreate(tableName, searchObj, data, idFieldName): Promise<number> {
@@ -338,6 +349,9 @@ const resolvers: any = {
             const {qtyInStock, qtyUnreserved, qtyAvailableForApproval} = await Quantity.all(items);
 
             return requests.map(request => nestedRequest(request, context.user.admin, qtyInStock, qtyAvailableForApproval, qtyUnreserved));
+        },
+        setting: async (root, args, context): Promise<Setting | null> => {
+            return await getSetting(args.name);
         }
     },
     Mutation: {
@@ -471,6 +485,13 @@ const resolvers: any = {
             }
 
             const user = await getUser(args.newRequest.user_id);
+
+            // check requests_allowed setting status
+            const requests_allowed = await getSetting("requests_allowed");
+            if (requests_allowed !== 0 && requests_allowed.value == "false") {
+              console.log("Requests are disabled at this time");
+              throw new GraphQLError("Requests are disabled at this time");
+            }
 
             // fetch the item
             const item: Item | null = await getItem(args.newRequest.request_item_id, context.user.admin);
@@ -625,6 +646,64 @@ const resolvers: any = {
         updateUser: async (root, args, context): Promise<User | null> => {
             return await updateUser(args, context);
         },
+        createSetting: async (root, args, context): Promise<Setting> => {
+            // Restrict endpoint to admins
+            if (!context.user.admin) {
+                throw new GraphQLError("You do not have permission to access the createSetting endpoint");
+            }
+
+            if (!args.newSetting.name.trim().length) {
+                throw new GraphQLError("The setting name (name) can't be empty.");
+            }
+
+            if (!args.newSetting.value.trim().length) {
+                throw new GraphQLError("The value for this setting can't be blank.");
+            }
+
+            const newObjName = await DB.from("settings").insert({
+                name: args.newSetting.name,
+                value: args.newSetting.value
+            }).returning("name");
+
+            console.log("The new setting's name is", newObjName[0]);
+
+            return {
+                name: newObjName[0],
+                value: args.newSetting.value
+            };
+        },
+        /**
+         * Update an existing setting given its name
+         * @param root
+         * @param args
+         * @param context
+         */
+        updateSetting: async (root, args, context): Promise<Setting> => {
+            // Restrict endpoint to admins
+            if (!context.user.admin) {
+                throw new GraphQLError("You do not have permission to access the updateSetting endpoint");
+            }
+
+            if (!args.name.trim().length) {
+                throw new GraphQLError("You must provide a valid setting name to update a setting.");
+            }
+
+            if (!args.updatedSetting.value.trim().length) {
+                throw new GraphQLError("The value can't be empty.");
+            }
+
+            await DB.from("settings")
+                .where({name: args.name})
+                .update({
+                    name: args.updatedSetting.name,
+                    value: args.updatedSetting.value
+                });
+
+            return {
+                name: args.updatedSetting.name,
+                value: args.updatedSetting.value
+            };
+        }
     },
     Subscription: {
         request_change: {

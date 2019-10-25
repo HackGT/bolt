@@ -115,3 +115,21 @@ export const UPDATE_REQUEST = gql`
         }
     }
 `;
+
+export const CREATE_SETTING = gql`
+    mutation createSetting ($newSetting: SettingInput!) {
+        createSetting(newSetting: $newSetting) {
+            name
+            value
+        }
+    }
+`;
+
+export const UPDATE_SETTING = gql`
+    mutation updateSetting ($settingName: String!, $updatedSetting: SettingInput!) {
+        updateSetting(name: $settingName, updatedSetting: $updatedSetting) {
+            name
+            value
+        }
+    }
+`;

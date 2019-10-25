@@ -19,6 +19,8 @@ const hardwareDesk: AdminCardLink[] = [
 
 const manage: AdminCardLink[] = [
     adminCardLink("Users", "/admin/users"),
+    adminCardLink("Requests", "/admin/requests"),
+    adminCardLink("Items")
 ];
 
 const reports: AdminCardLink[] = [

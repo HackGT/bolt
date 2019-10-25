@@ -178,3 +178,11 @@ export const USER_PROFILE = gql`
         }
     }
 `;
+
+export const GET_SETTING = gql`
+    query getSetting($settingName: String!) {
+        setting(name: $settingName) {
+            name
+            value
+        }
+    }`;

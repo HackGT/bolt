@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useQuery} from "@apollo/react-hooks";
-import {ALL_ITEMS} from "../util/graphql/Queries";
+import {ALL_ITEMS, GET_SETTING} from "../util/graphql/Queries";
 import {
     Button,
     Grid,
@@ -16,6 +16,7 @@ import {connect} from "react-redux";
 import {AppState} from "../../state/Store";
 import {User} from "../../types/User";
 import {Link} from "react-router-dom";
+import {Query} from "react-apollo";
 
 const NewHardwareList = ({user}: { user: User | null }) => {
     const {data, loading, error} = useQuery(ALL_ITEMS);
@@ -61,7 +62,7 @@ const NewHardwareList = ({user}: { user: User | null }) => {
                 </Message>
             </Grid.Column>
         </Grid.Row>) : "";
-
+    let requests_allowed = "true";
     return (
         <div>
             <Grid columns='equal'>
@@ -97,6 +98,29 @@ const NewHardwareList = ({user}: { user: User | null }) => {
                                }
                                }
                         />
+                        <Query
+                            query={GET_SETTING}
+                            pollInterval={60000}
+                            variables={{settingName: "requests_allowed"}}
+                        >
+                          {
+                              ({loading, error, data}: any) => {
+                                if (loading) {
+                                    return <Loader active inline="centered" content="Just a sec!"/>;
+                                }
+                                if (data !== undefined && data.setting !== undefined && data.setting.value === "false") {
+                                  return <Message error visible={true}
+                                                  header="Requests are disabled"
+                                                  content="We are currently not accepting new hardware requests."
+                                  />;
+                                }
+                                else {
+                                    return <div></div>;
+                                }
+
+                              }
+                          }
+                        </Query>
                     </Grid.Column>
                 </Grid.Row>
             </Grid>

@@ -11,6 +11,7 @@ import PrivateRoute from "./components/util/PrivateRoute";
 import AdminOverviewContainer from "./components/admin/AdminOverviewContainer";
 import {bugsnagClient, bugsnagEnabled} from "./index";
 import AdminUsersListWrapper from "./components/admin/AdminUsersListWrapper";
+import AdminRequestsWrapper from "./components/admin/AdminRequestsWrapper";
 import UserProfileWrapper from "./components/users/UserProfileWrapper";
 import DeskContainer from "./components/desk/DeskContainer";
 import {User} from "./types/User";
@@ -91,6 +92,7 @@ class App extends Component<Props, {}> {
                             <PrivateRoute path="/admin/items" component={ItemWrapper}/>
                             <PrivateRoute exact path="/admin/csv" component={CSVWizard}/>
                             <PrivateRoute exact path="/admin/users" component={AdminUsersListWrapper}/>
+                            <PrivateRoute exact path="/admin/requests" component={AdminRequestsWrapper}/>
                             <Route component={HomeContainer}/>
                         </Switch>
                         <Footer/>

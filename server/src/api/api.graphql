@@ -13,12 +13,18 @@ type Query {
 	items: [Item!]
 	# Return request(s) matching the search query provided and that the user has permission to see
     requests(search: RequestSearch!): [Request!]
+	# Return setting(s) with the name provided
+		setting(name: String!): Setting
     locations: [Location!]
 }
 
 type Mutation {
     # Create a new item
 	createItem(newItem: ItemInput!): Item!
+		# Update an existing setting
+	updateSetting(name: String!, updatedSetting: SettingInput!): Setting!
+	# Create a new setting
+	createSetting(newSetting: SettingInput!): Setting!
     # Update the item with the specified ID to have the properties in updatedItem.  At this time
     #    all fields must be included
     updateItem(id: Int!, updatedItem: ItemInput!): Item
@@ -84,6 +90,11 @@ type ItemsByCategory {
 	items: [Item!]
 }
 
+type Setting {
+	name: String!
+	value: String!
+}
+
 input ItemInput {
 	item_name: String!
     description: String!
@@ -104,6 +115,11 @@ input ItemInput {
     approvalRequired: Boolean!
     # The person or organization that owns this item
     owner: String!
+}
+
+input SettingInput {
+		name: String!
+    value: String!
 }
 
 type Category {
