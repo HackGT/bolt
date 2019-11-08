@@ -58,6 +58,7 @@ Development
   - For frontend development, run `npm start` inside the `/client` directory.
 - You can find GraphiQL at `/api/graphiql`, but note that this endpoint is restricted to admin users.  For local development,
 promote your account to an admin in order to access GraphiQL.
+- Remember to increment the version number in [`server/package.json`](server/package.json) as well as [`client/package.json`](client/package.json)
 
 Code Style
 ----

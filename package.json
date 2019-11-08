@@ -11,7 +11,7 @@
   "devDependencies": {},
   "name": "bolt",
   "description": "Simple and efficient hardware checkout system",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "server/app.js",
   "scripts": {
     "postinstall": "gulp postinstall",

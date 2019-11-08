@@ -60,7 +60,7 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "author": "Evan Strat",
+  "author": "Evan Strat, Nikita Rajput, Michael Raman",
   "devDependencies": {
     "@types/accounting": "^0.4.1",
     "@types/cleave.js": "^1.4.0",
