@@ -62,6 +62,9 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                 location: "",
                 totalAvailable: 0,
                 maxRequestQty: 0,
+                qtyAvailableForApproval: 0,
+                qtyUnreserved: 0,
+                qtyInStock: 0,
                 price: 0,
                 approvalRequired: true,
                 returnRequired: true,
@@ -170,7 +173,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                               }
                                               delete variables.newItem.__typename;
                                           }
-
                                           const categoryError = this.state.item.category === "";
                                           const locationError = this.state.item.location === "";
                                           const ownerError = this.state.item.owner === "";
@@ -186,6 +188,10 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                           if (categoryError || locationError || ownerError || qtyPerRequestTooLargeError) {
                                               return;
                                           }
+
+                                          delete variables.updatedItem.qtyAvailableForApproval;
+                                          delete variables.updatedItem.qtyInStock;
+                                          delete variables.updatedItem.qtyUnreserved;
 
                                           submitForm({
                                               variables
@@ -354,6 +360,24 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                     placeholder="6">
                                             <input type="number" min={1}/>
                                         </Form.Input>
+                                    </Form.Group>
+                                    <h3>Calculated Quantities</h3>
+                                    <Form.Group>
+                                        <Form.Field width={4}>
+                                            <Popup inverted={true} trigger={<label>Unreserved</label>}
+                                                content="The number of an item that is not reserved"/>
+                                            <p>{this.state.item.qtyUnreserved}</p>
+                                        </Form.Field>
+                                        <Form.Field width={4}>
+                                            <Popup inverted={true} trigger={<label>In stock</label>}
+                                                content="The number of an item that should be physically at the hardware desk"/>
+                                            <p>{this.state.item.qtyInStock}</p>
+                                        </Form.Field>
+                                        <Form.Field width={4}>
+                                            <Popup inverted={true} trigger={<label>Available for approval</label>}
+                                                content="The number of an item that is available to be allocated to requests waiting to be approved"/>
+                                            <p>{this.state.item.qtyAvailableForApproval}</p>
+                                        </Form.Field>
                                     </Form.Group>
                                     {/*<Form.TextArea width={6}*/}
                                     {/*               label="Serial numbers (one per line)"*/}

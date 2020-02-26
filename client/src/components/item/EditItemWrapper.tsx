@@ -30,7 +30,7 @@ class EditItemWrapper extends Component<EditItemProps, EditItemState> {
         const itemId: number = parseInt(this.props.match.params.itemId, 10);
         return (
             <div>
-                <Header as="h1">Edit item</Header>
+                <Header as="h1">Edit Item</Header>
                 <Query
                     query={ITEM_EDIT_GET_ITEM}
                     variables={

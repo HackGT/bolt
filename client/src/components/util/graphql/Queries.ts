@@ -12,6 +12,9 @@ export const ITEM_EDIT_GET_ITEM = gql`
             price
             approvalRequired
             returnRequired
+            qtyUnreserved
+            qtyInStock
+            qtyAvailableForApproval
             hidden
             owner
             location {
@@ -57,6 +60,7 @@ export const ALL_ITEMS = gql`
                 items {
                     id
                     qtyUnreserved
+                    qtyInStock
                     item_name
                     description
                     imageUrl
@@ -68,6 +72,7 @@ export const ALL_ITEMS = gql`
                     returnRequired
                     owner
                     hidden
+                    qtyAvailableForApproval
                     location {
                         location_id
                         location_name
