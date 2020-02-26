@@ -26,7 +26,7 @@ class CreateItemWrapper extends Component<CreateItemProps, CreateItemState> {
     public render() {
         return (
             <div>
-                <Header as="h1">Create item</Header>
+                <Header as="h1">Create Item</Header>
                 <ItemEditForm createItem={true}/>
             </div>
         );
