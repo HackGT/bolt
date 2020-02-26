@@ -89,7 +89,7 @@ async function updateUser(args, context) {
         return null;
     }
 
-    if (searchObj.phone && !(/^\((\d){3}\) (\d){3}-(\d){4}$/).test(searchObj.phone)) {
+    if (searchObj.phone && !(/^\(?(\d){3}\)? ?(\d){3}-?(\d){4}$/).test(searchObj.phone)) {
         throw new GraphQLError("User not updated because phone number format is invalid");
     }
 
