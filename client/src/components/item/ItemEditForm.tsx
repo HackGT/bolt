@@ -195,10 +195,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                           if (categoryError || locationError || ownerError || qtyPerRequestTooLargeError) {
                                               return;
                                           }
-
-                                          if (variables.updatedItems != null) {
-                                            
-                                          }
                                          
 
                                           submitForm({
