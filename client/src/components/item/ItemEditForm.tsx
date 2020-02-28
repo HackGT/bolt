@@ -178,7 +178,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                               delete variables.newItem.qtyAvailableForApproval;
                                               delete variables.newItem.qtyInStock;
                                               delete variables.newItem.qtyUnreserved;
-
                                           }
                                           const categoryError = this.state.item.category === "";
                                           const locationError = this.state.item.location === "";
@@ -195,7 +194,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                           if (categoryError || locationError || ownerError || qtyPerRequestTooLargeError) {
                                               return;
                                           }
-                                         
 
                                           submitForm({
                                               variables
