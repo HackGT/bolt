@@ -167,11 +167,17 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                                   variables.updatedItem.location = variables.updatedItem.location.location_name;
                                               }
                                               delete variables.updatedItem.__typename;
+                                              delete variables.updatedItem.qtyAvailableForApproval;
+                                              delete variables.updatedItem.qtyInStock;
+                                              delete variables.updatedItem.qtyUnreserved;
                                           } else {
                                               if (typeof variables.newItem.location === "object") { // Transform location from the object from server into just the location name
                                                   variables.newItem.location = variables.newItem.location.location_name;
                                               }
                                               delete variables.newItem.__typename;
+                                              delete variables.newItem.qtyAvailableForApproval;
+                                              delete variables.newItem.qtyInStock;
+                                              delete variables.newItem.qtyUnreserved;
                                           }
                                           const categoryError = this.state.item.category === "";
                                           const locationError = this.state.item.location === "";
@@ -188,10 +194,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                           if (categoryError || locationError || ownerError || qtyPerRequestTooLargeError) {
                                               return;
                                           }
-
-                                          delete variables.updatedItem.qtyAvailableForApproval;
-                                          delete variables.updatedItem.qtyInStock;
-                                          delete variables.updatedItem.qtyUnreserved;
 
                                           submitForm({
                                               variables
