@@ -24,9 +24,8 @@ const manage: AdminCardLink[] = [
 ];
 
 const reports: AdminCardLink[] = [
-    adminCardLink("Unreturned, lost, and damaged items"),
-    adminCardLink("Request statistics"),
-    adminCardLink("Popular items"),
+    adminCardLink("Item demand", "/admin/reports/demand"),
+    adminCardLink("Popular items", "/admin/reports/popular")
 ];
 
 const baseUrl = (process.env.NODE_ENV === "production") ? "" : "http://localhost:3000";
@@ -48,6 +47,9 @@ const funPhrases: string[] = [
     "We go together like a nut and a bolt",
     "Did you know: Bolt is held together with 1,482 bolts",
     "A developer somewhere spent multiple minutes adding these random phrases",
+    "Did you know: a robot personally prepares this page for you each time you view it",
+    "Releasing a new version of Bolt just to update these messages would be a real power move",
+    "\"Clouds have excellent eyesight\" -James Lu"
 ];
 
 export function pickRandomElement<T>(arr: T[]): T {
@@ -66,7 +68,7 @@ function AdminOverviewContainer() {
                     <div className="ui centered cards">
                         <AdminLinksCard title="Hardware Desk" links={hardwareDesk}/>
                         <AdminLinksCard title="Manage..." links={manage}/>
-                        <AdminLinksCard title="Reports" links={reports} notice="COMING SOON"/>
+                        <AdminLinksCard title="Reports" links={reports} notice="NEW"/>
                         <AdminLinksCard title="Utilities" links={utilities}/>
                     </div>
                 </Grid.Column>

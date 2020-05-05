@@ -9,13 +9,13 @@ type Query {
     allItems: [ItemsByLocation!]
     # Get a list containing each category that is on at least one item
     categories: [Category!]
-	# Get an array of every item in the database
-	items: [Item!]
+	# Get detailed statistics about all items
+	itemStatistics: [ItemWithStatistics!]
 	# Return request(s) matching the search query provided and that the user has permission to see
     requests(search: RequestSearch!): [Request!]
 	# Return setting(s) with the name provided
 		setting(name: String!): Setting
-    locations: [Location!]
+    locations: [Location!],
 }
 
 type Mutation {
@@ -78,6 +78,26 @@ type Item {
 	approvalRequired: Boolean!
     # The person or organization that owns this item (only visible to admins)
     owner: String
+	# Detailed breakdown by status for all requests for this item (only visible to admins)
+}
+
+type ItemWithStatistics {
+	item: Item!
+	detailedQuantities: DetailedItemQuantities!
+}
+
+type DetailedItemQuantities {
+	SUBMITTED: Int!,
+	APPROVED: Int!,
+	DENIED: Int!,
+	ABANDONED: Int!,
+	CANCELLED: Int!,
+	READY_FOR_PICKUP: Int!,
+	FULFILLED: Int!,
+	RETURNED: Int!,
+	LOST: Int!,
+	DAMAGED: Int!
+	total: Int!
 }
 
 type ItemsByLocation {

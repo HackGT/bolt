@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="client" type="js.build_tools.npm">
+    <package-json value="$PROJECT_DIR$/client/package.json" />
+    <command value="start" />
+    <node-interpreter value="project" />
+    <envs>
+      <env name="PORT" value="3001" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>

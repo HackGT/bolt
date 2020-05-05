@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="1b63e28b-2804-4188-a76f-610d8f9d6da6" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/client/src/components/reports/demand/ItemDemandReport.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/reports/popular/DetailedItemStatistics.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/util/LoadingSpinner.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/meta.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/meta.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/admin/AdminOverviewContainer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/admin/AdminOverviewContainer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/inventory/RequestButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/inventory/RequestButton.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/requests/RequestedList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/requests/RequestedList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/util/graphql/Queries.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/util/graphql/Queries.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/types/Hardware.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/types/Hardware.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/api/api.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/api/api.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/api/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/api/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/api/items/item.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/api/items/ItemController.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/api/requests/quantity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/api/requests/quantity.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1bHd5OxLuPLSXUbpkOGz7sTtIbQ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DatabaseDriversLRU" value="postgresql" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/server/src/config" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="ts.external.directory.path" value="C:\Users\evans\Documents\GitHub\bolt\server\node_modules\typescript\lib" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\evans\Documents\GitHub\bolt\server\src\config" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.client">
+    <list>
+      <item itemvalue="npm.server" />
+      <item itemvalue="npm.client" />
+    </list>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1b63e28b-2804-4188-a76f-610d8f9d6da6" name="Default Changelist" comment="" />
+      <created>1588292768173</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1588292768173</updated>
+      <workItem from="1588292770048" duration="10557000" />
+      <workItem from="1588628916809" duration="7285000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="1431" y="-816" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1588296146081">
+      <screen x="781" y="-1080" width="1920" height="1040" />
+    </state>
+    <state x="1431" y="-816" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588296146081" />
+    <state x="1757" y="-716" key="FileChooserDialogImpl" timestamp="1588296050676">
+      <screen x="781" y="-1080" width="1920" height="1040" />
+    </state>
+    <state x="1757" y="-716" key="FileChooserDialogImpl/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588296050676" />
+    <state width="1877" height="282" key="GridCell.Tab.0.bottom" timestamp="1588647938563">
+      <screen x="781" y="-1080" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="282" key="GridCell.Tab.0.bottom/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588647938563" />
+    <state width="1877" height="282" key="GridCell.Tab.0.center" timestamp="1588647938562">
+      <screen x="781" y="-1080" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="282" key="GridCell.Tab.0.center/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588647938562" />
+    <state width="1877" height="282" key="GridCell.Tab.0.left" timestamp="1588647938562">
+      <screen x="781" y="-1080" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="282" key="GridCell.Tab.0.left/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588647938562" />
+    <state width="1877" height="282" key="GridCell.Tab.0.right" timestamp="1588647938562">
+      <screen x="781" y="-1080" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="282" key="GridCell.Tab.0.right/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588647938562" />
+    <state x="1321" y="-823" key="IDE.errors.dialog" timestamp="1588361223175">
+      <screen x="781" y="-1080" width="1920" height="1040" />
+    </state>
+    <state x="1321" y="-823" key="IDE.errors.dialog/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588361223175" />
+    <state x="1242" y="-916" key="SettingsEditor" timestamp="1588296215413">
+      <screen x="781" y="-1080" width="1920" height="1040" />
+    </state>
+    <state x="1242" y="-916" key="SettingsEditor/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588296215413" />
+    <state x="1450" y="-807" width="582" height="494" key="find.popup" timestamp="1588298930524">
+      <screen x="781" y="-1080" width="1920" height="1040" />
+    </state>
+    <state x="1450" y="-807" width="582" height="494" key="find.popup/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588298930524" />
+    <state x="1404" y="-855" width="672" height="678" key="search.everywhere.popup" timestamp="1588648733159">
+      <screen x="781" y="-1080" width="1920" height="1040" />
+    </state>
+    <state x="1404" y="-855" width="672" height="678" key="search.everywhere.popup/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588648733159" />
+  </component>
+</project>

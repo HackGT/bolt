@@ -1,15 +1,15 @@
 import React from "react";
-import {
-    Card,
-    Container,
-    Header, Icon, Label,
-    Loader, Message,
-    Step
-} from "semantic-ui-react";
+import {Card, Container, Header, Icon, Label, Loader, Message, Step} from "semantic-ui-react";
 import {
     ABANDONED,
-    APPROVED, CANCELLED, DAMAGED, DENIED, FULFILLED, LOST,
-    READY_FOR_PICKUP, RETURNED,
+    APPROVED,
+    CANCELLED,
+    DAMAGED,
+    DENIED,
+    FULFILLED,
+    LOST,
+    READY_FOR_PICKUP,
+    RETURNED,
     SUBMITTED
 } from "../../types/Hardware";
 import {useQuery} from "@apollo/react-hooks";
@@ -70,10 +70,16 @@ function RequestedList({user}: RequestedListProps) {
     if (data.requests.length > 0) {
         return data.requests.sort((a: Request, b: Request) => a.item.location.location_name.localeCompare(b.item.location.location_name) || a.item.item_name.localeCompare(b.item.item_name) || a.request_id - b.request_id).map((r: Request) => {
 
-            let idInfo = (r.item.returnRequired) && (
-                <Label as='a' color={'yellow'} attached='top right'>
+            let idInfo = (r.item.returnRequired && r.status !== RETURNED) && (
+                <Label color={'yellow'} attached='top right'>
                     <Icon name='id badge'/>
                     Return required
+                </Label>
+            )
+
+            let returned = (r.status === RETURNED) && (
+                <Label color={'green'} attached='top right'>
+                    <Icon name='check circle'/> Returned
                 </Label>
             )
 
@@ -117,11 +123,6 @@ function RequestedList({user}: RequestedListProps) {
             } else {
                 steps = (
                     <Label.Group size={'large'}>
-                        {(r.status === RETURNED) &&
-                        <Label basic size={'large'} color={'green'}>
-                            <Icon name='check circle'/>
-                            Returned
-                        </Label>}
                         {(r.status === DENIED || r.status === ABANDONED || r.status === CANCELLED) &&
                         <Label size={'large'} color={'red'}>
                             <Icon name='times circle'/>
@@ -150,8 +151,9 @@ function RequestedList({user}: RequestedListProps) {
                         <Card.Description>
                             {steps}
                         </Card.Description>
+                        {idInfo}
+                        {returned}
                     </Card.Content>
-                    {idInfo}
                     {locationInfo}
                 </Card>
             );
