@@ -2,7 +2,7 @@ import React, {ChangeEvent} from "react";
 import {Button, Icon, Input, Item, Popup} from "semantic-ui-react";
 import {withToastManager} from "react-toast-notifications";
 import {Link} from "react-router-dom";
-import {HwItem, ItemStatus, RequestedItem} from "../../types/Hardware";
+import {HwItem, RequestedItem, SUBMITTED} from "../../types/Hardware";
 import {AppState} from "../../state/Store";
 import {connect} from "react-redux";
 import {User} from "../../types/User";
@@ -80,7 +80,7 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
             name: this.props.item.item_name,
             qtyRequested: this.state.qtyRequested,
             category: this.props.item.category,
-            status: ItemStatus.SUBMITTED,
+            status: SUBMITTED,
             location: this.props.item.location,
             cancelled: false
         };

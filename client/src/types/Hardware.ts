@@ -63,21 +63,8 @@ export interface RequestedItem {
 	qtyRequested: number;
 	category: string;
 	location: Location;
-	status: ItemStatus;
+	status: string;
 	cancelled: boolean;
-}
-
-export enum ItemStatus {
-	SUBMITTED = "submitted",
-	APPROVED = "approved",
-	DECLINED = "declined",
-	ABANDONED = "abandoned",
-	CANCELLED = "cancelled",
-	READY = "ready",
-	FULFILLED = "fulfilled",
-	RETURNED = "returned",
-	LOST = "lost",
-	DAMAGED = "damaged"
 }
 
 export const SUBMITTED = "SUBMITTED";
@@ -92,18 +79,10 @@ export const LOST = "LOST";
 export const DAMAGED = "DAMAGED";
 
 export type DetailedItemQuantities = {
-    SUBMITTED: number,
-    APPROVED: number,
-    DENIED: number,
-    ABANDONED: number,
-    CANCELLED: number,
-    READY_FOR_PICKUP: number,
-    FULFILLED: number,
-    RETURNED: number,
-    LOST: number,
-    DAMAGED: number
-    total: number
-}
+	[key: string]: number;
+} & {
+	total: number;
+};
 
 export type ItemWithStatistics = {
     item: HwItem,

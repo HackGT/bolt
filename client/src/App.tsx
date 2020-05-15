@@ -18,7 +18,7 @@ import {User} from "./types/User";
 import {loginUser} from "./state/Account";
 import {AppState} from "./state/Store";
 import CacheBuster from "./components/util/CacheBuster";
-import DetailedItemStatistics from "./components/reports/popular/DetailedItemStatistics";
+import DetailedItemStatistics from "./components/reports/statistics/DetailedItemStatistics";
 import ItemDemandReport from "./components/reports/demand/ItemDemandReport";
 
 export interface OwnProps {}
@@ -93,7 +93,7 @@ class App extends Component<Props, {}> {
                             <PrivateRoute exact path="/admin/csv" component={CSVWizard}/>
                             <PrivateRoute exact path="/admin/users" component={AdminUsersListWrapper}/>
                             <PrivateRoute exact path="/admin/requests" component={AdminRequestsWrapper}/>
-                            <PrivateRoute exact path="/admin/reports/popular" component={DetailedItemStatistics}/>
+                            <PrivateRoute exact path="/admin/reports/statistics" component={DetailedItemStatistics}/>
                             <PrivateRoute exact path="/admin/reports/demand" component={ItemDemandReport}/>
                             <Route component={HomeContainer}/>
                         </Switch>

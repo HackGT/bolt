@@ -24,8 +24,8 @@ const manage: AdminCardLink[] = [
 ];
 
 const reports: AdminCardLink[] = [
-    adminCardLink("Item demand", "/admin/reports/demand"),
-    adminCardLink("Popular items", "/admin/reports/popular")
+    adminCardLink("Detailed item statistics", "/admin/reports/statistics"),
+    adminCardLink("Item demand", "/admin/reports/demand")
 ];
 
 const baseUrl = (process.env.NODE_ENV === "production") ? "" : "http://localhost:3000";
