@@ -9,7 +9,7 @@ import {Header, Icon, Message} from "semantic-ui-react";
 function DetailedItemStatistics(props: {}) {
 	const {data, loading, error} = useQuery(DETAILED_ITEM_STATISTICS, {
 		partialRefetch: true,
-		pollInterval: 30000
+		pollInterval: 120000
 	});
 
 	const columns = useMemo(() => [
@@ -107,8 +107,8 @@ function DetailedItemStatistics(props: {}) {
 
 	return (
 		<>
-			<Header content={"Detailed Item Statistics"} size={"huge"} />
-			<Message><Icon name={"info circle"}/> Data refreshes automatically every 30 seconds.</Message>
+			<Header content={"Detailed Item Statistics"} size={"huge"}/>
+			<Message><Icon name={"info circle"}/> Data refreshes automatically every 2 minutes.</Message>
 			<DataTable columns={columns}
 			           data={data.itemStatistics || []}
 			           dense
@@ -116,9 +116,9 @@ function DetailedItemStatistics(props: {}) {
 			           fixedHeader
 			           pagination
 			           paginationComponentOptions={{
-			           	selectAllRowsItem: true
+				           selectAllRowsItem: true
 			           }}
-			           paginationRowsPerPageOptions={[25,50,100]}
+			           paginationRowsPerPageOptions={[25, 50, 100]}
 			           progressPending={loading}
 			           noHeader
 			           striped

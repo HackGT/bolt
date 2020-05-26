@@ -70,15 +70,16 @@ function RequestedList({user}: RequestedListProps) {
     if (data.requests.length > 0) {
         return data.requests.sort((a: Request, b: Request) => a.item.location.location_name.localeCompare(b.item.location.location_name) || a.item.item_name.localeCompare(b.item.item_name) || a.request_id - b.request_id).map((r: Request) => {
 
-            let idInfo = (r.item.returnRequired && r.status !== RETURNED) && (
-                <Label color={'yellow'} attached='top right'>
+            let returnInfo = (r.item.returnRequired && r.status !== RETURNED && r.status !== DENIED
+                && r.status !== CANCELLED && r.status !== ABANDONED) && (
+                <Label size={'large'} color={'yellow'} attached='top right'>
                     <Icon name='id badge'/>
                     Return required
                 </Label>
             )
 
             let returned = (r.status === RETURNED) && (
-                <Label color={'green'} attached='top right'>
+                <Label size={'large'} color={'green'} attached='top right'>
                     <Icon name='check circle'/> Returned
                 </Label>
             )
@@ -90,7 +91,7 @@ function RequestedList({user}: RequestedListProps) {
                 </Label>
             </Card.Content>);
 
-            if (r.status == SUBMITTED || r.status === APPROVED) {
+            if (r.status === SUBMITTED || r.status === APPROVED) {
                 steps = (
                     <Label.Group size={'large'}>
                         <Label
@@ -124,7 +125,7 @@ function RequestedList({user}: RequestedListProps) {
                 steps = (
                     <Label.Group size={'large'}>
                         {(r.status === DENIED || r.status === ABANDONED || r.status === CANCELLED) &&
-                        <Label size={'large'} color={'red'}>
+                        <Label size={'large'} color={'red'} attached='top right'>
                             <Icon name='times circle'/>
                             {r.status === DENIED ? "Declined" : r.status.charAt(0).toUpperCase() + r.status.substring(1).toLowerCase()}
                         </Label>}
@@ -151,7 +152,7 @@ function RequestedList({user}: RequestedListProps) {
                         <Card.Description>
                             {steps}
                         </Card.Description>
-                        {idInfo}
+                        {returnInfo}
                         {returned}
                     </Card.Content>
                     {locationInfo}

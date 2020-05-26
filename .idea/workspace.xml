@@ -3,13 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="1b63e28b-2804-4188-a76f-610d8f9d6da6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/admin/AdminOverviewContainer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/admin/AdminOverviewContainer.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/inventory/HardwareItem.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/inventory/HardwareItem.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/components/reports/demand/ItemDemandReport.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/reports/demand/ItemDemandReport.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/reports/popular/DetailedItemStatistics.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/reports/statistics/DetailedItemStatistics.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/enums.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/types/Hardware.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/types/Hardware.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/reports/statistics/DetailedItemStatistics.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/reports/statistics/DetailedItemStatistics.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/requests/RequestedList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/requests/RequestedList.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +45,7 @@
       <recent name="C:\Users\evans\Documents\GitHub\bolt\server\src\config" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.server">
+  <component name="RunManager" selected="npm.client">
     <list>
       <item itemvalue="npm.server" />
       <item itemvalue="npm.client" />
@@ -65,7 +61,8 @@
       <workItem from="1588292770048" duration="10557000" />
       <workItem from="1588628916809" duration="7411000" />
       <workItem from="1588783599576" duration="5135000" />
-      <workItem from="1589510418305" duration="1026000" />
+      <workItem from="1589510418305" duration="2712000" />
+      <workItem from="1590460394420" duration="2778000" />
     </task>
     <task id="LOCAL-00001" summary="More work on reports and some backend refactoring with items">
       <created>1588659428429</created>
@@ -74,46 +71,64 @@
       <option name="project" value="LOCAL" />
       <updated>1588659428429</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Initial work simplifying item demand report calculations; type cruft cleanup">
+      <created>1589511505526</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1589511505526</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="2" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
     <MESSAGE value="More work on reports and some backend refactoring with items" />
-    <option name="LAST_COMMIT_MESSAGE" value="More work on reports and some backend refactoring with items" />
+    <MESSAGE value="Initial work simplifying item demand report calculations; type cruft cleanup" />
+    <option name="LAST_COMMIT_MESSAGE" value="Initial work simplifying item demand report calculations; type cruft cleanup" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="WindowStateProjectService">
     <state x="1431" y="-816" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1588296146081">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
     <state x="1431" y="-816" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588296146081" />
-    <state x="1368" y="-986" width="899" height="815" key="CommitChangelistDialog2" timestamp="1588659427645">
+    <state x="1368" y="-986" width="899" height="815" key="CommitChangelistDialog2" timestamp="1589511504805">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
-    <state x="1368" y="-986" width="899" height="815" key="CommitChangelistDialog2/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588659427645" />
+    <state x="1368" y="-986" width="899" height="815" key="CommitChangelistDialog2/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1589511504805" />
     <state x="1757" y="-716" key="FileChooserDialogImpl" timestamp="1588296050676">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
     <state x="1757" y="-716" key="FileChooserDialogImpl/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588296050676" />
-    <state width="1877" height="282" key="GridCell.Tab.0.bottom" timestamp="1589511261508">
+    <state width="1877" height="264" key="GridCell.Tab.0.bottom" timestamp="1590461293916">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
-    <state width="1877" height="282" key="GridCell.Tab.0.bottom/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1589511261508" />
-    <state width="1877" height="282" key="GridCell.Tab.0.center" timestamp="1589511261508">
+    <state width="1493" height="210" key="GridCell.Tab.0.bottom/0.0.1536.824/781.-1080.1920.1040@0.0.1536.824" timestamp="1589598386400" />
+    <state width="1877" height="264" key="GridCell.Tab.0.bottom/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590461293916" />
+    <state width="1493" height="210" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1589667230393" />
+    <state width="1877" height="264" key="GridCell.Tab.0.center" timestamp="1590461293916">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
-    <state width="1877" height="282" key="GridCell.Tab.0.center/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1589511261508" />
-    <state width="1877" height="282" key="GridCell.Tab.0.left" timestamp="1589511261508">
+    <state width="1493" height="210" key="GridCell.Tab.0.center/0.0.1536.824/781.-1080.1920.1040@0.0.1536.824" timestamp="1589598386400" />
+    <state width="1877" height="264" key="GridCell.Tab.0.center/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590461293916" />
+    <state width="1493" height="210" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1589667230393" />
+    <state width="1877" height="264" key="GridCell.Tab.0.left" timestamp="1590461293916">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
-    <state width="1877" height="282" key="GridCell.Tab.0.left/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1589511261508" />
-    <state width="1877" height="282" key="GridCell.Tab.0.right" timestamp="1589511261508">
+    <state width="1493" height="210" key="GridCell.Tab.0.left/0.0.1536.824/781.-1080.1920.1040@0.0.1536.824" timestamp="1589598386400" />
+    <state width="1877" height="264" key="GridCell.Tab.0.left/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590461293916" />
+    <state width="1493" height="210" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1589667230393" />
+    <state width="1877" height="264" key="GridCell.Tab.0.right" timestamp="1590461293916">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
-    <state width="1877" height="282" key="GridCell.Tab.0.right/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1589511261508" />
+    <state width="1493" height="210" key="GridCell.Tab.0.right/0.0.1536.824/781.-1080.1920.1040@0.0.1536.824" timestamp="1589598386400" />
+    <state width="1877" height="264" key="GridCell.Tab.0.right/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590461293916" />
+    <state width="1493" height="210" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1589667230393" />
     <state x="1321" y="-823" key="IDE.errors.dialog" timestamp="1588361223175">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
@@ -134,13 +149,13 @@
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
     <state x="1450" y="-807" width="582" height="494" key="find.popup/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588298930524" />
-    <state x="1397" y="-299" key="run.anything.popup" timestamp="1588784452514">
+    <state x="1397" y="-299" key="run.anything.popup" timestamp="1589598464288">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
-    <state x="1397" y="-299" key="run.anything.popup/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588784452514" />
-    <state x="1404" y="-855" width="672" height="678" key="search.everywhere.popup" timestamp="1589511414390">
+    <state x="1397" y="-299" key="run.anything.popup/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1589598464288" />
+    <state x="1404" y="-855" width="672" height="678" key="search.everywhere.popup" timestamp="1590462514668">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
-    <state x="1404" y="-855" width="672" height="678" key="search.everywhere.popup/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1589511414390" />
+    <state x="1404" y="-855" width="672" height="678" key="search.everywhere.popup/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590462514668" />
   </component>
 </project>

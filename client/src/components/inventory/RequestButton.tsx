@@ -15,7 +15,7 @@ interface RequestButtonProps {
 }
 
 function RequestButton({requestedItem, user, toastManager}: RequestButtonProps) {
-    const [createRequest, {data, loading, error}] = useMutation(CREATE_REQUEST, {
+    const [createRequest, {loading, error}] = useMutation(CREATE_REQUEST, {
         refetchQueries: [
             {
                 query: USER_REQUESTS,
@@ -25,6 +25,7 @@ function RequestButton({requestedItem, user, toastManager}: RequestButtonProps) 
             },
         ],
     });
+
     if (loading) {
         return <Loader active inline="centered" content="Just a sec!"/>;
     }
