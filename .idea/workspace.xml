@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1b63e28b-2804-4188-a76f-610d8f9d6da6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/desk/returns/PhotoIdReturn.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/desk/returns/PhotoIdReturn.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/requests/RequestedList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/requests/RequestedList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CODEOWNERS" beforeDir="false" afterPath="$PROJECT_DIR$/CODEOWNERS" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,7 +59,7 @@
       <workItem from="1588628916809" duration="7411000" />
       <workItem from="1588783599576" duration="5135000" />
       <workItem from="1589510418305" duration="2712000" />
-      <workItem from="1590460394420" duration="4385000" />
+      <workItem from="1590460394420" duration="5114000" />
     </task>
     <task id="LOCAL-00001" summary="More work on reports and some backend refactoring with items">
       <created>1588659428429</created>
@@ -84,7 +82,14 @@
       <option name="project" value="LOCAL" />
       <updated>1590463420366</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Fix an edge case in determining whether to return a user's photo ID&#10;&#10;should fix #92">
+      <created>1590465054997</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1590465054997</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -95,7 +100,8 @@
     <MESSAGE value="More work on reports and some backend refactoring with items" />
     <MESSAGE value="Initial work simplifying item demand report calculations; type cruft cleanup" />
     <MESSAGE value="Item demand calculations finishing touches" />
-    <option name="LAST_COMMIT_MESSAGE" value="Item demand calculations finishing touches" />
+    <MESSAGE value="Fix an edge case in determining whether to return a user's photo ID&#10;&#10;should fix #92" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix an edge case in determining whether to return a user's photo ID&#10;&#10;should fix #92" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
@@ -104,10 +110,10 @@
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
     <state x="1431" y="-816" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588296146081" />
-    <state x="1368" y="-986" width="899" height="815" key="CommitChangelistDialog2" timestamp="1590463419523">
+    <state x="1368" y="-986" width="899" height="815" key="CommitChangelistDialog2" timestamp="1590465054536">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
-    <state x="1368" y="-986" width="899" height="815" key="CommitChangelistDialog2/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590463419523" />
+    <state x="1368" y="-986" width="899" height="815" key="CommitChangelistDialog2/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590465054536" />
     <state x="1757" y="-716" key="FileChooserDialogImpl" timestamp="1588296050676">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
@@ -144,10 +150,10 @@
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
     <state x="1242" y="-916" key="SettingsEditor/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588296215413" />
-    <state x="1333" y="-825" key="Vcs.Push.Dialog.v2" timestamp="1590463422359">
+    <state x="1333" y="-825" key="Vcs.Push.Dialog.v2" timestamp="1590465057264">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
-    <state x="1333" y="-825" key="Vcs.Push.Dialog.v2/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590463422359" />
+    <state x="1333" y="-825" key="Vcs.Push.Dialog.v2/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590465057264" />
     <state x="1552" y="-644" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1588659368827">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
@@ -160,9 +166,9 @@
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
     <state x="1397" y="-299" key="run.anything.popup/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1589598464288" />
-    <state x="1404" y="-855" width="672" height="678" key="search.everywhere.popup" timestamp="1590464254560">
+    <state x="1404" y="-855" width="672" height="678" key="search.everywhere.popup" timestamp="1590465685272">
       <screen x="781" y="-1080" width="1920" height="1040" />
     </state>
-    <state x="1404" y="-855" width="672" height="678" key="search.everywhere.popup/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590464254560" />
+    <state x="1404" y="-855" width="672" height="678" key="search.everywhere.popup/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590465685272" />
   </component>
 </project>
