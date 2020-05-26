@@ -138,7 +138,7 @@ function RequestedList({user}: RequestedListProps) {
             }
 
             return (
-                <Card fluid>
+                <Card fluid key={r.request_id}>
                     <Card.Content>
                         <Card.Header>
                             <ItemAndQuantity quantity={r.quantity}
