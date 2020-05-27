@@ -4,6 +4,8 @@ import {AppState} from "../../state/Store";
 import AdminLinksCard from "./AdminLinksCard";
 import {Grid, Header} from "semantic-ui-react";
 
+import {randomItemString} from "stuff-with-good-eyesight";
+
 export type AdminCardLink = {
     name: string;
     to: string;
@@ -49,7 +51,7 @@ const funPhrases: string[] = [
     "A developer somewhere spent multiple minutes adding these random phrases",
     "Did you know: a robot personally prepares this page for you each time you view it",
     "Releasing a new version of Bolt just to update these messages would be a real power move",
-    "\"Clouds have excellent eyesight\" -James Lu"
+    `"${randomItemString()}" -James Lu`
 ];
 
 export function pickRandomElement<T>(arr: T[]): T {
