@@ -3,7 +3,6 @@ import {connect} from "react-redux";
 import {AppState} from "../../state/Store";
 import AdminLinksCard from "./AdminLinksCard";
 import {Grid, Header} from "semantic-ui-react";
-
 import {randomItemString} from "stuff-with-good-eyesight";
 
 export type AdminCardLink = {
