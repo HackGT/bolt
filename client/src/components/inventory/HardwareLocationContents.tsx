@@ -47,7 +47,7 @@ const HardwareLocationContents = ({itemsByLocation, searchQuery, requestsEnabled
             <Accordion key={`${itemsByLocation.location.location_id}-accordion`}>
                 {itemsByLocation.categories.map((itemByCat: ItemByCat, index: number) => <>
                     {filteredItems(itemByCat.items, searchQuery).length ? <>
-                        <Accordion.Title key={`${index}-title`}
+                        <Accordion.Title key={`${itemsByLocation.location.location_id}-${index}-title`}
                                          active={accordionState.includes(index) || searchQuery.length >= 3}
                                          index={index}
                                          onClick={(e: any, titleProps: any) => {
@@ -58,13 +58,14 @@ const HardwareLocationContents = ({itemsByLocation, searchQuery, requestsEnabled
                                 {itemByCat.category.category_name}
                             </Header>
                         </Accordion.Title>
-                        <Accordion.Content key={`${index}-content`}
+                        <Accordion.Content key={`${itemsByLocation.location.location_id}-${index}-content`}
                                            active={accordionState.includes(index) || searchQuery.length >= 3}
                                            index={index}>
-                            <HardwareCategory key={itemByCat.category.category_id}
-                                              items={filteredItems(itemByCat.items, searchQuery)}
-                                              requestsEnabled={requestsEnabled}
-                                              name={itemByCat.category.category_name}/>
+                            <HardwareCategory
+                                key={`${itemsByLocation.location.location_id}-${itemByCat.category.category_id}`}
+                                items={filteredItems(itemByCat.items, searchQuery)}
+                                requestsEnabled={requestsEnabled}
+                                name={itemByCat.category.category_name}/>
                         </Accordion.Content></> : ""}
                 </>)}
                 {(!itemsByLocation.categories.length
