@@ -10,6 +10,7 @@
     "@apollo/react-ssr": "^3.0.1",
     "@bugsnag/js": "^6.3.2",
     "@bugsnag/plugin-react": "^6.2.0",
+    "@sentry/browser": "^5.15.5",
     "accounting": "^0.4.1",
     "apollo-cache-inmemory": "^1.6.2",
     "apollo-client": "^2.6.4",

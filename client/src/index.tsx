@@ -16,6 +16,7 @@ import {WebSocketLink} from "apollo-link-ws";
 import {SubscriptionClient} from "subscriptions-transport-ws";
 import {getMainDefinition} from "apollo-utilities";
 import {ApolloProvider} from "@apollo/react-common";
+import * as Sentry from '@sentry/browser';
 
 const httpLink = createHttpLink({
     uri: "/api",
@@ -74,6 +75,7 @@ export const client = new ApolloClient({
     }
 });
 
+Sentry.init({dsn: "https://f99dbdbd670a46f4b7f8d2f7c9e4280b@o399078.ingest.sentry.io/5255650"});
 export const bugsnagEnabled = process.env.REACT_APP_ENABLE_BUGSNAG!.toLowerCase() === "true";
 export let bugsnagClient: any;
 if (bugsnagEnabled) {
