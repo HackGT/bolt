@@ -110,7 +110,7 @@ function DetailedItemStatistics(props: {}) {
 			<Header content={"Detailed Item Statistics"} size={"huge"}/>
 			<Message><Icon name={"info circle"}/> Data refreshes automatically every 2 minutes.</Message>
 			<DataTable columns={columns}
-			           data={data.itemStatistics || []}
+			           data={data ? data.itemStatistics || [] : []}
 			           dense
 			           defaultSortField={"item.location.location_name"}
 			           fixedHeader
