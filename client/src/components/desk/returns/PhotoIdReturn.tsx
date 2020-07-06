@@ -63,32 +63,38 @@ function PhotoIdCheck({userName, loading, updateRequest, requests, returnRequire
     let card;
 
     // Top secret machine learning to decide whether to keep or return photo ID or indicate if we already returned it
-    if (!returnRequired) {
-        if (!numReturnRequired) {
-            if (haveID) {
-                card = returnID;
-            } else {
+    if (!returnRequired) { // If this item does not require return
+        if (!numReturnRequired) { // If this user doesn't have any other items requiring return either
+            if (haveID) { // If we have their ID
+                card = returnID; // return it
+            } else { // We already returned it (or never had it)
                 card = alreadyReturnedID;
             }
-        } else {
-            if (haveID) {
-                card = keepID;
+        } else { // If this user has other items that require return
+            if (haveID) { // and we have their ID
+                card = keepID; // keep it
             } else {
-                card = alreadyReturnedID;
+                card = alreadyReturnedID; // we don't have it
             }
         }
-    } else {
-        if (numReturnRequired === 1 || numReturnRequired === requests.length) {
-            if (haveID) {
-                card = returnID;
+    } else { // this item requires return
+        if (numReturnRequired === 0 || // Technically this can be condensed, but this case is set aside for clarity.
+            // Specifically, if this item requires return, but this request has been marked lost or damaged,
+            // then it is possible that even though this item requires return, there are no remaining items that can be returned
+            // (an example: if you have 2 optional requests and 2 requests marked lost)
+            // If, in this very very specific case, we still have the user's photo ID, we should return it.
+            // See also https://github.com/HackGT/bolt/issues/92
+            numReturnRequired === 1 || numReturnRequired === requests.length) { // if this is the only item to be returned or every item is being returned
+            if (haveID) { // and we have their ID
+                card = returnID; // return it
             } else {
-                card = alreadyReturnedID;
+                card = alreadyReturnedID; // we already gave it back
             }
-        } else {
-            if (haveID) {
-                card = keepID;
+        } else { // there are other items that have to be returned
+            if (haveID) { // and we have their ID
+                card = keepID; // keep their ID
             } else {
-                card = alreadyReturnedID;
+                card = alreadyReturnedID; // we already returned their ID
             }
         }
     }

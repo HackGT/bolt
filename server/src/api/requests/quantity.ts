@@ -1,6 +1,6 @@
 import {RequestStatus} from "../graphql.types";
 import {DB} from "../../database";
-import {Item} from "../items/item";
+import {ItemController} from "../items/ItemController";
 
 interface QuantitiesInStatus {
     [statusName: string]: number;
@@ -23,28 +23,28 @@ export interface ItemAllQtys {
 export class Quantity {
     public static async inStock(itemIds: number[] = []): Promise<ItemQtyAvailable> {
         const quantities: ItemQuantities = await Quantity.getQuantities(["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"], itemIds);
-        const totalAvailable: ItemQtyAvailable = await Item.getTotalAvailable(itemIds);
+        const totalAvailable: ItemQtyAvailable = await ItemController.getTotalAvailable(itemIds);
 
         return this.getTotalAvailableLessStatuses(quantities, totalAvailable, ["FULFILLED", "LOST", "DAMAGED"]);
     }
 
     public static async unreserved(itemIds: number[] = []): Promise<ItemQtyAvailable> {
         const quantities: ItemQuantities = await Quantity.getQuantities(["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"], itemIds);
-        const totalAvailable: ItemQtyAvailable = await Item.getTotalAvailable(itemIds);
+        const totalAvailable: ItemQtyAvailable = await ItemController.getTotalAvailable(itemIds);
 
         return this.getTotalAvailableLessStatuses(quantities, totalAvailable, ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"]);
     }
 
     public static async availableForApproval(itemIds: number[] = []): Promise<ItemQtyAvailable> {
         const quantities: ItemQuantities = await Quantity.getQuantities(["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"], itemIds);
-        const totalAvailable: ItemQtyAvailable = await Item.getTotalAvailable(itemIds);
+        const totalAvailable: ItemQtyAvailable = await ItemController.getTotalAvailable(itemIds);
 
         return this.getTotalAvailableLessStatuses(quantities, totalAvailable, ["APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"]);
     }
 
     public static async all(itemIds: number[] = []): Promise<ItemAllQtys> {
         const quantities: ItemQuantities = await Quantity.getQuantities(["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"], itemIds);
-        const totalAvailable: ItemQtyAvailable = await Item.getTotalAvailable(itemIds);
+        const totalAvailable: ItemQtyAvailable = await ItemController.getTotalAvailable(itemIds);
 
         const qtyInStock: ItemQtyAvailable = this.getTotalAvailableLessStatuses(quantities, totalAvailable, ["FULFILLED", "LOST", "DAMAGED"]);
         const qtyUnreserved: ItemQtyAvailable = this.getTotalAvailableLessStatuses(quantities, totalAvailable, ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"]);
@@ -55,6 +55,10 @@ export class Quantity {
             qtyUnreserved,
             qtyAvailableForApproval
         };
+    }
+
+    public static async quantityStatistics(itemIds: number[] = []): Promise<ItemQuantities> {
+        return await Quantity.getQuantities();
     }
 
     private static getTotalAvailableLessStatuses(quantities: ItemQuantities, totalAvailable: ItemQtyAvailable, statuses: RequestStatus[] = []): ItemQtyAvailable {
@@ -119,7 +123,9 @@ export class Quantity {
             if (!result.hasOwnProperty(requestItemId.toString(10))) {
                 result[requestItemId] = Object.assign({}, baseObj); // make a copy of baseObj
             }
+
             result[requestItemId][item.status] = Number.parseInt(item.sum, 10);
+            result[requestItemId].total = result[requestItemId][item.status] + (result[requestItemId].total || 0);
         }
 
         return result;

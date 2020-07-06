@@ -1,13 +1,12 @@
 import React from "react";
-import {Button, Icon} from "semantic-ui-react";
+import {Button, Icon, Loader, Message} from "semantic-ui-react";
 import {useMutation} from "@apollo/react-hooks";
 import {Query} from "react-apollo";
 import {CREATE_REQUEST} from "../util/graphql/Mutations";
 import {RequestedItem} from "../../types/Hardware";
 import {withToastManager} from "react-toast-notifications";
-import {USER_REQUESTS, GET_SETTING} from "../util/graphql/Queries";
+import {GET_SETTING, USER_REQUESTS} from "../util/graphql/Queries";
 import {User} from "../../types/User";
-import {Loader, Message} from "semantic-ui-react";
 
 interface RequestButtonProps {
     requestedItem: RequestedItem,
@@ -16,7 +15,7 @@ interface RequestButtonProps {
 }
 
 function RequestButton({requestedItem, user, toastManager}: RequestButtonProps) {
-    const [createRequest, {data, loading, error}] = useMutation(CREATE_REQUEST, {
+    const [createRequest, {loading, error}] = useMutation(CREATE_REQUEST, {
         refetchQueries: [
             {
                 query: USER_REQUESTS,
@@ -26,6 +25,7 @@ function RequestButton({requestedItem, user, toastManager}: RequestButtonProps) 
             },
         ],
     });
+
     if (loading) {
         return <Loader active inline="centered" content="Just a sec!"/>;
     }
@@ -43,9 +43,9 @@ function RequestButton({requestedItem, user, toastManager}: RequestButtonProps) 
         >
           {
               ({loading, error, data}: any) => {
-                if (loading) {
-                    return <Loader active inline="centered" content="Just a sec!"/>;
-                }
+                // if (loading) {
+                //     return <Loader active inline="centered" content="Just a sec!"/>;
+                // }
                 if (!error && data.setting !== undefined) {
                   requests_allowed = data.setting.value;
                 }

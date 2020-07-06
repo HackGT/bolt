@@ -1,15 +1,15 @@
 import React from "react";
-import {
-    Card,
-    Container,
-    Header, Icon, Label,
-    Loader, Message,
-    Step
-} from "semantic-ui-react";
+import {Card, Container, Header, Icon, Label, Loader, Message, Step} from "semantic-ui-react";
 import {
     ABANDONED,
-    APPROVED, CANCELLED, DAMAGED, DENIED, FULFILLED, LOST,
-    READY_FOR_PICKUP, RETURNED,
+    APPROVED,
+    CANCELLED,
+    DAMAGED,
+    DENIED,
+    FULFILLED,
+    LOST,
+    READY_FOR_PICKUP,
+    RETURNED,
     SUBMITTED
 } from "../../types/Hardware";
 import {useQuery} from "@apollo/react-hooks";
@@ -70,10 +70,17 @@ function RequestedList({user}: RequestedListProps) {
     if (data.requests.length > 0) {
         return data.requests.sort((a: Request, b: Request) => a.item.location.location_name.localeCompare(b.item.location.location_name) || a.item.item_name.localeCompare(b.item.item_name) || a.request_id - b.request_id).map((r: Request) => {
 
-            let idInfo = (r.item.returnRequired) && (
-                <Label as='a' color={'yellow'} attached='top right'>
+            let returnInfo = (r.item.returnRequired && r.status !== RETURNED && r.status !== DENIED
+                && r.status !== CANCELLED && r.status !== ABANDONED) && (
+                <Label size={'large'} color={'yellow'} attached='top right'>
                     <Icon name='id badge'/>
                     Return required
+                </Label>
+            )
+
+            let returned = (r.status === RETURNED) && (
+                <Label size={'large'} color={'green'} attached='top right'>
+                    <Icon name='check circle'/> Returned
                 </Label>
             )
 
@@ -84,7 +91,7 @@ function RequestedList({user}: RequestedListProps) {
                 </Label>
             </Card.Content>);
 
-            if (r.status == SUBMITTED || r.status === APPROVED) {
+            if (r.status === SUBMITTED || r.status === APPROVED) {
                 steps = (
                     <Label.Group size={'large'}>
                         <Label
@@ -117,13 +124,8 @@ function RequestedList({user}: RequestedListProps) {
             } else {
                 steps = (
                     <Label.Group size={'large'}>
-                        {(r.status === RETURNED) &&
-                        <Label basic size={'large'} color={'green'}>
-                            <Icon name='check circle'/>
-                            Returned
-                        </Label>}
                         {(r.status === DENIED || r.status === ABANDONED || r.status === CANCELLED) &&
-                        <Label size={'large'} color={'red'}>
+                        <Label size={'large'} color={'red'} attached='top right'>
                             <Icon name='times circle'/>
                             {r.status === DENIED ? "Declined" : r.status.charAt(0).toUpperCase() + r.status.substring(1).toLowerCase()}
                         </Label>}
@@ -136,7 +138,7 @@ function RequestedList({user}: RequestedListProps) {
             }
 
             return (
-                <Card fluid>
+                <Card fluid key={r.request_id}>
                     <Card.Content>
                         <Card.Header>
                             <ItemAndQuantity quantity={r.quantity}
@@ -150,8 +152,9 @@ function RequestedList({user}: RequestedListProps) {
                         <Card.Description>
                             {steps}
                         </Card.Description>
+                        {returnInfo}
+                        {returned}
                     </Card.Content>
-                    {idInfo}
                     {locationInfo}
                 </Card>
             );

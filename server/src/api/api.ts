@@ -13,7 +13,7 @@ import {Category, Item, Location, Request, RequestStatus, Setting, User, UserUpd
 import {config} from "../common";
 import {PubSub} from "graphql-subscriptions";
 import {Quantity} from "./requests/quantity";
-import {getItemLocation} from "./items/item";
+import {getItemLocation, ItemController} from "./items/ItemController";
 
 const fetch = require("isomorphic-fetch");
 const bodyParser = require("body-parser");
@@ -248,37 +248,38 @@ const resolvers: any = {
 
             return Object.values(itemsByLocation);
         },
-        categories: async (root, args, context): Promise<Category[]> => {
-            return await DB.from("categories");
+        categories: (root, args, context): Promise<Category[]> => {
+            return DB.from("categories");
         },
-        locations: async (root, args, context): Promise<Location[]> => {
-            return await DB.from("locations");
+        locations: (root, args, context): Promise<Location[]> => {
+            return DB.from("locations");
         },
-        items: async (root, args, context): Promise<Item[]> => {
-            const searchObj: any = {};
-
-            if (!context.user.admin) {
-                searchObj.hidden = false;
+        itemStatistics: async (root, args, context): Promise<Item[]> => {
+            if (!context.user.admin) { // TODO: validate this
+                throw new GraphQLError("You do not have permission to access this endpoint");
             }
 
-            const items = await DB.from("items")
-                .where(searchObj)
-                .join("categories", "items.category_id", "=", "categories.category_id")
-                .join("locations", "locations.location_id", "=", "items.location_id");
+            const items: any = await ItemController.get({}, context.user.admin);
+            const detailedQuantities = await Quantity.quantityStatistics();
 
-            const {qtyInStock, qtyUnreserved, qtyAvailableForApproval} = await Quantity.all();
+            return items.map((item) => {
+                const qtyInfo = detailedQuantities[item.item_id] || {
+                    SUBMITTED: 0,
+                    APPROVED: 0,
+                    DENIED: 0,
+                    ABANDONED: 0,
+                    CANCELLED: 0,
+                    READY_FOR_PICKUP: 0,
+                    FULFILLED: 0,
+                    RETURNED: 0,
+                    LOST: 0,
+                    DAMAGED: 0,
+                    total: 0
 
-            return items.map(item => {
+                };
                 return {
-                    ...item,
-                    id: item.item_id,
-                    category: item.category_name,
-                    location: getItemLocation(item),
-                    price: onlyIfAdmin(item.price, context.user.admin),
-                    owner: onlyIfAdmin(item.owner, context.user.admin),
-                    qtyInStock: qtyInStock[item.item_id],
-                    qtyUnreserved: qtyUnreserved[item.item_id],
-                    qtyAvailableForApproval: qtyAvailableForApproval[item.item_id]
+                    item,
+                    detailedQuantities: qtyInfo
                 };
             });
         },
@@ -312,7 +313,6 @@ const resolvers: any = {
             if (args.search.statuses && args.search.statuses.length) {
                 statuses = args.search.statuses;
             }
-
 
             // If user is not an admin
             if (!context.user.admin) {

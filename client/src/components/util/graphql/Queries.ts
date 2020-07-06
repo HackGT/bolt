@@ -190,4 +190,47 @@ export const GET_SETTING = gql`
             name
             value
         }
-    }`;
+    }
+`;
+
+export const DETAILED_ITEM_STATISTICS = gql`
+    query {
+        itemStatistics {
+            item {
+                id
+                qtyUnreserved
+                qtyInStock
+                item_name
+                description
+                imageUrl
+                category
+                totalAvailable
+                maxRequestQty
+                hidden
+                approvalRequired
+                returnRequired
+                owner
+                hidden
+                qtyAvailableForApproval
+                location {
+                    location_id
+                    location_name
+                    location_hidden
+                }
+            }
+            detailedQuantities {
+                SUBMITTED
+                APPROVED
+                DENIED
+                ABANDONED
+                CANCELLED
+                READY_FOR_PICKUP
+                FULFILLED
+                RETURNED
+                LOST
+                DAMAGED
+	            total
+            }
+        }
+    }
+`;
