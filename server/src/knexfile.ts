@@ -5,7 +5,7 @@ const fs = require("fs");
 // Some duplicated code here from common.ts, but we can't use import in this file and we only need a couple values for knex
 const path = require("path");
 
-let URL;
+let connectionUrl;
 if (!(process.env.PRODUCTION && process.env.PRODUCTION.toLowerCase() === "true")) {
     let config;
     try {
@@ -17,12 +17,13 @@ if (!(process.env.PRODUCTION && process.env.PRODUCTION.toLowerCase() === "true")
     }
 
     if (config.server && config.server.postgresURL) {
-        URL = config.server.postgresURL;
+        connectionUrl = config.server.postgresURL;
     }
 }
 
 if (process.env.POSTGRES_URL) {
-    URL = process.env.POSTGRES_URL;
+    // @ts-ignore
+    connectionUrl = process.env.POSTGRES_URL;
 }
 
 const migrations = {
@@ -32,6 +33,6 @@ const migrations = {
 
 module.exports = {
     client: "pg",
-    connection: URL,
+    connection: connectionUrl,
     migrations
 };

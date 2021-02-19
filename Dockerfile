@@ -1,4 +1,4 @@
-FROM node:12.4-alpine
+FROM node:14.15-alpine
 
 # Bundle Source
 RUN mkdir -p /usr/src/bolt
@@ -10,7 +10,7 @@ RUN npm install --unsafe-perm
 RUN apk add tzdata
 ENV TZ="/usr/share/zoneinfo/America/New_York"
 
-FROM node:12.4-alpine
+FROM node:14.15-alpine
 COPY --from=0 /usr/src/bolt/server/ /usr/src/bolt/server/
 COPY --from=0 /usr/src/bolt/client/ /usr/src/bolt/client/
 WORKDIR /usr/src/bolt

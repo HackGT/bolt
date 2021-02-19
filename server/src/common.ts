@@ -3,14 +3,6 @@ import * as crypto from "crypto";
 import * as path from "path";
 import "passport";
 
-import {IUser} from "./database";
-//
-// Email
-//
-import sendgrid from "@sendgrid/mail";
-import marked from "marked";
-import {ClientResponse} from "@sendgrid/client/src/response";
-
 //
 // Config
 //
@@ -101,6 +93,7 @@ class Config implements IConfig.Main {
         }
         if (config.secrets) {
             for (const key of Object.keys(config.secrets) as Array<keyof IConfig.Secrets>) {
+                // @ts-ignore
                 this.secrets[key] = config.secrets[key];
             }
         }
@@ -111,6 +104,7 @@ class Config implements IConfig.Main {
         }
         if (config.server) {
             for (const key of Object.keys(config.server) as Array<keyof IConfig.Server>) {
+                // @ts-ignore
                 this.server[key] = config.server[key];
             }
         }
@@ -206,79 +200,3 @@ export const COOKIE_OPTIONS = {
     secure: config.server.cookieSecureOnly,
     httpOnly: true
 };
-
-sendgrid.setApiKey(config.email.key);
-// tslint:disable-next-line:no-var-requires
-const striptags = require("striptags");
-
-export interface IMailObject {
-    to: string;
-    from: string;
-    subject: string;
-    html: string;
-    text: string;
-}
-// Union types don't work well with overloaded method resolution in Typescript so we split into two methods
-export async function sendMailAsync(mail: IMailObject): Promise<[ClientResponse, {}]> {
-    return sendgrid.send(mail);
-}
-export async function sendBatchMailAsync(mail: IMailObject[]): Promise<[ClientResponse, {}]> {
-    return sendgrid.send(mail);
-}
-export function sanitize(input?: string): string {
-    if (!input || typeof input !== "string") {
-        return "";
-    }
-    return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-export function removeTags(input: string): string {
-    const text = striptags(input);
-    text.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-    return text;
-}
-
-const renderer = new marked.Renderer();
-const singleLineRenderer = new marked.Renderer();
-singleLineRenderer.link = (href, title, text) => `<a target=\"_blank\" href=\"${href}\" title=\"${title || ""}\">${text}</a>`;
-singleLineRenderer.paragraph = (text) => text;
-export async function renderMarkdown(markdown: string, options?: marked.MarkedOptions, singleLine: boolean = false): Promise<string> {
-    const r = singleLine ? singleLineRenderer : renderer;
-    return new Promise<string>((resolve, reject) => {
-        marked(markdown, { sanitize: false, smartypants: true, renderer: r, ...options }, (err: Error | null, content: string) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            resolve(content);
-        });
-    });
-}
-export async function renderEmailHTML(markdown: string, user: IUser): Promise<string> {
-    // Interpolate and sanitize variables
-    markdown = markdown.replace(/{{eventName}}/g, sanitize(config.eventName));
-    markdown = markdown.replace(/{{email}}/g, sanitize(user.email));
-    markdown = markdown.replace(/{{name}}/g, sanitize(user.name));
-
-    return renderMarkdown(markdown);
-}
-export async function renderEmailText(markdown: string, user: IUser, markdownRendered: boolean = false): Promise<string> {
-    let html: string;
-    if (!markdownRendered) {
-        html = await renderEmailHTML(markdown, user);
-    } else {
-        html = markdown;
-    }
-    // Remove <style> and <script> block's content
-    html = html.replace(/<style>[\s\S]*?<\/style>/gi, "<style></style>").replace(/<script>[\s\S]*?<\/script>/gi, "<script></script>");
-
-    // Append href of links to their text
-    const cheerio = await import("cheerio");
-    const $ = cheerio.load(html, { decodeEntities: false });
-    $("a").each((i, el) => {
-        const element = $(el);
-        element.text(`${element.text()} (${element.attr("href")})`);
-    });
-    html = $.html();
-
-    return removeTags(html);
-}

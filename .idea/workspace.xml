@@ -1,9 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="1b63e28b-2804-4188-a76f-610d8f9d6da6" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/inventory/HardwareLocationContents.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/inventory/HardwareLocationContents.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/admin/AdminOverviewContainer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/admin/AdminOverviewContainer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/reports/demand/ItemDemandReport.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/reports/demand/ItemDemandReport.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/server/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/server/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/api/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/api/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/api/items/ItemController.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/api/items/ItemController.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/api/requests.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/api/requests.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/app.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/auth/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/auth/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/auth/strategies.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/auth/strategies.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/common.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/common.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/knexfile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/knexfile.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tslint.json" beforeDir="false" afterPath="$PROJECT_DIR$/tslint.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,7 +38,18 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="UPDATE_TYPE" value="REBASE" />
   </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
   <component name="ProjectId" id="1bHd5OxLuPLSXUbpkOGz7sTtIbQ" />
+  <component name="ProjectLevelVcsManager">
+    <OptionsSetting value="false" id="Update" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -28,10 +58,14 @@
     <property name="DatabaseDriversLRU" value="postgresql" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../hackgt/registration" />
+    <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
@@ -49,6 +83,7 @@
       <item itemvalue="npm.client" />
     </list>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="1b63e28b-2804-4188-a76f-610d8f9d6da6" name="Default Changelist" comment="" />
@@ -64,6 +99,8 @@
       <workItem from="1590465990548" duration="863000" />
       <workItem from="1590546119417" duration="1658000" />
       <workItem from="1593990551343" duration="1294000" />
+      <workItem from="1596245260150" duration="28000" />
+      <workItem from="1613692864105" duration="4564000" />
     </task>
     <task id="LOCAL-00001" summary="More work on reports and some backend refactoring with items">
       <created>1588659428429</created>
@@ -118,7 +155,7 @@
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="2" />
+    <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
@@ -132,73 +169,5 @@
     <option name="LAST_COMMIT_MESSAGE" value="initial work" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="1431" y="-816" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1590546254207">
-      <screen x="781" y="-1080" width="1920" height="1040" />
-    </state>
-    <state x="1431" y="-816" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590546254207" />
-    <state x="1368" y="-986" width="899" height="815" key="CommitChangelistDialog2" timestamp="1590547768487">
-      <screen x="781" y="-1080" width="1920" height="1040" />
-    </state>
-    <state x="1368" y="-986" width="899" height="815" key="CommitChangelistDialog2/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590547768487" />
-    <state x="1757" y="-716" key="FileChooserDialogImpl" timestamp="1590466153942">
-      <screen x="781" y="-1080" width="1920" height="1040" />
-    </state>
-    <state x="1757" y="-716" key="FileChooserDialogImpl/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590466153942" />
-    <state width="1493" height="196" key="GridCell.Tab.0.bottom" timestamp="1593991323790">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1493" height="210" key="GridCell.Tab.0.bottom/0.0.1536.824/781.-1080.1920.1040@0.0.1536.824" timestamp="1589598386400" />
-    <state width="1877" height="264" key="GridCell.Tab.0.bottom/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590546587001" />
-    <state width="1493" height="196" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1593991323790" />
-    <state width="1493" height="196" key="GridCell.Tab.0.center" timestamp="1593991323789">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1493" height="210" key="GridCell.Tab.0.center/0.0.1536.824/781.-1080.1920.1040@0.0.1536.824" timestamp="1589598386400" />
-    <state width="1877" height="264" key="GridCell.Tab.0.center/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590546587000" />
-    <state width="1493" height="196" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1593991323789" />
-    <state width="1493" height="196" key="GridCell.Tab.0.left" timestamp="1593991323789">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1493" height="210" key="GridCell.Tab.0.left/0.0.1536.824/781.-1080.1920.1040@0.0.1536.824" timestamp="1589598386400" />
-    <state width="1877" height="264" key="GridCell.Tab.0.left/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590546587000" />
-    <state width="1493" height="196" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1593991323789" />
-    <state width="1493" height="196" key="GridCell.Tab.0.right" timestamp="1593991323789">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1493" height="210" key="GridCell.Tab.0.right/0.0.1536.824/781.-1080.1920.1040@0.0.1536.824" timestamp="1589598386400" />
-    <state width="1877" height="264" key="GridCell.Tab.0.right/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590546587000" />
-    <state width="1493" height="196" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1593991323789" />
-    <state x="1321" y="-823" key="IDE.errors.dialog" timestamp="1588361223175">
-      <screen x="781" y="-1080" width="1920" height="1040" />
-    </state>
-    <state x="1321" y="-823" key="IDE.errors.dialog/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588361223175" />
-    <state x="1242" y="-916" key="SettingsEditor" timestamp="1588296215413">
-      <screen x="781" y="-1080" width="1920" height="1040" />
-    </state>
-    <state x="1242" y="-916" key="SettingsEditor/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588296215413" />
-    <state x="1333" y="-825" key="Vcs.Push.Dialog.v2" timestamp="1590547771697">
-      <screen x="781" y="-1080" width="1920" height="1040" />
-    </state>
-    <state x="1333" y="-825" key="Vcs.Push.Dialog.v2/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590547771697" />
-    <state x="617" y="345" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1593990778688">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="1552" y="-644" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588659368827" />
-    <state x="617" y="345" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1536.824@0.0.1536.824" timestamp="1593990778688" />
-    <state x="1450" y="-807" width="582" height="494" key="find.popup" timestamp="1588298930524">
-      <screen x="781" y="-1080" width="1920" height="1040" />
-    </state>
-    <state x="1450" y="-807" width="582" height="494" key="find.popup/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1588298930524" />
-    <state x="1397" y="-299" key="run.anything.popup" timestamp="1589598464288">
-      <screen x="781" y="-1080" width="1920" height="1040" />
-    </state>
-    <state x="1397" y="-299" key="run.anything.popup/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1589598464288" />
-    <state x="498" y="178" width="672" height="538" key="search.everywhere.popup" timestamp="1593991408975">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="1404" y="-855" width="672" height="678" key="search.everywhere.popup/0.0.1536.824/781.-1080.1920.1040@781.-1080.1920.1040" timestamp="1590465685272" />
-    <state x="498" y="178" width="672" height="538" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1593991408975" />
   </component>
 </project>

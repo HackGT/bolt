@@ -21,7 +21,7 @@ const bodyParser = require("body-parser");
 export const apiRoutes = express.Router();
 export const pubsub = new PubSub();
 
-async function getItem(itemId: number, isAdmin: boolean): Promise<Item|null> {
+async function getItem(itemId: number, isAdmin: boolean): Promise<Item | null> {
     if (itemId <= 0) {
         throw new GraphQLError("Invalid item ID.  The item ID you provided was <= 0, but item IDs must be >= 1.");
     }
@@ -52,7 +52,7 @@ async function getItem(itemId: number, isAdmin: boolean): Promise<Item|null> {
 
 const REQUEST_CHANGE = "request_change";
 
-async function getUser(userId) {
+async function getUser(userId: string) {
     const users: User[] = await DB.from("users").where({
         uuid: userId
     }).select("name", "email", "uuid", "phone", "slackUsername", "haveID", "admin");
@@ -64,6 +64,7 @@ async function getUser(userId) {
     return users[0];
 }
 
+// tslint:disable-next-line:typedef
 async function updateUser(args, context) {
     const searchObj: UserUpdateInput = args.updatedUser;
 
@@ -107,7 +108,7 @@ async function updateUser(args, context) {
     return updatedUser[0];
 }
 
-async function getSetting(settingName) {
+async function getSetting(settingName: string) {
     const settings: Setting[] = await DB.from("settings").where({
         name: settingName
     }).select("name", "value");
@@ -118,7 +119,7 @@ async function getSetting(settingName) {
     return settings[0];
 }
 
-async function findOrCreate(tableName, searchObj, data, idFieldName): Promise<number> {
+async function findOrCreate(tableName: string, searchObj: object, data: object, idFieldName: string): Promise<number> {
     const matchingRows = await DB.from(tableName).where(searchObj);
 
     if (!matchingRows.length) {
@@ -196,7 +197,7 @@ const resolvers: any = {
             }
             const items = await DB.from("items")
                 .where(itemsSearchObj)
-                .join("categories", "items.category_id", "=", "categories.category_id")
+                .join("categories", "items.category_id", "=", "categories.category_id");
 
             const locations: Location[] = await DB.from("locations")
                 .where(locationsSearchObj);
@@ -489,13 +490,14 @@ const resolvers: any = {
             // check requests_allowed setting status
             let requests_allowed;
             try {
-              requests_allowed = await getSetting("requests_allowed");
-            } catch(error) {
-              console.log("Could not find requests_allowed setting");
+                requests_allowed = await getSetting("requests_allowed");
+            } catch (error) {
+                console.log("Could not find requests_allowed setting");
             }
+            // tslint:disable-next-line:triple-equals
             if (requests_allowed !== undefined && requests_allowed.value == "false") {
-              console.log("Requests are disabled at this time");
-              throw new GraphQLError("Requests are disabled at this time");
+                console.log("Requests are disabled at this time");
+                throw new GraphQLError("Requests are disabled at this time");
             }
 
             // fetch the item
@@ -739,57 +741,59 @@ apiRoutes.all("/graphiql", isAdminNoAuthCheck, graphqlHTTP({
 }));
 
 apiRoutes.post("/slack/feedback", bodyParser.json(), (req, res) => {
-  fetch(config.server.slackURL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      attachments: [
-        {
-          fallback: req.body.fallback,
-          color: req.body.color,
-          fields: [
-            {
-              title: "Feedback Type",
-              value: req.body.title,
-            },
-            {
-              title: "Comment",
-              value: req.body.text,
-            },
-            {
-              title: "URL",
-              value: req.body.title_link,
-            },
-            {
-              title: "Name",
-              value: req.user.name,
-            },
-            {
-              title: "UUID",
-              value: req.user.uuid,
-            },
-            {
-              title: "Email",
-              value: req.user.email,
-            },
-            {
-              title: "Slack Username",
-              value: req.user.slackUsername,
-            },
-            {
-              title: "Admin",
-              value: req.user.admin ? "Yes" : "No",
-            }
-          ]
-        }
-      ],
-    }),
-  }).then(response => {
-    return res.status(response.status).send({
-      status: response.status,
-      statusText: response.statusText
+    const user = req.user as User;
+
+    fetch(config.server.slackURL, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            attachments: [
+                {
+                    fallback: req.body.fallback,
+                    color: req.body.color,
+                    fields: [
+                        {
+                            title: "Feedback Type",
+                            value: req.body.title,
+                        },
+                        {
+                            title: "Comment",
+                            value: req.body.text,
+                        },
+                        {
+                            title: "URL",
+                            value: req.body.title_link,
+                        },
+                        {
+                            title: "Name",
+                            value: user.name,
+                        },
+                        {
+                            title: "UUID",
+                            value: user.uuid,
+                        },
+                        {
+                            title: "Email",
+                            value: user.email,
+                        },
+                        {
+                            title: "Slack Username",
+                            value: user.slackUsername,
+                        },
+                        {
+                            title: "Admin",
+                            value: user.admin ? "Yes" : "No",
+                        }
+                    ]
+                }
+            ],
+        }),
+    }).then(response => {
+        return res.status(response.status).send({
+            status: response.status,
+            statusText: response.statusText
+        });
+    }).catch(error => {
+        return res.status(500).send(error.toString());
     });
-  }).catch(error => {
-    return res.status(500).send(error.toString());
-  });
 });

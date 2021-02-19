@@ -20,8 +20,7 @@ const hardwareDesk: AdminCardLink[] = [
 
 const manage: AdminCardLink[] = [
     adminCardLink("Users", "/admin/users"),
-    adminCardLink("Request settings", "/admin/requests"),
-    adminCardLink("Items")
+    adminCardLink("Request settings", "/admin/requests")
 ];
 
 const reports: AdminCardLink[] = [
@@ -46,6 +45,7 @@ const funPhrases: string[] = [
     "It's a wonderful day to configure Bolt",
     "Millions of hardware items look up to you",
     "We go together like a nut and a bolt",
+    "Thank you for calling the Ellie Morton Water Bottle Company, how may I help you?",
     "Did you know: Bolt is held together with 1,482 bolts",
     "A developer somewhere spent multiple minutes adding these random phrases",
     "Did you know: a robot personally prepares this page for you each time you view it",

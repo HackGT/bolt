@@ -73,7 +73,7 @@ export function nestedRequest(request: KnexRequest, isAdmin: boolean, qtyInStock
     };
 }
 
-export function redactedItem(item, isAdmin: boolean, qtyInStock: ItemQtyAvailable, qtyAvailableForApproval: ItemQtyAvailable, qtyUnreserved: ItemQtyAvailable) {
+export function redactedItem(item: any, isAdmin: boolean, qtyInStock: ItemQtyAvailable, qtyAvailableForApproval: ItemQtyAvailable, qtyUnreserved: ItemQtyAvailable) {
     return {
         id: item.item_id,
         item_name: item.item_name,
