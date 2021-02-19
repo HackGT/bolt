@@ -75,6 +75,8 @@ export class GroundTruthStrategy extends OAuthStrategy {
             });
         } else {
             user.token = accessToken;
+
+            user.admin = !!profile.member;
         }
 
         const domain = user.email.split("@").pop();
