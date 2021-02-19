@@ -13,16 +13,6 @@ import {execute, subscribe} from "graphql";
 import {SubscriptionServer} from "subscriptions-transport-ws";
 import {createServer} from "http";
 import {findUserByID} from "./database";
-// *** The placement of these imports is very important; ensure that your editor does not optimize the imports or otherwise
-// reformat this file as it will cause errors (most likely similar to
-//         "/usr/src/bolt/server/build/auth/auth.js:37
-//          app_1.app.enable("trust proxy");
-//          TypeError: Cannot read property 'enable' of undefined")
-//     if they are moved to the top of this file
-// Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
-import {authRoutes, isAuthenticated, sessionMiddleware} from "./auth/auth";
-// *** The placement of this import is also important! (See above)
-import {apiRoutes, schema} from "./api/api";
 import flash = require("connect-flash");
 
 // Set up Express and its middleware
@@ -76,8 +66,18 @@ process.on("unhandledRejection", err => {
     throw err;
 });
 
+// *** The placement of these imports is very important; ensure that your editor does not optimize the imports or otherwise
+// reformat this file as it will cause errors (most likely similar to
+//         "/usr/src/bolt/server/build/auth/auth.js:37
+//          app_1.app.enable("trust proxy");
+//          TypeError: Cannot read property 'enable' of undefined")
+//     if they are moved to the top of this file
+// Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
+import {authRoutes, isAuthenticated, sessionMiddleware} from "./auth/auth";
 app.use("/auth", authRoutes);
 
+// *** The placement of this import is also important! (See above)
+import {apiRoutes, schema} from "./api/api";
 app.use("/api", isAuthenticated, apiRoutes);
 
 app.route("/version").get((request, response) => {

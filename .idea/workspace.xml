@@ -4,26 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1b63e28b-2804-4188-a76f-610d8f9d6da6" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/admin/AdminOverviewContainer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/admin/AdminOverviewContainer.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/reports/demand/ItemDemandReport.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/reports/demand/ItemDemandReport.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/server/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/server/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/api/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/api/api.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/api/items/ItemController.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/api/items/ItemController.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/api/requests.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/api/requests.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/app.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/auth/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/auth/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/auth/strategies.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/auth/strategies.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/common.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/common.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/knexfile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/knexfile.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tslint.json" beforeDir="false" afterPath="$PROJECT_DIR$/tslint.json" afterDir="false" />
-    </list>
+    <list default="true" id="1b63e28b-2804-4188-a76f-610d8f9d6da6" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -77,7 +58,7 @@
       <recent name="C:\Users\evans\Documents\GitHub\bolt\server\src\config" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.client">
+  <component name="RunManager" selected="npm.server">
     <list>
       <item itemvalue="npm.server" />
       <item itemvalue="npm.client" />
@@ -100,7 +81,7 @@
       <workItem from="1590546119417" duration="1658000" />
       <workItem from="1593990551343" duration="1294000" />
       <workItem from="1596245260150" duration="28000" />
-      <workItem from="1613692864105" duration="4564000" />
+      <workItem from="1613692864105" duration="4957000" />
     </task>
     <task id="LOCAL-00001" summary="More work on reports and some backend refactoring with items">
       <created>1588659428429</created>
@@ -151,7 +132,14 @@
       <option name="project" value="LOCAL" />
       <updated>1593990759178</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Upgraded server deps and fixed auth bug">
+      <created>1613697948794</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1613697948794</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -166,7 +154,8 @@
     <MESSAGE value="remove @petschekr as a code owner :cry:" />
     <MESSAGE value="A very important and necessary commit :clown_face:&#10;&#10;hehe" />
     <MESSAGE value="initial work" />
-    <option name="LAST_COMMIT_MESSAGE" value="initial work" />
+    <MESSAGE value="Upgraded server deps and fixed auth bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="Upgraded server deps and fixed auth bug" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
