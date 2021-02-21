@@ -23,9 +23,11 @@ const cookieParserInstance = cookieParser(undefined, COOKIE_OPTIONS as cookiePar
 app.use(cookieParserInstance);
 morgan.token("sessionid", (request, response) => {
     const FAILURE_MESSAGE = "Unknown session";
+    // @ts-ignore
     if (!request.cookies["connect.sid"]) {
         return FAILURE_MESSAGE;
     }
+    // @ts-ignore
     const rawID: string = request.cookies["connect.sid"].slice(2);
     const id = cookieSignature.unsign(rawID, config.secrets.session);
     if (typeof id === "string") {
@@ -51,7 +53,7 @@ morgan.format("hackgt", (tokens, request, response) => {
         tokens.sessionid(request, response),
         tokens.method(request, response),
         tokens.url(request, response),
-        statusColorizer(tokens.status(request, response)),
+        statusColorizer(tokens.status(request, response)!!),
         tokens["response-time"](request, response), "ms", "-",
         tokens.res(request, response, "content-length")
     ].join(" ");

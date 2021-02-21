@@ -51,7 +51,7 @@ export class ItemController {
     }
 }
 
-export function getItemLocation(item) {
+export function getItemLocation(item: any) {
     return {
         location_id: item.location_id,
         location_name: item.location_name,

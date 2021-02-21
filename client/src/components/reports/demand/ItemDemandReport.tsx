@@ -20,6 +20,14 @@ function ColumnDef(column: string, def: string) {
 	return {column, def};
 }
 
+function customSort(rows: any[], field: string, direction: string) {
+	console.log(rows, field, direction);
+	const splitField = field.split(".")
+
+
+	return rows;
+}
+
 
 function ItemDemandReport(props: {}) {
 	const {data, loading, error} = useQuery(DETAILED_ITEM_STATISTICS, {
@@ -173,6 +181,7 @@ function ItemDemandReport(props: {}) {
 			           paginationRowsPerPageOptions={[25, 50, 100]}
 			           progressPending={loading}
 			           noHeader
+			           sortFunction={customSort}
 			           striped
 			           progressComponent={<LoadingSpinner active content={"Crunching the numbers..."}/>}
 			/>

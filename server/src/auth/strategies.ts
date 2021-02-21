@@ -24,10 +24,11 @@ interface IOAuthStrategyOptions extends IStrategyOptions {
 interface IProfile {
     uuid: string;
     name: string;
-    nameParts: { firstName: string, lastName: string, preferredName?: string};
+    nameParts?: { firstName: string, lastName: string, preferredName?: string };
     email: string;
     token: string;
-    scopes: IProfileScopes | null;
+    scopes?: IProfileScopes | null;
+    member?: boolean;
 }
 interface IProfileScopes {
     slack: string;
@@ -63,14 +64,21 @@ export class GroundTruthStrategy extends OAuthStrategy {
             }
             delete profile.scopes;
             delete profile.nameParts; // Basically ignore the Ground Truth nameParts field for now
+            const adminBecauseHackGTMember = profile.member || false;
+            delete profile.member;
             user = await createRecord<IUser>("users", {
                 ...GroundTruthStrategy.defaultUserProperties,
                 ...profile,
                 slackUsername: scopes.slack,
-                phone: scopes.phone
+                phone: scopes.phone,
+                admin: adminBecauseHackGTMember
             });
         } else {
             user.token = accessToken;
+
+            if (profile.member) {
+                user.admin = true;
+            }
         }
 
         const domain = user.email.split("@").pop();

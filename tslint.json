@@ -2,7 +2,10 @@
   "extends": "tslint:recommended",
   "rules": {
     "array-type": false,
-    "max-line-length": [false],
+    "max-line-length": [
+      false
+    ],
+    "jsdoc-format": false,
     "no-unnecessary-initializer": false,
     "no-var-requires": false,
     "no-consecutive-blank-lines": false,
@@ -12,7 +15,9 @@
       "avoid-escape"
     ],
     "max-classes-per-file": false,
-    "interface-name": [false],
+    "interface-name": [
+      false
+    ],
     "interface-over-type-literal": false,
     "no-empty-interface": false,
     "no-namespace": false,

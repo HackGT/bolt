@@ -35,10 +35,14 @@ export const sessionMiddleware = session({
 });
 app.use(sessionMiddleware);
 
+// @ts-ignore
 passport.serializeUser<IUser, string>((user, done) => {
+    // @ts-ignore
     done(null, user.uuid);
 });
+// @ts-ignore
 passport.deserializeUser<IUser, string>(async (id, done) => {
+    // @ts-ignore
     findUserByID(id).then(user => {
         done(null, user!);
     }).catch(err => {
@@ -50,6 +54,7 @@ export function isAuthenticated(request: express.Request, response: express.Resp
     response.setHeader("Cache-Control", "private");
     if (!request.isAuthenticated() || !request.user) {
         if (request.session) {
+            // @ts-ignore
             request.session.returnTo = request.originalUrl;
         }
         response.redirect("/auth/login");
@@ -65,6 +70,7 @@ export function isAdmin(request: express.Request, response: express.Response, ne
 
 
 export function isAdminNoAuthCheck(request: express.Request, response: express.Response, next: express.NextFunction): void {
+    // @ts-ignore
     if (request.user && request.user.admin) {
         next();
         return; // Prevents a "Can't set headers after they are sent" error
@@ -94,6 +100,7 @@ authRoutes.all("/logout", (request, response) => {
         request.logout();
     }
     if (request.session) {
+        // @ts-ignore
         request.session.loginAction = "render";
     }
     response.redirect("/auth/login");
