@@ -3,7 +3,7 @@ import {Button, Card, Header, Icon, Label, Popup} from "semantic-ui-react";
 import TimeAgo from "react-timeago";
 import {Request} from "../../../types/Request";
 import ItemAndQuantity from "../ItemAndQuantity";
-import {useMutation} from "@apollo/react-hooks";
+import {useMutation} from "@apollo/client";
 import {UPDATE_REQUEST} from "../../util/graphql/Mutations";
 import {APPROVED, DENIED} from "../../../types/Hardware";
 

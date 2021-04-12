@@ -12,7 +12,7 @@ import {
     RETURNED,
     SUBMITTED
 } from "../../types/Hardware";
-import {useQuery} from "@apollo/react-hooks";
+import {useQuery} from "@apollo/client";
 import {USER_REQUESTS} from "../util/graphql/Queries";
 import {Request} from "../../types/Request";
 import ItemAndQuantity from "../desk/ItemAndQuantity";

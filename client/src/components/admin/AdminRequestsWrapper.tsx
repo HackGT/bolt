@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {connect} from "react-redux";
 import {AppState} from "../../state/Store";
 import {Button, Checkbox, Grid, Header, Loader, Message} from "semantic-ui-react";
-import {Query, Mutation} from "react-apollo";
+import {Query, Mutation} from "@apollo/client/react/components";
 import {GET_SETTING} from "../util/graphql/Queries";
 import {UPDATE_SETTING, CREATE_SETTING} from "../util/graphql/Mutations";
 

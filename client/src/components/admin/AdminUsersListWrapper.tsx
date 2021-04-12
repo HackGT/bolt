@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {connect} from "react-redux";
 import {AppState} from "../../state/Store";
 import {Header, Loader, Message} from "semantic-ui-react";
-import {Query} from "react-apollo";
+import {Query} from "@apollo/client/react/components";
 import AdminUsersListTable from "./AdminUsersListTable";
 import {FullUser} from "../../types/User";
 import {ALL_USERS} from "../util/graphql/Queries";

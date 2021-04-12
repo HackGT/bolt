@@ -16,10 +16,6 @@ interface StateProps {
 
 type Props = StateProps & OwnProps;
 
-interface State {
-
-}
-
 function AdminLinksCard(props: Props) {
     const content = (
         <List>

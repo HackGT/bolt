@@ -1,7 +1,7 @@
 import React, {useMemo} from 'react';
 import DataTable from "react-data-table-component";
 import LoadingSpinner from "../../util/LoadingSpinner";
-import {useQuery} from "@apollo/react-hooks";
+import {useQuery} from "@apollo/client";
 import {DETAILED_ITEM_STATISTICS} from "../../util/graphql/Queries";
 import {Header, Icon, Message} from "semantic-ui-react";
 

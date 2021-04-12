@@ -1,7 +1,7 @@
 import React from "react";
 import {Button, Icon, Loader, Message} from "semantic-ui-react";
-import {useMutation} from "@apollo/react-hooks";
-import {Query} from "react-apollo";
+import {useMutation} from "@apollo/client";
+import {Query} from "@apollo/client/react/components";
 import {CREATE_REQUEST} from "../util/graphql/Mutations";
 import {RequestedItem} from "../../types/Hardware";
 import {withToastManager} from "react-toast-notifications";
@@ -43,9 +43,9 @@ function RequestButton({requestedItem, user, toastManager}: RequestButtonProps) 
         >
           {
               ({loading, error, data}: any) => {
-                // if (loading) {
-                //     return <Loader active inline="centered" content="Just a sec!"/>;
-                // }
+                if (loading) {
+                    return <Loader active inline="centered" content="Just a sec!"/>;
+                }
                 if (!error && data.setting !== undefined) {
                   requests_allowed = data.setting.value;
                 }

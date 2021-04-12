@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {connect} from "react-redux";
 import {Checkbox, DropdownProps, Grid, Header, Loader, Message, Select} from "semantic-ui-react";
 import SubmittedList from "./submitted/SubmittedList";
-import {useQuery} from "@apollo/react-hooks";
+import {useQuery} from "@apollo/client";
 import {REQUEST_CHANGE} from "../util/graphql/Subscriptions";
 import ReadyToPrepareList from "./fulfillment/ReadyToPrepareList";
 import {DESK_REQUESTS} from "../util/graphql/Queries";
@@ -97,7 +97,7 @@ function DeskContainer() {
     const {subscribeToMore, ...query} = useQuery(DESK_REQUESTS);
     const randomPhrase = useState(`${pickRandomElement(starters)} ${Math.floor((Math.random() + 1) * 900)} ${pickRandomElement(funPhrases)} ${pickRandomElement(endings)}`);
     const [returnsMode, setReturnsMode] = useState(false);
-    const [location, setLocation] = useState();
+    const [location, setLocation] = useState<number>();
 
     if (query.loading) {
         return <Loader active inline="centered" content="Loading requests..."/>;
@@ -127,7 +127,7 @@ function DeskContainer() {
             }
                     onChange={(event: React.SyntheticEvent<HTMLElement>, data: DropdownProps): void => {
                         console.log(data);
-                        const value = data.value;
+                        const value: any = data.value;
                         setLocation(value);
                     }}
             />
@@ -166,7 +166,7 @@ function DeskContainer() {
                             })
                         }
                                 onChange={(event: React.SyntheticEvent<HTMLElement>, data: DropdownProps): void => {
-                                    const value = data.value;
+                                    const value: any = data.value;
                                     setLocation(value);
                                 }}
                         />

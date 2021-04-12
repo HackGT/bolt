@@ -4,7 +4,7 @@ import TimeAgo from "react-timeago";
 import {Request, UserAndRequests} from "../../../types/Request";
 import ItemAndQuantity from "../ItemAndQuantity";
 import {APPROVED} from "../../../types/Hardware";
-import {useMutation} from "@apollo/react-hooks";
+import {useMutation} from "@apollo/client";
 import {UPDATE_REQUEST} from "../../util/graphql/Mutations";
 import {updateRequestStatus} from "../DeskUtil";
 import PhotoIdCheck from "./PhotoIdCheck";

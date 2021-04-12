@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {useQuery} from "@apollo/react-hooks";
+import {useQuery} from "@apollo/client";
 import {DETAILED_ITEM_STATISTICS} from "../../util/graphql/Queries";
 import {Header, List, Message, Table} from "semantic-ui-react";
 import DataTable from "react-data-table-component";
@@ -22,7 +22,7 @@ function ColumnDef(column: string, def: string) {
 
 function customSort(rows: any[], field: string, direction: string) {
 	console.log(rows, field, direction);
-	const splitField = field.split(".")
+	// const splitField = field.split(".")
 
 
 	return rows;

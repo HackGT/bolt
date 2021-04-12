@@ -4,9 +4,8 @@ import UploadStep from "./CSVUpload";
 import ReviewStep from "./CSVReview";
 import {ItemComplete} from "../item/ItemEditForm";
 import {withToastManager} from "react-toast-notifications";
-import {Redirect, withRouter} from "react-router-dom";
-import {compose} from "redux";
-import {Mutation} from "@apollo/react-components";
+import {Redirect} from "react-router-dom";
+import {Mutation} from "@apollo/client/react/components";
 import {CREATE_ITEM} from "../util/graphql/Mutations";
 
 interface CSVWizardProps {
@@ -205,4 +204,4 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
     }
 }
 
-export default compose(withRouter, withToastManager)(CSVWizard);
+export default withToastManager(CSVWizard);

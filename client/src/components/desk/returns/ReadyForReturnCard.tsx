@@ -9,7 +9,7 @@ import {
     LOST,
     READY_FOR_PICKUP
 } from "../../../types/Hardware";
-import {useMutation} from "@apollo/react-hooks";
+import {useMutation} from "@apollo/client";
 import {UPDATE_REQUEST} from "../../util/graphql/Mutations";
 import {updateRequestStatus} from "../DeskUtil";
 import PhotoIdReturn from "./PhotoIdReturn";

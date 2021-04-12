@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {connect} from "react-redux";
 import {AppState} from "../../state/Store";
 import {Button, Icon, Input, Table, TableHeaderCell} from "semantic-ui-react";
-import {Mutation} from "react-apollo";
+import {Mutation} from "@apollo/client/react/components";
 import {Link} from "react-router-dom";
 import {withToastManager} from "react-toast-notifications";
 import {FullUser, User} from "../../types/User";

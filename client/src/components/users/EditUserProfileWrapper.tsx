@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {match} from "react-router";
-import {Query} from "react-apollo";
+import {Query} from "@apollo/client/react/components";
 import {Header, Loader, Message} from "semantic-ui-react";
 import UserProfile from "./UserProfile";
 import {connect} from "react-redux";

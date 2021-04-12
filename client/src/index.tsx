@@ -5,19 +5,17 @@ import App from "./App";
 import {Provider} from "react-redux";
 import * as serviceWorker from "./serviceWorker";
 import {store} from "./state/Store";
-import {ApolloClient} from "apollo-client";
-import {split} from "apollo-link";
-import {createHttpLink} from "apollo-link-http";
-import {defaultDataIdFromObject, InMemoryCache} from "apollo-cache-inmemory";
-import bugsnag from "@bugsnag/js";
-import bugsnagReact from "@bugsnag/plugin-react";
+import Bugsnag from "@bugsnag/js";
+import BugsnagPluginReact from "@bugsnag/plugin-react";
 import packageJson from "../package.json";
-import {WebSocketLink} from "apollo-link-ws";
 import {SubscriptionClient} from "subscriptions-transport-ws";
-import {getMainDefinition} from "apollo-utilities";
-import {ApolloProvider} from "@apollo/react-common";
+import {getMainDefinition} from "@apollo/client/utilities";
+import {HttpLink, ApolloClient, InMemoryCache} from "@apollo/client";
+import { ApolloProvider } from '@apollo/client/react';
+import { RetryLink } from '@apollo/client/link/retry';
+import { WebSocketLink } from "@apollo/client/link/ws";
 
-const httpLink = createHttpLink({
+const httpLink = new HttpLink({
     uri: "/api",
     credentials: "include"
 });
@@ -32,7 +30,7 @@ const wsClient = new SubscriptionClient(wsUrl, {
     reconnect: true
 });
 const wsLink = new WebSocketLink(wsClient);
-const link = split(
+const link = new RetryLink().split(
     // split based on operation type
     ({query}) => {
         const definition = getMainDefinition(query);
@@ -48,22 +46,21 @@ const link = split(
 export const client = new ApolloClient({
     link,
     cache: new InMemoryCache({
-        dataIdFromObject: (object: any) => {
-            switch (object.__typename) {
-                case 'Location':
-                    return "Location:" + object.location_id;
-                case 'Category':
-                    return "Category:" + object.category_id; // use `category_id` as the primary key
-                case 'User':
-                    return "User:" + object.uuid; // use `uuid` as the primary key
-                case 'Request':
-                    return "Request:" + object.request_id; // use `request_id` as the primary key
-                case 'Item':
-                    return "Item:" + object.id;
-                case 'Setting':
-                    return "Setting:" + object.name;
-                default:
-                    return defaultDataIdFromObject(object); // fall back to default handling
+        typePolicies: { // specify custom primary keys for certain types for caching
+            Location: {
+                keyFields: ["location_id"]
+            },
+            Category: {
+                keyFields: ["category_id"]
+            },
+            User: {
+                keyFields: ["uuid"]
+            },
+            Request: {
+                keyFields: ["request_id"]
+            },
+            Setting: {
+                keyFields: ["name"]
             }
         }
     }),
@@ -77,11 +74,11 @@ export const client = new ApolloClient({
 export const bugsnagEnabled = process.env.REACT_APP_ENABLE_BUGSNAG!.toLowerCase() === "true";
 export let bugsnagClient: any;
 if (bugsnagEnabled) {
-    bugsnagClient = bugsnag({
+    bugsnagClient = Bugsnag.start({
         apiKey: process.env.REACT_APP_BUGSNAG_API_KEY as string,
         appVersion: `${packageJson.version}`
     });
-    bugsnagClient.use(bugsnagReact, React);
+    bugsnagClient.use(BugsnagPluginReact, React);
     const ErrorBoundary = bugsnagClient.getPlugin("react");
     ReactDOM.render(
         (<ErrorBoundary>

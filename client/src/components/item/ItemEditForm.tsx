@@ -4,7 +4,7 @@ import {Button, CheckboxProps, DropdownProps, Form, Grid, Header, Item, Label, M
 import AddOptionDropdown from "../util/AddOptionDropdown";
 import {withToastManager} from "react-toast-notifications";
 import {Redirect} from "react-router";
-import {Mutation, Query} from "@apollo/react-components";
+import {Mutation, Query} from "@apollo/client/react/components";
 import {CREATE_ITEM, UPDATE_ITEM} from "../util/graphql/Mutations";
 import {ALL_CATEGORIES, ALL_ITEMS, ALL_LOCATIONS} from "../util/graphql/Queries";
 import {ItemNoId, Location} from "../../types/Hardware";

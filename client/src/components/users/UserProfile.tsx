@@ -6,7 +6,7 @@ import {Link, Redirect} from "react-router-dom";
 import {withToastManager} from "react-toast-notifications";
 import {FullUser, User} from "../../types/User";
 import {AppState} from "../../state/Store";
-import {Mutation} from "@apollo/react-components";
+import {Mutation} from "@apollo/client/react/components";
 import {UPDATE_USER} from "../util/graphql/Mutations";
 
 type UserProfileProps = {

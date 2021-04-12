@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {match} from "react-router";
-import {Query} from "react-apollo";
+import {Query} from "@apollo/client/react/components";
 import ItemEditForm from "./ItemEditForm";
 import {Header, Loader, Message} from "semantic-ui-react";
 import {ITEM_EDIT_GET_ITEM} from "../util/graphql/Queries";
