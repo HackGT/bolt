@@ -2,7 +2,7 @@ import {config} from "./common";
 //
 // Database connection
 //
-import knex from "knex";
+import { Knex, knex } from "knex";
 import * as path from "path";
 
 const migrations = {
@@ -10,7 +10,7 @@ const migrations = {
     directory: path.normalize(path.join(__dirname, "/migrations"))
 };
 
-const DBConfig: knex.Config = {
+const DBConfig: Knex.Config = {
     client: "pg",
     connection: config.server.postgresURL,
     searchPath: ["knex", "public"],

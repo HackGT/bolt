@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import express from "express";
-import graphqlHTTP from "express-graphql";
+import { graphqlHTTP } from "express-graphql";
 import {GraphQLError} from "graphql";
 import {DB, IItem} from "../database";
 import {isAdminNoAuthCheck} from "../auth/auth";
@@ -124,7 +124,7 @@ async function findOrCreate(tableName: string, searchObj: object, data: object, 
 
     if (!matchingRows.length) {
         // The result must be an exact match
-        const id = await DB.from(tableName).insert(data).returning(idFieldName);
+        const id = await DB.from(tableName).returning(idFieldName).insert(data);
         return id[0];
     }
     return matchingRows[0][idFieldName];
@@ -406,11 +406,11 @@ const resolvers: any = {
             delete args.newItem.category; // Remove the category property from the input item so knex won't try to add it to the database
             delete args.newItem.location;
 
-            const newObjId = await DB.from("items").insert({
+            const newObjId = await DB.from("items").returning("item_id").insert({
                 category_id,
                 location_id,
                 ...args.newItem
-            }).returning("item_id");
+            });
 
             console.log("The new item's ID is", newObjId[0]);
 
@@ -523,7 +523,7 @@ const resolvers: any = {
                 ...args.newRequest,
                 status: initialStatus
             })
-                .returning(["request_id", "quantity", "status", "created_at", "updated_at"]);
+            .returning(["request_id", "quantity", "status", "created_at", "updated_at"]);
 
             newRequest = newRequest[0];
             const updatedItem = await getItem(args.newRequest.request_item_id, context.user.admin);
@@ -599,7 +599,7 @@ const resolvers: any = {
             if (Object.keys(updateObj).length >= 1) {
                 updateObj.updated_at = new Date();
 
-                const updatedRequest = await DB.from("requests")
+                const updatedRequest: any = await DB.from("requests")
                     .where({
                         request_id: args.updatedRequest.request_id,
                     })
@@ -667,7 +667,7 @@ const resolvers: any = {
                 throw new GraphQLError("The value for this setting can't be blank.");
             }
 
-            const newObjName = await DB.from("settings").insert({
+            const newObjName = await DB.from<Setting>("settings").insert({
                 name: args.newSetting.name,
                 value: args.newSetting.value
             }).returning("name");
