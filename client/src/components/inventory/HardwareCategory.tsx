@@ -8,9 +8,9 @@ const HardwareCategory = ({ name, items, requestsEnabled }: any) => (
   <div>
     <Item.Group>
       {items
-        // @ts-ignore
         .sort(
           (a: any, b: any) =>
+            // @ts-ignore
             (b.qtyUnreserved > 0) - (a.qtyUnreserved > 0) || a.item_name.localeCompare(b.item_name)
         )
         .map((item: HwItem) => (

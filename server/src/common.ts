@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-namespace, @typescript-eslint/no-empty-interface */
 import * as fs from "fs";
 import * as crypto from "crypto";
 import * as path from "path";
