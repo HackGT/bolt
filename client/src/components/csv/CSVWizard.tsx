@@ -70,11 +70,10 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
   };
 
   public uploadInventory = (createItem: any) => {
-    const totalItems = this.state.inventory.length;
-    this.setState({
+    this.setState(prevState => ({
       isSubmitting: true,
-      totalItems,
-    });
+      totalItems: prevState.inventory.length,
+    }));
 
     Promise.all(
       this.state.inventory.map(item =>
@@ -84,10 +83,9 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
           },
         })
           .then(() => {
-            const numSubmitted = this.state.itemsCreated;
-            this.setState({
-              itemsCreated: numSubmitted + 1,
-            });
+            this.setState(prevState => ({
+              itemsCreated: prevState.itemsCreated + 1,
+            }));
           })
           .catch((err: Error) => {
             console.error(err);
@@ -170,6 +168,7 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
     const activeStepContent = stepsSrc[wizardStep].stepDiv || defaultStep;
 
     // Set appropriate state in step component and strip stepDiv for proper props
+    /* eslint-disable no-param-reassign */
     const steps: StepInterface[] = stepsSrc.map((step, i) => {
       if (i === wizardStep) {
         step.active = true;

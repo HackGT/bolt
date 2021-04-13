@@ -61,7 +61,7 @@ const HardwareLocationContents = ({
             {filteredItems(itemByCat.items, searchQuery).length ? (
               <>
                 <Accordion.Title
-                  key={`${itemsByLocation.location.location_id}-${index}-title`}
+                  key={`${itemsByLocation.location.location_id}-title`}
                   active={accordionState.includes(index) || searchQuery.length >= 3}
                   index={index}
                   onClick={(e: any, titleProps: any) => {
@@ -74,7 +74,7 @@ const HardwareLocationContents = ({
                   </Header>
                 </Accordion.Title>
                 <Accordion.Content
-                  key={`${itemsByLocation.location.location_id}-${index}-content`}
+                  key={`${itemsByLocation.location.location_id}-content`}
                   active={accordionState.includes(index) || searchQuery.length >= 3}
                   index={index}
                 >

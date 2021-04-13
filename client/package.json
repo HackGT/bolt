@@ -53,9 +53,9 @@
   ],
   "author": "Evan Strat",
   "devDependencies": {
-    "@hex-labs/eslint-config-react": "^1.1.1",
-    "@hex-labs/prettier-config": "^1.1.1",
-    "@hex-labs/stylelint-config": "^1.1.1",
+    "@hex-labs/eslint-config-react": "^1.1.5",
+    "@hex-labs/prettier-config": "^1.1.5",
+    "@hex-labs/stylelint-config": "^1.1.5",
     "@types/accounting": "^0.4.1",
     "@types/cleave.js": "^1.4.4",
     "@types/jest": "26.0.22",

@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { AppState } from "../../state/Store";
 import { AdminCardLink } from "./AdminOverviewContainer";
 
-export interface OwnProps {
+interface OwnProps {
   title: string;
   links: AdminCardLink[];
   notice?: string;
@@ -16,7 +16,7 @@ interface StateProps {}
 
 type Props = StateProps & OwnProps;
 
-function AdminLinksCard(props: Props) {
+const AdminLinksCard: React.FC<Props> = props => {
   const content = (
     <List>
       {props.links.map(value => (
@@ -40,7 +40,7 @@ function AdminLinksCard(props: Props) {
       </Card.Content>
     </Card>
   );
-}
+};
 
 function mapStateToProps(state: AppState) {
   return {

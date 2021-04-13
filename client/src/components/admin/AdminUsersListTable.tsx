@@ -47,6 +47,111 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
     };
   }
 
+  private getUserIndex(uuid: string) {
+    return this.state.users.findIndex(user => user.uuid === uuid);
+  }
+
+  private modifyUserAdminInState = (uuid: string, admin: boolean) => {
+    const userIndex = this.getUserIndex(uuid);
+    const { users } = this.state;
+
+    users[userIndex] = {
+      ...users[userIndex],
+      admin,
+    };
+
+    this.setState({
+      users,
+    });
+  };
+
+  private modifyLoadingUsers = (uuid: string, loading: boolean) => {
+    this.setState(prevState => {
+      const updatedLoadingUsers = prevState.loadingUsers;
+      updatedLoadingUsers[uuid] = loading;
+
+      return {
+        loadingUsers: updatedLoadingUsers,
+      };
+    });
+  };
+
+  private adminButton = (user: FullUser, changeAdmin: any, loading = true) => {
+    const { name, uuid, admin } = user;
+
+    if (this.props.user && uuid === this.props.user.uuid) {
+      return "";
+    }
+    // flip admin value so we promote/demote this user
+    const newAdminValue = !admin;
+    return (
+      <Button
+        size="small"
+        basic
+        primary
+        icon
+        compact
+        loading={this.state.loadingUsers[uuid] || false}
+        labelPosition="left"
+        onClick={e => {
+          e.preventDefault();
+          this.modifyLoadingUsers(uuid, true);
+          const { toastManager } = this.props;
+
+          changeAdmin({
+            variables: { uuid, updatedUser: { admin: newAdminValue } },
+          })
+            .then(({ data }: any) => {
+              if (data.updateUser) {
+                const addOrRemove = newAdminValue ? "now" : "no longer";
+                toastManager.add(`${name} is ${addOrRemove} an admin`, {
+                  appearance: "success",
+                  autoDismiss: true,
+                  placement: "top-center",
+                });
+                this.modifyUserAdminInState(uuid, newAdminValue);
+              } else {
+                toastManager.add(
+                  `The admin status for ${name} was not changed because the server didn't find any users to update or your account no longer has admin permissions.  Refresh the page and try again.`,
+                  {
+                    appearance: "warning",
+                    autoDismiss: false,
+                    placement: "top-center",
+                  }
+                );
+              }
+              this.modifyLoadingUsers(uuid, false);
+            })
+            .catch((err: any) => {
+              toastManager.add(
+                `Couldn't change admin status for ${name} because of an error: ${err.message}`,
+                {
+                  appearance: "error",
+                  autoDismiss: false,
+                  placement: "top-center",
+                }
+              );
+              this.modifyLoadingUsers(uuid, false);
+            });
+        }}
+      >
+        <Icon name={newAdminValue ? "arrow up" : "arrow down"} />
+        {newAdminValue ? "Make admin" : "Remove admin"}
+      </Button>
+    );
+  };
+
+  private containsSearchQuery(user: FullUser) {
+    const query: string = this.state.searchQuery;
+    return (
+      user.name.toLowerCase().indexOf(query) !== -1 ||
+      user.email.toLowerCase().indexOf(query) !== -1 ||
+      user.phone.indexOf(query) !== -1 ||
+      user.slackUsername.indexOf(query) !== -1 ||
+      user.uuid.indexOf(query) !== -1
+    );
+  }
+
   public render = () => {
     const tableColNames = [
       "Name",
@@ -117,109 +222,6 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
           </div>
         )}
       </Mutation>
-    );
-  };
-
-  private containsSearchQuery(user: FullUser) {
-    const query: string = this.state.searchQuery;
-    return (
-      user.name.toLowerCase().indexOf(query) !== -1 ||
-      user.email.toLowerCase().indexOf(query) !== -1 ||
-      user.phone.indexOf(query) !== -1 ||
-      user.slackUsername.indexOf(query) !== -1 ||
-      user.uuid.indexOf(query) !== -1
-    );
-  }
-
-  private getUserIndex(uuid: string) {
-    return this.state.users.findIndex(user => user.uuid === uuid);
-  }
-
-  private modifyUserAdminInState = (uuid: string, admin: boolean) => {
-    const userIndex = this.getUserIndex(uuid);
-    const { users } = this.state;
-
-    users[userIndex] = {
-      ...users[userIndex],
-      admin,
-    };
-
-    this.setState({
-      users,
-    });
-  };
-
-  private modifyLoadingUsers = (uuid: string, loading: boolean) => {
-    const updatedLoadingUsers = this.state.loadingUsers;
-    updatedLoadingUsers[uuid] = loading;
-
-    this.setState({
-      loadingUsers: updatedLoadingUsers,
-    });
-  };
-
-  private adminButton = (user: FullUser, changeAdmin: any, loading = true) => {
-    const { name, uuid, admin } = user;
-
-    if (this.props.user && uuid === this.props.user.uuid) {
-      return "";
-    }
-    // flip admin value so we promote/demote this user
-    const newAdminValue = !admin;
-    return (
-      <Button
-        size="small"
-        basic
-        primary
-        icon
-        compact
-        loading={this.state.loadingUsers[uuid] || false}
-        labelPosition="left"
-        onClick={e => {
-          e.preventDefault();
-          this.modifyLoadingUsers(uuid, true);
-          const { toastManager } = this.props;
-
-          changeAdmin({
-            variables: { uuid, updatedUser: { admin: newAdminValue } },
-          })
-            .then(({ data }: any) => {
-              if (data.updateUser) {
-                const addOrRemove = newAdminValue ? "now" : "no longer";
-                toastManager.add(`${name} is ${addOrRemove} an admin`, {
-                  appearance: "success",
-                  autoDismiss: true,
-                  placement: "top-center",
-                });
-                this.modifyUserAdminInState(uuid, newAdminValue);
-              } else {
-                toastManager.add(
-                  `The admin status for ${name} was not changed because the server didn't find any users to update or your account no longer has admin permissions.  Refresh the page and try again.`,
-                  {
-                    appearance: "warning",
-                    autoDismiss: false,
-                    placement: "top-center",
-                  }
-                );
-              }
-              this.modifyLoadingUsers(uuid, false);
-            })
-            .catch((err: any) => {
-              toastManager.add(
-                `Couldn't change admin status for ${name} because of an error: ${err.message}`,
-                {
-                  appearance: "error",
-                  autoDismiss: false,
-                  placement: "top-center",
-                }
-              );
-              this.modifyLoadingUsers(uuid, false);
-            });
-        }}
-      >
-        <Icon name={newAdminValue ? "arrow up" : "arrow down"} />
-        {newAdminValue ? "Make admin" : "Remove admin"}
-      </Button>
     );
   };
 }

@@ -87,8 +87,8 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
 
     const { toastManager, setInventory } = this.props;
 
-    reader.addEventListener("load", (e: any) => {
-      const csvdata: string = e.target.result;
+    reader.addEventListener("load", (event: any) => {
+      const csvdata: string = event.target.result;
       const lines = csvdata.split("\n");
       // Only request the first line to cleanse headers
       const header = lines[0].split("\t").map(field => field.toLowerCase());
@@ -156,8 +156,8 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
         <Header as="h3" dividing>
           Upload a TSV
         </Header>
-        <Container style={styles.wrapper}>
-          <div style={styles.buttonWrapper}>
+        <Container style={{ display: "flex" }}>
+          <div style={{ flex: "none", width: "15em" }}>
             <Label as="label" basic htmlFor="upload">
               <Button
                 icon="upload"
@@ -169,7 +169,7 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
               />
               <input hidden id="upload" type="file" accept="text/csv" onChange={this.onCSVSelect} />
             </Label>
-            <p style={styles.notice}>
+            <p style={{ marginTop: "1em" }}>
               Please save your file as a <strong>TSV</strong>, which is like a CSV but with tabs.
               This will allow you to have commas in your data fields. Note: TSVs MUST start with a
               header line as follows{" "}
@@ -179,11 +179,11 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
               . Formatting errors will not be picked up (yet)! Verify your entries!
             </p>
           </div>
-          <div style={styles.logWrapper}>
+          <div style={{ borderLeft: "2px solid black", marginLeft: "1em", paddingLeft: "1em" }}>
             <Container>
               <Header as="h4">Feed</Header>
-              {logs.map((log, i) => (
-                <p key={i}>{log}</p>
+              {logs.map(log => (
+                <p>{log}</p>
               ))}
             </Container>
           </div>
@@ -192,23 +192,5 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
     );
   }
 }
-
-const styles = {
-  buttonWrapper: {
-    flex: "none",
-    width: "15em",
-  },
-  logWrapper: {
-    borderLeft: "2px solid black",
-    marginLeft: "1em",
-    paddingLeft: "1em",
-  },
-  notice: {
-    marginTop: "1em",
-  },
-  wrapper: {
-    display: "flex",
-  },
-};
 
 export default withToastManager(UploadStep);

@@ -3,7 +3,7 @@ import * as React from "react";
 import FeedbackLink from "./FeedbackLink";
 import packageJson from "../../package.json";
 
-const Footer: React.FunctionComponent<{}> = props => (
+const Footer: React.FC = () => (
   <footer
     style={{
       textAlign: "center",

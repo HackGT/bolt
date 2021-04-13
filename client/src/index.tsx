@@ -1,7 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom";
-
-import "./index.css";
 import { Provider } from "react-redux";
 import Bugsnag from "@bugsnag/js";
 import BugsnagPluginReact from "@bugsnag/plugin-react";
@@ -14,8 +12,8 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 
 import packageJson from "../package.json";
 import { store } from "./state/Store";
-import * as serviceWorker from "./serviceWorker";
 import App from "./App";
+import "./index.css";
 
 const httpLink = new HttpLink({
   uri: "/api",
@@ -74,7 +72,8 @@ export const client = new ApolloClient({
   },
 });
 
-export const bugsnagEnabled = process.env.REACT_APP_ENABLE_BUGSNAG!.toLowerCase() === "true";
+export const bugsnagEnabled = process.env.REACT_APP_ENABLE_BUGSNAG?.toLowerCase() === "true";
+// eslint-disable-next-line import/no-mutable-exports
 export let bugsnagClient: any;
 if (bugsnagEnabled) {
   bugsnagClient = Bugsnag.start({
@@ -103,8 +102,3 @@ if (bugsnagEnabled) {
     document.getElementById("root")
   );
 }
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();

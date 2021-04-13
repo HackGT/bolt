@@ -38,7 +38,7 @@ class UserProfile extends Component<Props, UserProfileState> {
 
   public handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { target } = event;
-    let { value } = target;
+    let { value }: { value: any } = target;
     const { name } = target;
     const inputType = target.type;
     // Convert number input values to numbers
@@ -46,13 +46,12 @@ class UserProfile extends Component<Props, UserProfileState> {
       value = Number.parseFloat(value);
     }
 
-    // @ts-ignore
-    this.setState({
+    this.setState(prevState => ({
       user: {
-        ...this.state.user,
+        ...prevState.user,
         [name]: value,
       },
-    });
+    }));
   };
 
   public handleInputChangeCheckbox = (
@@ -63,15 +62,78 @@ class UserProfile extends Component<Props, UserProfileState> {
       const value: boolean = checkboxProps.checked;
       const { name } = checkboxProps;
 
-      // @ts-ignore
-      this.setState({
+      this.setState(prevState => ({
         user: {
-          ...this.state.user,
+          ...prevState.user,
           [name]: value,
         },
-      });
+      }));
     }
   };
+
+  private adminEditingOtherUser() {
+    return (
+      this.props.signedInUser &&
+      this.props.signedInUser.admin &&
+      this.props.signedInUser.uuid !== this.state.user.uuid
+    );
+  }
+
+  private finishFormSubmit(submitForm: any, toastManager: any) {
+    if (!this.validateForm()) {
+      return;
+    }
+
+    const variables: any = {
+      uuid: this.state.user.uuid,
+      updatedUser: {
+        phone: this.state.user.phone.trim(),
+        slackUsername: this.state.user.slackUsername.trim(),
+      },
+    };
+
+    // if the user saving is an admin
+    if (this.props.signedInUser && this.props.signedInUser.admin) {
+      variables.updatedUser.admin = this.state.user.admin;
+      variables.updatedUser.haveID = this.state.user.haveID;
+    }
+
+    submitForm({
+      variables,
+    })
+      .then(() => {
+        toastManager.add(`Profile updated`, {
+          appearance: "success",
+          autoDismiss: true,
+          placement: "top-center",
+        });
+      })
+      .catch((err: Error) => {
+        let message = `Couldn't update profile because of an error: ${err.message}.  Check your internet connection.  If the problem persists, contact a member of the HackGT Team for assistance.`;
+
+        if (err.message.indexOf("Network error") !== -1) {
+          message = `It appears you are offline.  Please check your internet connection and then try again.`;
+        }
+
+        toastManager.add(message, {
+          appearance: "error",
+          autoDismiss: false,
+          placement: "top-center",
+        });
+      });
+  }
+
+  private validateSlackUsername(): boolean {
+    return !this.state.submitClicked || this.state.user.slackUsername.length > 0;
+  }
+
+  private validatePhone(): boolean {
+    return !this.state.submitClicked || /^\((\d){3}\) (\d){3}-(\d){4}$/.test(this.state.user.phone);
+  }
+
+  private validateForm(): boolean {
+    return !this.state.submitClicked || (this.validatePhone() && this.validateSlackUsername());
+  }
 
   public render() {
     const isAdmin: boolean = !!this.props.signedInUser && this.props.signedInUser.admin;
@@ -224,70 +286,6 @@ class UserProfile extends Component<Props, UserProfileState> {
         </Mutation>
       </div>
     );
-  }
-
-  private adminEditingOtherUser() {
-    return (
-      this.props.signedInUser &&
-      this.props.signedInUser.admin &&
-      this.props.signedInUser.uuid !== this.state.user.uuid
-    );
-  }
-
-  private finishFormSubmit(submitForm: any, toastManager: any) {
-    if (!this.validateForm()) {
-      return;
-    }
-
-    const variables: any = {
-      uuid: this.state.user.uuid,
-      updatedUser: {
-        phone: this.state.user.phone.trim(),
-        slackUsername: this.state.user.slackUsername.trim(),
-      },
-    };
-
-    // if the user saving is an admin
-    if (this.props.signedInUser && this.props.signedInUser.admin) {
-      variables.updatedUser.admin = this.state.user.admin;
-      variables.updatedUser.haveID = this.state.user.haveID;
-    }
-
-    submitForm({
-      variables,
-    })
-      .then(() => {
-        toastManager.add(`Profile updated`, {
-          appearance: "success",
-          autoDismiss: true,
-          placement: "top-center",
-        });
-      })
-      .catch((err: Error) => {
-        let message = `Couldn't update profile because of an error: ${err.message}.  Check your internet connection.  If the problem persists, contact a member of the HackGT Team for assistance.`;
-
-        if (err.message.indexOf("Network error") !== -1) {
-          message = `It appears you are offline.  Please check your internet connection and then try again.`;
-        }
-
-        toastManager.add(message, {
-          appearance: "error",
-          autoDismiss: false,
-          placement: "top-center",
-        });
-      });
-  }
-
-  private validateSlackUsername(): boolean {
-    return !this.state.submitClicked || this.state.user.slackUsername.length > 0;
-  }
-
-  private validatePhone(): boolean {
-    return !this.state.submitClicked || /^\((\d){3}\) (\d){3}-(\d){4}$/.test(this.state.user.phone);
-  }
-
-  private validateForm(): boolean {
-    return !this.state.submitClicked || (this.validatePhone() && this.validateSlackUsername());
   }
 }
 

@@ -22,7 +22,7 @@ import CacheBuster from "./components/util/CacheBuster";
 import DetailedItemStatistics from "./components/reports/statistics/DetailedItemStatistics";
 import ItemDemandReport from "./components/reports/demand/ItemDemandReport";
 
-export interface OwnProps {}
+interface OwnProps {}
 
 interface StateProps {
   user: User | null;
@@ -31,8 +31,8 @@ interface StateProps {
 
 type Props = StateProps & OwnProps;
 
-class App extends Component<Props, {}> {
-  public async componentWillMount(): Promise<void> {
+class App extends Component<Props> {
+  public async componentDidMount(): Promise<void> {
     const userRequest = await fetch("/api", {
       credentials: "include",
       method: "POST",
@@ -41,14 +41,14 @@ class App extends Component<Props, {}> {
       },
       body: JSON.stringify({
         query: `
-                        query {
-                          user {
-                            uuid
-                            name
-                            admin
-                          }
-                        }
-                    `,
+          query {
+            user {
+              uuid
+              name
+              admin
+            }
+          }
+        `,
       }),
     });
     const json = await userRequest.json();

@@ -6,7 +6,7 @@ import { Header, Icon, Message } from "semantic-ui-react";
 import LoadingSpinner from "../../util/LoadingSpinner";
 import { DETAILED_ITEM_STATISTICS } from "../../util/graphql/Queries";
 
-function DetailedItemStatistics(props: {}) {
+const DetailedItemStatistics: React.FC = () => {
   const { data, loading, error } = useQuery(DETAILED_ITEM_STATISTICS, {
     partialRefetch: true,
     pollInterval: 120000,
@@ -132,6 +132,6 @@ function DetailedItemStatistics(props: {}) {
       />
     </>
   );
-}
+};
 
 export default DetailedItemStatistics;

@@ -9,13 +9,13 @@ import { RequestedItem } from "../../types/Hardware";
 import { GET_SETTING, USER_REQUESTS } from "../util/graphql/Queries";
 import { User } from "../../types/User";
 
-interface RequestButtonProps {
+interface Props {
   requestedItem: RequestedItem;
   user: User;
   toastManager: any;
 }
 
-function RequestButton({ requestedItem, user, toastManager }: RequestButtonProps) {
+const RequestButton: React.FC<Props> = ({ requestedItem, user, toastManager }) => {
   const [createRequest, { loading, error }] = useMutation(CREATE_REQUEST, {
     refetchQueries: [
       {
@@ -40,23 +40,23 @@ function RequestButton({ requestedItem, user, toastManager }: RequestButtonProps
       />
     );
   }
-  let requests_allowed = "true";
+  let requestsAllowed = "true";
   return (
     <Query query={GET_SETTING} variables={{ settingName: "requests_allowed" }}>
-      {({ loading, error, data }: any) => {
-        if (loading) {
+      {({ loading: queryLoading, error: queryError, data }: any) => {
+        if (queryLoading) {
           return <Loader active inline="centered" content="Just a sec!" />;
         }
-        if (!error && data.setting !== undefined) {
-          requests_allowed = data.setting.value;
+        if (!queryError && data.setting !== undefined) {
+          requestsAllowed = data.setting.value;
         }
         return (
           <Button
             primary
             icon
-            disabled={loading || requests_allowed === "false"}
+            disabled={loading || requestsAllowed === "false"}
             loading={loading}
-            onClick={event =>
+            onClick={() =>
               createRequest({
                 variables: {
                   newRequest: {
@@ -96,6 +96,6 @@ function RequestButton({ requestedItem, user, toastManager }: RequestButtonProps
       }}
     </Query>
   );
-}
+};
 
 export default withToastManager(RequestButton);

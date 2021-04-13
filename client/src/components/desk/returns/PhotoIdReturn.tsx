@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 import React, { useState } from "react";
 import { Button, Card, Dropdown, Icon } from "semantic-ui-react";
 
