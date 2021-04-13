@@ -1,8 +1,9 @@
+/* eslint-disable prefer-destructuring */
 import { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<any> {
   const existingLocations = await knex.from("locations");
-  let defaultLocation;
+  let defaultLocation: any;
   if (!existingLocations.length) {
     // create a default location if one doesn't exist
     defaultLocation = await knex("locations")

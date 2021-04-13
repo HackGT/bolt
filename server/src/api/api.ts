@@ -1,11 +1,12 @@
-/* tslint:disable:variable-name */
+/* eslint-disable camelcase, no-param-reassign */
 import * as fs from "fs";
 import * as path from "path";
 import express from "express";
 import { graphqlHTTP } from "express-graphql";
 import { GraphQLError } from "graphql";
-import { makeExecutableSchema } from "graphql-tools";
+import { IResolvers, makeExecutableSchema } from "graphql-tools";
 import { PubSub } from "graphql-subscriptions";
+import fetch from "isomorphic-fetch";
 
 import { DB, IItem } from "../database";
 import { isAdminNoAuthCheck } from "../auth/auth";
@@ -23,9 +24,6 @@ import {
 import { config } from "../common";
 import { Quantity } from "./requests/quantity";
 import { getItemLocation, ItemController } from "./items/ItemController";
-
-const fetch = require("isomorphic-fetch");
-const bodyParser = require("body-parser");
 
 export const apiRoutes = express.Router();
 export const pubsub = new PubSub();
@@ -79,8 +77,7 @@ async function getUser(userId: string) {
   return users[0];
 }
 
-// tslint:disable-next-line:typedef
-async function updateUser(args, context) {
+async function updateUser(args: any, context: any) {
   const searchObj: UserUpdateInput = args.updatedUser;
 
   if (!context.user.admin && args.uuid !== context.user.uuid) {
@@ -138,8 +135,8 @@ async function getSetting(settingName: string) {
 
 async function findOrCreate(
   tableName: string,
-  searchObj: object,
-  data: object,
+  searchObj: Record<string, unknown>,
+  data: Record<string, unknown>,
   idFieldName: string
 ): Promise<number> {
   const matchingRows = await DB.from(tableName).where(searchObj);
@@ -152,7 +149,7 @@ async function findOrCreate(
   return matchingRows[0][idFieldName];
 }
 
-const resolvers: any = {
+const resolvers: IResolvers = {
   Query: {
     /* Queries */
     /**
@@ -225,17 +222,17 @@ const resolvers: any = {
       const locations: Location[] = await DB.from("locations").where(locationsSearchObj);
 
       const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await Quantity.all();
-      const itemsByLocation = {};
+      const itemsByLocation: any = {};
       for (let i = 0; i < locations.length; i++) {
         const loc = locations[i];
 
         const itemsAtLocation = items.filter(predItem => predItem.location_id === loc.location_id);
-        const itemsByCategory = {};
+        const itemsByCategory: any = {};
 
         for (let j = 0; j < itemsAtLocation.length; j++) {
           const item = itemsAtLocation[j];
 
-          if (!itemsByCategory.hasOwnProperty(item.category_id)) {
+          if (!Object.prototype.hasOwnProperty.call(itemsByCategory, item.category_id)) {
             itemsByCategory[item.category_id] = {
               category: {
                 category_id: item.category_id,
@@ -267,8 +264,8 @@ const resolvers: any = {
 
       return Object.values(itemsByLocation);
     },
-    categories: (root, args, context): Promise<Category[]> => DB.from("categories"),
-    locations: (root, args, context): Promise<Location[]> => DB.from("locations"),
+    categories: (): Promise<Category[]> => DB.from("categories"),
+    locations: (): Promise<Location[]> => DB.from("locations"),
     itemStatistics: async (root, args, context): Promise<Item[]> => {
       if (!context.user.admin) {
         // TODO: validate this
@@ -278,7 +275,7 @@ const resolvers: any = {
       const items: any = await ItemController.get({}, context.user.admin);
       const detailedQuantities = await Quantity.quantityStatistics();
 
-      return items.map(item => {
+      return items.map((item: any) => {
         const qtyInfo = detailedQuantities[item.item_id] || {
           SUBMITTED: 0,
           APPROVED: 0,
@@ -373,7 +370,7 @@ const resolvers: any = {
         )
       );
     },
-    setting: async (root, args, context): Promise<Setting | null> => await getSetting(args.name),
+    setting: async (root, args): Promise<Setting | null> => await getSetting(args.name),
   },
   Mutation: {
     /* Mutations */
@@ -532,7 +529,8 @@ const resolvers: any = {
       } catch (error) {
         console.log("Could not find requests_allowed setting");
       }
-      // tslint:disable-next-line:triple-equals
+
+      // eslint-disable-next-line eqeqeq
       if (requests_allowed !== undefined && requests_allowed.value == "false") {
         console.log("Requests are disabled at this time");
         throw new GraphQLError("Requests are disabled at this time");
@@ -578,6 +576,7 @@ const resolvers: any = {
         })
         .returning(["request_id", "quantity", "status", "created_at", "updated_at"]);
 
+      // eslint-disable-next-line prefer-destructuring
       newRequest = newRequest[0];
       const updatedItem = await getItem(args.newRequest.request_item_id, context.user.admin);
       if (!updatedItem) {
@@ -674,7 +673,7 @@ const resolvers: any = {
         const simpleRequest = toSimpleRequest(updatedRequest[0]);
         console.log(simpleRequest);
 
-        let user;
+        let user: User | null;
         if (updatedUserHaveID !== null) {
           user = await updateUser(
             {
@@ -687,6 +686,10 @@ const resolvers: any = {
           );
         } else {
           user = await getUser(updatedRequest[0].user_id);
+        }
+
+        if (!user) {
+          throw new GraphQLError("Unknown user");
         }
 
         // fetch the item
@@ -815,7 +818,7 @@ apiRoutes.all(
   })
 );
 
-apiRoutes.post("/slack/feedback", bodyParser.json(), (req, res) => {
+apiRoutes.post("/slack/feedback", express.json(), (req, res) => {
   const user = req.user as User;
 
   fetch(config.server.slackURL, {

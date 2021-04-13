@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import moment from "moment";
 
 import { RequestStatus } from "./graphql.types";
@@ -50,36 +51,6 @@ export function onlyIfAdmin(val: any, isAdmin: boolean) {
   return isAdmin ? val : null;
 }
 
-export function nestedRequest(
-  request: KnexRequest,
-  isAdmin: boolean,
-  qtyInStock: ItemQtyAvailable,
-  qtyAvailableForApproval: ItemQtyAvailable,
-  qtyUnreserved: ItemQtyAvailable
-) {
-  const user = {
-    uuid: request.uuid,
-    admin: request.admin,
-    name: request.name,
-    email: request.email,
-    phone: request.phone,
-    slackUsername: request.slackUsername,
-    haveID: request.haveID,
-  };
-
-  return {
-    user,
-    item: redactedItem(request, isAdmin, qtyInStock, qtyAvailableForApproval, qtyUnreserved),
-    request_id: request.request_id,
-    status: request.status,
-    location: redactedItem(request, isAdmin, qtyInStock, qtyAvailableForApproval, qtyUnreserved)
-      .location,
-    quantity: request.quantity,
-    createdAt: localTimestamp(request.created_at),
-    updatedAt: localTimestamp(request.updated_at),
-  };
-}
-
 export function redactedItem(
   item: any,
   isAdmin: boolean,
@@ -108,6 +79,36 @@ export function redactedItem(
     qtyInStock: qtyInStock[item.item_id],
     qtyAvailableForApproval: qtyAvailableForApproval[item.item_id],
     qtyUnreserved: qtyUnreserved[item.item_id],
+  };
+}
+
+export function nestedRequest(
+  request: KnexRequest,
+  isAdmin: boolean,
+  qtyInStock: ItemQtyAvailable,
+  qtyAvailableForApproval: ItemQtyAvailable,
+  qtyUnreserved: ItemQtyAvailable
+) {
+  const user = {
+    uuid: request.uuid,
+    admin: request.admin,
+    name: request.name,
+    email: request.email,
+    phone: request.phone,
+    slackUsername: request.slackUsername,
+    haveID: request.haveID,
+  };
+
+  return {
+    user,
+    item: redactedItem(request, isAdmin, qtyInStock, qtyAvailableForApproval, qtyUnreserved),
+    request_id: request.request_id,
+    status: request.status,
+    location: redactedItem(request, isAdmin, qtyInStock, qtyAvailableForApproval, qtyUnreserved)
+      .location,
+    quantity: request.quantity,
+    createdAt: localTimestamp(request.created_at),
+    updatedAt: localTimestamp(request.updated_at),
   };
 }
 

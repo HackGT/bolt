@@ -38,17 +38,18 @@ export const sessionMiddleware = session({
 });
 app.use(sessionMiddleware);
 
-// @ts-ignore
-passport.serializeUser<IUser, string>((user, done) => {
-  // @ts-ignore
+passport.serializeUser<string>((user, done) => {
   done(null, user.uuid);
 });
-// @ts-ignore
-passport.deserializeUser<IUser, string>(async (id, done) => {
-  // @ts-ignore
+
+passport.deserializeUser<string>(async (id, done) => {
   findUserByID(id)
     .then(user => {
-      done(null, user!);
+      if (user) {
+        done(null, user);
+      } else {
+        done("No user found");
+      }
     })
     .catch(err => {
       done(err);
@@ -63,13 +64,24 @@ export function isAuthenticated(
   response.setHeader("Cache-Control", "private");
   if (!request.isAuthenticated() || !request.user) {
     if (request.session) {
-      // @ts-ignore
       request.session.returnTo = request.originalUrl;
     }
     response.redirect("/auth/login");
   } else {
     next();
   }
+}
+
+export function isAdminNoAuthCheck(
+  request: express.Request,
+  response: express.Response,
+  next: express.NextFunction
+): void {
+  if (request.user && request.user.admin) {
+    next();
+    return; // Prevents a "Can't set headers after they are sent" error
+  }
+  response.status(403).send("You are not permitted to access this endpoint");
 }
 
 export function isAdmin(
@@ -79,19 +91,6 @@ export function isAdmin(
 ): void {
   isAuthenticated(request, response, next);
   isAdminNoAuthCheck(request, response, next);
-}
-
-export function isAdminNoAuthCheck(
-  request: express.Request,
-  response: express.Response,
-  next: express.NextFunction
-): void {
-  // @ts-ignore
-  if (request.user && request.user.admin) {
-    next();
-    return; // Prevents a "Can't set headers after they are sent" error
-  }
-  response.status(403).send("You are not permitted to access this endpoint");
 }
 
 export const authRoutes = express.Router();
@@ -120,7 +119,6 @@ authRoutes.all("/logout", (request, response) => {
     request.logout();
   }
   if (request.session) {
-    // @ts-ignore
     request.session.loginAction = "render";
   }
   response.redirect("/auth/login");
