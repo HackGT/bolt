@@ -3,11 +3,11 @@
   flex-flow: row wrap;
   justify-content: center;
   width: 100%;
+}
 
-  > .hw-card {
-    width: 100%;
-    max-width: 500px;
-  }
+.hw-list > .hw-card {
+  width: 100%;
+  max-width: 500px;
 }
 
 .hw-image > img {
