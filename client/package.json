@@ -38,10 +38,12 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint src/ --fix; stylelint src/**/*.css --fix; prettier src/ --write"
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "prettier": "@hex-labs/prettier-config",
+  "stylelint": {
+    "extends": "@hex-labs/stylelint-config"
   },
   "browserslist": [
     ">0.2%",
@@ -51,6 +53,9 @@
   ],
   "author": "Evan Strat",
   "devDependencies": {
+    "@hex-labs/eslint-config-react": "^1.1.1",
+    "@hex-labs/prettier-config": "^1.1.1",
+    "@hex-labs/stylelint-config": "^1.1.1",
     "@types/accounting": "^0.4.1",
     "@types/cleave.js": "^1.4.4",
     "@types/jest": "26.0.22",
@@ -60,7 +65,10 @@
     "@types/react-router-dom": "^5.1.7",
     "@types/react-timeago": "^4.1.2",
     "@types/semantic-ui": "^2.2.7",
-    "redux-devtools": "^3.5.0"
+    "eslint": "^7.24.0",
+    "prettier": "^2.2.1",
+    "redux-devtools": "^3.5.0",
+    "stylelint": "^13.12.0"
   },
   "proxy": "http://localhost:3000"
 }

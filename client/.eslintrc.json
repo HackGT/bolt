@@ -1,0 +1,6 @@
+{
+  "extends": "@hex-labs/eslint-config-react",
+  "rules": {
+    "camelcase": "off"
+  }
+}

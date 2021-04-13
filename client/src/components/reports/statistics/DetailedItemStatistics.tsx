@@ -1,131 +1,137 @@
-import React, {useMemo} from 'react';
+import React, { useMemo } from "react";
 import DataTable from "react-data-table-component";
-import LoadingSpinner from "../../util/LoadingSpinner";
-import {useQuery} from "@apollo/client";
-import {DETAILED_ITEM_STATISTICS} from "../../util/graphql/Queries";
-import {Header, Icon, Message} from "semantic-ui-react";
+import { useQuery } from "@apollo/client";
+import { Header, Icon, Message } from "semantic-ui-react";
 
+import LoadingSpinner from "../../util/LoadingSpinner";
+import { DETAILED_ITEM_STATISTICS } from "../../util/graphql/Queries";
 
 function DetailedItemStatistics(props: {}) {
-	const {data, loading, error} = useQuery(DETAILED_ITEM_STATISTICS, {
-		partialRefetch: true,
-		pollInterval: 120000
-	});
+  const { data, loading, error } = useQuery(DETAILED_ITEM_STATISTICS, {
+    partialRefetch: true,
+    pollInterval: 120000,
+  });
 
-	const columns = useMemo(() => [
-		{
-			name: "Location",
-			selector: "item.location.location_name",
-			sortable: true,
-			grow: 5
+  const columns = useMemo(
+    () => [
+      {
+        name: "Location",
+        selector: "item.location.location_name",
+        sortable: true,
+        grow: 5,
+      },
+      {
+        name: "Item",
+        selector: "item.item_name",
+        sortable: true,
+        grow: 6,
+      },
+      {
+        name: "Total",
+        selector: "detailedQuantities.total",
+        sortable: true,
+        center: true,
+      },
+      {
+        name: "Submitted",
+        selector: "detailedQuantities.SUBMITTED",
+        sortable: true,
+        center: true,
+      },
+      {
+        name: "Approved",
+        selector: "detailedQuantities.APPROVED",
+        sortable: true,
+        center: true,
+      },
+      {
+        name: "Denied",
+        selector: "detailedQuantities.DENIED",
+        sortable: true,
+        center: true,
+      },
+      {
+        name: "RFP",
+        selector: "detailedQuantities.READY_FOR_PICKUP",
+        sortable: true,
+        center: true,
+      },
+      {
+        name: "Fulfilled",
+        selector: "detailedQuantities.FULFILLED",
+        sortable: true,
+        center: true,
+      },
+      {
+        name: "Returned",
+        selector: "detailedQuantities.RETURNED",
+        sortable: true,
+        center: true,
+      },
+      {
+        name: "Lost",
+        selector: "detailedQuantities.LOST",
+        sortable: true,
+        center: true,
+      },
+      {
+        name: "Damaged",
+        selector: "detailedQuantities.DAMAGED",
+        sortable: true,
+        center: true,
+      },
+      {
+        name: "Abandoned",
+        selector: "detailedQuantities.ABANDONED",
+        sortable: true,
+        center: true,
+      },
+      {
+        name: "Cancelled",
+        selector: "detailedQuantities.CANCELLED",
+        sortable: true,
+        center: true,
+      },
+    ],
+    []
+  );
 
-		},
-		{
-			name: "Item",
-			selector: "item.item_name",
-			sortable: true,
-			grow: 6
-		},
-		{
-			name: "Total",
-			selector: "detailedQuantities.total",
-			sortable: true,
-			center: true
-		},
-		{
-			name: "Submitted",
-			selector: "detailedQuantities.SUBMITTED",
-			sortable: true,
-			center: true
+  if (error) {
+    return (
+      <>
+        <Header content="Detailed Item Statistics" size="huge" />
+        <Message negative>
+          <Message.Header>Error displaying report</Message.Header>
+          <p>Something is preventing us from showing this report: {error.message}</p>
+        </Message>
+      </>
+    );
+  }
 
-		},
-		{
-			name: "Approved",
-			selector: "detailedQuantities.APPROVED",
-			sortable: true,
-			center: true
-		},
-		{
-			name: "Denied",
-			selector: "detailedQuantities.DENIED",
-			sortable: true,
-			center: true
-		},
-		{
-			name: "RFP",
-			selector: "detailedQuantities.READY_FOR_PICKUP",
-			sortable: true,
-			center: true
-		},
-		{
-			name: "Fulfilled",
-			selector: "detailedQuantities.FULFILLED",
-			sortable: true,
-			center: true
-		},
-		{
-			name: "Returned",
-			selector: "detailedQuantities.RETURNED",
-			sortable: true,
-			center: true
-		},
-		{
-			name: "Lost",
-			selector: "detailedQuantities.LOST",
-			sortable: true,
-			center: true
-		},
-		{
-			name: "Damaged",
-			selector: "detailedQuantities.DAMAGED",
-			sortable: true,
-			center: true
-		},
-		{
-			name: "Abandoned",
-			selector: "detailedQuantities.ABANDONED",
-			sortable: true,
-			center: true
-		},
-		{
-			name: "Cancelled",
-			selector: "detailedQuantities.CANCELLED",
-			sortable: true,
-			center: true
-		},
-	], []);
-
-	if (error) {
-		return <>
-			<Header content={"Detailed Item Statistics"} size={"huge"} />
-			<Message negative>
-				<Message.Header>Error displaying report</Message.Header>
-				<p>Something is preventing us from showing this report: {error.message}</p>
-			</Message>
-		</>;
-	}
-
-	return (
-		<>
-			<Header content={"Detailed Item Statistics"} size={"huge"}/>
-			<Message><Icon name={"info circle"}/> Data refreshes automatically every 2 minutes.</Message>
-			<DataTable columns={columns}
-			           data={data && data.itemStatistics ? data.itemStatistics : []}
-			           dense
-			           defaultSortField={"item.location.location_name"}
-			           fixedHeader
-			           pagination
-			           paginationComponentOptions={{
-				           selectAllRowsItem: true
-			           }}
-			           paginationRowsPerPageOptions={[25, 50, 100]}
-			           progressPending={loading}
-			           noHeader
-			           striped
-			           progressComponent={<LoadingSpinner active content={"Crunching the numbers..."} />}
-			/>
-		</>
-	);
+  return (
+    <>
+      <Header content="Detailed Item Statistics" size="huge" />
+      <Message>
+        <Icon name="info circle" /> Data refreshes automatically every 2 minutes.
+      </Message>
+      <DataTable
+        columns={columns}
+        data={data && data.itemStatistics ? data.itemStatistics : []}
+        dense
+        defaultSortField="item.location.location_name"
+        fixedHeader
+        pagination
+        paginationComponentOptions={{
+          selectAllRowsItem: true,
+        }}
+        paginationRowsPerPageOptions={[25, 50, 100]}
+        progressPending={loading}
+        noHeader
+        striped
+        progressComponent={<LoadingSpinner active content="Crunching the numbers..." />}
+      />
+    </>
+  );
 }
 
 export default DetailedItemStatistics;
