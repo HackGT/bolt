@@ -49,7 +49,7 @@ export async function findUserByID(id: string): Promise<IUser | null> {
   return null;
 }
 
-export async function createRecord<T extends object>(tableName: string, data: T) {
+export async function createRecord<T>(tableName: string, data: T) {
   await DB.into(tableName).insert(data);
   return data;
 }

@@ -98,7 +98,7 @@ export class Quantity {
     };
   }
 
-  public static async quantityStatistics(itemIds: number[] = []): Promise<ItemQuantities> {
+  public static async quantityStatistics(): Promise<ItemQuantities> {
     return await Quantity.getQuantities();
   }
 
@@ -107,11 +107,11 @@ export class Quantity {
     totalAvailable: ItemQtyAvailable,
     statuses: RequestStatus[] = []
   ): ItemQtyAvailable {
-    const result = {};
+    const result: any = {};
 
     for (const id in totalAvailable) {
-      if (totalAvailable.hasOwnProperty(id)) {
-        if (quantities.hasOwnProperty(id)) {
+      if (Object.prototype.hasOwnProperty.call(totalAvailable, id)) {
+        if (Object.prototype.hasOwnProperty.call(quantities, id)) {
           const itemStatusCounts = quantities[id];
           let quantity = totalAvailable[id];
           for (let i = 0; i < statuses.length; i++) {
@@ -132,8 +132,9 @@ export class Quantity {
     statuses: RequestStatus[] = [],
     itemIds: number[] = []
   ): Promise<ItemQuantities> {
-    if (!statuses.length) {
-      statuses = [
+    let selectStatuses = statuses;
+    if (selectStatuses.length === 0) {
+      selectStatuses = [
         "SUBMITTED",
         "APPROVED",
         "DENIED",
@@ -149,7 +150,7 @@ export class Quantity {
 
     const DBQuantities: any = await DB.from("requests")
       .where(builder => {
-        const whereInStatus = builder.whereIn("status", statuses);
+        const whereInStatus = builder.whereIn("status", selectStatuses);
         if (itemIds.length > 0) {
           return whereInStatus.whereIn("request_item_id", itemIds);
         }
@@ -160,21 +161,21 @@ export class Quantity {
       .select(["request_item_id", "status"])
       .sum("quantity");
 
-    const baseObj = {};
-    for (let i = 0; i < statuses.length; i++) {
-      baseObj[statuses[i]] = 0;
+    const baseObj: any = {};
+    for (let i = 0; i < selectStatuses.length; i++) {
+      baseObj[selectStatuses[i]] = 0;
     }
 
-    const result = {};
+    const result: any = {};
     for (let i = 0; i < DBQuantities.length; i++) {
       const item = DBQuantities[i];
       const requestItemId = item.request_item_id;
 
-      if (!result.hasOwnProperty(requestItemId.toString(10))) {
+      if (!Object.prototype.hasOwnProperty.call(result, requestItemId.toString(10))) {
         result[requestItemId] = { ...baseObj }; // make a copy of baseObj
       }
 
-      result[requestItemId][item.status] = Number.parseInt(item.sum, 10);
+      result[requestItemId][item.status] = parseInt(item.sum);
       result[requestItemId].total =
         result[requestItemId][item.status] + (result[requestItemId].total || 0);
     }

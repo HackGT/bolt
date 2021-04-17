@@ -1,7 +1,8 @@
-import React, { Component } from "react";
+import React from "react";
 import { ToastProvider } from "react-toast-notifications";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { connect } from "react-redux";
+import { useQuery } from "@apollo/client";
 
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
@@ -21,8 +22,10 @@ import { AppState } from "./state/Store";
 import CacheBuster from "./components/util/CacheBuster";
 import DetailedItemStatistics from "./components/reports/statistics/DetailedItemStatistics";
 import ItemDemandReport from "./components/reports/demand/ItemDemandReport";
+import { USER_INFO } from "./components/util/graphql/Queries";
+import LoadingSpinner from "./components/util/LoadingSpinner";
 
-export interface OwnProps {}
+interface OwnProps {}
 
 interface StateProps {
   user: User | null;
@@ -31,97 +34,75 @@ interface StateProps {
 
 type Props = StateProps & OwnProps;
 
-class App extends Component<Props, {}> {
-  public async componentWillMount(): Promise<void> {
-    const userRequest = await fetch("/api", {
-      credentials: "include",
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: `
-                        query {
-                          user {
-                            uuid
-                            name
-                            admin
-                          }
-                        }
-                    `,
-      }),
-    });
-    const json = await userRequest.json();
-    if (json && json.data && json.data.user) {
-      const { user } = json.data;
-      if (user) {
-        this.props.loginUser(user);
-        if (bugsnagEnabled) {
-          bugsnagClient.user = user;
-        }
-      }
-    } else {
-      console.error("Invalid user information returned by server, can't sign in: ", json);
-      if (bugsnagEnabled) {
-        bugsnagClient.notify("Invalid user information returned by server, can't sign in", {
-          severity: "error",
-          metaData: {
-            fetchResult: json,
-          },
-        });
-      }
+const App: React.FC<Props> = props => {
+  const { loading, data, error } = useQuery(USER_INFO);
+
+  if (loading) {
+    return <LoadingSpinner active />;
+  }
+
+  if (error) {
+    console.error("Invalid user information returned by server, can't sign in: ", error);
+    if (bugsnagEnabled) {
+      bugsnagClient.notify("Invalid user information returned by server, can't sign in", {
+        severity: "error",
+        metaData: {
+          fetchResult: error,
+        },
+      });
     }
   }
 
-  public render() {
-    return (
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "960px",
-          margin: "0 auto",
-          padding: "0 5px",
-        }}
-      >
-        <Router>
-          <ToastProvider placement="top-center">
-            <Navigation />
-            <Switch>
-              <Route path="/" exact component={HomeContainer} />
-              <Route path="/user" component={UserProfileWrapper} />
-              <PrivateRoute exact path="/admin" component={AdminOverviewContainer} />
-              <PrivateRoute exact path="/admin/desk" component={DeskContainer} />
-              <PrivateRoute path="/admin/items" component={ItemWrapper} />
-              <PrivateRoute exact path="/admin/csv" component={CSVWizard} />
-              <PrivateRoute exact path="/admin/users" component={AdminUsersListWrapper} />
-              <PrivateRoute exact path="/admin/requests" component={AdminRequestsWrapper} />
-              <PrivateRoute
-                exact
-                path="/admin/reports/statistics"
-                component={DetailedItemStatistics}
-              />
-              <PrivateRoute exact path="/admin/reports/demand" component={ItemDemandReport} />
-              <Route component={HomeContainer} />
-            </Switch>
-            <Footer />
-          </ToastProvider>
-        </Router>
-        <CacheBuster>
-          {({ loading, isLatestVersion, refreshCacheAndReload }: any) => {
-            if (loading) {
-              return null;
-            }
-            if (!loading && !isLatestVersion) {
-              // You can decide how and when you want to force reload
-              refreshCacheAndReload();
-            }
-            return null;
-          }}
-        </CacheBuster>
-      </div>
-    );
+  const { user } = data;
+  props.loginUser(user);
+  if (bugsnagEnabled) {
+    bugsnagClient.user = user;
   }
-}
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "960px",
+        margin: "0 auto",
+        padding: "0 5px",
+      }}
+    >
+      <Router>
+        <ToastProvider placement="top-center">
+          <Navigation />
+          <Switch>
+            <Route path="/" exact component={HomeContainer} />
+            <Route path="/user" component={UserProfileWrapper} />
+            <PrivateRoute exact path="/admin" component={AdminOverviewContainer} />
+            <PrivateRoute exact path="/admin/desk" component={DeskContainer} />
+            <PrivateRoute path="/admin/items" component={ItemWrapper} />
+            <PrivateRoute exact path="/admin/csv" component={CSVWizard} />
+            <PrivateRoute exact path="/admin/users" component={AdminUsersListWrapper} />
+            <PrivateRoute exact path="/admin/requests" component={AdminRequestsWrapper} />
+            <PrivateRoute
+              exact
+              path="/admin/reports/statistics"
+              component={DetailedItemStatistics}
+            />
+            <PrivateRoute exact path="/admin/reports/demand" component={ItemDemandReport} />
+            <Route component={HomeContainer} />
+          </Switch>
+          <Footer />
+        </ToastProvider>
+      </Router>
+      <CacheBuster>
+        {({ loading: cacheLoading, isLatestVersion, refreshCacheAndReload }: any) => {
+          if (!cacheLoading && !isLatestVersion) {
+            // You can decide how and when you want to force reload
+            refreshCacheAndReload();
+          }
+          return null;
+        }}
+      </CacheBuster>
+    </div>
+  );
+};
 
 function mapStateToProps(state: AppState) {
   return {

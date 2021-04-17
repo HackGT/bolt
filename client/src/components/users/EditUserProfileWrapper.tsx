@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { match } from "react-router";
 import { Query } from "@apollo/client/react/components";
 import { Header, Loader, Message } from "semantic-ui-react";
@@ -18,53 +18,49 @@ interface EditUserParams {
   params: { userId?: string };
 }
 
-class EditUserProfileWrapper extends Component<EditUserProps, {}> {
-  public render() {
-    const loader = <Loader active inline="centered" content="Loading profile information..." />;
+const EditUserProfileWrapper: React.FC<EditUserProps> = props => {
+  const loader = <Loader active inline="centered" content="Loading profile information..." />;
 
-    let { userId } = this.props.match.params;
-    const title = userId === undefined ? "My Profile" : "Edit User";
+  let { userId } = props.match.params;
+  const title = userId === undefined ? "My Profile" : "Edit User";
 
-    const header = <Header size="huge">{title}</Header>;
-    if (userId === undefined && !this.props.user) {
-      return (
-        <div>
-          {header}
-          {loader}
-        </div>
-      );
-    }
-
-    if (!userId && this.props.user) {
-      userId = this.props.user.uuid;
-    }
-
+  const header = <Header size="huge">{title}</Header>;
+  if (userId === undefined && !props.user) {
     return (
       <div>
-        <Query
-          query={USER_PROFILE}
-          variables={{
-            uuid: userId,
-          }}
-          fetchPolicy="no-cache"
-        >
-          {({ loading, error, data }: any) => {
-            if (loading) {
-              return loader;
-            }
-            if (error) {
-              return (
-                <Message error visible header="Glitch in the matrix" content={error.message} />
-              );
-            }
-
-            return <UserProfile preloadUser={data.users[0]} />;
-          }}
-        </Query>
+        {header}
+        {loader}
       </div>
     );
   }
-}
+
+  if (!userId && props.user) {
+    userId = props.user.uuid;
+  }
+
+  return (
+    <div>
+      <Query
+        query={USER_PROFILE}
+        variables={{
+          uuid: userId,
+        }}
+        fetchPolicy="no-cache"
+      >
+        {({ loading, error, data }: any) => {
+          if (loading) {
+            return loader;
+          }
+          if (error) {
+            return <Message error visible header="Glitch in the matrix" content={error.message} />;
+          }
+
+          return <UserProfile preloadUser={data.users[0]} />;
+        }}
+      </Query>
+    </div>
+  );
+};
 
 function mapStateToProps(state: AppState) {
   return {

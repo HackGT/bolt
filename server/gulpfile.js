@@ -8,7 +8,7 @@ const gulpCopy = require("gulp-copy");
 
 const tsProject = ts.createProject("./tsconfig.json");
 
-gulp.task("watch", (done) => {
+gulp.task("watch", () => {
     gulp.watch("src/**/*", gulp.series("build:server", "build:static"));
 });
 

@@ -49,23 +49,24 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
   }
 
   public incrementQty = () => {
-    this.setState({
-      qtyRequested: this.state.qtyRequested + 1,
-    });
+    this.setState(prevState => ({
+      qtyRequested: prevState.qtyRequested + 1,
+    }));
   };
 
   public decrementQty = () => {
-    this.setState({
-      qtyRequested: this.state.qtyRequested - 1,
-    });
+    this.setState(prevState => ({
+      qtyRequested: prevState.qtyRequested - 1,
+    }));
   };
 
   public handleQtyUpdate = (qtyInput: ChangeEvent<HTMLInputElement>) => {
-    const qtyAsNumber: number = Number.parseInt(qtyInput.target.value, 10);
+    const qtyAsNumber: number = Number.parseInt(qtyInput.target.value);
 
     this.updateQtyRequested(qtyAsNumber);
   };
 
+  /* eslint-disable no-param-reassign */
   public updateQtyRequested = (qtyRequested: number) => {
     if (Number.isNaN(qtyRequested)) {
       qtyRequested = 0;

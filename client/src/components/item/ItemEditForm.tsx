@@ -50,7 +50,6 @@ export type Category = {
 interface ItemEditState {
   loading: boolean;
   item: ItemComplete;
-  itemOwnerChoices: string[];
   itemPreviewKey: number;
   categoryError: boolean;
   ownerError: boolean;
@@ -86,7 +85,6 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
             owner: "HackGT",
           }
         : this.props.preloadItem,
-      itemOwnerChoices: ["HackGT", "The Hive", "Invention Studio"],
       itemPreviewKey: 0,
     };
   }
@@ -99,13 +97,12 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
       const value: boolean = checkboxProps.checked;
       const { name } = checkboxProps;
 
-      // @ts-ignore
-      this.setState({
+      this.setState(prevState => ({
         item: {
-          ...this.state.item,
+          ...prevState.item,
           [name]: value,
         },
-      });
+      }));
     }
   };
 
@@ -115,18 +112,17 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
     inputName: string
   ): void => {
     const { value } = data;
-    // @ts-ignore
-    this.setState({
+    this.setState(prevState => ({
       item: {
-        ...this.state.item,
+        ...prevState.item,
         [inputName]: value,
       },
-    });
+    }));
   };
 
   public handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { target } = event;
-    let { value } = target;
+    let { value }: { value: any } = target;
     const { name } = target;
     const inputType = target.type;
 
@@ -136,18 +132,17 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
     }
 
     if (name === "totalAvailable") {
-      this.setState({
-        itemPreviewKey: this.state.itemPreviewKey + 1,
-      });
+      this.setState(prevState => ({
+        itemPreviewKey: prevState.itemPreviewKey + 1,
+      }));
     }
 
-    // @ts-ignore
-    this.setState({
+    this.setState(prevState => ({
       item: {
-        ...this.state.item,
+        ...prevState.item,
         [name]: value,
       },
-    });
+    }));
   };
 
   public render() {
@@ -175,6 +170,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                   loading={this.state.loading || loading || this.props.loading}
                   onChange={this.handleInputChange}
                   error={this.state.categoryError || this.state.ownerError}
+                  /* eslint-disable react/no-access-state-in-setstate, no-underscore-dangle */
                   onSubmit={e => {
                     e.preventDefault();
                     const { toastManager } = this.props;

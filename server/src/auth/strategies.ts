@@ -62,21 +62,25 @@ export class GroundTruthStrategy extends OAuthStrategy {
     done: PassportDone
   ): Promise<void> {
     let user = await findUserByID(profile.uuid);
+
     if (!user) {
-      console.log(profile);
       const { scopes } = profile;
       if (!scopes) {
         console.warn(`User ${profile.uuid} has no scope data`);
         done(new Error("No scope data for new user"));
         return;
       }
-      delete profile.scopes;
-      delete profile.nameParts; // Basically ignore the Ground Truth nameParts field for now
+
       const adminBecauseHackGTMember = profile.member || false;
-      delete profile.member;
+      const createProfile = profile;
+
+      delete createProfile.scopes;
+      delete createProfile.nameParts; // Basically ignore the Ground Truth nameParts field for now
+      delete createProfile.member;
+
       user = await createRecord<IUser>("users", {
         ...GroundTruthStrategy.defaultUserProperties,
-        ...profile,
+        ...createProfile,
         slackUsername: scopes.slack,
         phone: scopes.phone,
         admin: adminBecauseHackGTMember,
@@ -121,6 +125,7 @@ export class GroundTruthStrategy extends OAuthStrategy {
   }
 
   public userProfile(accessToken: string, done: PassportProfileDone): void | PassportProfileDone {
+    // eslint-disable-next-line no-underscore-dangle
     (this._oauth2 as any)._request(
       "GET",
       new URL("/api/user", this.url).toString(),
@@ -138,8 +143,8 @@ export class GroundTruthStrategy extends OAuthStrategy {
             token: accessToken,
           };
           done(null, profile);
-        } catch (err) {
-          return done(err);
+        } catch (parseErr) {
+          done(parseErr);
         }
       }
     );
@@ -162,7 +167,7 @@ function getExternalPort(request: Request): number {
   const offset = host[0] === "[" ? host.indexOf("]") + 1 : 0;
   const index = host.indexOf(":", offset);
   if (index !== -1) {
-    return parseInt(host.substring(index + 1), 10);
+    return parseInt(host.substring(index + 1));
   }
   return defaultPort();
 }
@@ -188,6 +193,7 @@ export function validateAndCacheHostName(
     }
     message.setEncoding("utf8");
     let data = "";
+    // eslint-disable-next-line no-return-assign
     message.on("data", chunk => (data += chunk));
     message.on("end", () => {
       const localHMAC = crypto
@@ -234,6 +240,7 @@ export function validateAndCacheHostName(
 //     }
 // }
 
+/* eslint-disable no-param-reassign */
 export function createLink(request: Request, link: string, proto?: string): string {
   if (!proto) {
     proto = "http";
@@ -241,6 +248,7 @@ export function createLink(request: Request, link: string, proto?: string): stri
   if (link[0] === "/") {
     link = link.substring(1);
   }
+
   if (
     (request.secure && getExternalPort(request) === 443) ||
     (!request.secure && getExternalPort(request) === 80)

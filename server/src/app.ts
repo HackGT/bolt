@@ -1,29 +1,19 @@
+/* eslint-disable import/first, import/order */
 import * as path from "path";
+import * as cookieSignature from "cookie-signature";
+import * as chalk from "chalk";
+
 import express from "express";
 import serveStatic from "serve-static";
 import compression from "compression";
 import cookieParser from "cookie-parser";
-import * as cookieSignature from "cookie-signature";
-import * as chalk from "chalk";
 import morgan from "morgan";
 import { execute, subscribe } from "graphql";
 import { SubscriptionServer } from "subscriptions-transport-ws";
 import { createServer } from "http";
+
 import { config, COOKIE_OPTIONS, PORT, VERSION_NUMBER } from "./common";
-
 import { findUserByID } from "./database";
-
-// *** The placement of these imports is very important; ensure that your editor does not optimize the imports or otherwise
-// reformat this file as it will cause errors (most likely similar to
-//         "/usr/src/bolt/server/build/auth/auth.js:37
-//          app_1.app.enable("trust proxy");
-//          TypeError: Cannot read property 'enable' of undefined")
-//     if they are moved to the top of this file
-// Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
-import { authRoutes, isAuthenticated, sessionMiddleware } from "./auth/auth";
-
-// *** The placement of this import is also important! (See above)
-import { apiRoutes, schema } from "./api/api";
 
 import flash = require("connect-flash");
 
@@ -36,12 +26,15 @@ const cookieParserInstance = cookieParser(
   COOKIE_OPTIONS as cookieParser.CookieParseOptions
 );
 app.use(cookieParserInstance);
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 morgan.token("sessionid", (request, response) => {
   const FAILURE_MESSAGE = "Unknown session";
   // @ts-ignore
   if (!request.cookies["connect.sid"]) {
     return FAILURE_MESSAGE;
   }
+
   // @ts-ignore
   const rawID: string = request.cookies["connect.sid"].slice(2);
   const id = cookieSignature.unsign(rawID, config.secrets.session);
@@ -68,7 +61,7 @@ morgan.format("hackgt", (tokens, request, response) => {
     tokens.sessionid(request, response),
     tokens.method(request, response),
     tokens.url(request, response),
-    statusColorizer(tokens.status(request, response)!),
+    statusColorizer(tokens.status(request, response)!), // eslint-disable-line @typescript-eslint/no-non-null-assertion
     tokens["response-time"](request, response),
     "ms",
     "-",
@@ -82,7 +75,21 @@ app.use(flash());
 process.on("unhandledRejection", err => {
   throw err;
 });
+
+// *** The placement of these imports is very important; ensure that your editor does not optimize the imports or otherwise
+// reformat this file as it will cause errors (most likely similar to
+//         "/usr/src/bolt/server/build/auth/auth.js:37
+//          app_1.app.enable("trust proxy");
+//          TypeError: Cannot read property 'enable' of undefined")
+//     if they are moved to the top of this file
+// Auth needs to be the first route configured or else requests handled before it will always be unauthenticated
+import { authRoutes, isAuthenticated, sessionMiddleware } from "./auth/auth";
+
 app.use("/auth", authRoutes);
+
+// *** The placement of this import is also important! (See above)
+import { apiRoutes, schema } from "./api/api";
+
 app.use("/api", isAuthenticated, apiRoutes);
 
 app.route("/version").get((request, response) => {
@@ -104,13 +111,13 @@ const server = createServer(app);
 server.listen(PORT, () => {
   console.log(`Bolt v${VERSION_NUMBER} started on port ${PORT}`);
 
-  // tslint:disable-next-line:no-unused-expression
+  /* eslint-disable no-new, @typescript-eslint/no-unused-vars */
   new SubscriptionServer(
     {
       execute,
       subscribe,
       schema,
-      onConnect: async (connectParams, webSocket, context) => {
+      onConnect: async (connectParams: any, webSocket: any, context: any) => {
         const promise = new Promise((resolve, reject) => {
           // session is the Express library that creates the sessionMiddleware function that parses the session
           //    cookie.

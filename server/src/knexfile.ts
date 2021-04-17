@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 require("ts-node/register"); // this line is what makes Knex migrations work with TypeScript!  Thanks to https://gist.github.com/tukkajukka/9893e5f111862d06044b73fa944a8741
-const fs = require("fs");
 
 // Some duplicated code here from common.ts, but we can't use import in this file and we only need a couple values for knex
+const fs = require("fs");
 const path = require("path");
 
 let connectionUrl;
@@ -23,7 +24,6 @@ if (!(process.env.PRODUCTION && process.env.PRODUCTION.toLowerCase() === "true")
 }
 
 if (process.env.POSTGRES_URL) {
-  // @ts-ignore
   connectionUrl = process.env.POSTGRES_URL;
 }
 

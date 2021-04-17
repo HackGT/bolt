@@ -8,14 +8,13 @@ const semverGreaterThan = (versionA: string, versionB: string): boolean => {
   const versionsB = versionB.split(/\./g);
   while (versionsA.length || versionsB.length) {
     const a = Number(versionsA.shift());
-
     const b = Number(versionsB.shift());
-    // eslint-disable-next-line no-continue
+
     if (a === b) {
-      continue;
+      continue; // eslint-disable-line no-continue
     }
-    // eslint-disable-next-line no-restricted-globals
-    return a > b || isNaN(b);
+
+    return a > b || Number.isNaN(b);
   }
   return false;
 };

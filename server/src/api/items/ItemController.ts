@@ -3,6 +3,14 @@ import { Quantity } from "../requests/quantity";
 import { onlyIfAdmin } from "../requests";
 import { Item } from "../graphql.types";
 
+export function getItemLocation(item: any) {
+  return {
+    location_id: item.location_id,
+    location_name: item.location_name,
+    location_hidden: item.location_hidden,
+  };
+}
+
 export class ItemController {
   public static async getTotalAvailable(itemIds: number[] = []) {
     const result = await DB.from("items")
@@ -17,7 +25,7 @@ export class ItemController {
       return {};
     }
 
-    const resultObj = {};
+    const resultObj: any = {};
 
     for (let i = 0; i < result.length; i++) {
       const item = result[i];
@@ -47,12 +55,4 @@ export class ItemController {
       qtyAvailableForApproval: qtyAvailableForApproval[item.item_id],
     }));
   }
-}
-
-export function getItemLocation(item: any) {
-  return {
-    location_id: item.location_id,
-    location_name: item.location_name,
-    location_hidden: item.location_hidden,
-  };
 }

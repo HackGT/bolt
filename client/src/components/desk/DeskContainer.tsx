@@ -43,7 +43,7 @@ function getConsolidatedRequestsWithStatus(
 
   for (let i = 0; i < filteredRequests.length; i++) {
     const req = filteredRequests[i];
-    if (!requestsByUser.hasOwnProperty(req.user.uuid)) {
+    if (!Object.prototype.hasOwnProperty.call(requestsByUser, req.user.uuid)) {
       requestsByUser[req.user.uuid] = {
         user: req.user,
         requests: [],
@@ -134,14 +134,14 @@ function DeskContainer() {
         <Header size="medium">Select a location to continue</Header>
         <Select
           placeholder="Select a location"
-          options={query.data.locations.map((location: Location) => ({
-            key: location.location_id,
-            value: location.location_id,
-            text: location.location_name,
+          options={query.data.locations.map((locationOption: Location) => ({
+            key: locationOption.location_id,
+            value: locationOption.location_id,
+            text: locationOption.location_name,
           }))}
           onChange={(event: React.SyntheticEvent<HTMLElement>, data: DropdownProps): void => {
             console.log(data);
-            const { value } = data;
+            const { value }: { value?: any } = data;
             setLocation(value);
           }}
         />
@@ -167,20 +167,20 @@ function DeskContainer() {
             <Checkbox
               toggle
               label="Returns mode"
-              onChange={(event, { checked }): any => setReturnsMode(checked!)}
+              onChange={(event, { checked }): any => setReturnsMode(checked ?? false)}
             />
           </Grid.Column>
           <Grid.Column>
             <Select
               placeholder="Select a location"
               value={location}
-              options={query.data.locations.map((location: Location) => ({
-                key: location.location_id,
-                value: location.location_id,
-                text: location.location_name,
+              options={query.data.locations.map((locationOption: Location) => ({
+                key: locationOption.location_id,
+                value: locationOption.location_id,
+                text: locationOption.location_name,
               }))}
               onChange={(event: React.SyntheticEvent<HTMLElement>, data: DropdownProps): void => {
-                const { value } = data;
+                const { value }: { value?: any } = data;
                 setLocation(value);
               }}
             />

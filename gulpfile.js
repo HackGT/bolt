@@ -1,7 +1,5 @@
 const gulp = require("gulp");
-const gutil = require("gulp-util");
 const install = require('gulp-install');
-const path = require('path');
 const shell = require('gulp-shell');
 
 // Tasks relating build

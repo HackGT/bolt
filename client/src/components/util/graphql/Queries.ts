@@ -85,6 +85,16 @@ export const ALL_ITEMS = gql`
   }
 `;
 
+export const USER_INFO = gql`
+  query user {
+    user {
+      uuid
+      name
+      admin
+    }
+  }
+`;
+
 export const ALL_USERS = gql`
   query users {
     users(search: {}) {

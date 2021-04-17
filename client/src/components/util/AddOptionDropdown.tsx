@@ -47,9 +47,9 @@ class AddOptionDropdown extends Component<AddOptionDropdownProps, AddOptionDropd
   }
 
   public handleAddition = (e: any, { value }: any) => {
-    this.setState({
-      options: [{ text: value, value }, ...this.state.options],
-    });
+    this.setState(prevState => ({
+      options: [{ text: value, value }, ...prevState.options],
+    }));
   };
 
   public handleChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {

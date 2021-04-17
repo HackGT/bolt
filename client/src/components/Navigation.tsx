@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { User } from "../types/User";
 import { AppState } from "../state/Store";
 
-export interface OwnProps {}
+interface OwnProps {}
 
 interface StateProps {
   user: User | null;
@@ -14,7 +14,12 @@ interface StateProps {
 
 type Props = StateProps & OwnProps;
 
-class Navigation extends React.Component<Props, {}> {
+class Navigation extends React.Component<Props> {
+  private isAdmin = () => {
+    const { user } = this.props;
+    return user && user.admin;
+  };
+
   public render() {
     const { user } = this.props;
 
@@ -63,11 +68,6 @@ class Navigation extends React.Component<Props, {}> {
       </Menu>
     );
   }
-
-  private isAdmin = () => {
-    const { user } = this.props;
-    return user && user.admin;
-  };
 }
 
 function mapStateToProps(state: AppState) {

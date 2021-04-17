@@ -28,7 +28,7 @@ function customSort(rows: any[], field: string, direction: string) {
   return rows;
 }
 
-function ItemDemandReport(props: {}) {
+const ItemDemandReport: React.FC = () => {
   const { data, loading, error } = useQuery(DETAILED_ITEM_STATISTICS, {
     partialRefetch: true,
   });
@@ -226,6 +226,6 @@ function ItemDemandReport(props: {}) {
       />
     </>
   );
-}
+};
 
 export default ItemDemandReport;

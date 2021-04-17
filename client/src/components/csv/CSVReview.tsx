@@ -7,24 +7,6 @@ interface ReviewCardProps {
   item: ItemComplete;
 }
 
-interface ReviewProps {
-  inventory: ItemComplete[];
-}
-
-const ReviewSetup = (props: ReviewProps) => {
-  const { inventory } = props;
-
-  return (
-    <Container>
-      <Item.Group>
-        {inventory.map(item => (
-          <ReviewCard key={item.name} item={item} />
-        ))}
-      </Item.Group>
-    </Container>
-  );
-};
-
 const ReviewCard = (props: ReviewCardProps) => {
   const { item } = props;
   const {
@@ -71,6 +53,24 @@ const ReviewCard = (props: ReviewCardProps) => {
         <Item.Description>{description}</Item.Description>
       </Item.Content>
     </Item>
+  );
+};
+
+interface ReviewSetupProps {
+  inventory: ItemComplete[];
+}
+
+const ReviewSetup = (props: ReviewSetupProps) => {
+  const { inventory } = props;
+
+  return (
+    <Container>
+      <Item.Group>
+        {inventory.map(item => (
+          <ReviewCard key={item.name} item={item} />
+        ))}
+      </Item.Group>
+    </Container>
   );
 };
 

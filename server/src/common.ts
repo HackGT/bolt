@@ -3,6 +3,8 @@ import * as crypto from "crypto";
 import * as path from "path";
 import "passport";
 
+import { IUser } from "./database";
+
 //
 // Config
 //
@@ -84,7 +86,6 @@ class Config implements IConfig.Main {
   }
 
   protected loadFromJSON(fileName: string): void {
-    // tslint:disable-next-line:no-shadowed-variable
     let config: Partial<IConfig.Main> | null = null;
     try {
       config = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config", fileName), "utf8"));
@@ -156,14 +157,14 @@ class Config implements IConfig.Main {
       this.server.isProduction = true;
     }
     if (process.env.PORT) {
-      const port = parseInt(process.env.PORT!, 10);
-      if (!isNaN(port) && port > 0) {
+      const port = parseInt(process.env.PORT);
+      if (!Number.isNaN(port) && port > 0) {
         this.server.port = port;
       }
     }
     if (process.env.COOKIE_MAX_AGE) {
-      const maxAge = parseInt(process.env.COOKIE_MAX_AGE, 10);
-      if (!isNaN(maxAge) && maxAge > 0) {
+      const maxAge = parseInt(process.env.COOKIE_MAX_AGE);
+      if (!Number.isNaN(maxAge) && maxAge > 0) {
         this.server.cookieMaxAge = maxAge;
       }
     }
@@ -178,7 +179,7 @@ class Config implements IConfig.Main {
     }
     // Admins
     if (process.env.ADMIN_EMAILS) {
-      this.admins.emails = JSON.parse(process.env.ADMIN_EMAILS!);
+      this.admins.emails = JSON.parse(process.env.ADMIN_EMAILS);
     }
     if (process.env.ADMIN_DOMAINS) {
       this.admins.domains = JSON.parse(process.env.ADMIN_DOMAINS);
@@ -208,3 +209,20 @@ export const COOKIE_OPTIONS = {
   secure: config.server.cookieSecureOnly,
   httpOnly: true,
 };
+
+//
+// Namespaces
+//
+
+declare global {
+  namespace Express {
+    interface User extends IUser {}
+  }
+}
+
+declare module "express-session" {
+  interface Session {
+    returnTo?: string;
+    loginAction?: string;
+  }
+}
