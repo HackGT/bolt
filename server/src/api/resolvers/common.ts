@@ -3,10 +3,10 @@ import { GraphQLError } from "graphql";
 import { PubSub } from "graphql-subscriptions";
 
 import { DB, IItem } from "../../database";
-import { onlyIfAdmin } from "../requests";
+import { onlyIfAdmin } from "../util";
 import { Item, Setting, User, UserUpdateInput } from "../graphql.types";
-import { Quantity } from "../requests/quantity";
-import { getItemLocation } from "../items/ItemController";
+import { QuantityController } from "../controllers/QuantityController";
+import { ItemController } from "../controllers/ItemController";
 
 export const pubsub = new PubSub();
 
@@ -29,12 +29,14 @@ export async function getItem(itemId: number, isAdmin: boolean): Promise<Item | 
   }
   const actualItem: any = item[0];
   const { item_id } = actualItem;
-  const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await Quantity.all([item_id]);
+  const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await QuantityController.all([
+    item_id,
+  ]);
   return {
     ...actualItem,
     id: item_id,
     category: actualItem.category_name,
-    location: getItemLocation(actualItem),
+    location: ItemController.getItemLocation(actualItem),
     price: onlyIfAdmin(actualItem.price, isAdmin),
     owner: onlyIfAdmin(actualItem.owner, isAdmin),
     qtyInStock: qtyInStock[item_id],

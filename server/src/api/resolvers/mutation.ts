@@ -3,9 +3,7 @@ import { GraphQLError } from "graphql";
 import { IResolvers } from "graphql-tools";
 
 import { DB } from "../../database";
-import { localTimestamp, toSimpleRequest } from "../requests";
 import { Item, Location, Request, RequestStatus, Setting, User } from "../graphql.types";
-import { getItemLocation } from "../items/ItemController";
 import {
   findOrCreate,
   getItem,
@@ -15,6 +13,9 @@ import {
   updateUser,
   pubsub,
 } from "./common";
+import { localTimestamp } from "../util";
+import { ItemController } from "../controllers/ItemController";
+import { RequestController } from "../controllers/RequestController";
 
 export const Mutation: IResolvers = {
   /* Mutations */
@@ -227,7 +228,7 @@ export const Mutation: IResolvers = {
       throw new GraphQLError("Unable to retrieve the new item information after creating request");
     }
 
-    const simpleRequest = toSimpleRequest(newRequest);
+    const simpleRequest = RequestController.toSimpleRequest(newRequest);
 
     const result: Request = {
       ...simpleRequest,
@@ -312,7 +313,7 @@ export const Mutation: IResolvers = {
           "request_item_id",
         ]);
 
-      const simpleRequest = toSimpleRequest(updatedRequest[0]);
+      const simpleRequest = RequestController.toSimpleRequest(updatedRequest[0]);
       console.log(simpleRequest);
 
       let user: User | null;
@@ -340,7 +341,7 @@ export const Mutation: IResolvers = {
         context.user.admin
       );
 
-      const location: Location | null = getItemLocation(item);
+      const location: Location | null = ItemController.getItemLocation(item);
 
       if (!item) {
         throw new GraphQLError(

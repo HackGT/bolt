@@ -2,11 +2,12 @@ import { GraphQLError } from "graphql";
 import { IResolvers } from "graphql-tools";
 
 import { DB } from "../../database";
-import { nestedRequest, onlyIfAdmin } from "../requests";
+import { onlyIfAdmin } from "../util";
 import { Category, Item, Location, Request, RequestStatus, Setting, User } from "../graphql.types";
-import { Quantity } from "../requests/quantity";
-import { ItemController } from "../items/ItemController";
+import { QuantityController } from "../controllers/QuantityController";
+import { ItemController } from "../controllers/ItemController";
 import { getItem, getSetting } from "./common";
+import { RequestController } from "../controllers/RequestController";
 
 export const Query: IResolvers = {
   /* Queries */
@@ -79,7 +80,7 @@ export const Query: IResolvers = {
 
     const locations: Location[] = await DB.from("locations").where(locationsSearchObj);
 
-    const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await Quantity.all();
+    const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await QuantityController.all();
     const itemsByLocation: any = {};
     for (let i = 0; i < locations.length; i++) {
       const loc = locations[i];
@@ -131,7 +132,7 @@ export const Query: IResolvers = {
     }
 
     const items: any = await ItemController.get({}, context.user.admin);
-    const detailedQuantities = await Quantity.quantityStatistics();
+    const detailedQuantities = await QuantityController.quantityStatistics();
 
     return items.map((item: any) => {
       const qtyInfo = detailedQuantities[item.item_id] || {
@@ -216,10 +217,18 @@ export const Query: IResolvers = {
       }
     });
 
-    const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await Quantity.all(items);
+    const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await QuantityController.all(
+      items
+    );
 
     return requests.map(request =>
-      nestedRequest(request, context.user.admin, qtyInStock, qtyAvailableForApproval, qtyUnreserved)
+      RequestController.nestedRequest(
+        request,
+        context.user.admin,
+        qtyInStock,
+        qtyAvailableForApproval,
+        qtyUnreserved
+      )
     );
   },
   setting: async (root, args): Promise<Setting | null> => await getSetting(args.name),

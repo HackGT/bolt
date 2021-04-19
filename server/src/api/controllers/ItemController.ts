@@ -1,17 +1,17 @@
 import { DB } from "../../database";
-import { Quantity } from "../requests/quantity";
-import { onlyIfAdmin } from "../requests";
+import { QuantityController } from "./QuantityController";
+import { onlyIfAdmin } from "../util";
 import { Item } from "../graphql.types";
 
-export function getItemLocation(item: any) {
-  return {
-    location_id: item.location_id,
-    location_name: item.location_name,
-    location_hidden: item.location_hidden,
-  };
-}
-
 export class ItemController {
+  public static getItemLocation(item: any) {
+    return {
+      location_id: item.location_id,
+      location_name: item.location_name,
+      location_hidden: item.location_hidden,
+    };
+  }
+
   public static async getTotalAvailable(itemIds: number[] = []) {
     const result = await DB.from("items")
       .where(builder => {
@@ -41,13 +41,13 @@ export class ItemController {
       .join("categories", "items.category_id", "=", "categories.category_id")
       .join("locations", "locations.location_id", "=", "items.location_id");
 
-    const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await Quantity.all();
+    const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await QuantityController.all();
 
     return items.map(item => ({
       ...item,
       id: item.item_id,
       category: item.category_name,
-      location: getItemLocation(item),
+      location: ItemController.getItemLocation(item),
       price: onlyIfAdmin(item.price, isAdmin),
       owner: onlyIfAdmin(item.owner, isAdmin),
       qtyInStock: qtyInStock[item.item_id],

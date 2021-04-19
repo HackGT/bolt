@@ -1,6 +1,6 @@
 import { RequestStatus } from "../graphql.types";
 import { DB } from "../../database";
-import { ItemController } from "../items/ItemController";
+import { ItemController } from "./ItemController";
 
 interface QuantitiesInStatus {
   [statusName: string]: number;
@@ -20,9 +20,9 @@ export interface ItemAllQtys {
   qtyAvailableForApproval: ItemQtyAvailable;
 }
 
-export class Quantity {
+export class QuantityController {
   public static async inStock(itemIds: number[] = []): Promise<ItemQtyAvailable> {
-    const quantities: ItemQuantities = await Quantity.getQuantities(
+    const quantities: ItemQuantities = await QuantityController.getQuantities(
       ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"],
       itemIds
     );
@@ -36,7 +36,7 @@ export class Quantity {
   }
 
   public static async unreserved(itemIds: number[] = []): Promise<ItemQtyAvailable> {
-    const quantities: ItemQuantities = await Quantity.getQuantities(
+    const quantities: ItemQuantities = await QuantityController.getQuantities(
       ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"],
       itemIds
     );
@@ -53,7 +53,7 @@ export class Quantity {
   }
 
   public static async availableForApproval(itemIds: number[] = []): Promise<ItemQtyAvailable> {
-    const quantities: ItemQuantities = await Quantity.getQuantities(
+    const quantities: ItemQuantities = await QuantityController.getQuantities(
       ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"],
       itemIds
     );
@@ -69,7 +69,7 @@ export class Quantity {
   }
 
   public static async all(itemIds: number[] = []): Promise<ItemAllQtys> {
-    const quantities: ItemQuantities = await Quantity.getQuantities(
+    const quantities: ItemQuantities = await QuantityController.getQuantities(
       ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"],
       itemIds
     );
@@ -99,7 +99,7 @@ export class Quantity {
   }
 
   public static async quantityStatistics(): Promise<ItemQuantities> {
-    return await Quantity.getQuantities();
+    return await QuantityController.getQuantities();
   }
 
   private static getTotalAvailableLessStatuses(
