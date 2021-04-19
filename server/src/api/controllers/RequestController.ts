@@ -35,75 +35,58 @@ export interface KnexRequest extends KnexSimpleRequest {
   qtyInStock: number;
   qtyUnreserved: number;
   qtyAvailableForApproval: number;
+  location_id: number;
+  location_name: string;
+  location_hidden: boolean;
 }
 
 export class RequestController {
-  public static redactedItem(
-    item: any,
-    isAdmin: boolean,
-    qtyInStock: ItemQtyAvailable,
-    qtyAvailableForApproval: ItemQtyAvailable,
-    qtyUnreserved: ItemQtyAvailable
-  ) {
-    return {
-      id: item.item_id,
-      item_name: item.item_name,
-      description: item.description,
-      imageUrl: item.imageUrl,
-      category: item.category_name,
-      location: {
-        location_id: item.location_id,
-        location_name: item.location_name,
-        location_hidden: item.location_hidden,
-      },
-      totalAvailable: item.totalAvailable,
-      maxRequestQty: item.maxRequestQty,
-      price: onlyIfAdmin(item.price, isAdmin),
-      hidden: item.hidden,
-      returnRequired: item.returnRequired,
-      approvalRequired: item.approvalRequired,
-      owner: onlyIfAdmin(item.owner, isAdmin),
-      qtyInStock: qtyInStock[item.item_id],
-      qtyAvailableForApproval: qtyAvailableForApproval[item.item_id],
-      qtyUnreserved: qtyUnreserved[item.item_id],
-    };
-  }
-
-  public static nestedRequest(
+  public static toNestedRequest(
     request: KnexRequest,
     isAdmin: boolean,
     qtyInStock: ItemQtyAvailable,
     qtyAvailableForApproval: ItemQtyAvailable,
     qtyUnreserved: ItemQtyAvailable
   ) {
-    const user = {
-      uuid: request.uuid,
-      admin: request.admin,
-      name: request.name,
-      email: request.email,
-      phone: request.phone,
-      slackUsername: request.slackUsername,
-      haveID: request.haveID,
-    };
-
     return {
-      user,
-      item: RequestController.redactedItem(
-        request,
-        isAdmin,
-        qtyInStock,
-        qtyAvailableForApproval,
-        qtyUnreserved
-      ),
+      user: {
+        uuid: request.uuid,
+        admin: request.admin,
+        name: request.name,
+        email: request.email,
+        phone: request.phone,
+        slackUsername: request.slackUsername,
+        haveID: request.haveID,
+      },
+      item: {
+        id: request.item_id,
+        item_name: request.item_name,
+        description: request.description,
+        imageUrl: request.imageUrl,
+        category: request.category_name,
+        location: {
+          location_id: request.location_id,
+          location_name: request.location_name,
+          location_hidden: request.location_hidden,
+        },
+        totalAvailable: request.totalAvailable,
+        maxRequestQty: request.maxRequestQty,
+        price: onlyIfAdmin(request.price, isAdmin),
+        hidden: request.hidden,
+        returnRequired: request.returnRequired,
+        approvalRequired: request.approvalRequired,
+        owner: onlyIfAdmin(request.owner, isAdmin),
+        qtyInStock: qtyInStock[request.item_id],
+        qtyAvailableForApproval: qtyAvailableForApproval[request.item_id],
+        qtyUnreserved: qtyUnreserved[request.item_id],
+      },
       request_id: request.request_id,
       status: request.status,
-      location: RequestController.redactedItem(
-        request,
-        isAdmin,
-        qtyInStock,
-        qtyAvailableForApproval,
-        qtyUnreserved
-      ).location,
+      location: {
+        location_id: request.location_id,
+        location_name: request.location_name,
+        location_hidden: request.location_hidden,
+      },
       quantity: request.quantity,
       createdAt: localTimestamp(request.created_at),
       updatedAt: localTimestamp(request.updated_at),

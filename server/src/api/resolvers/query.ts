@@ -222,7 +222,7 @@ export const Query: IResolvers = {
     );
 
     return requests.map(request =>
-      RequestController.nestedRequest(
+      RequestController.toNestedRequest(
         request,
         context.user.admin,
         qtyInStock,
