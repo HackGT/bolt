@@ -36,7 +36,7 @@ type Mutation {
 }
 
 type Subscription {
-  request_change: Request!
+  requestChange: Request!
 }
 
 type User {
@@ -53,10 +53,10 @@ type User {
 
 type Item {
   id: Int!
-  item_name: String!
+  name: String!
   description: String!
   imageUrl: String!
-  category: String!
+  category: Category!
   location: Location!
   # Total number of this item in the hardware inventory
   totalAvailable: Int!
@@ -116,7 +116,7 @@ type Setting {
 }
 
 input ItemInput {
-  item_name: String!
+  name: String!
   description: String!
   imageUrl: String!
   category: String!
@@ -144,15 +144,15 @@ input SettingInput {
 
 type Category {
   # The unique ID for this category
-  category_id: Int!
+  id: Int!
   # The human-readable, user-facing name for this category
-  category_name: String!
+  name: String!
 }
 
 type Location {
-  location_id: Int!
-  location_name: String!
-  location_hidden: Boolean!
+  id: Int!
+  name: String!
+  hidden: Boolean!
 }
 
 enum RequestStatus {
@@ -168,44 +168,34 @@ enum RequestStatus {
   DAMAGED
 }
 
-# Simple representation of a request without the linked item or user
-type SimpleRequest {
-  request_id: Int!
-  status: RequestStatus!
-  quantity: Int!
-  createdAt: String!
-  updatedAt: String!
-}
-
 type Request {
-  request_id: Int!
-  user: User!
+  id: Int!
   item: Item!
-  location: Location!
-  status: RequestStatus!
   quantity: Int!
+  user: User!
+  status: RequestStatus!
   createdAt: String!
   updatedAt: String!
 }
 
 input RequestSearch {
-  item_id: Int
-  request_id: Int
-  user_id: String
+  id: Int
+  itemId: Int
+  userId: String
   statuses: [RequestStatus!]
 }
 
 input RequestInput {
-  user_id: String!
-  request_item_id: Int!
+  userId: String!
+  itemId: Int!
   quantity: Int!
 }
 
 input RequestUpdateInput {
-  request_id: Int!
-  new_quantity: Int
-  new_status: RequestStatus
-  user_haveID: Boolean
+  id: Int!
+  quantity: Int
+  status: RequestStatus
+  userHaveId: Boolean
 }
 
 input UserSearch {

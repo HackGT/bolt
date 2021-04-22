@@ -12,8 +12,7 @@ import { execute, subscribe } from "graphql";
 import { SubscriptionServer } from "subscriptions-transport-ws";
 import { createServer } from "http";
 
-import { config, COOKIE_OPTIONS, PORT, VERSION_NUMBER } from "./common";
-import { findUserByID } from "./database";
+import { config, COOKIE_OPTIONS, PORT, prisma, VERSION_NUMBER } from "./common";
 
 import flash = require("connect-flash");
 
@@ -131,7 +130,11 @@ server.listen(PORT, () => {
         });
 
         const { user }: any = await promise;
-        const fullUser = await findUserByID(user);
+        const fullUser = await prisma.user.findUnique({
+          where: {
+            uuid: user,
+          },
+        });
 
         if (fullUser && fullUser.admin) {
           return true;

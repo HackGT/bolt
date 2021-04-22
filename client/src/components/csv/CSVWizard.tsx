@@ -6,8 +6,8 @@ import { Mutation } from "@apollo/client/react/components";
 
 import UploadStep from "./CSVUpload";
 import ReviewStep from "./CSVReview";
-import { ItemComplete } from "../item/ItemEditForm";
 import { CREATE_ITEM } from "../util/graphql/Mutations";
+import { Item } from "../../types/Hardware";
 
 interface CSVWizardProps {
   toastManager: any;
@@ -15,7 +15,7 @@ interface CSVWizardProps {
 
 interface CSVWizardState {
   wizardStep: number;
-  inventory: ItemComplete[];
+  inventory: Item[];
   isStepComplete: boolean;
   isSubmitting: boolean;
   isComplete: boolean;
@@ -65,7 +65,7 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
     }
   };
 
-  public setInventory = (inventory: ItemComplete[]) => {
+  public setInventory = (inventory: Item[]) => {
     this.setState({ inventory, isStepComplete: true });
   };
 

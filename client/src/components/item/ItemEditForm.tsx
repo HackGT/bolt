@@ -6,7 +6,7 @@ import {
   Form,
   Grid,
   Header,
-  Item,
+  Item as SMItem,
   Label,
   Message,
   Popup,
@@ -19,37 +19,37 @@ import AddOptionDropdown from "../util/AddOptionDropdown";
 import HardwareItem from "../inventory/HardwareItem";
 import { CREATE_ITEM, UPDATE_ITEM } from "../util/graphql/Mutations";
 import { ALL_CATEGORIES, ALL_ITEMS, ALL_LOCATIONS } from "../util/graphql/Queries";
-import { ItemNoId, Location } from "../../types/Hardware";
-
-interface ItemDetails {
-  approvalRequired: boolean;
-  returnRequired: boolean;
-  price: number;
-  hidden: boolean;
-  owner: string;
-}
+import { Item, Location, Category } from "../../types/Hardware";
 
 interface ItemEditProps {
   preloadItemId: number;
-  preloadItem: ItemComplete;
+  preloadItem: Item;
   createItem: boolean;
   toastManager: any;
   loading?: boolean;
 }
 
-export type ItemComplete = ItemNoId &
-  ItemDetails & {
-    [name: string]: any | any[];
-  };
-
-export type Category = {
-  category_id: number;
-  category_name: string;
+export type FormItem = {
+  name: string;
+  description: string;
+  imageUrl: string;
+  category: string;
+  totalAvailable: number;
+  maxRequestQty: number;
+  price: number;
+  hidden: boolean;
+  returnRequired: boolean;
+  approvalRequired: boolean;
+  owner: string;
+  location: string;
+  qtyUnreserved: number;
+  qtyInStock: number;
+  qtyAvailableForApproval: number;
 };
 
 interface ItemEditState {
   loading: boolean;
-  item: ItemComplete;
+  item: FormItem;
   itemPreviewKey: number;
   categoryError: boolean;
   ownerError: boolean;
@@ -68,7 +68,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
       loading: false,
       item: this.props.createItem
         ? {
-            item_name: "",
+            name: "",
             description: "",
             imageUrl: "",
             category: "",
@@ -84,7 +84,23 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
             hidden: false,
             owner: "HackGT",
           }
-        : this.props.preloadItem,
+        : {
+            name: this.props.preloadItem.name,
+            description: this.props.preloadItem.description,
+            imageUrl: this.props.preloadItem.imageUrl,
+            category: this.props.preloadItem.category.name,
+            location: this.props.preloadItem.location.name,
+            totalAvailable: this.props.preloadItem.totalAvailable,
+            maxRequestQty: this.props.preloadItem.maxRequestQty,
+            qtyAvailableForApproval: this.props.preloadItem.qtyAvailableForApproval,
+            qtyUnreserved: this.props.preloadItem.qtyUnreserved,
+            qtyInStock: this.props.preloadItem.qtyInStock,
+            price: this.props.preloadItem.price,
+            approvalRequired: this.props.preloadItem.approvalRequired,
+            returnRequired: this.props.preloadItem.returnRequired,
+            hidden: this.props.preloadItem.hidden,
+            owner: this.props.preloadItem.owner,
+          },
       itemPreviewKey: 0,
     };
   }
@@ -184,8 +200,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                       };
                       if (typeof variables.updatedItem.location === "object") {
                         // Transform location from the object from server into just the location name
-                        variables.updatedItem.location =
-                          variables.updatedItem.location.location_name;
+                        variables.updatedItem.location = variables.updatedItem.location.name;
                       }
                       delete variables.updatedItem.__typename;
                       delete variables.updatedItem.qtyAvailableForApproval;
@@ -194,7 +209,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                     } else {
                       if (typeof variables.newItem.location === "object") {
                         // Transform location from the object from server into just the location name
-                        variables.newItem.location = variables.newItem.location.location_name;
+                        variables.newItem.location = variables.newItem.location.name;
                       }
                       delete variables.newItem.__typename;
                       delete variables.newItem.qtyAvailableForApproval;
@@ -227,7 +242,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                       variables,
                     })
                       .then(() => {
-                        toastManager.add(`${this.state.item.item_name} saved`, {
+                        toastManager.add(`${this.state.item.name} saved`, {
                           appearance: "success",
                           autoDismiss: true,
                           placement: "top-center",
@@ -257,8 +272,8 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                       width={6}
                       label="Item name"
                       type="text"
-                      name="item_name"
-                      value={this.state.item.item_name}
+                      name="name"
+                      value={this.state.item.name}
                       required
                       placeholder="Ventral quark accelerator"
                     />
@@ -294,7 +309,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                           // for more information on why this is necessary and why it works.
                           if (queryData && queryData.categories) {
                             categoriesList = queryData.categories.map(
-                              (item: Category) => item.category_name
+                              (item: Category) => item.name
                             );
                             dataLoadedKey = 1;
                           }
@@ -368,9 +383,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                           // See https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key
                           // for more information on why this is necessary and why it works.
                           if (queryData && queryData.locations) {
-                            locationsList = queryData.locations.map(
-                              (item: Location) => item.location_name
-                            );
+                            locationsList = queryData.locations.map((item: Location) => item.name);
                             dataLoadedKey = 1;
                           }
                           const queryErrorMsg = (
@@ -392,7 +405,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                                 loading={queryLoading}
                                 disabled={queryLoading}
                                 key={dataLoadedKey}
-                                value={this.state.item.location.location_name}
+                                value={this.state.item.location}
                                 options={locationsList}
                                 error={this.state.locationError}
                                 onChange={this.handleInputChangeDropdown}
@@ -513,7 +526,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
           </Grid.Column>
           <Grid.Column width={5}>
             <Header>Preview</Header>
-            <Item.Group>
+            <SMItem.Group>
               <HardwareItem
                 item={this.state.item}
                 requestsEnabled={false}
@@ -521,7 +534,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
                 user={null}
                 preview
               />
-            </Item.Group>
+            </SMItem.Group>
           </Grid.Column>
         </Grid.Row>
       </Grid>

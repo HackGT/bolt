@@ -2,8 +2,8 @@ import gql from "graphql-tag";
 
 export const REQUEST_CHANGE = gql`
   subscription rc {
-    request_change {
-      request_id
+    requestChange {
+      id
       user {
         uuid
         name
@@ -14,13 +14,13 @@ export const REQUEST_CHANGE = gql`
       }
       item {
         id
-        item_name
+        name
         qtyAvailableForApproval
         returnRequired
         location {
-          location_id
-          location_name
-          location_hidden
+          id
+          name
+          hidden
           __typename @skip(if: false)
         }
       }

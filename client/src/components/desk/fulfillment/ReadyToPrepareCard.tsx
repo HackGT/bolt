@@ -25,12 +25,11 @@ function ReadyToPrepareCard({ card }: ReadyToFulfillCardProps) {
         <Header size="medium">{card.user.name}</Header>
       </Card.Content>
       {card.requests.map(request => (
-        <Card.Content key={request.request_id}>
+        <Card.Content key={request.id}>
           <strong>
-            <ItemAndQuantity quantity={request.quantity} itemName={request.item.item_name} />
+            <ItemAndQuantity quantity={request.quantity} itemName={request.item.name} />
           </strong>
           &nbsp;
-          <span style={{ color: "gray" }}>#{request.request_id}</span>
           <div style={{ display: "inline", float: "right" }}>
             <Popup
               inverted
@@ -41,9 +40,7 @@ function ReadyToPrepareCard({ card }: ReadyToFulfillCardProps) {
                   basic
                   loading={loading}
                   size="tiny"
-                  onClick={event =>
-                    updateRequestStatus(updateRequest, request.request_id, SUBMITTED)
-                  }
+                  onClick={event => updateRequestStatus(updateRequest, request.id, SUBMITTED)}
                 >
                   <Icon className="hw-negative" name="arrow left" />
                 </Button>
@@ -60,7 +57,7 @@ function ReadyToPrepareCard({ card }: ReadyToFulfillCardProps) {
                   loading={loading}
                   size="tiny"
                   onClick={event =>
-                    updateRequestStatus(updateRequest, request.request_id, READY_FOR_PICKUP)
+                    updateRequestStatus(updateRequest, request.id, READY_FOR_PICKUP)
                   }
                 >
                   <Icon className="hw-positive" name="arrow right" />
@@ -98,7 +95,7 @@ function ReadyToPrepareCard({ card }: ReadyToFulfillCardProps) {
                   loading={loading}
                   onClick={event =>
                     card.requests.forEach(request =>
-                      updateRequestStatus(updateRequest, request.request_id, SUBMITTED)
+                      updateRequestStatus(updateRequest, request.id, SUBMITTED)
                     )
                   }
                 >
@@ -117,7 +114,7 @@ function ReadyToPrepareCard({ card }: ReadyToFulfillCardProps) {
                   color="green"
                   onClick={event =>
                     card.requests.forEach(request =>
-                      updateRequestStatus(updateRequest, request.request_id, READY_FOR_PICKUP)
+                      updateRequestStatus(updateRequest, request.id, READY_FOR_PICKUP)
                     )
                   }
                 >

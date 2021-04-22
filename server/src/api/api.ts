@@ -4,6 +4,7 @@ import express from "express";
 import { graphqlHTTP } from "express-graphql";
 import { IResolvers, makeExecutableSchema } from "graphql-tools";
 import fetch from "isomorphic-fetch";
+import { GraphQLError, GraphQLFormattedError } from "graphql";
 
 import { isAdminNoAuthCheck } from "../auth/auth";
 import { User } from "./graphql.types";
@@ -22,11 +23,26 @@ export const schema = makeExecutableSchema({
   resolvers,
 });
 
+const customFormatErrorFn: (
+  error: GraphQLError
+) => GraphQLFormattedError<Record<string, any>> = error => {
+  const output = {
+    message: error.message,
+    locations: error.locations,
+    stack: error.stack ? error.stack.split("\n") : [],
+    path: error.path,
+  };
+  console.error(output);
+  return output;
+};
+
 apiRoutes.post(
   "/",
   graphqlHTTP({
     schema,
     graphiql: false,
+    pretty: true,
+    customFormatErrorFn,
   })
 );
 
@@ -36,6 +52,8 @@ apiRoutes.all(
   graphqlHTTP({
     schema,
     graphiql: true,
+    pretty: true,
+    customFormatErrorFn,
   })
 );
 

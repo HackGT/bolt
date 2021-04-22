@@ -3,10 +3,10 @@ import gql from "graphql-tag";
 export const ITEM_EDIT_GET_ITEM = gql`
   query getItem($itemId: Int!) {
     item(id: $itemId) {
-      item_name
+      id
+      name
       description
       imageUrl
-      category
       totalAvailable
       maxRequestQty
       price
@@ -17,10 +17,14 @@ export const ITEM_EDIT_GET_ITEM = gql`
       qtyAvailableForApproval
       hidden
       owner
+      category {
+        id
+        name
+      }
       location {
-        location_id
-        location_name
-        location_hidden
+        id
+        name
+        hidden
       }
     }
   }
@@ -29,8 +33,8 @@ export const ITEM_EDIT_GET_ITEM = gql`
 export const ALL_CATEGORIES = gql`
   query categories {
     categories {
-      category_id
-      category_name
+      id
+      name
     }
   }
 `;
@@ -38,9 +42,9 @@ export const ALL_CATEGORIES = gql`
 export const ALL_LOCATIONS = gql`
   query locations {
     locations {
-      location_id
-      location_name
-      location_hidden
+      id
+      name
+      hidden
     }
   }
 `;
@@ -49,23 +53,22 @@ export const ALL_ITEMS = gql`
   query {
     allItems {
       location {
-        location_id
-        location_name
-        location_hidden
+        id
+        name
+        hidden
       }
       categories {
         category {
-          category_id
-          category_name
+          id
+          name
         }
         items {
           id
+          name
           qtyUnreserved
           qtyInStock
-          item_name
           description
           imageUrl
-          category
           totalAvailable
           maxRequestQty
           hidden
@@ -74,10 +77,14 @@ export const ALL_ITEMS = gql`
           owner
           hidden
           qtyAvailableForApproval
+          category {
+            id
+            name
+          }
           location {
-            location_id
-            location_name
-            location_hidden
+            id
+            name
+            hidden
           }
         }
       }
@@ -112,14 +119,14 @@ export const ALL_USERS = gql`
 export const DESK_REQUESTS = gql`
   query {
     locations {
-      location_id
-      location_name
-      location_hidden
+      id
+      name
+      hidden
     }
     requests(
       search: { statuses: [SUBMITTED, APPROVED, READY_FOR_PICKUP, FULFILLED, LOST, DAMAGED] }
     ) {
-      request_id
+      id
       user {
         uuid
         name
@@ -130,13 +137,13 @@ export const DESK_REQUESTS = gql`
       }
       item {
         id
-        item_name
+        name
         qtyAvailableForApproval
         returnRequired
         location {
-          location_id
-          location_name
-          location_hidden
+          id
+          name
+          hidden
         }
       }
       status
@@ -150,12 +157,12 @@ export const DESK_REQUESTS = gql`
 export const USER_REQUESTS = gql`
   query userRequests($uuid: String!) {
     locations {
-      location_id
-      location_name
-      location_hidden
+      id
+      name
+      hidden
     }
-    requests(search: { user_id: $uuid }) {
-      request_id
+    requests(search: { userId: $uuid }) {
+      id
       user {
         uuid
         name
@@ -166,13 +173,13 @@ export const USER_REQUESTS = gql`
       }
       item {
         id
-        item_name
+        name
         qtyAvailableForApproval
         returnRequired
         location {
-          location_id
-          location_name
-          location_hidden
+          id
+          name
+          hidden
         }
       }
       status
@@ -211,12 +218,12 @@ export const DETAILED_ITEM_STATISTICS = gql`
     itemStatistics {
       item {
         id
+        name
         qtyUnreserved
         qtyInStock
-        item_name
+        qtyAvailableForApproval
         description
         imageUrl
-        category
         totalAvailable
         maxRequestQty
         hidden
@@ -224,11 +231,14 @@ export const DETAILED_ITEM_STATISTICS = gql`
         returnRequired
         owner
         hidden
-        qtyAvailableForApproval
+        category {
+          id
+          name
+        }
         location {
-          location_id
-          location_name
-          location_hidden
+          id
+          name
+          hidden
         }
       }
       detailedQuantities {

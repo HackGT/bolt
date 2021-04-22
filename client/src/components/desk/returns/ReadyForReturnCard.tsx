@@ -67,7 +67,7 @@ function ReadyForReturnCard({ card }: ReadyForReturnCardProps) {
   card.requests.sort(
     (a: Request, b: Request) =>
       // @ts-ignore
-      a.item.returnRequired - b.item.returnRequired || a.request_id - b.request_id
+      a.item.returnRequired - b.item.returnRequired || a.id - b.id
   );
   const requiredRequests = returnRequiredFulfilledRequests(card.requests);
   return (
@@ -76,12 +76,12 @@ function ReadyForReturnCard({ card }: ReadyForReturnCardProps) {
         <Header size="medium">{card.user.name}</Header>
       </Card.Content>
       {card.requests.map(request => (
-        <Card.Content key={request.request_id} description>
+        <Card.Content key={request.id} description>
           <strong>
-            <ItemAndQuantity quantity={request.quantity} itemName={request.item.item_name} />
+            <ItemAndQuantity quantity={request.quantity} itemName={request.item.name} />
           </strong>
           &nbsp;
-          <span style={{ color: "gray" }}>#{request.request_id}</span>
+          <span style={{ color: "gray" }}>#{request.id}</span>
           <div style={{ display: "inline", float: "right" }}>
             {request.status === LOST && <WarningLabel text="LOST" />}
             {request.status === DAMAGED && <WarningLabel text="DAMAGED" />}
@@ -114,7 +114,7 @@ function ReadyForReturnCard({ card }: ReadyForReturnCardProps) {
           </div>
           <Card.Content>
             <Icon name="map marker alternate" />
-            {request.item.location.location_name}
+            {request.item.location.name}
           </Card.Content>
         </Card.Content>
       ))}
@@ -145,7 +145,7 @@ function ReadyForReturnCard({ card }: ReadyForReturnCardProps) {
                   loading={loading}
                   onClick={event =>
                     card.requests.forEach(request =>
-                      updateRequestStatus(updateRequest, request.request_id, READY_FOR_PICKUP)
+                      updateRequestStatus(updateRequest, request.id, READY_FOR_PICKUP)
                     )
                   }
                 >

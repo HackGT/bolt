@@ -1,31 +1,31 @@
-export type HwItem = {
+export type Item = {
   id: number;
-  item_name: string;
+  name: string;
   description: string;
   imageUrl: string;
-  category: string;
+  category: Category;
   totalAvailable: number;
-  maxRequestQty: number;
+  maxRequestQty: number; // max number of a specific item you can request at once
   price: number;
   hidden: boolean;
   returnRequired: boolean;
   approvalRequired: boolean;
   owner: string;
+  location: Location;
   qtyUnreserved: number;
   qtyInStock: number;
   qtyAvailableForApproval: number;
-  location: Location;
 };
 
 export type Category = {
-  category_id: number;
-  category_name: string;
+  id: number;
+  name: string;
 };
 
 export type Location = {
-  location_id: number;
-  location_name: string;
-  location_hidden: boolean;
+  id: number;
+  name: string;
+  hidden: boolean;
 };
 
 export type ItemByLocation = {
@@ -35,33 +35,15 @@ export type ItemByLocation = {
 
 export type ItemByCat = {
   category: Category;
-  items: HwItem[];
+  items: Item[];
 };
-
-export interface ItemCore {
-  item_name: string;
-  description: string;
-  totalAvailable: number;
-  maxRequestQty: number;
-  category: string;
-  imageUrl: string;
-}
-
-export interface ItemNoId {
-  item_name: string; // name of this item
-  description: string; // brief description
-  totalAvailable: number;
-  maxRequestQty: number; // max number of a specific item you can request at once
-  category: string;
-  imageUrl: string;
-}
 
 export interface RequestedItem {
   id: number;
   user: string;
   name: string;
   qtyRequested: number;
-  category: string;
+  category: Category;
   location: Location;
   status: string;
   cancelled: boolean;
@@ -85,6 +67,6 @@ export type DetailedItemQuantities = {
 };
 
 export type ItemWithStatistics = {
-  item: HwItem;
+  item: Item;
   detailedQuantities: DetailedItemQuantities;
 };

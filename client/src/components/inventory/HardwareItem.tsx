@@ -1,10 +1,10 @@
 import React, { ChangeEvent } from "react";
-import { Button, Icon, Input, Item, Popup } from "semantic-ui-react";
+import { Button, Icon, Input, Item as SMItem, Popup } from "semantic-ui-react";
 import { withToastManager } from "react-toast-notifications";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
-import { HwItem, RequestedItem, SUBMITTED } from "../../types/Hardware";
+import { Item, RequestedItem, SUBMITTED } from "../../types/Hardware";
 import { AppState } from "../../state/Store";
 import { User } from "../../types/User";
 import RequestButton from "./RequestButton";
@@ -15,7 +15,7 @@ interface HardwareItemState {
 }
 
 interface HardwareItemProps {
-  item: HwItem;
+  item: Item;
   toastManager: any;
   requestsEnabled: boolean;
   user: User | null;
@@ -24,7 +24,7 @@ interface HardwareItemProps {
 
 function itemImage(src: string, outOfStock = false) {
   return (
-    <Item.Image
+    <SMItem.Image
       draggable={false}
       size="tiny"
       src={src || "http://placekitten.com/300/300"}
@@ -84,7 +84,7 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
     const newRequest: RequestedItem = {
       id: this.props.item.id,
       user: this.props.user ? this.props.user.uuid : "",
-      name: this.props.item.item_name,
+      name: this.props.item.name,
       qtyRequested: this.state.qtyRequested,
       category: this.props.item.category,
       status: SUBMITTED,
@@ -165,19 +165,19 @@ class HardwareItem extends React.Component<HardwareItemProps, HardwareItemState>
       );
 
     return (
-      <Item>
+      <SMItem>
         {itemImage(this.props.item.imageUrl, this.props.item.qtyUnreserved <= 0)}
-        <Item.Content>
-          <Item.Header>
-            {editBtn} {hidden} {this.props.item.item_name || (this.props.preview && "Item Name")}
-          </Item.Header>
-          <Item.Meta>{maxPerRequest}</Item.Meta>
-          <Item.Description>
+        <SMItem.Content>
+          <SMItem.Header>
+            {editBtn} {hidden} {this.props.item.name || (this.props.preview && "SMItem Name")}
+          </SMItem.Header>
+          <SMItem.Meta>{maxPerRequest}</SMItem.Meta>
+          <SMItem.Description>
             {this.props.item.description || (this.props.preview && "Description")}
-          </Item.Description>
-          <Item.Extra>{qtyRequest}</Item.Extra>
-        </Item.Content>
-      </Item>
+          </SMItem.Description>
+          <SMItem.Extra>{qtyRequest}</SMItem.Extra>
+        </SMItem.Content>
+      </SMItem>
     );
   }
 }

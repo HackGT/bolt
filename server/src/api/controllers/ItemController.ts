@@ -1,58 +1,44 @@
-import { DB } from "../../database";
 import { QuantityController } from "./QuantityController";
 import { onlyIfAdmin } from "../util";
 import { Item } from "../graphql.types";
+import { prisma } from "../../common";
 
 export class ItemController {
-  public static getItemLocation(item: any) {
-    return {
-      location_id: item.location_id,
-      location_name: item.location_name,
-      location_hidden: item.location_hidden,
-    };
-  }
-
   public static async getTotalAvailable(itemIds: number[] = []) {
-    const result = await DB.from("items")
-      .where(builder => {
-        if (itemIds.length) {
-          builder.whereIn("item_id", itemIds);
-        }
-      })
-      .select(["item_id", "totalAvailable"]);
+    const items = await prisma.item.findMany({
+      where: {
+        id: {
+          in: itemIds.length === 0 ? undefined : itemIds,
+        },
+      },
+    });
+    const resultObj: { [id: number]: number } = {};
 
-    if (!result.length) {
-      return {};
-    }
-
-    const resultObj: any = {};
-
-    for (let i = 0; i < result.length; i++) {
-      const item = result[i];
-      resultObj[item.item_id] = item.totalAvailable;
+    for (const item of items) {
+      resultObj[item.id] = item.totalAvailable;
     }
 
     return resultObj;
   }
 
   public static async get(searchObj: any, isAdmin: boolean): Promise<Item[]> {
-    const items = await DB.from("items")
-      .where(searchObj)
-      .join("categories", "items.category_id", "=", "categories.category_id")
-      .join("locations", "locations.location_id", "=", "items.location_id");
+    const items = await prisma.item.findMany({
+      where: searchObj,
+      include: {
+        category: true,
+        location: true,
+      },
+    });
 
     const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await QuantityController.all();
 
     return items.map(item => ({
       ...item,
-      id: item.item_id,
-      category: item.category_name,
-      location: ItemController.getItemLocation(item),
       price: onlyIfAdmin(item.price, isAdmin),
       owner: onlyIfAdmin(item.owner, isAdmin),
-      qtyInStock: qtyInStock[item.item_id],
-      qtyUnreserved: qtyUnreserved[item.item_id],
-      qtyAvailableForApproval: qtyAvailableForApproval[item.item_id],
+      qtyInStock: qtyInStock[item.id],
+      qtyUnreserved: qtyUnreserved[item.id],
+      qtyAvailableForApproval: qtyAvailableForApproval[item.id],
     }));
   }
 }

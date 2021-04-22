@@ -108,7 +108,7 @@ const NewHardwareList = ({ user }: { user: User | null }) => {
       </Grid>
       {data.allItems.map((itemsByLocation: ItemByLocation) => (
         <HardwareLocationContents
-          key={itemsByLocation.location.location_id}
+          key={itemsByLocation.location.id}
           requestsEnabled={requestsEnabled}
           itemsByLocation={itemsByLocation}
           searchQuery={searchQuery}

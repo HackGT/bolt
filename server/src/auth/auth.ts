@@ -4,11 +4,11 @@ import { URL } from "url";
 import * as crypto from "crypto";
 import express from "express";
 import session from "express-session";
-import pgSession from "connect-pg-simple";
 import passport from "passport";
+import { User } from "@prisma/client";
+import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 
-import { findUserByID, IUser } from "../database";
-import { config, COOKIE_OPTIONS } from "../common";
+import { config, COOKIE_OPTIONS, prisma } from "../common";
 import {
   AuthenticateOptions,
   createLink,
@@ -30,30 +30,30 @@ if (!config.sessionSecretSet) {
 export const sessionMiddleware = session({
   secret: config.secrets.session,
   cookie: COOKIE_OPTIONS,
-  resave: false,
-  store: new (pgSession(session))({
-    conString: config.server.postgresURL,
-  }),
   saveUninitialized: false,
+  resave: false,
+  store: new PrismaSessionStore(prisma, {
+    checkPeriod: 2 * 60 * 1000, // ms
+    dbRecordIdIsSessionId: true,
+  }),
 });
 app.use(sessionMiddleware);
 
 passport.serializeUser<string>((user, done) => {
   done(null, user.uuid);
 });
-
 passport.deserializeUser<string>(async (id, done) => {
-  findUserByID(id)
-    .then(user => {
-      if (user) {
-        done(null, user);
-      } else {
-        done("No user found");
-      }
-    })
-    .catch(err => {
-      done(err);
-    });
+  const user = await prisma.user.findUnique({
+    where: {
+      uuid: id,
+    },
+  });
+
+  if (user) {
+    done(null, user);
+  } else {
+    done("No user found", undefined);
+  }
 });
 
 export function isAuthenticated(
@@ -103,7 +103,7 @@ authRoutes.get("/validatehost/:nonce", (request, response) => {
 });
 
 authRoutes.all("/logout", (request, response) => {
-  const user = request.user as IUser | undefined;
+  const user = request.user as User | undefined;
   if (user) {
     const groundTruthURL = new URL(config.secrets.groundTruth.url);
     const requester = groundTruthURL.protocol === "http:" ? http : https;

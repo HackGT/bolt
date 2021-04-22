@@ -16,13 +16,13 @@ const DetailedItemStatistics: React.FC = () => {
     () => [
       {
         name: "Location",
-        selector: "item.location.location_name",
+        selector: "item.location.name",
         sortable: true,
         grow: 5,
       },
       {
         name: "Item",
-        selector: "item.item_name",
+        selector: "item.name",
         sortable: true,
         grow: 6,
       },
@@ -118,7 +118,7 @@ const DetailedItemStatistics: React.FC = () => {
         columns={columns}
         data={data && data.itemStatistics ? data.itemStatistics : []}
         dense
-        defaultSortField="item.location.location_name"
+        defaultSortField="item.location.name"
         fixedHeader
         pagination
         paginationComponentOptions={{

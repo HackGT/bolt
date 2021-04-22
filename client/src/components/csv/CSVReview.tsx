@@ -1,16 +1,16 @@
 import React from "react";
-import { Container, Item, Label } from "semantic-ui-react";
+import { Container, Item as SMItem, Label } from "semantic-ui-react";
 
-import { ItemComplete } from "../item/ItemEditForm";
+import { Item } from "../../types/Hardware";
 
 interface ReviewCardProps {
-  item: ItemComplete;
+  item: Item;
 }
 
 const ReviewCard = (props: ReviewCardProps) => {
   const { item } = props;
   const {
-    item_name,
+    name,
     description,
     totalAvailable,
     maxRequestQty,
@@ -24,15 +24,15 @@ const ReviewCard = (props: ReviewCardProps) => {
     location,
   } = item;
   return (
-    <Item>
-      <Item.Image size="tiny" src={imageUrl} />
-      <Item.Content>
-        <Item.Header as="h4">{item_name}</Item.Header>
-        <Item.Meta>
+    <SMItem>
+      <SMItem.Image size="tiny" src={imageUrl} />
+      <SMItem.Content>
+        <SMItem.Header as="h4">{name}</SMItem.Header>
+        <SMItem.Meta>
           Request up to {maxRequestQty} at a time | {totalAvailable} available, Location: {location}
           , Owner: {owner}, Unit Cost: ${price}
-        </Item.Meta>
-        <Item.Meta>
+        </SMItem.Meta>
+        <SMItem.Meta>
           <Label>Category: {category}</Label>
           {hidden ? (
             <Label tag color="red">
@@ -49,15 +49,15 @@ const ReviewCard = (props: ReviewCardProps) => {
               No Return Required
             </Label>
           ) : null}
-        </Item.Meta>
-        <Item.Description>{description}</Item.Description>
-      </Item.Content>
-    </Item>
+        </SMItem.Meta>
+        <SMItem.Description>{description}</SMItem.Description>
+      </SMItem.Content>
+    </SMItem>
   );
 };
 
 interface ReviewSetupProps {
-  inventory: ItemComplete[];
+  inventory: Item[];
 }
 
 const ReviewSetup = (props: ReviewSetupProps) => {
@@ -65,11 +65,11 @@ const ReviewSetup = (props: ReviewSetupProps) => {
 
   return (
     <Container>
-      <Item.Group>
+      <SMItem.Group>
         {inventory.map(item => (
           <ReviewCard key={item.name} item={item} />
         ))}
-      </Item.Group>
+      </SMItem.Group>
     </Container>
   );
 };

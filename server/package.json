@@ -5,9 +5,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "prestart": "npm run generate-gql-types && npm run knex:migrate:latest",
+    "prestart": "npm run generate-gql-types && npm run primsa migrate deploy",
     "start": "gulp",
-    "start:server": "npm run knex:migrate:latest && npm run serve",
+    "start:server": "npm run primsa migrate deploy && npm run serve",
     "start:no-migration": "npm run generate-gql-types && gulp",
     "dev": "npm run start:no-migration",
     "serve": "node ./build/app.js",
@@ -15,14 +15,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "npm run generate-gql-types",
     "generate-gql-types": "graphql-codegen",
-    "knex:migrate:make": "knex --knexfile src/knexfile.ts -x ts migrate:make",
-    "knex:migrate:latest": "knex --knexfile src/knexfile.ts migrate:latest",
-    "knex:migrate:rollback": "knex --knexfile src/knexfile.ts migrate:rollback",
     "lint": "eslint src/ --fix; prettier src/ --write"
   },
   "author": "Ryan Petschek, Evan Strat",
   "license": "MIT",
   "dependencies": {
+    "@prisma/client": "^2.21.2",
+    "@quixo3/prisma-session-store": "^3.0.1",
     "chalk": "^4.1.0",
     "compression": "^1.7.4",
     "connect-flash": "^0.1.1",
@@ -41,7 +40,6 @@
     "gulp-typescript": "^5.0.1",
     "gulp-util": "^3.0.8",
     "isomorphic-fetch": "^3.0.0",
-    "knex": "^0.95.4",
     "moment": "^2.29.1",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.7",
@@ -77,7 +75,8 @@
     "@types/pg": "^7.14.11",
     "@types/ws": "^7.4.1",
     "eslint": "^7.24.0",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "prisma": "^2.21.2"
   },
   "eslintConfig": {
     "extends": "@hex-labs/eslint-config"

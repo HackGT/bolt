@@ -3,7 +3,7 @@ import { Accordion, Divider, Header, Icon } from "semantic-ui-react";
 import { connect } from "react-redux";
 
 import HardwareLocation from "./HardwareLocation";
-import { HwItem, ItemByCat, ItemByLocation } from "../../types/Hardware";
+import { Item, ItemByCat, ItemByLocation } from "../../types/Hardware";
 import HardwareCategory from "./HardwareCategory";
 import NoItemsFound from "./NoItemsFound";
 import { AppState } from "../../state/Store";
@@ -21,11 +21,11 @@ function handleClick(e: any, titleProps: any, accordionState: any, setAccordionS
   setAccordionState(accordionStateClone);
 }
 
-function filteredItems(items: HwItem[], searchQuery: string): HwItem[] {
-  return items.filter((item: HwItem) => item.item_name.toLowerCase().includes(searchQuery));
+function filteredItems(items: Item[], searchQuery: string): Item[] {
+  return items.filter((item: Item) => item.name.toLowerCase().includes(searchQuery));
 }
 
-function combinedAndFilteredItemsByCategory(categories: any, searchQuery: string): HwItem[] {
+function combinedAndFilteredItemsByCategory(categories: any, searchQuery: string): Item[] {
   return filteredItems(
     categories.reduce((acc: any, val: any) => acc.concat(val.items), []),
     searchQuery
@@ -52,16 +52,16 @@ const HardwareLocationContents = ({
       }}
     >
       <HardwareLocation
-        key={`${itemsByLocation.location.location_id}-hardware_loc`}
-        location_name={itemsByLocation.location.location_name}
+        key={`${itemsByLocation.location.id}-hardware_loc`}
+        name={itemsByLocation.location.name}
       />
-      <Accordion key={`${itemsByLocation.location.location_id}-accordion`}>
+      <Accordion key={`${itemsByLocation.location.id}-accordion`}>
         {itemsByLocation.categories.map((itemByCat: ItemByCat, index: number) => (
           <>
             {filteredItems(itemByCat.items, searchQuery).length ? (
               <>
                 <Accordion.Title
-                  key={`${itemsByLocation.location.location_id}-title`}
+                  key={`${itemsByLocation.location.id}-title`}
                   active={accordionState.includes(index) || searchQuery.length >= 3}
                   index={index}
                   onClick={(e: any, titleProps: any) => {
@@ -70,19 +70,19 @@ const HardwareLocationContents = ({
                 >
                   <Header size="medium">
                     <Icon name="dropdown" />
-                    {itemByCat.category.category_name}
+                    {itemByCat.category.name}
                   </Header>
                 </Accordion.Title>
                 <Accordion.Content
-                  key={`${itemsByLocation.location.location_id}-content`}
+                  key={`${itemsByLocation.location.id}-content`}
                   active={accordionState.includes(index) || searchQuery.length >= 3}
                   index={index}
                 >
                   <HardwareCategory
-                    key={`${itemsByLocation.location.location_id}-${itemByCat.category.category_id}`}
+                    key={`${itemsByLocation.location.id}-${itemByCat.category.id}`}
                     items={filteredItems(itemByCat.items, searchQuery)}
                     requestsEnabled={requestsEnabled}
-                    name={itemByCat.category.category_name}
+                    name={itemByCat.category.name}
                   />
                 </Accordion.Content>
               </>
@@ -93,10 +93,7 @@ const HardwareLocationContents = ({
         ))}
         {(!itemsByLocation.categories.length ||
           !combinedAndFilteredItemsByCategory(itemsByLocation.categories, searchQuery).length) && (
-          <NoItemsFound
-            key={`${itemsByLocation.location.location_id}-no_items`}
-            searchQuery={searchQuery}
-          />
+          <NoItemsFound key={`${itemsByLocation.location.id}-no_items`} searchQuery={searchQuery} />
         )}
       </Accordion>
       <Divider />

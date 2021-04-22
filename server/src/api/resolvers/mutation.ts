@@ -1,23 +1,21 @@
 /* eslint-disable camelcase, no-param-reassign */
 import { GraphQLError } from "graphql";
-import { IResolvers } from "graphql-tools";
 
-import { DB } from "../../database";
-import { Item, Location, Request, RequestStatus, Setting, User } from "../graphql.types";
+import { Item, MutationResolvers, Request, RequestStatus, User } from "../graphql.types";
 import {
-  findOrCreate,
   getItem,
   getUser,
   getSetting,
   REQUEST_CHANGE,
   updateUser,
   pubsub,
+  populateItem,
 } from "./common";
 import { localTimestamp } from "../util";
-import { ItemController } from "../controllers/ItemController";
 import { RequestController } from "../controllers/RequestController";
+import { prisma } from "../../common";
 
-export const Mutation: IResolvers = {
+export const Mutation: MutationResolvers = {
   /* Mutations */
   /**
    * Create a new item
@@ -27,14 +25,14 @@ export const Mutation: IResolvers = {
    * @param args
    * @param context
    */
-  createItem: async (root, args, context): Promise<Item | null> => {
+  createItem: async (root, args, context) => {
     // Restrict endpoint to admins
     if (!context.user.admin) {
       throw new GraphQLError("You do not have permission to access the createItem endpoint");
     }
 
-    if (!args.newItem.item_name.trim().length) {
-      throw new GraphQLError("The item name (item_name) can't be empty.");
+    if (!args.newItem.name.trim().length) {
+      throw new GraphQLError("The item name can't be empty.");
     }
 
     if (!args.newItem.category.trim().length) {
@@ -63,28 +61,37 @@ export const Mutation: IResolvers = {
       );
     }
 
-    const categoryObj = { category_name: args.newItem.category };
-    const category_id = await findOrCreate("categories", categoryObj, categoryObj, "category_id");
-
-    const locationObj = {
-      location_name: args.newItem.location,
-    };
-    const location_id = await findOrCreate("locations", locationObj, locationObj, "location_id");
-
-    delete args.newItem.category; // Remove the category property from the input item so knex won't try to add it to the database
-    delete args.newItem.location;
-
-    const newObjId = await DB.from("items")
-      .returning("item_id")
-      .insert({
-        category_id,
-        location_id,
+    const item = await prisma.item.create({
+      data: {
         ...args.newItem,
-      });
+        category: {
+          connectOrCreate: {
+            where: {
+              name: args.newItem.category,
+            },
+            create: {
+              name: args.newItem.category,
+            },
+          },
+        },
+        location: {
+          connectOrCreate: {
+            where: {
+              name: args.newItem.location,
+            },
+            create: {
+              name: args.newItem.location,
+            },
+          },
+        },
+      },
+      include: {
+        category: true,
+        location: true,
+      },
+    });
 
-    console.log("The new item's ID is", newObjId[0]);
-
-    return await getItem(newObjId[0], context.user.admin);
+    return await populateItem(item, context.user.admin);
   },
   /**
    * Update an existing item given its ID
@@ -94,7 +101,7 @@ export const Mutation: IResolvers = {
    * @param args
    * @param context
    */
-  updateItem: async (root, args, context): Promise<Item | null> => {
+  updateItem: async (root, args, context) => {
     // Restrict endpoint to admins
     if (!context.user.admin) {
       throw new GraphQLError("You do not have permission to access the updateItem endpoint");
@@ -106,8 +113,8 @@ export const Mutation: IResolvers = {
       );
     }
 
-    if (!args.updatedItem.item_name.trim().length) {
-      throw new GraphQLError("The item name (item_name) can't be empty.");
+    if (!args.updatedItem.name.trim().length) {
+      throw new GraphQLError("The item name can't be empty.");
     }
 
     if (!args.updatedItem.category.trim().length) {
@@ -136,36 +143,51 @@ export const Mutation: IResolvers = {
       );
     }
 
-    const categoryObj = { category_name: args.updatedItem.category };
-    const category_id = await findOrCreate("categories", categoryObj, categoryObj, "category_id");
-
-    const locationObj = {
-      location_name: args.updatedItem.location,
-    };
-    const location_id = await findOrCreate("locations", locationObj, locationObj, "location_id");
-
-    delete args.updatedItem.category; // Remove the category property from the input item so knex won't try to add it to the database
-    delete args.updatedItem.location;
-    await DB.from("items")
-      .where({ item_id: args.id })
-      .update({
-        category_id,
-        location_id,
+    const item = await prisma.item.update({
+      where: {
+        id: args.id,
+      },
+      data: {
         ...args.updatedItem,
-      });
+        category: {
+          connectOrCreate: {
+            where: {
+              name: args.updatedItem.category,
+            },
+            create: {
+              name: args.updatedItem.category,
+            },
+          },
+        },
+        location: {
+          connectOrCreate: {
+            where: {
+              name: args.updatedItem.location,
+            },
+            create: {
+              name: args.updatedItem.location,
+            },
+          },
+        },
+      },
+      include: {
+        category: true,
+        location: true,
+      },
+    });
 
-    return await getItem(args.id, context.user.admin);
+    return await populateItem(item, context.user.admin);
   },
-  createRequest: async (root, args, context): Promise<Request> => {
+  createRequest: async (root, args, context) => {
     // if non-admin, user on request must be user signed in
-    if (!context.user.admin && context.user.uuid !== args.newRequest.user_id) {
+    if (!context.user.admin && context.user.uuid !== args.newRequest.userId) {
       throw new GraphQLError(
         "Unable to create request because you are not an admin and your UUID " +
           "does not match the UUID of the user this request is for"
       );
     }
 
-    const user = await getUser(args.newRequest.user_id);
+    const user = await getUser(args.newRequest.userId);
 
     // check requests_allowed setting status
     let requests_allowed;
@@ -182,11 +204,11 @@ export const Mutation: IResolvers = {
     }
 
     // fetch the item
-    const item: Item | null = await getItem(args.newRequest.request_item_id, context.user.admin);
+    const item: Item | null = await getItem(args.newRequest.itemId, context.user.admin);
 
     if (!item) {
       throw new GraphQLError(
-        `Can't create request for item that doesn't exist!  Item ID provided: ${args.newRequest.request_item_id}`
+        `Can't create request for item that doesn't exist!  Item ID provided: ${args.newRequest.itemId}`
       );
     }
 
@@ -214,16 +236,17 @@ export const Mutation: IResolvers = {
         ? "APPROVED"
         : "SUBMITTED";
 
-    let newRequest: any = await DB.from("requests")
-      .insert({
+    const newRequest = await prisma.request.create({
+      data: {
         ...args.newRequest,
         status: initialStatus,
-      })
-      .returning(["request_id", "quantity", "status", "created_at", "updated_at"]);
+      },
+      include: {
+        user: true,
+      },
+    });
 
-    // eslint-disable-next-line prefer-destructuring
-    newRequest = newRequest[0];
-    const updatedItem = await getItem(args.newRequest.request_item_id, context.user.admin);
+    const updatedItem = await getItem(args.newRequest.itemId, context.user.admin);
     if (!updatedItem) {
       throw new GraphQLError("Unable to retrieve the new item information after creating request");
     }
@@ -234,7 +257,6 @@ export const Mutation: IResolvers = {
       ...simpleRequest,
       user,
       item: updatedItem,
-      location: updatedItem.location,
     };
 
     pubsub.publish(REQUEST_CHANGE, {
@@ -242,30 +264,30 @@ export const Mutation: IResolvers = {
     });
 
     return {
-      request_id: newRequest.request_id,
+      id: newRequest.id,
       quantity: args.newRequest.quantity,
       status: initialStatus,
       item: updatedItem,
       location: updatedItem.location,
       user,
-      createdAt: localTimestamp(newRequest.created_at),
-      updatedAt: localTimestamp(newRequest.updated_at),
+      createdAt: localTimestamp(newRequest.createdAt),
+      updatedAt: localTimestamp(newRequest.updatedAt),
     };
   },
-  deleteRequest: async (root, args, context): Promise<boolean> => {
+  deleteRequest: async (root, args, context) => {
     if (!context.user.admin) {
       throw new GraphQLError("You do not have permission to access the deleteRequest endpoint.");
     }
 
-    const numRowsAffected: number = await DB.from("requests")
-      .where({
-        request_id: args.id,
-      })
-      .del();
+    await prisma.request.delete({
+      where: {
+        id: args.id,
+      },
+    });
 
-    return numRowsAffected !== 0;
+    return true;
   },
-  updateRequest: async (root, args, context): Promise<Request | null> => {
+  updateRequest: async (root, args, context) => {
     if (!context.user.admin) {
       throw new GraphQLError("You do not have permission to access the updateRequest endpoint.");
     }
@@ -274,53 +296,44 @@ export const Mutation: IResolvers = {
 
     // Not going to validate against maxRequestQty since only admins can change this currently
 
-    const newQuantity: number | undefined = args.updatedRequest.new_quantity;
-    if (newQuantity && newQuantity <= 0) {
+    const { quantity } = args.updatedRequest;
+    if (quantity && quantity <= 0) {
       throw new GraphQLError(
-        `Invalid new requested quantity of ${newQuantity} specified.  The new requested quantity must be >= 1.`
+        `Invalid new requested quantity of ${quantity} specified.  The new requested quantity must be >= 1.`
       );
     }
 
     // TODO: status change validation logic
-    if (args.updatedRequest.new_status) {
-      updateObj.status = args.updatedRequest.new_status;
+    if (args.updatedRequest.status) {
+      updateObj.status = args.updatedRequest.status;
     }
 
-    if (args.updatedRequest.new_quantity) {
-      updateObj.quantity = args.updatedRequest.new_quantity;
+    if (args.updatedRequest.quantity) {
+      updateObj.quantity = args.updatedRequest.quantity;
     }
 
     let updatedUserHaveID = null;
-    if (typeof args.updatedRequest.user_haveID !== "undefined") {
-      updatedUserHaveID = args.updatedRequest.user_haveID;
+    if (typeof args.updatedRequest.userHaveId !== "undefined") {
+      updatedUserHaveID = args.updatedRequest.userHaveId;
     }
 
     if (Object.keys(updateObj).length >= 1) {
-      updateObj.updated_at = new Date();
+      updateObj.updatedAt = new Date();
 
-      const updatedRequest: any = await DB.from("requests")
-        .where({
-          request_id: args.updatedRequest.request_id,
-        })
-        .update(updateObj)
-        .returning([
-          "request_id",
-          "quantity",
-          "status",
-          "created_at",
-          "updated_at",
-          "user_id",
-          "request_item_id",
-        ]);
+      const updatedRequest = await prisma.request.update({
+        where: {
+          id: args.updatedRequest.id,
+        },
+        data: updateObj,
+      });
 
-      const simpleRequest = RequestController.toSimpleRequest(updatedRequest[0]);
-      console.log(simpleRequest);
+      const simpleRequest = RequestController.toSimpleRequest(updatedRequest);
 
       let user: User | null;
       if (updatedUserHaveID !== null) {
         user = await updateUser(
           {
-            uuid: updatedRequest[0].user_id,
+            uuid: updatedRequest.userId,
             updatedUser: {
               haveID: updatedUserHaveID,
             },
@@ -328,7 +341,7 @@ export const Mutation: IResolvers = {
           context
         );
       } else {
-        user = await getUser(updatedRequest[0].user_id);
+        user = await getUser(updatedRequest.userId);
       }
 
       if (!user) {
@@ -336,20 +349,15 @@ export const Mutation: IResolvers = {
       }
 
       // fetch the item
-      const item: Item | null = await getItem(
-        updatedRequest[0].request_item_id,
-        context.user.admin
-      );
-
-      const location: Location | null = ItemController.getItemLocation(item);
+      const item = await getItem(updatedRequest.itemId, context.user.admin);
 
       if (!item) {
         throw new GraphQLError(
-          `Can't create request for item that doesn't exist!  Item ID provided: ${args.newRequest.request_item_id}`
+          `Can't create request for item that doesn't exist!  Item ID provided: ${updatedRequest.itemId}`
         );
       }
 
-      if (updatedRequest.length === 0) {
+      if (updatedRequest === null) {
         return null;
       }
 
@@ -357,7 +365,6 @@ export const Mutation: IResolvers = {
         ...simpleRequest,
         user,
         item,
-        location,
       };
 
       pubsub.publish(REQUEST_CHANGE, {
@@ -369,8 +376,8 @@ export const Mutation: IResolvers = {
 
     return null;
   },
-  updateUser: async (root, args, context): Promise<User | null> => await updateUser(args, context),
-  createSetting: async (root, args, context): Promise<Setting> => {
+  updateUser: async (root, args, context) => await updateUser(args, context),
+  createSetting: async (root, args, context) => {
     // Restrict endpoint to admins
     if (!context.user.admin) {
       throw new GraphQLError("You do not have permission to access the createSetting endpoint");
@@ -384,19 +391,11 @@ export const Mutation: IResolvers = {
       throw new GraphQLError("The value for this setting can't be blank.");
     }
 
-    const newObjName = await DB.from<Setting>("settings")
-      .insert({
-        name: args.newSetting.name,
-        value: args.newSetting.value,
-      })
-      .returning("name");
+    const setting = await prisma.setting.create({
+      data: args.newSetting,
+    });
 
-    console.log("The new setting's name is", newObjName[0]);
-
-    return {
-      name: newObjName[0],
-      value: args.newSetting.value,
-    };
+    return setting;
   },
   /**
    * Update an existing setting given its name
@@ -404,7 +403,7 @@ export const Mutation: IResolvers = {
    * @param args
    * @param context
    */
-  updateSetting: async (root, args, context): Promise<Setting> => {
+  updateSetting: async (root, args, context) => {
     // Restrict endpoint to admins
     if (!context.user.admin) {
       throw new GraphQLError("You do not have permission to access the updateSetting endpoint");
@@ -418,14 +417,13 @@ export const Mutation: IResolvers = {
       throw new GraphQLError("The value can't be empty.");
     }
 
-    await DB.from("settings").where({ name: args.name }).update({
-      name: args.updatedSetting.name,
-      value: args.updatedSetting.value,
+    const setting = await prisma.setting.update({
+      where: {
+        name: args.name,
+      },
+      data: args.updatedSetting,
     });
 
-    return {
-      name: args.updatedSetting.name,
-      value: args.updatedSetting.value,
-    };
+    return setting;
   },
 };

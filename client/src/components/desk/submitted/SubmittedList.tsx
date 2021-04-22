@@ -38,7 +38,7 @@ class SubmittedList extends Component<SubmittedListProps> {
         length={this.props.requests.length}
         filter={requestSearch}
         cards={this.props.requests}
-        render={(request: any) => <SubmittedCard key={request.request_id} request={request} />}
+        render={(request: any) => <SubmittedCard key={request.id} request={request} />}
         empty={empty}
       />
     );

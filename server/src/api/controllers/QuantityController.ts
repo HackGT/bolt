@@ -1,6 +1,6 @@
 import { RequestStatus } from "../graphql.types";
-import { DB } from "../../database";
 import { ItemController } from "./ItemController";
+import { prisma } from "../../common";
 
 interface QuantitiesInStatus {
   [statusName: string]: number;
@@ -148,18 +148,20 @@ export class QuantityController {
       ];
     }
 
-    const DBQuantities: any = await DB.from("requests")
-      .where(builder => {
-        const whereInStatus = builder.whereIn("status", selectStatuses);
-        if (itemIds.length > 0) {
-          return whereInStatus.whereIn("request_item_id", itemIds);
-        }
-
-        return whereInStatus;
-      })
-      .groupBy(["request_item_id", "status"])
-      .select(["request_item_id", "status"])
-      .sum("quantity");
+    const quantities = await prisma.request.groupBy({
+      by: ["itemId", "status"],
+      sum: {
+        quantity: true,
+      },
+      where: {
+        status: {
+          in: selectStatuses.length === 0 ? undefined : selectStatuses,
+        },
+        itemId: {
+          in: itemIds.length === 0 ? undefined : itemIds,
+        },
+      },
+    });
 
     const baseObj: any = {};
     for (let i = 0; i < selectStatuses.length; i++) {
@@ -167,15 +169,15 @@ export class QuantityController {
     }
 
     const result: any = {};
-    for (let i = 0; i < DBQuantities.length; i++) {
-      const item = DBQuantities[i];
-      const requestItemId = item.request_item_id;
+    for (let i = 0; i < quantities.length; i++) {
+      const item = quantities[i];
+      const requestItemId = item.itemId;
 
       if (!Object.prototype.hasOwnProperty.call(result, requestItemId.toString(10))) {
         result[requestItemId] = { ...baseObj }; // make a copy of baseObj
       }
 
-      result[requestItemId][item.status] = parseInt(item.sum);
+      result[requestItemId][item.status] = item.sum.quantity;
       result[requestItemId].total =
         result[requestItemId][item.status] + (result[requestItemId].total || 0);
     }

@@ -9,6 +9,6 @@ export function onlyIfAdmin(val: any, isAdmin: boolean) {
   return isAdmin ? val : null;
 }
 
-export function localTimestamp(createdAt: string): string {
+export function localTimestamp(createdAt: Date): string {
   return moment(createdAt).toISOString(true);
 }

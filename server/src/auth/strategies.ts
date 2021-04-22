@@ -5,13 +5,13 @@ import { URL } from "url";
 import * as passport from "passport";
 import { Strategy as OAuthStrategy } from "passport-oauth2";
 import { NextFunction, Request, Response } from "express";
+import { User } from "@prisma/client";
 
-import { createRecord, DB, findUserByID, IUser } from "../database";
-import { config } from "../common";
+import { config, prisma } from "../common";
 
 type PassportDone = (
   err: Error | null,
-  user?: IUser | false,
+  user?: User | false,
   errMessage?: { message: string }
 ) => void;
 type PassportProfileDone = (err: Error | null, profile?: IProfile) => void;
@@ -61,7 +61,16 @@ export class GroundTruthStrategy extends OAuthStrategy {
     profile: IProfile,
     done: PassportDone
   ): Promise<void> {
-    let user = await findUserByID(profile.uuid);
+    const domain = profile.email.split("@").pop();
+    const isAdmin =
+      (domain && config.admins.domains.includes(domain)) ||
+      config.admins.emails.includes(profile.email);
+
+    let user = await prisma.user.findUnique({
+      where: {
+        uuid: profile.uuid,
+      },
+    });
 
     if (!user) {
       const { scopes } = profile;
@@ -71,36 +80,29 @@ export class GroundTruthStrategy extends OAuthStrategy {
         return;
       }
 
-      const adminBecauseHackGTMember = profile.member || false;
-      const createProfile = profile;
-
-      delete createProfile.scopes;
-      delete createProfile.nameParts; // Basically ignore the Ground Truth nameParts field for now
-      delete createProfile.member;
-
-      user = await createRecord<IUser>("users", {
-        ...GroundTruthStrategy.defaultUserProperties,
-        ...createProfile,
-        slackUsername: scopes.slack,
-        phone: scopes.phone,
-        admin: adminBecauseHackGTMember,
+      user = await prisma.user.create({
+        data: {
+          name: profile.name,
+          uuid: profile.uuid,
+          email: profile.email,
+          token: profile.token,
+          slackUsername: scopes.slack,
+          phone: scopes.phone,
+          admin: isAdmin,
+        },
       });
     } else {
-      user.token = accessToken;
-
-      if (profile.member) {
-        user.admin = true;
-      }
+      user = await prisma.user.update({
+        where: {
+          uuid: profile.uuid,
+        },
+        data: {
+          token: accessToken,
+          admin: isAdmin || user.admin,
+        },
+      });
     }
 
-    const domain = user.email.split("@").pop();
-    if (domain && config.admins.domains.includes(domain)) {
-      user.admin = true;
-    }
-    if (config.admins.emails.includes(profile.email)) {
-      user.admin = true;
-    }
-    await DB.from("users").where({ uuid: user.uuid }).update(user);
     done(null, user);
   }
 

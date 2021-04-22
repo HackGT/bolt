@@ -43,11 +43,9 @@ function SubmittedCard({ request }: SubmittedCardProps) {
         </Label>
 
         <Header style={{ display: "inline-block" }} size="medium">
-          <ItemAndQuantity itemName={request.item.item_name} quantity={request.quantity} />
+          <ItemAndQuantity itemName={request.item.name} quantity={request.quantity} />
           &nbsp;
-          <span style={{ color: "gray", fontSize: 14, fontWeight: "normal" }}>
-            #{request.request_id}
-          </span>
+          <span style={{ color: "gray", fontSize: 14, fontWeight: "normal" }}>#{request.id}</span>
         </Header>
       </Card.Content>
       {request.item.qtyAvailableForApproval >= request.quantity
@@ -78,8 +76,8 @@ function SubmittedCard({ request }: SubmittedCardProps) {
                     updateRequest({
                       variables: {
                         updatedRequest: {
-                          request_id: request.request_id,
-                          new_status: DENIED,
+                          id: request.id,
+                          status: DENIED,
                         },
                       },
                     })
@@ -103,8 +101,8 @@ function SubmittedCard({ request }: SubmittedCardProps) {
                     updateRequest({
                       variables: {
                         updatedRequest: {
-                          request_id: request.request_id,
-                          new_status: APPROVED,
+                          id: request.id,
+                          status: APPROVED,
                         },
                       },
                     })

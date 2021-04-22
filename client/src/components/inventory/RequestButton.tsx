@@ -60,8 +60,8 @@ const RequestButton: React.FC<Props> = ({ requestedItem, user, toastManager }) =
               createRequest({
                 variables: {
                   newRequest: {
-                    user_id: requestedItem.user,
-                    request_item_id: requestedItem.id,
+                    userId: requestedItem.user,
+                    itemId: requestedItem.id,
                     quantity: requestedItem.qtyRequested,
                   },
                 },

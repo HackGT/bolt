@@ -1,13 +1,13 @@
 import React from "react";
 import { Header, Icon } from "semantic-ui-react";
 
-const HardwareLocation = ({ location_name }: any) => (
+const HardwareLocation = ({ name }: any) => (
   <div>
     <Header size="large">
       <Icon name="building" />
-      {location_name}
+      {name}
     </Header>
-    <p>These items are available from {location_name}. Pick them up and return them there.</p>
+    <p>These items are available from {name}. Pick them up and return them there.</p>
   </div>
 );
 

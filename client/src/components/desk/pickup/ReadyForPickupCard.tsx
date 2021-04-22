@@ -37,12 +37,12 @@ function ReadyForPickupCard({ card }: ReadyForPickupCardProps) {
         ""
       )}
       {card.requests.map(request => (
-        <Card.Content key={request.request_id}>
+        <Card.Content key={request.id}>
           <strong>
-            <ItemAndQuantity quantity={request.quantity} itemName={request.item.item_name} />
+            <ItemAndQuantity quantity={request.quantity} itemName={request.item.name} />
           </strong>
           &nbsp;
-          <span style={{ color: "gray" }}>#{request.request_id}</span>
+          <span style={{ color: "gray" }}>#{request.id}</span>
           <div style={{ display: "inline", float: "right" }}>
             <Popup
               inverted
@@ -53,9 +53,7 @@ function ReadyForPickupCard({ card }: ReadyForPickupCardProps) {
                   basic
                   loading={loading}
                   size="tiny"
-                  onClick={event =>
-                    updateRequestStatus(updateRequest, request.request_id, APPROVED)
-                  }
+                  onClick={event => updateRequestStatus(updateRequest, request.id, APPROVED)}
                 >
                   <Icon className="hw-negative" name="arrow left" />
                 </Button>
@@ -112,7 +110,7 @@ function ReadyForPickupCard({ card }: ReadyForPickupCardProps) {
                   loading={loading}
                   onClick={event =>
                     card.requests.forEach(request =>
-                      updateRequestStatus(updateRequest, request.request_id, APPROVED)
+                      updateRequestStatus(updateRequest, request.id, APPROVED)
                     )
                   }
                 >

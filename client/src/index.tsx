@@ -49,16 +49,16 @@ export const client = new ApolloClient({
     typePolicies: {
       // specify custom primary keys for certain types for caching
       Location: {
-        keyFields: ["location_id"],
+        keyFields: ["id"],
       },
       Category: {
-        keyFields: ["category_id"],
+        keyFields: ["id"],
       },
       User: {
         keyFields: ["uuid"],
       },
       Request: {
-        keyFields: ["request_id"],
+        keyFields: ["id"],
       },
       Setting: {
         keyFields: ["name"],

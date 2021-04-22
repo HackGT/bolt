@@ -1,15 +1,14 @@
 import { GraphQLError } from "graphql";
-import { IResolvers } from "graphql-tools";
 
-import { DB } from "../../database";
 import { onlyIfAdmin } from "../util";
-import { Category, Item, Location, Request, RequestStatus, Setting, User } from "../graphql.types";
+import { QueryResolvers, RequestStatus } from "../graphql.types";
 import { QuantityController } from "../controllers/QuantityController";
 import { ItemController } from "../controllers/ItemController";
 import { getItem, getSetting } from "./common";
 import { RequestController } from "../controllers/RequestController";
+import { prisma } from "../../common";
 
-export const Query: IResolvers = {
+export const Query: QueryResolvers = {
   /* Queries */
   /**
    * Returns information about the current signed in user
@@ -18,7 +17,7 @@ export const Query: IResolvers = {
    * @param args
    * @param context
    */
-  user: async (root, args, context): Promise<User> => ({
+  user: async (root, args, context) => ({
     uuid: context.user.uuid,
     name: context.user.name,
     email: context.user.email,
@@ -27,7 +26,7 @@ export const Query: IResolvers = {
     haveID: context.user.haveID,
     admin: context.user.admin,
   }),
-  users: async (root, args, context): Promise<User[]> => {
+  users: async (root, args, context) => {
     let searchObj = args.search;
 
     // Restrict results to current user for non-admins
@@ -37,17 +36,20 @@ export const Query: IResolvers = {
       };
     }
 
-    const colNames: string[] = [
-      "uuid",
-      "name",
-      "haveID",
-      "phone",
-      "email",
-      "slackUsername",
-      "admin",
-    ];
-
-    return await DB.from("users").where(searchObj).select(colNames).orderBy("name");
+    return await prisma.user.findMany({
+      where: {
+        uuid: searchObj.uuid || undefined,
+        name: searchObj.name || undefined,
+        haveID: searchObj.haveID || undefined,
+        phone: searchObj.phone || undefined,
+        email: searchObj.email || undefined,
+        slackUsername: searchObj.slackUsername || undefined,
+        admin: searchObj.admin || undefined,
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
   },
   /**
    * Returns information about a single item
@@ -57,8 +59,7 @@ export const Query: IResolvers = {
    * @param args
    * @param context
    */
-  item: async (root, args, context): Promise<Item | null> =>
-    await getItem(args.id, context.user.admin),
+  item: async (root, args, context) => await getItem(args.id, context.user.admin),
   /**
    * Bulk items API
    * TODO: pagination/returned quantity limit
@@ -67,65 +68,68 @@ export const Query: IResolvers = {
    * @param args
    * @param context
    */
-  allItems: async (root, args, context): Promise<Item[]> => {
+  allItems: async (root, args, context) => {
     const itemsSearchObj: any = {};
     const locationsSearchObj: any = {};
     if (!context.user.admin) {
       itemsSearchObj.hidden = false;
-      locationsSearchObj.location_hidden = false;
+      locationsSearchObj.hidden = false;
     }
-    const items = await DB.from("items")
-      .where(itemsSearchObj)
-      .join("categories", "items.category_id", "=", "categories.category_id");
+    const items = await prisma.item.findMany({
+      where: itemsSearchObj,
+      include: {
+        location: true,
+        category: true,
+      },
+    });
 
-    const locations: Location[] = await DB.from("locations").where(locationsSearchObj);
+    const locations = await prisma.location.findMany({
+      where: locationsSearchObj,
+    });
 
     const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await QuantityController.all();
     const itemsByLocation: any = {};
     for (let i = 0; i < locations.length; i++) {
       const loc = locations[i];
 
-      const itemsAtLocation = items.filter(predItem => predItem.location_id === loc.location_id);
+      const itemsAtLocation = items.filter(predItem => predItem.locationId === loc.id);
       const itemsByCategory: any = {};
 
       for (let j = 0; j < itemsAtLocation.length; j++) {
         const item = itemsAtLocation[j];
 
-        if (!Object.prototype.hasOwnProperty.call(itemsByCategory, item.category_id)) {
-          itemsByCategory[item.category_id] = {
+        if (!Object.prototype.hasOwnProperty.call(itemsByCategory, item.categoryId)) {
+          itemsByCategory[item.categoryId] = {
             category: {
-              category_id: item.category_id,
-              category_name: item.category_name,
+              id: item.categoryId,
+              name: item.category.name,
             },
             items: [],
           };
         }
-        itemsByCategory[item.category_id].items.push({
+        itemsByCategory[item.categoryId].items.push({
           ...item,
-          id: item.item_id,
-          category: item.category_name,
-          location: loc,
           price: onlyIfAdmin(item.price, context.user.admin),
           owner: onlyIfAdmin(item.owner, context.user.admin),
-          qtyInStock: qtyInStock[item.item_id],
-          qtyUnreserved: qtyUnreserved[item.item_id],
-          qtyAvailableForApproval: qtyAvailableForApproval[item.item_id],
+          qtyInStock: qtyInStock[item.id],
+          qtyUnreserved: qtyUnreserved[item.id],
+          qtyAvailableForApproval: qtyAvailableForApproval[item.id],
         });
       }
 
-      itemsByLocation[loc.location_id] = {
+      itemsByLocation[loc.id] = {
         location: loc,
         categories: Object.values(itemsByCategory).sort((a: any, b: any) =>
-          a.category.category_name.localeCompare(b.category.category_name)
+          a.category.name.localeCompare(b.category.name)
         ),
       };
     }
 
     return Object.values(itemsByLocation);
   },
-  categories: (): Promise<Category[]> => DB.from("categories"),
-  locations: (): Promise<Location[]> => DB.from("locations"),
-  itemStatistics: async (root, args, context): Promise<Item[]> => {
+  categories: async () => await prisma.category.findMany(),
+  locations: async () => await prisma.location.findMany(),
+  itemStatistics: async (root, args, context) => {
     if (!context.user.admin) {
       // TODO: validate this
       throw new GraphQLError("You do not have permission to access this endpoint");
@@ -135,7 +139,7 @@ export const Query: IResolvers = {
     const detailedQuantities = await QuantityController.quantityStatistics();
 
     return items.map((item: any) => {
-      const qtyInfo = detailedQuantities[item.item_id] || {
+      const qtyInfo = detailedQuantities[item.id] || {
         SUBMITTED: 0,
         APPROVED: 0,
         DENIED: 0,
@@ -154,19 +158,19 @@ export const Query: IResolvers = {
       };
     });
   },
-  requests: async (root, args, context): Promise<Request[]> => {
+  requests: async (root, args, context) => {
     const searchObj: any = {};
 
-    if (args.search.item_id) {
-      searchObj.item_id = args.search.item_id;
+    if (args.search.itemId) {
+      searchObj.itemId = args.search.itemId;
     }
 
-    if (args.search.request_id) {
-      searchObj.request_id = args.search.request_id;
+    if (args.search.id) {
+      searchObj.id = args.search.id;
     }
 
-    if (args.search.user_id) {
-      searchObj.user_id = args.search.user_id;
+    if (args.search.userId) {
+      searchObj.userId = args.search.userId;
     }
 
     let statuses: RequestStatus[] = [
@@ -189,47 +193,49 @@ export const Query: IResolvers = {
     // If user is not an admin
     if (!context.user.admin) {
       // then if they are requesting requests for a user that is not themselves
-      if (args.search.user_id && args.search.user_id !== context.user.uuid) {
+      if (args.search.userId && args.search.userId !== context.user.uuid) {
         // return an empty array and avoid making a DB query
         return [];
       }
 
       // otherwise, restrict their results to just their user ID
-      searchObj.user_id = context.user.uuid;
-      searchObj.location_hidden = false; // don't show hidden locations
-      searchObj.hidden = false; // don't show hidden items
+      searchObj.userId = context.user.uuid;
+      searchObj.item.location.hidden = false; // don't show hidden locations
+      searchObj.item.hidden = false; // don't show hidden items
     }
 
-    const requests = await DB.from("requests")
-      .whereIn("status", statuses)
-      .andWhere(searchObj)
-      .join("users", "requests.user_id", "=", "users.uuid")
-      .join("items", "requests.request_item_id", "=", "items.item_id")
-      .join("categories", "categories.category_id", "=", "items.category_id")
-      .join("locations", "locations.location_id", "=", "items.location_id")
-      .orderBy("requests.created_at", "asc");
+    const requests = await prisma.request.findMany({
+      where: {
+        status: {
+          in: statuses.length === 0 ? undefined : statuses,
+        },
+        ...searchObj,
+      },
+      include: {
+        user: true,
+        item: {
+          include: {
+            category: true,
+            location: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
 
     const items: number[] = [];
 
     requests.forEach(value => {
-      if (items.indexOf(value.request_item_id) === -1) {
-        items.push(value.request_item_id);
+      if (items.indexOf(value.itemId) === -1) {
+        items.push(value.itemId);
       }
     });
 
-    const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await QuantityController.all(
-      items
-    );
-
     return requests.map(request =>
-      RequestController.toNestedRequest(
-        request,
-        context.user.admin,
-        qtyInStock,
-        qtyAvailableForApproval,
-        qtyUnreserved
-      )
+      RequestController.toNestedRequest(request, context.user.admin, items)
     );
   },
-  setting: async (root, args): Promise<Setting | null> => await getSetting(args.name),
+  setting: async (root, args) => await getSetting(args.name),
 };

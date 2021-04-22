@@ -25,20 +25,15 @@ function mapStateToProps(state: any) {
   return {};
 }
 
-function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], location_id = 0) {
+function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], id = 0) {
   return requests.filter(
     (r: Request) =>
-      (location_id === 0 || r.item.location.location_id === location_id) &&
-      statuses.some(status => r.status === status)
+      (id === 0 || r.item.location.id === id) && statuses.some(status => r.status === status)
   );
 }
 
-function getConsolidatedRequestsWithStatus(
-  requests: Request[],
-  statuses: RequestStatus[],
-  location_id = 0
-) {
-  const filteredRequests = getRequestsWithStatus(requests, statuses, location_id);
+function getConsolidatedRequestsWithStatus(requests: Request[], statuses: RequestStatus[], id = 0) {
+  const filteredRequests = getRequestsWithStatus(requests, statuses, id);
   const requestsByUser: any = {};
 
   for (let i = 0; i < filteredRequests.length; i++) {
@@ -82,21 +77,21 @@ function getUpdateQuery() {
     if (!subscriptionData.data) {
       return prev;
     }
-    const updatedRequest = subscriptionData.data;
-    const index = prev.requests.findIndex(
-      (x: any) => x.request_id === updatedRequest.request_change.request_id
-    );
+    const updatedRequest = subscriptionData.data.requestChange;
+    const index: number = prev.requests.findIndex((x: any) => x.id === updatedRequest.id);
 
-    const { requests } = prev;
+    const requests = prev.requests.map((request: any) => ({ ...request }));
 
     if (index === -1) {
       // request wasn't returned with original query; add it to array of requests
       // If adding a new request to the array of requests, you have to do it this way rather than just pushing to the array
-      return { ...prev, requests: [updatedRequest.request_change, ...prev.requests] };
-    } // request was returned with original query; update it
-    requests[index] = updatedRequest.request_change;
+      return { ...prev, requests: [updatedRequest, ...prev.requests] };
+    }
 
-    return { requests };
+    // request was returned with original query; update it
+    requests[index] = updatedRequest;
+
+    return { ...prev, requests };
   };
 }
 
@@ -135,12 +130,11 @@ function DeskContainer() {
         <Select
           placeholder="Select a location"
           options={query.data.locations.map((locationOption: Location) => ({
-            key: locationOption.location_id,
-            value: locationOption.location_id,
-            text: locationOption.location_name,
+            key: locationOption.id,
+            value: locationOption.id,
+            text: locationOption.name,
           }))}
           onChange={(event: React.SyntheticEvent<HTMLElement>, data: DropdownProps): void => {
-            console.log(data);
             const { value }: { value?: any } = data;
             setLocation(value);
           }}
@@ -175,9 +169,9 @@ function DeskContainer() {
               placeholder="Select a location"
               value={location}
               options={query.data.locations.map((locationOption: Location) => ({
-                key: locationOption.location_id,
-                value: locationOption.location_id,
-                text: locationOption.location_name,
+                key: locationOption.id,
+                value: locationOption.id,
+                text: locationOption.name,
               }))}
               onChange={(event: React.SyntheticEvent<HTMLElement>, data: DropdownProps): void => {
                 const { value }: { value?: any } = data;

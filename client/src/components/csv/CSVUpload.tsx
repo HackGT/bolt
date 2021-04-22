@@ -3,7 +3,7 @@ import { Button, Container, Header, Label } from "semantic-ui-react";
 import { withToastManager } from "react-toast-notifications";
 import { unformat } from "accounting";
 
-import { ItemComplete } from "../item/ItemEditForm";
+import { Item } from "../../types/Hardware";
 
 const templateHeader = [
   "Name",
@@ -32,7 +32,7 @@ const typeBool = (field: string) => field === "1";
 const fieldInfo: {
   [field: string]: { index: number; typer: (field: string) => any; kw: string[] };
 } = {
-  item_name: { index: 0, typer: typeString, kw: ["name"] },
+  name: { index: 0, typer: typeString, kw: ["name"] },
   description: { index: 1, typer: typeString, kw: ["desc"] },
   totalAvailable: { index: 2, typer: typeNumber, kw: ["total"] },
   maxRequestQty: { index: 3, typer: typeNumber, kw: ["max"] },
@@ -56,7 +56,7 @@ Object.keys(fieldInfo).forEach(field => {
 });
 
 interface UploadProps {
-  setInventory: (inventory: ItemComplete[]) => any;
+  setInventory: (inventory: Item[]) => any;
   toastManager: any;
 }
 
@@ -114,7 +114,7 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
         });
       });
 
-      const items: ItemComplete[] = [];
+      const items: Item[] = [];
       this.addLog("Starting CSV parse");
       for (let i = 1; i < lines.length; i++) {
         const fields = lines[i].split("\t");
@@ -140,8 +140,8 @@ class UploadStep extends React.Component<UploadProps, UploadState> {
           const rawField: string = fields[index];
           newItem[key] = typer(rawField);
         });
-        this.addLog(`${newItem.item_name} added: Quantity ${newItem.totalAvailable}`);
-        items.push(newItem as ItemComplete);
+        this.addLog(`${newItem.name} added: Quantity ${newItem.totalAvailable}`);
+        items.push(newItem as Item);
       }
       setInventory(items);
     });

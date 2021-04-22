@@ -1,5 +1,5 @@
 import { BaseUserWithID, FullUser } from "./User";
-import { HwItem } from "./Hardware";
+import { Item } from "./Hardware";
 
 export type RequestStatus =
   | "SUBMITTED"
@@ -14,9 +14,9 @@ export type RequestStatus =
   | "DAMAGED";
 
 export interface Request {
-  request_id: number;
+  id: number;
   user: FullUser;
-  item: HwItem;
+  item: Item;
   status: RequestStatus;
   location: Location;
   quantity: number;

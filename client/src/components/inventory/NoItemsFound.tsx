@@ -6,7 +6,6 @@ import { connect } from "react-redux";
 import { AppState } from "../../state/Store";
 
 const NoItemsFound = ({ searchQuery, user }: any) => {
-  console.log("user", user);
   if (!searchQuery) {
     return (
       <Message style={{ marginTop: 10 }}>

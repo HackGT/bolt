@@ -37,13 +37,13 @@ const ItemDemandReport: React.FC = () => {
     () => [
       {
         name: "Location",
-        selector: "item.location.location_name",
+        selector: "item.location.name",
         sortable: true,
         grow: 2,
       },
       {
         name: "Item",
-        selector: "item.item_name",
+        selector: "item.name",
         sortable: true,
         grow: 2,
       },
@@ -211,7 +211,7 @@ const ItemDemandReport: React.FC = () => {
         columns={columns}
         data={calculatedData || []}
         dense
-        defaultSortField="item.location.location_name"
+        defaultSortField="item.location.name"
         fixedHeader
         pagination
         paginationComponentOptions={{

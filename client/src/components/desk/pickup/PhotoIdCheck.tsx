@@ -47,7 +47,7 @@ function PhotoIdCheck({
           loading={loading}
           onClick={event =>
             requests.forEach((request: any) =>
-              updateRequestStatus(updateRequest, request.request_id, FULFILLED)
+              updateRequestStatus(updateRequest, request.id, FULFILLED)
             )
           }
         >
@@ -58,7 +58,7 @@ function PhotoIdCheck({
           loading={loading}
           onClick={event =>
             requests.forEach((request: any) =>
-              updateRequestStatus(updateRequest, request.request_id, FULFILLED, true)
+              updateRequestStatus(updateRequest, request.id, FULFILLED, true)
             )
           }
         >
@@ -76,7 +76,7 @@ function PhotoIdCheck({
       loading={loading}
       onClick={event =>
         requests.forEach((request: any) =>
-          updateRequestStatus(updateRequest, request.request_id, FULFILLED)
+          updateRequestStatus(updateRequest, request.id, FULFILLED)
         )
       }
     >

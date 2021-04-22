@@ -12,20 +12,23 @@ export const CREATE_ITEM = gql`
   mutation createItem($newItem: ItemInput!) {
     createItem(newItem: $newItem) {
       id
-      item_name
+      name
       description
       imageUrl
-      category
       totalAvailable
       maxRequestQty
       hidden
       approvalRequired
       returnRequired
       owner
+      category {
+        id
+        name
+      }
       location {
-        location_id
-        location_name
-        location_hidden
+        id
+        name
+        hidden
       }
     }
   }
@@ -37,10 +40,9 @@ export const UPDATE_ITEM = gql`
   mutation updateItem($itemId: Int!, $updatedItem: ItemInput!) {
     updateItem(id: $itemId, updatedItem: $updatedItem) {
       id
-      item_name
+      name
       description
       imageUrl
-      category
       totalAvailable
       maxRequestQty
       hidden
@@ -48,10 +50,14 @@ export const UPDATE_ITEM = gql`
       returnRequired
       owner
       hidden
+      category {
+        id
+        name
+      }
       location {
-        location_id
-        location_name
-        location_hidden
+        id
+        name
+        hidden
       }
     }
   }
@@ -60,7 +66,7 @@ export const UPDATE_ITEM = gql`
 export const CREATE_REQUEST = gql`
   mutation createRequest($newRequest: RequestInput!) {
     createRequest(newRequest: $newRequest) {
-      request_id
+      id
       user {
         uuid
         name
@@ -68,14 +74,14 @@ export const CREATE_REQUEST = gql`
       }
       item {
         id
-        item_name
+        name
         qtyAvailableForApproval
         returnRequired
-      }
-      location {
-        location_id
-        location_name
-        location_hidden
+        location {
+          id
+          name
+          hidden
+        }
       }
       status
       quantity
@@ -88,7 +94,7 @@ export const CREATE_REQUEST = gql`
 export const UPDATE_REQUEST = gql`
   mutation updateRequest($updatedRequest: RequestUpdateInput!) {
     updateRequest(updatedRequest: $updatedRequest) {
-      request_id
+      id
       user {
         uuid
         name
@@ -99,13 +105,13 @@ export const UPDATE_REQUEST = gql`
       }
       item {
         id
-        item_name
+        name
         qtyAvailableForApproval
         returnRequired
         location {
-          location_id
-          location_name
-          location_hidden
+          id
+          name
+          hidden
         }
       }
       status

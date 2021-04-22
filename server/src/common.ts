@@ -2,8 +2,7 @@ import * as fs from "fs";
 import * as crypto from "crypto";
 import * as path from "path";
 import "passport";
-
-import { IUser } from "./database";
+import { PrismaClient, User as PrismaUser } from "@prisma/client";
 
 //
 // Config
@@ -216,7 +215,7 @@ export const COOKIE_OPTIONS = {
 
 declare global {
   namespace Express {
-    interface User extends IUser {}
+    interface User extends PrismaUser {}
   }
 }
 
@@ -226,3 +225,11 @@ declare module "express-session" {
     loginAction?: string;
   }
 }
+
+//
+// Prisma
+//
+
+export const prisma = new PrismaClient({
+  errorFormat: "pretty",
+});

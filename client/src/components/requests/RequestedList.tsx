@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, Container, Header, Icon, Label, Loader, Message, Step } from "semantic-ui-react";
 import { useQuery } from "@apollo/client";
+import _ from "lodash";
 
 import {
   ABANDONED,
@@ -65,12 +66,14 @@ function RequestedList({ user }: RequestedListProps) {
   }
 
   if (data.requests.length > 0) {
-    return data.requests
+    const sortedData = _.cloneDeep(data);
+
+    return sortedData.requests
       .sort(
         (a: Request, b: Request) =>
-          a.item.location.location_name.localeCompare(b.item.location.location_name) ||
-          a.item.item_name.localeCompare(b.item.item_name) ||
-          a.request_id - b.request_id
+          a.item.location.name.localeCompare(b.item.location.name) ||
+          a.item.name.localeCompare(b.item.name) ||
+          a.id - b.id
       )
       .map((r: Request) => {
         const returnInfo = r.item.returnRequired &&
@@ -94,7 +97,7 @@ function RequestedList({ user }: RequestedListProps) {
           <Card.Content>
             <Label attached="bottom">
               <Icon name="map marker alternate" />
-              Checked out at {r.item.location.location_name}
+              Checked out at {r.item.location.name}
             </Label>
           </Card.Content>
         );
@@ -139,10 +142,10 @@ function RequestedList({ user }: RequestedListProps) {
         }
 
         return (
-          <Card fluid key={r.request_id}>
+          <Card fluid key={r.id}>
             <Card.Content>
               <Card.Header>
-                <ItemAndQuantity quantity={r.quantity} itemName={r.item.item_name} />
+                <ItemAndQuantity quantity={r.quantity} itemName={r.item.name} />
                 &nbsp;
                 <span
                   style={{
@@ -151,7 +154,7 @@ function RequestedList({ user }: RequestedListProps) {
                     fontWeight: "normal",
                   }}
                 >
-                  #{r.request_id}
+                  #{r.id}
                 </span>
               </Card.Header>
               <Card.Description>{steps}</Card.Description>
