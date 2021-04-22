@@ -38,13 +38,13 @@ export const Query: QueryResolvers = {
 
     return await prisma.user.findMany({
       where: {
-        uuid: searchObj.uuid || undefined,
-        name: searchObj.name || undefined,
-        haveID: searchObj.haveID || undefined,
-        phone: searchObj.phone || undefined,
-        email: searchObj.email || undefined,
-        slackUsername: searchObj.slackUsername || undefined,
-        admin: searchObj.admin || undefined,
+        uuid: searchObj.uuid ?? undefined,
+        name: searchObj.name ?? undefined,
+        haveID: searchObj.haveID ?? undefined,
+        phone: searchObj.phone ?? undefined,
+        email: searchObj.email ?? undefined,
+        slackUsername: searchObj.slackUsername ?? undefined,
+        admin: searchObj.admin ?? undefined,
       },
       orderBy: {
         name: "asc",

@@ -104,10 +104,10 @@ export async function updateUser(args: any, context: any) {
     },
     data: {
       ...searchObj,
-      phone: searchObj.phone || undefined,
-      slackUsername: searchObj.slackUsername || undefined,
-      haveID: searchObj.haveID || undefined,
-      admin: searchObj.admin || undefined,
+      phone: searchObj.phone ?? undefined,
+      slackUsername: searchObj.slackUsername ?? undefined,
+      haveID: searchObj.haveID ?? undefined,
+      admin: searchObj.admin ?? undefined,
     },
   });
 
