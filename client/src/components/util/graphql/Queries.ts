@@ -1,33 +1,14 @@
 import gql from "graphql-tag";
 
+import { ITEM_INFO_FRAGMENT, USER_INFO_FRAGMENT } from "./Fragments";
+
 export const ITEM_EDIT_GET_ITEM = gql`
   query getItem($itemId: Int!) {
     item(id: $itemId) {
-      id
-      name
-      description
-      imageUrl
-      totalAvailable
-      maxRequestQty
-      price
-      approvalRequired
-      returnRequired
-      qtyUnreserved
-      qtyInStock
-      qtyAvailableForApproval
-      hidden
-      owner
-      category {
-        id
-        name
-      }
-      location {
-        id
-        name
-        hidden
-      }
+      ...ItemInfoFragment
     }
   }
+  ${ITEM_INFO_FRAGMENT}
 `;
 
 export const ALL_CATEGORIES = gql`
@@ -63,57 +44,30 @@ export const ALL_ITEMS = gql`
           name
         }
         items {
-          id
-          name
-          qtyUnreserved
-          qtyInStock
-          description
-          imageUrl
-          totalAvailable
-          maxRequestQty
-          hidden
-          approvalRequired
-          returnRequired
-          owner
-          hidden
-          qtyAvailableForApproval
-          category {
-            id
-            name
-          }
-          location {
-            id
-            name
-            hidden
-          }
+          ...ItemInfoFragment
         }
       }
     }
   }
+  ${ITEM_INFO_FRAGMENT}
 `;
 
 export const USER_INFO = gql`
   query user {
     user {
-      uuid
-      name
-      admin
+      ...UserInfoFragment
     }
   }
+  ${USER_INFO_FRAGMENT}
 `;
 
 export const ALL_USERS = gql`
   query users {
     users(search: {}) {
-      uuid
-      name
-      email
-      phone
-      slackUsername
-      haveID
-      admin
+      ...UserInfoFragment
     }
   }
+  ${USER_INFO_FRAGMENT}
 `;
 
 export const DESK_REQUESTS = gql`
@@ -128,12 +82,7 @@ export const DESK_REQUESTS = gql`
     ) {
       id
       user {
-        uuid
-        name
-        haveID
-        slackUsername
-        phone
-        email
+        ...UserInfoFragment
       }
       item {
         id
@@ -152,6 +101,7 @@ export const DESK_REQUESTS = gql`
       updatedAt
     }
   }
+  ${USER_INFO_FRAGMENT}
 `;
 
 export const USER_REQUESTS = gql`
@@ -164,12 +114,7 @@ export const USER_REQUESTS = gql`
     requests(search: { userId: $uuid }) {
       id
       user {
-        uuid
-        name
-        haveID
-        slackUsername
-        phone
-        email
+        ...UserInfoFragment
       }
       item {
         id
@@ -188,20 +133,16 @@ export const USER_REQUESTS = gql`
       updatedAt
     }
   }
+  ${USER_INFO_FRAGMENT}
 `;
 
 export const USER_PROFILE = gql`
   query users($uuid: String!) {
     users(search: { uuid: $uuid }) {
-      uuid
-      name
-      email
-      phone
-      slackUsername
-      haveID
-      admin
+      ...UserInfoFragment
     }
   }
+  ${USER_INFO_FRAGMENT}
 `;
 
 export const GET_SETTING = gql`
@@ -217,29 +158,7 @@ export const DETAILED_ITEM_STATISTICS = gql`
   query {
     itemStatistics {
       item {
-        id
-        name
-        qtyUnreserved
-        qtyInStock
-        qtyAvailableForApproval
-        description
-        imageUrl
-        totalAvailable
-        maxRequestQty
-        hidden
-        approvalRequired
-        returnRequired
-        owner
-        hidden
-        category {
-          id
-          name
-        }
-        location {
-          id
-          name
-          hidden
-        }
+        ...ItemInfoFragment
       }
       detailedQuantities {
         SUBMITTED
@@ -256,4 +175,5 @@ export const DETAILED_ITEM_STATISTICS = gql`
       }
     }
   }
+  ${ITEM_INFO_FRAGMENT}
 `;

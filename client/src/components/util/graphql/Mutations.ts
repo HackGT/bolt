@@ -1,5 +1,7 @@
 import gql from "graphql-tag";
 
+import { ITEM_INFO_FRAGMENT, USER_INFO_FRAGMENT } from "./Fragments";
+
 export const UPDATE_USER = gql`
   mutation updateUser($uuid: String!, $updatedUser: UserUpdateInput!) {
     updateUser(uuid: $uuid, updatedUser: $updatedUser) {
@@ -11,56 +13,20 @@ export const UPDATE_USER = gql`
 export const CREATE_ITEM = gql`
   mutation createItem($newItem: ItemInput!) {
     createItem(newItem: $newItem) {
-      id
-      name
-      description
-      imageUrl
-      totalAvailable
-      maxRequestQty
-      hidden
-      approvalRequired
-      returnRequired
-      owner
-      category {
-        id
-        name
-      }
-      location {
-        id
-        name
-        hidden
-      }
+      ...ItemInfoFragment
     }
   }
+  ${ITEM_INFO_FRAGMENT}
 `;
 
-// Having this mutation return the item metadata (everything except ID) is
-// what makes the cache update when an item is updated!
+// Having this mutation return the item metadata is what makes the cache update when an item is updated!
 export const UPDATE_ITEM = gql`
   mutation updateItem($itemId: Int!, $updatedItem: ItemInput!) {
     updateItem(id: $itemId, updatedItem: $updatedItem) {
-      id
-      name
-      description
-      imageUrl
-      totalAvailable
-      maxRequestQty
-      hidden
-      approvalRequired
-      returnRequired
-      owner
-      hidden
-      category {
-        id
-        name
-      }
-      location {
-        id
-        name
-        hidden
-      }
+      ...ItemInfoFragment
     }
   }
+  ${ITEM_INFO_FRAGMENT}
 `;
 
 export const CREATE_REQUEST = gql`
@@ -68,9 +34,7 @@ export const CREATE_REQUEST = gql`
     createRequest(newRequest: $newRequest) {
       id
       user {
-        uuid
-        name
-        haveID
+        ...UserInfoFragment
       }
       item {
         id
@@ -89,6 +53,7 @@ export const CREATE_REQUEST = gql`
       updatedAt
     }
   }
+  ${USER_INFO_FRAGMENT}
 `;
 
 export const UPDATE_REQUEST = gql`
@@ -96,12 +61,7 @@ export const UPDATE_REQUEST = gql`
     updateRequest(updatedRequest: $updatedRequest) {
       id
       user {
-        uuid
-        name
-        haveID
-        slackUsername
-        phone
-        email
+        ...UserInfoFragment
       }
       item {
         id
@@ -120,6 +80,7 @@ export const UPDATE_REQUEST = gql`
       updatedAt
     }
   }
+  ${USER_INFO_FRAGMENT}
 `;
 
 export const CREATE_SETTING = gql`

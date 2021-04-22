@@ -1,16 +1,13 @@
 import gql from "graphql-tag";
 
+import { USER_INFO_FRAGMENT } from "./Fragments";
+
 export const REQUEST_CHANGE = gql`
   subscription rc {
     requestChange {
       id
       user {
-        uuid
-        name
-        haveID
-        slackUsername
-        phone
-        email
+        ...UserInfoFragment
       }
       item {
         id
@@ -30,4 +27,5 @@ export const REQUEST_CHANGE = gql`
       updatedAt
     }
   }
+  ${USER_INFO_FRAGMENT}
 `;
