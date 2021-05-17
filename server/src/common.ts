@@ -200,7 +200,7 @@ export const config = new Config();
 //
 export const PORT = config.server.port;
 export const VERSION_NUMBER = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, "./package.json"), "utf8")
+  fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf8")
 ).version;
 export const COOKIE_OPTIONS = {
   path: "/",

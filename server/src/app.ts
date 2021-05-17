@@ -2,6 +2,7 @@
 import * as path from "path";
 import * as cookieSignature from "cookie-signature";
 import * as chalk from "chalk";
+import "source-map-support/register";
 
 import express from "express";
 import serveStatic from "serve-static";
