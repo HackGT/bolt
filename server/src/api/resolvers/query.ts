@@ -194,14 +194,16 @@ export const Query: QueryResolvers = {
     if (!context.user.admin) {
       // then if they are requesting requests for a user that is not themselves
       if (args.search.userId && args.search.userId !== context.user.uuid) {
-        // return an empty array and avoid making a DB query
-        return [];
+        return []; // return an empty array and avoid making a DB query
       }
 
-      // otherwise, restrict their results to just their user ID
-      searchObj.userId = context.user.uuid;
-      searchObj.item.location.hidden = false; // don't show hidden locations
-      searchObj.item.hidden = false; // don't show hidden items
+      searchObj.userId = context.user.uuid; // otherwise, restrict their results to just their user ID
+      searchObj.item = {
+        location: {
+          hidden: false, // don't show hidden locations
+        },
+        hidden: false, // don't show hidden items
+      };
     }
 
     const requests = await prisma.request.findMany({
