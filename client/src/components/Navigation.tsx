@@ -1,67 +1,79 @@
 import React from "react";
-import {Icon, Menu, Popup} from "semantic-ui-react";
-import {Link} from "react-router-dom";
-import {connect} from "react-redux";
-import {User} from "../types/User";
-import {AppState} from "../state/Store";
+import { Icon, Menu, Popup } from "semantic-ui-react";
+import { Link } from "react-router-dom";
+import { connect } from "react-redux";
 
-export interface OwnProps {}
+import { User } from "../types/User";
+import { AppState } from "../state/Store";
+
+interface OwnProps {}
 
 interface StateProps {
-    user: User|null;
+  user: User | null;
 }
 
 type Props = StateProps & OwnProps;
 
-class Navigation extends React.Component<Props, {}> {
-    public render() {
-        const { user } = this.props;
+class Navigation extends React.Component<Props> {
+  private isAdmin = () => {
+    const { user } = this.props;
+    return user && user.admin;
+  };
 
-        const homeLink = (<Link to="/">
-            <Menu.Item name="inventory">
-                <Icon name="home"/>Inventory
-            </Menu.Item>
-        </Link>);
+  public render() {
+    const { user } = this.props;
 
-        const loginLink = !user && <Menu.Item href="/auth/login">Sign in</Menu.Item>;
+    const homeLink = (
+      <Link to="/">
+        <Menu.Item name="inventory">
+          <Icon name="home" />
+          Inventory
+        </Menu.Item>
+      </Link>
+    );
 
-        const userProfile = user &&
-            <Popup inverted={true}
-                   trigger={<Menu.Item as={Link} to="/user/me"><Icon name="user"/> {user.name}</Menu.Item>}
-                   content="Edit your profile"/>;
+    const loginLink = !user && <Menu.Item href="/auth/login">Sign in</Menu.Item>;
 
-        const adminLink = this.isAdmin() &&
-            <Menu.Item as={Link} to="/admin">
-                <Icon name="setting"/>Admin
-            </Menu.Item>;
+    const userProfile = user && (
+      <Popup
+        inverted
+        trigger={
+          <Menu.Item as={Link} to="/user/me">
+            <Icon name="user" /> {user.name}
+          </Menu.Item>
+        }
+        content="Edit your profile"
+      />
+    );
 
-        const logoutLink = user && <Menu.Item href="/auth/logout">Sign out</Menu.Item>;
+    const adminLink = this.isAdmin() && (
+      <Menu.Item as={Link} to="/admin">
+        <Icon name="setting" />
+        Admin
+      </Menu.Item>
+    );
 
-        return (
-            <Menu stackable>
-                <Menu.Item header>HackGT Hardware</Menu.Item>
-                {homeLink}
-                {adminLink}
-                {loginLink}
-                <Menu.Menu position="right">
-                    {userProfile}
-                    {logoutLink}
-                </Menu.Menu>
-            </Menu>
+    const logoutLink = user && <Menu.Item href="/auth/logout">Sign out</Menu.Item>;
 
-        );
-    }
-
-    private isAdmin = () => {
-        const {user} = this.props;
-        return user && user.admin;
-    }
+    return (
+      <Menu stackable>
+        <Menu.Item header>HackGT Hardware</Menu.Item>
+        {homeLink}
+        {adminLink}
+        {loginLink}
+        <Menu.Menu position="right">
+          {userProfile}
+          {logoutLink}
+        </Menu.Menu>
+      </Menu>
+    );
+  }
 }
 
 function mapStateToProps(state: AppState) {
-    return {
-        user: state.account
-    };
+  return {
+    user: state.account,
+  };
 }
 
-export default connect(mapStateToProps) (Navigation);
+export default connect(mapStateToProps)(Navigation);

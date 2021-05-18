@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  items Item[]
+
+  @@map("categories")
+}
+
+enum RequestStatus {
+  SUBMITTED
+  APPROVED
+  DENIED
+  ABANDONED
+  CANCELLED
+  READY_FOR_PICKUP
+  FULFILLED
+  RETURNED
+  LOST
+  DAMAGED
+}
+
+model Item {
+  id               Int       @id @default(autoincrement())
+  name             String
+  description      String
+  imageUrl         String
+  totalAvailable   Int
+  maxRequestQty    Int
+  price            Decimal?  @default(0) @db.Decimal(6, 2)
+  hidden           Boolean   @default(false)
+  returnRequired   Boolean   @default(true)
+  approvalRequired Boolean   @default(true)
+  owner            String
+  category         Category  @relation(fields: [categoryId], references: [id])
+  location         Location  @relation(fields: [locationId], references: [id])
+  requests         Request[]
+
+  categoryId Int
+  locationId Int @default(1)
+  @@map("items")
+}
+
+model Location {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+  hidden Boolean @default(false)
+  items  Item[]
+
+  @@map("locations")
+}
+
+model Request {
+  id        Int           @id @default(autoincrement())
+  quantity  Int
+  status    RequestStatus
+  createdAt DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime      @default(now()) @db.Timestamptz(6)
+  item      Item          @relation(fields: [itemId], references: [id])
+  user      User          @relation(fields: [userId], references: [uuid])
+
+  itemId Int
+  userId String @db.Uuid
+  @@map("requests")
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
+
+  @@map("sessions")
+}
+
+model Setting {
+  name  String @id
+  value String
+
+  @@map("settings")
+}
+
+model User {
+  uuid          String    @id @db.Uuid
+  token         String?   @db.VarChar(256)
+  name          String
+  email         String
+  phone         String
+  slackUsername String
+  haveID        Boolean   @default(false)
+  admin         Boolean   @default(false)
+  requests      Request[]
+
+  @@map("users")
+}

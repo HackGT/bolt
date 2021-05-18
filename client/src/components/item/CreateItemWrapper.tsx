@@ -1,44 +1,41 @@
-import React, {Component} from "react";
-import {connect} from "react-redux";
-import {AppState} from "../../state/Store";
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { match } from "react-router";
+import { Header } from "semantic-ui-react";
+
+import { AppState } from "../../state/Store";
 import ItemEditForm from "./ItemEditForm";
-import {match} from "react-router";
-import {Header} from "semantic-ui-react";
 
 interface CreateItemProps {
-    match: match & CreateItemParams;
+  match: match & CreateItemParams;
 }
 
 interface CreateItemParams {
-    params: { itemId: string };
+  params: { itemId: string };
 }
 
-interface CreateItemState {
-}
+interface CreateItemState {}
 
 class CreateItemWrapper extends Component<CreateItemProps, CreateItemState> {
-    constructor(props: CreateItemProps) {
-        super(props);
-        this.state = {};
+  constructor(props: CreateItemProps) {
+    super(props);
+    this.state = {};
+  }
 
-    }
-
-    public render() {
-        return (
-            <div>
-                <Header as="h1">Create Item</Header>
-                <ItemEditForm createItem={true}/>
-            </div>
-        );
-    }
+  public render() {
+    return (
+      <div>
+        <Header as="h1">Create Item</Header>
+        <ItemEditForm createItem />
+      </div>
+    );
+  }
 }
 
 function mapStateToProps(state: AppState) {
-    return {
-        user: state.account
-    };
+  return {
+    user: state.account,
+  };
 }
 
-export default connect(
-    mapStateToProps
-)(CreateItemWrapper);
+export default connect(mapStateToProps)(CreateItemWrapper);

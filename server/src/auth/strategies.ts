@@ -1,197 +1,234 @@
 import * as crypto from "crypto";
 import * as http from "http";
 import * as https from "https";
-import {URL} from "url";
+import { URL } from "url";
 import * as passport from "passport";
-import {Strategy as OAuthStrategy} from "passport-oauth2";
+import { Strategy as OAuthStrategy } from "passport-oauth2";
+import { NextFunction, Request, Response } from "express";
+import { User } from "@prisma/client";
 
-import {createRecord, DB, findUserByID, IUser} from "../database";
-import {config} from "../common";
-import {NextFunction, Request, Response} from "express";
+import { config, prisma } from "../common";
 
-type PassportDone = (err: Error | null, user?: IUser | false, errMessage?: { message: string }) => void;
+type PassportDone = (
+  err: Error | null,
+  user?: User | false,
+  errMessage?: { message: string }
+) => void;
 type PassportProfileDone = (err: Error | null, profile?: IProfile) => void;
 interface IStrategyOptions {
-    passReqToCallback: true; // Forced to true for our usecase
+  passReqToCallback: true; // Forced to true for our usecase
 }
 interface IOAuthStrategyOptions extends IStrategyOptions {
-    authorizationURL: string;
-    tokenURL: string;
-    clientID: string;
-    clientSecret: string;
-    scope: string[];
+  authorizationURL: string;
+  tokenURL: string;
+  clientID: string;
+  clientSecret: string;
+  scope: string[];
 }
 interface IProfile {
-    uuid: string;
-    name: string;
-    nameParts?: { firstName: string, lastName: string, preferredName?: string };
-    email: string;
-    token: string;
-    scopes?: IProfileScopes | null;
-    member?: boolean;
+  uuid: string;
+  name: string;
+  nameParts?: { firstName: string; lastName: string; preferredName?: string };
+  email: string;
+  token: string;
+  scopes?: IProfileScopes | null;
+  member?: boolean;
 }
 interface IProfileScopes {
-    slack: string;
-    phone: string;
+  slack: string;
+  phone: string;
 }
 
 // Because the passport typedefs don't include this for some reason
 // Defined:
 // https://github.com/jaredhanson/passport-oauth2/blob/9ddff909a992c3428781b7b2957ce1a97a924367/lib/strategy.js#L135
 export type AuthenticateOptions = passport.AuthenticateOptions & {
-    callbackURL: string;
+  callbackURL: string;
 };
 
 export class GroundTruthStrategy extends OAuthStrategy {
+  public static get defaultUserProperties(): { admin: boolean; haveID: boolean } {
+    return {
+      admin: false,
+      haveID: false,
+    };
+  }
 
-    public static get defaultUserProperties(): { admin: boolean, haveID: boolean } {
-        return {
-            admin: false,
-            haveID: false
-        };
+  protected static async passportCallback(
+    request: Request,
+    accessToken: string,
+    refreshToken: string,
+    profile: IProfile,
+    done: PassportDone
+  ): Promise<void> {
+    const domain = profile.email.split("@").pop();
+    const isAdmin =
+      (domain && config.admins.domains.includes(domain)) ||
+      config.admins.emails.includes(profile.email);
+
+    let user = await prisma.user.findUnique({
+      where: {
+        uuid: profile.uuid,
+      },
+    });
+
+    if (!user) {
+      const { scopes } = profile;
+      if (!scopes) {
+        console.warn(`User ${profile.uuid} has no scope data`);
+        done(new Error("No scope data for new user"));
+        return;
+      }
+
+      user = await prisma.user.create({
+        data: {
+          name: profile.name,
+          uuid: profile.uuid,
+          email: profile.email,
+          token: profile.token,
+          slackUsername: scopes.slack,
+          phone: scopes.phone,
+          admin: isAdmin,
+        },
+      });
+    } else {
+      user = await prisma.user.update({
+        where: {
+          uuid: profile.uuid,
+        },
+        data: {
+          token: accessToken,
+          admin: isAdmin || user.admin,
+        },
+      });
     }
 
-    protected static async passportCallback(request: Request, accessToken: string, refreshToken: string,
-                                            profile: IProfile, done: PassportDone): Promise<void> {
-        let user = await findUserByID(profile.uuid);
-        if (!user) {
-            console.log(profile);
-            const scopes = profile.scopes;
-            if (!scopes) {
-                console.warn(`User ${profile.uuid} has no scope data`);
-                done(new Error("No scope data for new user"));
-                return;
-            }
-            delete profile.scopes;
-            delete profile.nameParts; // Basically ignore the Ground Truth nameParts field for now
-            const adminBecauseHackGTMember = profile.member || false;
-            delete profile.member;
-            user = await createRecord<IUser>("users", {
-                ...GroundTruthStrategy.defaultUserProperties,
-                ...profile,
-                slackUsername: scopes.slack,
-                phone: scopes.phone,
-                admin: adminBecauseHackGTMember
-            });
-        } else {
-            user.token = accessToken;
+    done(null, user);
+  }
 
-            if (profile.member) {
-                user.admin = true;
-            }
-        }
+  public readonly url: string;
 
-        const domain = user.email.split("@").pop();
-        if (domain && config.admins.domains.includes(domain)) {
-            user.admin = true;
-        }
-        if (config.admins.emails.includes(profile.email)) {
-            user.admin = true;
-        }
-        await DB.from("users").where({ uuid: user.uuid }).update(user);
-        done(null, user);
-    }
-    public readonly url: string;
-
-    constructor(url: string) {
-        const secrets = config.secrets.groundTruth;
-        if (!secrets || !secrets.id || !secrets.secret) {
-            throw new Error(`Client ID or secret not configured in config.json or environment variables for Ground
+  constructor(url: string) {
+    const secrets = config.secrets.groundTruth;
+    if (!secrets || !secrets.id || !secrets.secret) {
+      throw new Error(`Client ID or secret not configured in config.json or environment variables for Ground
             Truth`);
-        }
-        const options: IOAuthStrategyOptions = {
-            authorizationURL: new URL("/oauth/authorize", url).toString(),
-            tokenURL: new URL("/oauth/token", url).toString(),
-            clientID: secrets.id,
-            clientSecret: secrets.secret,
-            scope: ["phone", "slack"],
-            passReqToCallback: true
-        };
-        super(options, GroundTruthStrategy.passportCallback);
-        this.url = url;
     }
+    const options: IOAuthStrategyOptions = {
+      authorizationURL: new URL("/oauth/authorize", url).toString(),
+      tokenURL: new URL("/oauth/token", url).toString(),
+      clientID: secrets.id,
+      clientSecret: secrets.secret,
+      scope: ["phone", "slack"],
+      passReqToCallback: true,
+    };
+    super(options, GroundTruthStrategy.passportCallback);
+    this.url = url;
+  }
 
-    public userProfile(accessToken: string, done: PassportProfileDone): void | PassportProfileDone {
-        (this._oauth2 as any)._request("GET", new URL("/api/user", this.url).toString(), null,
-            null, accessToken, (err: Error | null, data: string) => {
-            if (err) {
-                done(err);
-                return;
-            }
-            try {
-                const profile: IProfile = {
-                    ...JSON.parse(data),
-                    token: accessToken
-                };
-                done(null, profile);
-            } catch (err) {
-                return done(err);
-            }
-        });
-    }
+  public userProfile(accessToken: string, done: PassportProfileDone): void | PassportProfileDone {
+    // eslint-disable-next-line no-underscore-dangle
+    (this._oauth2 as any)._request(
+      "GET",
+      new URL("/api/user", this.url).toString(),
+      null,
+      null,
+      accessToken,
+      (err: Error | null, data: string) => {
+        if (err) {
+          done(err);
+          return;
+        }
+        try {
+          const profile: IProfile = {
+            ...JSON.parse(data),
+            token: accessToken,
+          };
+          done(null, profile);
+        } catch (parseErr) {
+          done(parseErr);
+        }
+      }
+    );
+  }
 }
 
 // Authentication helpers
 function getExternalPort(request: Request): number {
-    function defaultPort(): number {
-        // Default ports for HTTP and HTTPS
-        return request.protocol === "http" ? 80 : 443;
-    }
+  function defaultPort(): number {
+    // Default ports for HTTP and HTTPS
+    return request.protocol === "http" ? 80 : 443;
+  }
 
-    const host = request.headers.host;
-    if (!host || Array.isArray(host)) {
-        return defaultPort();
-    }
+  const { host } = request.headers;
+  if (!host || Array.isArray(host)) {
+    return defaultPort();
+  }
 
-    // IPv6 literal support
-    const offset = host[0] === "[" ? host.indexOf("]") + 1 : 0;
-    const index = host.indexOf(":", offset);
-    if (index !== -1) {
-        return parseInt(host.substring(index + 1), 10);
-    } else {
-        return defaultPort();
-    }
+  // IPv6 literal support
+  const offset = host[0] === "[" ? host.indexOf("]") + 1 : 0;
+  const index = host.indexOf(":", offset);
+  if (index !== -1) {
+    return parseInt(host.substring(index + 1));
+  }
+  return defaultPort();
 }
 
 const validatedHostNames: string[] = [];
-export function validateAndCacheHostName(request: Request, response: Response, next: NextFunction): void {
-    // Basically checks to see if the server behind the hostname has the same session key by HMACing a random nonce
-    if (validatedHostNames.find(hostname => hostname === request.hostname)) {
-        next();
-        return;
-    }
+export function validateAndCacheHostName(
+  request: Request,
+  response: Response,
+  next: NextFunction
+): void {
+  // Basically checks to see if the server behind the hostname has the same session key by HMACing a random nonce
+  if (validatedHostNames.find(hostname => hostname === request.hostname)) {
+    next();
+    return;
+  }
 
-    const nonce = crypto.randomBytes(64).toString("hex");
-    function callback(message: http.IncomingMessage): void {
-        if (message.statusCode !== 200) {
-            console.error(`Got non-OK status code when validating hostname: ${request.hostname}`);
-            message.resume();
-            return;
-        }
-        message.setEncoding("utf8");
-        let data = "";
-        message.on("data", (chunk) => data += chunk);
-        message.on("end", () => {
-            const localHMAC = crypto.createHmac("sha256", config.secrets.session).update(nonce).digest()
-                .toString("hex");
-            if (localHMAC === data) {
-                validatedHostNames.push(request.hostname);
-                next();
-            } else {
-                console.error(`Got invalid HMAC when validating hostname: ${request.hostname}`);
-            }
-        });
+  const nonce = crypto.randomBytes(64).toString("hex");
+  function callback(message: http.IncomingMessage): void {
+    if (message.statusCode !== 200) {
+      console.error(`Got non-OK status code when validating hostname: ${request.hostname}`);
+      message.resume();
+      return;
     }
-    function onError(err: Error): void {
-        console.error(`Error when validating hostname: ${request.hostname}`, err);
-    }
-    if (request.protocol === "http") {
-        http.get(`http://${request.hostname}:${getExternalPort(request)}/auth/validatehost/${nonce}`, callback)
-            .on("error", onError);
-    } else {
-        https.get(`https://${request.hostname}:${getExternalPort(request)}/auth/validatehost/${nonce}`, callback)
-            .on("error", onError);
-    }
+    message.setEncoding("utf8");
+    let data = "";
+    // eslint-disable-next-line no-return-assign
+    message.on("data", chunk => (data += chunk));
+    message.on("end", () => {
+      const localHMAC = crypto
+        .createHmac("sha256", config.secrets.session)
+        .update(nonce)
+        .digest()
+        .toString("hex");
+      if (localHMAC === data) {
+        validatedHostNames.push(request.hostname);
+        next();
+      } else {
+        console.error(`Got invalid HMAC when validating hostname: ${request.hostname}`);
+      }
+    });
+  }
+  function onError(err: Error): void {
+    console.error(`Error when validating hostname: ${request.hostname}`, err);
+  }
+  if (request.protocol === "http") {
+    http
+      .get(
+        `http://${request.hostname}:${getExternalPort(request)}/auth/validatehost/${nonce}`,
+        callback
+      )
+      .on("error", onError);
+  } else {
+    https
+      .get(
+        `https://${request.hostname}:${getExternalPort(request)}/auth/validatehost/${nonce}`,
+        callback
+      )
+      .on("error", onError);
+  }
 }
 
 // export function createLink(request: Request, link: string): string {
@@ -205,17 +242,22 @@ export function validateAndCacheHostName(request: Request, response: Response, n
 //     }
 // }
 
+/* eslint-disable no-param-reassign */
 export function createLink(request: Request, link: string, proto?: string): string {
-    if (!proto) {
-        proto = "http";
-    }
-    if (link[0] === "/") {
-        link = link.substring(1);
-    }
-    if ((request.secure && getExternalPort(request) === 443)
-        || (!request.secure && getExternalPort(request) === 80)) {
-        return `${proto}${request.secure ? "s" : ""}://${request.hostname}/${link}`;
-    } else {
-        return `${proto}${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(request)}/${link}`;
-    }
+  if (!proto) {
+    proto = "http";
+  }
+  if (link[0] === "/") {
+    link = link.substring(1);
+  }
+
+  if (
+    (request.secure && getExternalPort(request) === 443) ||
+    (!request.secure && getExternalPort(request) === 80)
+  ) {
+    return `${proto}${request.secure ? "s" : ""}://${request.hostname}/${link}`;
+  }
+  return `${proto}${request.secure ? "s" : ""}://${request.hostname}:${getExternalPort(
+    request
+  )}/${link}`;
 }

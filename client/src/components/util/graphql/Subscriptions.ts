@@ -1,33 +1,31 @@
 import gql from "graphql-tag";
 
+import { USER_INFO_FRAGMENT } from "./Fragments";
+
 export const REQUEST_CHANGE = gql`
-    subscription rc {
-        request_change {
-            request_id
-            user {
-                uuid
-                name
-                haveID
-                slackUsername
-                phone
-                email
-            }
-            item {
-                id
-                item_name
-                qtyAvailableForApproval
-                returnRequired
-                location {
-                    location_id
-                    location_name
-                    location_hidden
-                    __typename @skip(if: false)
-                }
-            }
-            status
-            quantity
-            createdAt
-            updatedAt
+  subscription rc {
+    requestChange {
+      id
+      user {
+        ...UserInfoFragment
+      }
+      item {
+        id
+        name
+        qtyAvailableForApproval
+        returnRequired
+        location {
+          id
+          name
+          hidden
+          __typename @skip(if: false)
         }
+      }
+      status
+      quantity
+      createdAt
+      updatedAt
     }
+  }
+  ${USER_INFO_FRAGMENT}
 `;

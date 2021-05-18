@@ -1,0 +1,7 @@
+{
+  "extends": "@hex-labs/eslint-config-react",
+  "rules": {
+    "camelcase": "off",
+    "jsx-a11y/label-has-associated-control": "off"
+  }
+}

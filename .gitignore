@@ -1,8 +1,10 @@
+**/.vscode/
+.DS_Store
+.env
 node_modules/
-client/node_modules/
-server/node_modules/
-node_modules
 server/src/config/config.json
 server/build/
-server/src/api/api.graphql.ts
+server/dist/
 server/src/api/graphql.types.ts
+
+yarn-error.log

@@ -1,228 +1,216 @@
 type Query {
-	# Get information about the currently logged in user
-	user: User
-	# For admins, get information about all users
-	users(search: UserSearch!): [User!]
-    # Get information about a specific item, given its ID
-	item(id: Int!): Item
-    # Get an array of every item in the database
-    allItems: [ItemsByLocation!]
-    # Get a list containing each category that is on at least one item
-    categories: [Category!]
-	# Get detailed statistics about all items
-	itemStatistics: [ItemWithStatistics!]
-	# Return request(s) matching the search query provided and that the user has permission to see
-    requests(search: RequestSearch!): [Request!]
-	# Return setting(s) with the name provided
-		setting(name: String!): Setting
-    locations: [Location!],
+  # Get information about the currently logged in user
+  user: User
+  # For admins, get information about all users
+  users(search: UserSearch!): [User!]
+  # Get information about a specific item, given its ID
+  item(id: Int!): Item
+  # Get an array of every item in the database
+  allItems: [ItemsByLocation!]
+  # Get a list containing each category that is on at least one item
+  categories: [Category!]
+  # Get detailed statistics about all items
+  itemStatistics: [ItemWithStatistics!]
+  # Return request(s) matching the search query provided and that the user has permission to see
+  requests(search: RequestSearch!): [Request!]
+  # Return setting(s) with the name provided
+  setting(name: String!): Setting
+  locations: [Location!]
 }
 
 type Mutation {
-    # Create a new item
-	createItem(newItem: ItemInput!): Item!
-		# Update an existing setting
-	updateSetting(name: String!, updatedSetting: SettingInput!): Setting!
-	# Create a new setting
-	createSetting(newSetting: SettingInput!): Setting!
-    # Update the item with the specified ID to have the properties in updatedItem.  At this time
-    #    all fields must be included
-    updateItem(id: Int!, updatedItem: ItemInput!): Item
-	createRequest(newRequest: RequestInput!):  Request!
-	updateRequest(updatedRequest: RequestUpdateInput!): Request
-    # Delete the request with the specified ID.  Returns true if successful; otherwise, false
-    deleteRequest(id: Int!): Boolean!
-    updateUser(uuid: String!, updatedUser: UserUpdateInput!): User
+  # Create a new item
+  createItem(newItem: ItemInput!): Item!
+  # Update an existing setting
+  updateSetting(name: String!, updatedSetting: SettingInput!): Setting!
+  # Create a new setting
+  createSetting(newSetting: SettingInput!): Setting!
+  # Update the item with the specified ID to have the properties in updatedItem.  At this time
+  #    all fields must be included
+  updateItem(id: Int!, updatedItem: ItemInput!): Item
+  createRequest(newRequest: RequestInput!): Request!
+  updateRequest(updatedRequest: RequestUpdateInput!): Request
+  # Delete the request with the specified ID.  Returns true if successful; otherwise, false
+  deleteRequest(id: Int!): Boolean!
+  updateUser(uuid: String!, updatedUser: UserUpdateInput!): User
 }
 
 type Subscription {
-	request_change: Request!
+  requestChange: Request!
 }
 
 type User {
-	uuid: ID!
-	name: String!
-	email: String!
-	phone: String!
-	slackUsername: String!
-	# Whether this user's ID has been collected or not
-	haveID: Boolean!
-	# Whether this user has admin permissions
-	admin: Boolean!
+  uuid: ID!
+  name: String!
+  email: String!
+  phone: String!
+  slackUsername: String!
+  # Whether this user's ID has been collected or not
+  haveID: Boolean!
+  # Whether this user has admin permissions
+  admin: Boolean!
 }
 
 type Item {
-	id: Int!
-	item_name: String!
-	description: String!
-	imageUrl: String!
-	category: String!
-    location: Location!
-	# Total number of this item in the hardware inventory
-	totalAvailable: Int!
-	# The number of an item that is not reserved
-	qtyInStock: Int!
-    # The number of an item that should be physically at the hardware desk
-	qtyUnreserved: Int!
-	# The number of an item that is available to be allocated to requests waiting to be approved
-	qtyAvailableForApproval: Int
-	# The largest quantity of this item that can be requested in one request
-	maxRequestQty: Int!
-    # The value of this item to replace it if lost or damaged (only visible to admins)
-    price: Float
-	# Whether to show this item to non-admins on the hardware list
-	hidden: Boolean!
-	# Whether people who check out this item are expected to return it
-	returnRequired: Boolean!
-	# Whether admin approval is required before requests for this item will be processed
-	approvalRequired: Boolean!
-    # The person or organization that owns this item (only visible to admins)
-    owner: String
-	# Detailed breakdown by status for all requests for this item (only visible to admins)
+  id: Int!
+  name: String!
+  description: String!
+  imageUrl: String!
+  category: Category!
+  location: Location!
+  # Total number of this item in the hardware inventory
+  totalAvailable: Int!
+  # The number of an item that is not reserved
+  qtyInStock: Int!
+  # The number of an item that should be physically at the hardware desk
+  qtyUnreserved: Int!
+  # The number of an item that is available to be allocated to requests waiting to be approved
+  qtyAvailableForApproval: Int
+  # The largest quantity of this item that can be requested in one request
+  maxRequestQty: Int!
+  # The value of this item to replace it if lost or damaged (only visible to admins)
+  price: Float
+  # Whether to show this item to non-admins on the hardware list
+  hidden: Boolean!
+  # Whether people who check out this item are expected to return it
+  returnRequired: Boolean!
+  # Whether admin approval is required before requests for this item will be processed
+  approvalRequired: Boolean!
+  # The person or organization that owns this item (only visible to admins)
+  owner: String
+  # Detailed breakdown by status for all requests for this item (only visible to admins)
 }
 
 type ItemWithStatistics {
-	item: Item!
-	detailedQuantities: DetailedItemQuantities!
+  item: Item!
+  detailedQuantities: DetailedItemQuantities!
 }
 
 type DetailedItemQuantities {
-	SUBMITTED: Int!,
-	APPROVED: Int!,
-	DENIED: Int!,
-	ABANDONED: Int!,
-	CANCELLED: Int!,
-	READY_FOR_PICKUP: Int!,
-	FULFILLED: Int!,
-	RETURNED: Int!,
-	LOST: Int!,
-	DAMAGED: Int!
-	total: Int!
+  SUBMITTED: Int!
+  APPROVED: Int!
+  DENIED: Int!
+  ABANDONED: Int!
+  CANCELLED: Int!
+  READY_FOR_PICKUP: Int!
+  FULFILLED: Int!
+  RETURNED: Int!
+  LOST: Int!
+  DAMAGED: Int!
+  total: Int!
 }
 
 type ItemsByLocation {
-    location: Location!,
-    categories: [ItemsByCategory!]
+  location: Location!
+  categories: [ItemsByCategory!]
 }
 
 type ItemsByCategory {
-	category: Category!
-	items: [Item!]
+  category: Category!
+  items: [Item!]
 }
 
 type Setting {
-	name: String!
-	value: String!
+  name: String!
+  value: String!
 }
 
 input ItemInput {
-	item_name: String!
-    description: String!
-    imageUrl: String!
-    category: String!
-    location: String!
-    # Total number of this item in the hardware inventory
-    totalAvailable: Int!
-    # The largest quantity of this item that can be requested in one request
-    maxRequestQty: Int!
-    # The value of this item to replace it if lost or damaged
-    price: Float!
-    # Whether to show this item to non-admins on the hardware list
-    hidden: Boolean!
-    # Whether people who check out this item are expected to return it
-    returnRequired: Boolean!
-    # Whether admin approval is required before requests for this item will be processed
-    approvalRequired: Boolean!
-    # The person or organization that owns this item
-    owner: String!
+  name: String!
+  description: String!
+  imageUrl: String!
+  category: String!
+  location: String!
+  # Total number of this item in the hardware inventory
+  totalAvailable: Int!
+  # The largest quantity of this item that can be requested in one request
+  maxRequestQty: Int!
+  # The value of this item to replace it if lost or damaged
+  price: Float!
+  # Whether to show this item to non-admins on the hardware list
+  hidden: Boolean!
+  # Whether people who check out this item are expected to return it
+  returnRequired: Boolean!
+  # Whether admin approval is required before requests for this item will be processed
+  approvalRequired: Boolean!
+  # The person or organization that owns this item
+  owner: String!
 }
 
 input SettingInput {
-		name: String!
-    value: String!
+  name: String!
+  value: String!
 }
 
 type Category {
-    # The unique ID for this category
-    category_id: Int!
-    # The human-readable, user-facing name for this category
-    category_name: String!
+  # The unique ID for this category
+  id: Int!
+  # The human-readable, user-facing name for this category
+  name: String!
 }
 
 type Location {
-    location_id: Int!
-    location_name: String!
-    location_hidden: Boolean!
+  id: Int!
+  name: String!
+  hidden: Boolean!
 }
 
 enum RequestStatus {
-	SUBMITTED
-	APPROVED
-	DENIED
-	ABANDONED
-    CANCELLED
-	READY_FOR_PICKUP
-	FULFILLED
-	RETURNED
-	LOST
-	DAMAGED
-}
-
-# Simple representation of a request without the linked item or user
-type SimpleRequest {
-	request_id: Int!,
-	status: RequestStatus!,
-	quantity: Int!,
-	createdAt: String!,
-	updatedAt: String!
+  SUBMITTED
+  APPROVED
+  DENIED
+  ABANDONED
+  CANCELLED
+  READY_FOR_PICKUP
+  FULFILLED
+  RETURNED
+  LOST
+  DAMAGED
 }
 
 type Request {
-    request_id: Int!,
-	user: User!,
-	item: Item!,
-	location: Location!,
-	status: RequestStatus!,
-	quantity: Int!,
-	createdAt: String!,
-	updatedAt: String!
+  id: Int!
+  item: Item!
+  quantity: Int!
+  user: User!
+  status: RequestStatus!
+  createdAt: String!
+  updatedAt: String!
 }
 
-
-
 input RequestSearch {
-    item_id: Int,
-    request_id: Int,
-    user_id: String,
-	statuses: [RequestStatus!]
+  id: Int
+  itemId: Int
+  userId: String
+  statuses: [RequestStatus!]
 }
 
 input RequestInput {
-	user_id: String!,
-    request_item_id: Int!,
-	quantity: Int!
+  userId: String!
+  itemId: Int!
+  quantity: Int!
 }
 
 input RequestUpdateInput {
-	request_id: Int!,
-	new_quantity: Int,
-    new_status: RequestStatus,
-    user_haveID: Boolean
+  id: Int!
+  quantity: Int
+  status: RequestStatus
+  userHaveId: Boolean
 }
 
 input UserSearch {
-	uuid: String,
-	name: String,
-	haveID: Boolean,
-	phone: String,
-	email: String,
-	slackUsername: String,
-	admin: Boolean
+  uuid: String
+  name: String
+  haveID: Boolean
+  phone: String
+  email: String
+  slackUsername: String
+  admin: Boolean
 }
 
 input UserUpdateInput {
-    phone: String,
-    slackUsername: String,
-    haveID: Boolean,
-    admin: Boolean
+  phone: String
+  slackUsername: String
+  haveID: Boolean
+  admin: Boolean
 }
