@@ -32,10 +32,10 @@ model Item {
   id               Int       @id @default(autoincrement())
   name             String
   description      String
-  imageUrl         String
+  imageUrl         String?
   totalAvailable   Int
   maxRequestQty    Int
-  price            Decimal?  @default(0) @db.Decimal(6, 2)
+  price            Decimal   @default(0) @db.Decimal(6, 2)
   hidden           Boolean   @default(false)
   returnRequired   Boolean   @default(true)
   approvalRequired Boolean   @default(true)
