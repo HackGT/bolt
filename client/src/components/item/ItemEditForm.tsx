@@ -87,7 +87,7 @@ class ItemEditForm extends Component<ItemEditProps, ItemEditState> {
         : {
             name: this.props.preloadItem.name,
             description: this.props.preloadItem.description,
-            imageUrl: this.props.preloadItem.imageUrl,
+            imageUrl: this.props.preloadItem.imageUrl || "",
             category: this.props.preloadItem.category.name,
             location: this.props.preloadItem.location.name,
             totalAvailable: this.props.preloadItem.totalAvailable,

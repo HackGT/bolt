@@ -22,7 +22,7 @@ interface HardwareItemProps {
   preview?: boolean;
 }
 
-function itemImage(src: string, outOfStock = false) {
+function itemImage(src: string | undefined, outOfStock = false) {
   return (
     <SMItem.Image
       draggable={false}

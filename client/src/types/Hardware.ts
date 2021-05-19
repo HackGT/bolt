@@ -2,7 +2,7 @@ export type Item = {
   id: number;
   name: string;
   description: string;
-  imageUrl: string;
+  imageUrl?: string;
   category: Category;
   totalAvailable: number;
   maxRequestQty: number; // max number of a specific item you can request at once
