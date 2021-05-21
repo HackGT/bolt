@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useQuery } from "@apollo/client";
 import { Header, List, Message, Table } from "semantic-ui-react";
 import DataTable from "react-data-table-component";
@@ -16,82 +16,119 @@ import {
   LOST,
   RETURNED,
 } from "../../../types/Hardware";
+import { ReportError } from "../ReportError";
 
-function ColumnDef(column: string, def: string) {
-  return { column, def };
-}
+const detailSort = (a: string, b: string) => {
+  // Get decimal percentage between parentheses
+  const parenthesesRegex = /\((\d*.\d*)%\)/;
 
-function customSort(rows: any[], field: string, direction: string) {
-  console.log(rows, field, direction);
-  // const splitField = field.split(".")
+  const aPercent = parenthesesRegex.exec(a) ?? [];
+  const bPercent = parenthesesRegex.exec(b) ?? [];
 
-  return rows;
-}
+  if (aPercent.length > 1 && bPercent.length > 1) {
+    return parseFloat(aPercent[1]) - parseFloat(bPercent[1]);
+  }
+
+  return 0;
+};
+
+const columns = [
+  {
+    name: "Location",
+    selector: "item.location.name",
+    sortable: true,
+    grow: 2,
+  },
+  {
+    name: "Item",
+    selector: "item.name",
+    sortable: true,
+    grow: 2,
+  },
+  {
+    name: "Total Available",
+    selector: "item.totalAvailable",
+    sortable: true,
+    center: true,
+  },
+  {
+    name: "Demand",
+    selector: "totalDemand",
+    sortable: true,
+    center: true,
+    sortFunction: (first: any, second: any) => detailSort(first.totalDemand, second.totalDemand),
+  },
+  {
+    name: "Qty Approved",
+    selector: "totalApproved",
+    sortable: true,
+    center: true,
+    sortFunction: (first: any, second: any) =>
+      detailSort(first.totalApproved, second.totalApproved),
+  },
+  {
+    name: "Qty Fulfilled",
+    selector: "totalFulfilled",
+    sortable: true,
+    center: true,
+    sortFunction: (first: any, second: any) =>
+      detailSort(first.totalFulfilled, second.totalFulfilled),
+  },
+  {
+    name: "Qty Not Fulfilled",
+    selector: "totalNotFulfilled",
+    sortable: true,
+    center: true,
+  },
+  {
+    name: "Qty Returned",
+    selector: "totalReturned",
+    sortable: true,
+    center: true,
+  },
+  {
+    name: "Qty Lost/Damaged",
+    selector: "totalLostDamaged",
+    sortable: true,
+    center: true,
+    sortFunction: (first: any, second: any) =>
+      detailSort(first.totalLostDamaged, second.totalLostDamaged),
+  },
+];
+
+const columnDefs = [
+  {
+    column: "Demand",
+    def: "The total quantity of this item that has ever been requested",
+  },
+  {
+    column: "Qty Approved",
+    def: "The total quantity of this item in requests with status approved, fulfilled, or returned",
+  },
+  {
+    column: "Qty Fulfilled",
+    def: "The total quantity of this item in requests with status fulfilled or returned",
+  },
+  {
+    column: "Qty Not Fulfilled",
+    def:
+      "The total quantity of this item that was requested but not given out, indicated by a request status of abandoned, cancelled, or declined",
+  },
+  {
+    column: "Qty Returned",
+    def: "The total quantity of this item in requests with status returned",
+  },
+  {
+    column: "Qty Lost/Damaged",
+    def:
+      "The total quantity of this item in requests with status lost or damaged.  The value in parentheses is this number divided by the item's Total Available value.",
+  },
+];
 
 const ItemDemandReport: React.FC = () => {
   const { data, loading, error } = useQuery(DETAILED_ITEM_STATISTICS, {
     partialRefetch: true,
   });
-
-  const columns = useMemo(
-    () => [
-      {
-        name: "Location",
-        selector: "item.location.name",
-        sortable: true,
-        grow: 2,
-      },
-      {
-        name: "Item",
-        selector: "item.name",
-        sortable: true,
-        grow: 2,
-      },
-      {
-        name: "Total Available",
-        selector: "item.totalAvailable",
-        sortable: true,
-        center: true,
-      },
-      {
-        name: "Demand",
-        selector: "totalDemand",
-        sortable: true,
-        center: true,
-      },
-      {
-        name: "Qty Approved",
-        selector: "totalApproved",
-        sortable: true,
-        center: true,
-      },
-      {
-        name: "Qty Fulfilled",
-        selector: "totalFulfilled",
-        sortable: true,
-        center: true,
-      },
-      {
-        name: "Qty Not Fulfilled",
-        selector: "totalNotFulfilled",
-        sortable: true,
-        center: true,
-      },
-      {
-        name: "Qty Returned",
-        selector: "totalReturned",
-        sortable: true,
-        center: true,
-      },
-      {
-        name: "Qty Lost/Damaged",
-        selector: "totalLostDamaged",
-        sortable: true,
-        center: true,
-      },
-    ],
-    []
-  );
 
   const totalRequests = loading
     ? 0
@@ -143,37 +180,8 @@ const ItemDemandReport: React.FC = () => {
         });
 
   if (error) {
-    return (
-      <>
-        <Header content="Item Demand Report" size="huge" />
-        <Message negative>
-          <Message.Header>Error displaying report</Message.Header>
-          <p>Something is preventing us from showing this report: {error.message}</p>
-        </Message>
-      </>
-    );
+    return <ReportError header="Item Demand Report" errorMessage={error.message} />;
   }
-
-  const columnDefs = [
-    ColumnDef("Demand", "The total quantity of this item that has ever been requested"),
-    ColumnDef(
-      "Qty Approved",
-      "The total quantity of this item in requests with status approved, fulfilled, or returned"
-    ),
-    ColumnDef(
-      "Qty Fulfilled",
-      "The total quantity of this item in requests with status fulfilled or returned"
-    ),
-    ColumnDef(
-      "Qty Not Fulfilled",
-      "The total quantity of this item that was requested but not given out, indicated by a request status of abandoned, cancelled, or declined"
-    ),
-    ColumnDef("Qty Returned", "The total quantity of this item in requests with status returned"),
-    ColumnDef(
-      "Qty Lost/Damaged",
-      "The total quantity of this item in requests with status lost or damaged.  The value in parentheses is this number divided by the item's Total Available value."
-    ),
-  ];
 
   return (
     <>
@@ -220,7 +228,6 @@ const ItemDemandReport: React.FC = () => {
         paginationRowsPerPageOptions={[25, 50, 100]}
         progressPending={loading}
         noHeader
-        sortFunction={customSort}
         striped
         progressComponent={<LoadingSpinner active content="Crunching the numbers..." />}
       />
