@@ -7,12 +7,12 @@ import { AppState } from "../../state/Store";
 import { GET_SETTING } from "../util/graphql/Queries";
 import { UPDATE_SETTING, CREATE_SETTING } from "../util/graphql/Mutations";
 
-const AdminRequestsWrapper: React.FC = () => {
+const AdminRequestSettingsWrapper: React.FC = () => {
   const [requestsAllowed, setRequestsAllowed] = useState(false);
 
   return (
     <div>
-      <Header as="h1">Requests</Header>
+      <Header as="h1">Settings</Header>
       <Query query={GET_SETTING} variables={{ settingName: "requests_allowed" }}>
         {({ loading, error, data }: any) => {
           if (loading) {
@@ -88,4 +88,4 @@ function mapStateToProps(state: AppState) {
   };
 }
 
-export default connect(mapStateToProps)(AdminRequestsWrapper);
+export default connect(mapStateToProps)(AdminRequestSettingsWrapper);

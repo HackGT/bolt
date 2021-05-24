@@ -20,8 +20,8 @@ export interface Request {
   status: RequestStatus;
   location: Location;
   quantity: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface UserAndRequests {

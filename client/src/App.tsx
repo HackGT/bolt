@@ -8,12 +8,11 @@ import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
 import HomeContainer from "./components/HomeContainer";
 import CSVWizard from "./components/csv/CSVWizard";
-import ItemWrapper from "./components/item/ItemWrapper";
 import PrivateRoute from "./components/util/PrivateRoute";
 import AdminOverviewContainer from "./components/admin/AdminOverviewContainer";
 import { bugsnagClient, bugsnagEnabled } from "./index";
 import AdminUsersListWrapper from "./components/admin/AdminUsersListWrapper";
-import AdminRequestsWrapper from "./components/admin/AdminRequestsWrapper";
+import AdminRequestSettingsWrapper from "./components/admin/AdminRequestSettingsWrapper";
 import UserProfileWrapper from "./components/users/UserProfileWrapper";
 import DeskContainer from "./components/desk/DeskContainer";
 import { User } from "./types/User";
@@ -24,6 +23,8 @@ import DetailedItemStatistics from "./components/reports/statistics/DetailedItem
 import ItemDemandReport from "./components/reports/demand/ItemDemandReport";
 import { USER_INFO } from "./components/util/graphql/Queries";
 import LoadingSpinner from "./components/util/LoadingSpinner";
+import CreateItemWrapper from "./components/item/CreateItemWrapper";
+import EditItemWrapper from "./components/item/EditItemWrapper";
 
 interface OwnProps {}
 
@@ -76,10 +77,11 @@ const App: React.FC<Props> = props => {
             <Route path="/user" component={UserProfileWrapper} />
             <PrivateRoute exact path="/admin" component={AdminOverviewContainer} />
             <PrivateRoute exact path="/admin/desk" component={DeskContainer} />
-            <PrivateRoute path="/admin/items" component={ItemWrapper} />
+            <PrivateRoute exact path="/admin/items/new" component={CreateItemWrapper} />
+            <PrivateRoute exact path="/admin/items/:itemId" component={EditItemWrapper} />
             <PrivateRoute exact path="/admin/csv" component={CSVWizard} />
             <PrivateRoute exact path="/admin/users" component={AdminUsersListWrapper} />
-            <PrivateRoute exact path="/admin/requests" component={AdminRequestsWrapper} />
+            <PrivateRoute exact path="/admin/settings" component={AdminRequestSettingsWrapper} />
             <PrivateRoute
               exact
               path="/admin/reports/statistics"
