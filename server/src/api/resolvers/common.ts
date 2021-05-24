@@ -1,31 +1,26 @@
 import { GraphQLError } from "graphql";
 import { PubSub } from "graphql-subscriptions";
-import { Category, Setting, Location, Item } from "@prisma/client";
+import { Category, Setting, Location, Item, Request } from "@prisma/client";
 
-import { onlyIfAdmin } from "../util";
-import { Item as GraphQLItem, UserUpdateInput } from "../graphql.types";
-import { QuantityController } from "../controllers/QuantityController";
+import { localTimestamp, onlyIfAdmin } from "../util";
+import { Item as GraphQLItem } from "../graphql.types";
+import { ItemAllQtys, QuantityController } from "../controllers/QuantityController";
 import { prisma } from "../../common";
 
 export const pubsub = new PubSub();
 
 export const REQUEST_CHANGE = "requestChange";
 
-export async function populateItem(
+export function populateItem(
   item: Item & { location: Location; category: Category },
-  isAdmin: boolean
-): Promise<GraphQLItem> {
-  const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await QuantityController.all([
-    item.id,
-  ]);
-
+  isAdmin: boolean,
+  itemQuantities: ItemAllQtys
+): GraphQLItem {
   return {
     ...item,
+    ...itemQuantities[item.id],
     price: onlyIfAdmin(item.price, isAdmin),
     owner: onlyIfAdmin(item.owner, isAdmin),
-    qtyInStock: qtyInStock[item.id],
-    qtyUnreserved: qtyUnreserved[item.id],
-    qtyAvailableForApproval: qtyAvailableForApproval[item.id],
   };
 }
 
@@ -50,7 +45,8 @@ export async function getItem(itemId: number, isAdmin: boolean): Promise<GraphQL
     return null;
   }
 
-  return populateItem(item, isAdmin);
+  const itemQuantities = await QuantityController.all([itemId]);
+  return populateItem(item, isAdmin, itemQuantities);
 }
 
 export async function getUser(userId: string) {
@@ -69,51 +65,6 @@ export async function getUser(userId: string) {
   return user;
 }
 
-export async function updateUser(args: any, context: any) {
-  const searchObj: UserUpdateInput = args.updatedUser;
-
-  if (!context.user.admin && args.uuid !== context.user.uuid) {
-    throw new GraphQLError("You do not have permission to update users other than yourself.");
-  }
-
-  // non-admins can't change these properties
-  if (!context.user.admin) {
-    console.log("updateUser: user is not admin");
-    delete searchObj.admin;
-    delete searchObj.haveID;
-  }
-
-  // don't let an admin remove their own admin permissions
-  if (context.user.admin && args.uuid === context.user.uuid) {
-    delete searchObj.admin;
-  }
-
-  // stop if no properties are going to be updated
-  if (!Object.keys(searchObj).length) {
-    console.log("updateUser: stopping as no properties will be updated");
-    return null;
-  }
-
-  if (searchObj.phone && !/^\(?(\d){3}\)? ?(\d){3}-?(\d){4}$/.test(searchObj.phone)) {
-    throw new GraphQLError("User not updated because phone number format is invalid");
-  }
-
-  const user = prisma.user.update({
-    where: {
-      uuid: args.uuid,
-    },
-    data: {
-      ...searchObj,
-      phone: searchObj.phone ?? undefined,
-      slackUsername: searchObj.slackUsername ?? undefined,
-      haveID: searchObj.haveID ?? undefined,
-      admin: searchObj.admin ?? undefined,
-    },
-  });
-
-  return user;
-}
-
 export async function getSetting(settingName: string): Promise<Setting> {
   const setting = prisma.setting.findFirst({
     where: {
@@ -127,4 +78,14 @@ export async function getSetting(settingName: string): Promise<Setting> {
 
   // @ts-ignore
   return setting;
+}
+
+export function toSimpleRequest(request: Request) {
+  return {
+    id: request.id,
+    status: request.status,
+    quantity: request.quantity,
+    createdAt: localTimestamp(request.createdAt),
+    updatedAt: localTimestamp(request.updatedAt),
+  };
 }

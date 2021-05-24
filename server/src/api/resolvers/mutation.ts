@@ -1,19 +1,19 @@
 /* eslint-disable camelcase, no-param-reassign */
 import { GraphQLError } from "graphql";
 
-import { Item, MutationResolvers, Request, RequestStatus, User } from "../graphql.types";
+import { MutationResolvers, Request, RequestStatus, User, UserUpdateInput } from "../graphql.types";
 import {
   getItem,
   getUser,
   getSetting,
   REQUEST_CHANGE,
-  updateUser,
   pubsub,
   populateItem,
+  toSimpleRequest,
 } from "./common";
 import { localTimestamp } from "../util";
-import { RequestController } from "../controllers/RequestController";
 import { prisma } from "../../common";
+import { QuantityController } from "../controllers/QuantityController";
 
 export const Mutation: MutationResolvers = {
   /* Mutations */
@@ -21,9 +21,6 @@ export const Mutation: MutationResolvers = {
    * Create a new item
    * TODO: error handling?
    * Access level: admins
-   * @param root
-   * @param args
-   * @param context
    */
   createItem: async (root, args, context) => {
     // Restrict endpoint to admins
@@ -91,15 +88,13 @@ export const Mutation: MutationResolvers = {
       },
     });
 
-    return await populateItem(item, context.user.admin);
+    const itemQuantities = await QuantityController.all([item.id]);
+    return populateItem(item, context.user.admin, itemQuantities);
   },
   /**
    * Update an existing item given its ID
    * TODO: reduce duplicate code from createItem
    * TODO: should be refactored to be like updateRequest
-   * @param root
-   * @param args
-   * @param context
    */
   updateItem: async (root, args, context) => {
     // Restrict endpoint to admins
@@ -176,14 +171,14 @@ export const Mutation: MutationResolvers = {
       },
     });
 
-    return await populateItem(item, context.user.admin);
+    const itemQuantities = await QuantityController.all([item.id]);
+    return populateItem(item, context.user.admin, itemQuantities);
   },
   createRequest: async (root, args, context) => {
     // if non-admin, user on request must be user signed in
     if (!context.user.admin && context.user.uuid !== args.newRequest.userId) {
       throw new GraphQLError(
-        "Unable to create request because you are not an admin and your UUID " +
-          "does not match the UUID of the user this request is for"
+        "Unable to create request because you are not an admin and your UUID does not match the UUID of the user this request is for"
       );
     }
 
@@ -198,13 +193,13 @@ export const Mutation: MutationResolvers = {
     }
 
     // eslint-disable-next-line eqeqeq
-    if (requests_allowed !== undefined && requests_allowed.value == "false") {
+    if (requests_allowed === undefined || requests_allowed.value == "false") {
       console.log("Requests are disabled at this time");
       throw new GraphQLError("Requests are disabled at this time");
     }
 
     // fetch the item
-    const item: Item | null = await getItem(args.newRequest.itemId, context.user.admin);
+    const item = await getItem(args.newRequest.itemId, context.user.admin);
 
     if (!item) {
       throw new GraphQLError(
@@ -251,7 +246,7 @@ export const Mutation: MutationResolvers = {
       throw new GraphQLError("Unable to retrieve the new item information after creating request");
     }
 
-    const simpleRequest = RequestController.toSimpleRequest(newRequest);
+    const simpleRequest = toSimpleRequest(newRequest);
 
     const result: Request = {
       ...simpleRequest,
@@ -327,19 +322,18 @@ export const Mutation: MutationResolvers = {
         data: updateObj,
       });
 
-      const simpleRequest = RequestController.toSimpleRequest(updatedRequest);
+      const simpleRequest = toSimpleRequest(updatedRequest);
 
       let user: User | null;
       if (updatedUserHaveID !== null) {
-        user = await updateUser(
-          {
+        user = await prisma.user.update({
+          where: {
             uuid: updatedRequest.userId,
-            updatedUser: {
-              haveID: updatedUserHaveID,
-            },
           },
-          context
-        );
+          data: {
+            haveID: updatedUserHaveID,
+          },
+        });
       } else {
         user = await getUser(updatedRequest.userId);
       }
@@ -376,7 +370,50 @@ export const Mutation: MutationResolvers = {
 
     return null;
   },
-  updateUser: async (root, args, context) => await updateUser(args, context),
+  updateUser: async (root, args, context) => {
+    const searchObj: UserUpdateInput = args.updatedUser;
+
+    if (!context.user.admin && args.uuid !== context.user.uuid) {
+      throw new GraphQLError("You do not have permission to update users other than yourself.");
+    }
+
+    // non-admins can't change these properties
+    if (!context.user.admin) {
+      console.log("updateUser: user is not admin");
+      delete searchObj.admin;
+      delete searchObj.haveID;
+    }
+
+    // don't let an admin remove their own admin permissions
+    if (context.user.admin && args.uuid === context.user.uuid) {
+      delete searchObj.admin;
+    }
+
+    // stop if no properties are going to be updated
+    if (!Object.keys(searchObj).length) {
+      console.log("updateUser: stopping as no properties will be updated");
+      return null;
+    }
+
+    if (searchObj.phone && !/^\(?(\d){3}\)? ?(\d){3}-?(\d){4}$/.test(searchObj.phone)) {
+      throw new GraphQLError("User not updated because phone number format is invalid");
+    }
+
+    const user = prisma.user.update({
+      where: {
+        uuid: args.uuid,
+      },
+      data: {
+        ...searchObj,
+        phone: searchObj.phone ?? undefined,
+        slackUsername: searchObj.slackUsername ?? undefined,
+        haveID: searchObj.haveID ?? undefined,
+        admin: searchObj.admin ?? undefined,
+      },
+    });
+
+    return user;
+  },
   createSetting: async (root, args, context) => {
     // Restrict endpoint to admins
     if (!context.user.admin) {
@@ -399,9 +436,6 @@ export const Mutation: MutationResolvers = {
   },
   /**
    * Update an existing setting given its name
-   * @param root
-   * @param args
-   * @param context
    */
   updateSetting: async (root, args, context) => {
     // Restrict endpoint to admins

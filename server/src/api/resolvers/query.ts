@@ -1,21 +1,16 @@
 import { GraphQLError } from "graphql";
 
-import { onlyIfAdmin } from "../util";
-import { QueryResolvers, RequestStatus } from "../graphql.types";
+import { ItemsByCategory, ItemsByLocation, QueryResolvers, RequestStatus } from "../graphql.types";
 import { QuantityController } from "../controllers/QuantityController";
-import { ItemController } from "../controllers/ItemController";
-import { getItem, getSetting } from "./common";
-import { RequestController } from "../controllers/RequestController";
+import { getItem, getSetting, populateItem } from "./common";
 import { prisma } from "../../common";
+import { localTimestamp } from "../util";
 
 export const Query: QueryResolvers = {
   /* Queries */
   /**
    * Returns information about the current signed in user
    * Access level: current signed in user
-   * @param root
-   * @param args
-   * @param context
    */
   user: async (root, args, context) => ({
     uuid: context.user.uuid,
@@ -55,18 +50,12 @@ export const Query: QueryResolvers = {
    * Returns information about a single item
    * TODO: better filtering/search
    * Access level: any signed in user
-   * @param root
-   * @param args
-   * @param context
    */
   item: async (root, args, context) => await getItem(args.id, context.user.admin),
   /**
    * Bulk items API
    * TODO: pagination/returned quantity limit
    * Access level: any signed in user
-   * @param root
-   * @param args
-   * @param context
    */
   allItems: async (root, args, context) => {
     const itemsSearchObj: any = {};
@@ -75,6 +64,7 @@ export const Query: QueryResolvers = {
       itemsSearchObj.hidden = false;
       locationsSearchObj.hidden = false;
     }
+
     const items = await prisma.item.findMany({
       where: itemsSearchObj,
       include: {
@@ -87,58 +77,56 @@ export const Query: QueryResolvers = {
       where: locationsSearchObj,
     });
 
-    const { qtyInStock, qtyUnreserved, qtyAvailableForApproval } = await QuantityController.all();
-    const itemsByLocation: any = {};
-    for (let i = 0; i < locations.length; i++) {
-      const loc = locations[i];
+    const itemQuantities = await QuantityController.all();
+    const itemsByLocation: ItemsByLocation[] = [];
 
-      const itemsAtLocation = items.filter(predItem => predItem.locationId === loc.id);
-      const itemsByCategory: any = {};
+    for (const location of locations) {
+      const itemsAtLocation = items.filter(predItem => predItem.locationId === location.id);
+      const itemsByCategory: Record<number, ItemsByCategory> = {};
 
-      for (let j = 0; j < itemsAtLocation.length; j++) {
-        const item = itemsAtLocation[j];
-
+      for (const item of itemsAtLocation) {
         if (!Object.prototype.hasOwnProperty.call(itemsByCategory, item.categoryId)) {
           itemsByCategory[item.categoryId] = {
-            category: {
-              id: item.categoryId,
-              name: item.category.name,
-            },
+            category: item.category,
             items: [],
           };
         }
-        itemsByCategory[item.categoryId].items.push({
-          ...item,
-          price: onlyIfAdmin(item.price, context.user.admin),
-          owner: onlyIfAdmin(item.owner, context.user.admin),
-          qtyInStock: qtyInStock[item.id],
-          qtyUnreserved: qtyUnreserved[item.id],
-          qtyAvailableForApproval: qtyAvailableForApproval[item.id],
-        });
+
+        // @ts-ignore
+        itemsByCategory[item.categoryId].items.push(
+          populateItem(item, context.user.admin, itemQuantities)
+        );
       }
 
-      itemsByLocation[loc.id] = {
-        location: loc,
-        categories: Object.values(itemsByCategory).sort((a: any, b: any) =>
+      itemsByLocation.push({
+        location,
+        categories: Object.values(itemsByCategory).sort((a, b) =>
           a.category.name.localeCompare(b.category.name)
         ),
-      };
+      });
     }
 
-    return Object.values(itemsByLocation);
+    return itemsByLocation;
   },
   categories: async () => await prisma.category.findMany(),
   locations: async () => await prisma.location.findMany(),
   itemStatistics: async (root, args, context) => {
     if (!context.user.admin) {
-      // TODO: validate this
       throw new GraphQLError("You do not have permission to access this endpoint");
     }
 
-    const items: any = await ItemController.get({}, context.user.admin);
-    const detailedQuantities = await QuantityController.quantityStatistics();
+    const prismaItems = await prisma.item.findMany({
+      include: {
+        category: true,
+        location: true,
+      },
+    });
 
-    return items.map((item: any) => {
+    const itemQuantities = await QuantityController.all();
+    const items = prismaItems.map(item => populateItem(item, context.user.admin, itemQuantities));
+    const detailedQuantities = await QuantityController.getQuantities();
+
+    return items.map(item => {
       const qtyInfo = detailedQuantities[item.id] || {
         SUBMITTED: 0,
         APPROVED: 0,
@@ -235,9 +223,14 @@ export const Query: QueryResolvers = {
       }
     });
 
-    return requests.map(request =>
-      RequestController.toNestedRequest(request, context.user.admin, items)
-    );
+    const itemQuantities = await QuantityController.all(items);
+
+    return requests.map(request => ({
+      ...request,
+      item: populateItem(request.item, context.user.admin, itemQuantities),
+      createdAt: localTimestamp(request.createdAt),
+      updatedAt: localTimestamp(request.updatedAt),
+    }));
   },
   setting: async (root, args) => await getSetting(args.name),
 };

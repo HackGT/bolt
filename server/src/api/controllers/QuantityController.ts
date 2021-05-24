@@ -1,13 +1,8 @@
 import { RequestStatus } from "../graphql.types";
-import { ItemController } from "./ItemController";
 import { prisma } from "../../common";
 
-interface QuantitiesInStatus {
-  [statusName: string]: number;
-}
-
-interface ItemQuantities {
-  [itemId: string]: QuantitiesInStatus;
+export interface ItemQuantities {
+  [itemId: string]: Record<RequestStatus | "total", number>;
 }
 
 export interface ItemQtyAvailable {
@@ -15,65 +10,20 @@ export interface ItemQtyAvailable {
 }
 
 export interface ItemAllQtys {
-  qtyInStock: ItemQtyAvailable;
-  qtyUnreserved: ItemQtyAvailable;
-  qtyAvailableForApproval: ItemQtyAvailable;
+  [itemId: string]: {
+    qtyInStock: number;
+    qtyUnreserved: number;
+    qtyAvailableForApproval: number;
+  };
 }
 
 export class QuantityController {
-  public static async inStock(itemIds: number[] = []): Promise<ItemQtyAvailable> {
-    const quantities: ItemQuantities = await QuantityController.getQuantities(
-      ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"],
-      itemIds
-    );
-    const totalAvailable: ItemQtyAvailable = await ItemController.getTotalAvailable(itemIds);
-
-    return this.getTotalAvailableLessStatuses(quantities, totalAvailable, [
-      "FULFILLED",
-      "LOST",
-      "DAMAGED",
-    ]);
-  }
-
-  public static async unreserved(itemIds: number[] = []): Promise<ItemQtyAvailable> {
-    const quantities: ItemQuantities = await QuantityController.getQuantities(
-      ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"],
-      itemIds
-    );
-    const totalAvailable: ItemQtyAvailable = await ItemController.getTotalAvailable(itemIds);
-
-    return this.getTotalAvailableLessStatuses(quantities, totalAvailable, [
-      "SUBMITTED",
-      "APPROVED",
-      "READY_FOR_PICKUP",
-      "FULFILLED",
-      "LOST",
-      "DAMAGED",
-    ]);
-  }
-
-  public static async availableForApproval(itemIds: number[] = []): Promise<ItemQtyAvailable> {
-    const quantities: ItemQuantities = await QuantityController.getQuantities(
-      ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"],
-      itemIds
-    );
-    const totalAvailable: ItemQtyAvailable = await ItemController.getTotalAvailable(itemIds);
-
-    return this.getTotalAvailableLessStatuses(quantities, totalAvailable, [
-      "APPROVED",
-      "READY_FOR_PICKUP",
-      "FULFILLED",
-      "LOST",
-      "DAMAGED",
-    ]);
-  }
-
   public static async all(itemIds: number[] = []): Promise<ItemAllQtys> {
     const quantities: ItemQuantities = await QuantityController.getQuantities(
       ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"],
       itemIds
     );
-    const totalAvailable: ItemQtyAvailable = await ItemController.getTotalAvailable(itemIds);
+    const totalAvailable: ItemQtyAvailable = await this.getTotalAvailable(itemIds);
 
     const qtyInStock: ItemQtyAvailable = this.getTotalAvailableLessStatuses(
       quantities,
@@ -91,44 +41,20 @@ export class QuantityController {
       ["APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"]
     );
 
-    return {
-      qtyInStock,
-      qtyUnreserved,
-      qtyAvailableForApproval,
-    };
+    const itemQuantities: ItemAllQtys = {};
+
+    Object.keys(quantities).forEach(itemId => {
+      itemQuantities[itemId] = {
+        qtyInStock: qtyInStock[itemId],
+        qtyUnreserved: qtyUnreserved[itemId],
+        qtyAvailableForApproval: qtyAvailableForApproval[itemId],
+      };
+    });
+
+    return itemQuantities;
   }
 
-  public static async quantityStatistics(): Promise<ItemQuantities> {
-    return await QuantityController.getQuantities();
-  }
-
-  private static getTotalAvailableLessStatuses(
-    quantities: ItemQuantities,
-    totalAvailable: ItemQtyAvailable,
-    statuses: RequestStatus[] = []
-  ): ItemQtyAvailable {
-    const result: any = {};
-
-    for (const id in totalAvailable) {
-      if (Object.prototype.hasOwnProperty.call(totalAvailable, id)) {
-        if (Object.prototype.hasOwnProperty.call(quantities, id)) {
-          const itemStatusCounts = quantities[id];
-          let quantity = totalAvailable[id];
-          for (let i = 0; i < statuses.length; i++) {
-            quantity -= itemStatusCounts[statuses[i]];
-          }
-          result[id] = quantity;
-        } else {
-          // no requests for this item with statuses provided, so just return totalAvailable
-          result[id] = totalAvailable[id];
-        }
-      }
-    }
-
-    return result;
-  }
-
-  private static async getQuantities(
+  public static async getQuantities(
     statuses: RequestStatus[] = [],
     itemIds: number[] = []
   ): Promise<ItemQuantities> {
@@ -183,5 +109,48 @@ export class QuantityController {
     }
 
     return result;
+  }
+
+  private static getTotalAvailableLessStatuses(
+    quantities: ItemQuantities,
+    totalAvailable: ItemQtyAvailable,
+    statuses: RequestStatus[] = []
+  ): ItemQtyAvailable {
+    const result: any = {};
+
+    for (const id in totalAvailable) {
+      if (Object.prototype.hasOwnProperty.call(totalAvailable, id)) {
+        if (Object.prototype.hasOwnProperty.call(quantities, id)) {
+          const itemStatusCounts = quantities[id];
+          let quantity = totalAvailable[id];
+          for (let i = 0; i < statuses.length; i++) {
+            quantity -= itemStatusCounts[statuses[i]];
+          }
+          result[id] = quantity;
+        } else {
+          // no requests for this item with statuses provided, so just return totalAvailable
+          result[id] = totalAvailable[id];
+        }
+      }
+    }
+
+    return result;
+  }
+
+  private static async getTotalAvailable(itemIds: number[] = []) {
+    const items = await prisma.item.findMany({
+      where: {
+        id: {
+          in: itemIds.length === 0 ? undefined : itemIds,
+        },
+      },
+    });
+    const resultObj: ItemQtyAvailable = {};
+
+    for (const item of items) {
+      resultObj[item.id] = item.totalAvailable;
+    }
+
+    return resultObj;
   }
 }
