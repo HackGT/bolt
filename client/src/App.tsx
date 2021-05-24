@@ -6,25 +6,25 @@ import { useQuery } from "@apollo/client";
 
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
-import HomeContainer from "./components/HomeContainer";
-import CSVWizard from "./components/csv/CSVWizard";
+import HomeContainer from "./components/home/HomeContainer";
+import CSVWizard from "./components/admin/csv/CSVWizard";
 import PrivateRoute from "./components/util/PrivateRoute";
 import AdminOverviewContainer from "./components/admin/AdminOverviewContainer";
 import { bugsnagClient, bugsnagEnabled } from "./index";
 import AdminUsersListWrapper from "./components/admin/AdminUsersListWrapper";
 import AdminRequestSettingsWrapper from "./components/admin/AdminRequestSettingsWrapper";
-import UserProfileWrapper from "./components/users/UserProfileWrapper";
-import DeskContainer from "./components/desk/DeskContainer";
+import UserProfileWrapper from "./components/userProfile/UserProfileWrapper";
+import DeskContainer from "./components/admin/desk/DeskContainer";
 import { User } from "./types/User";
 import { loginUser } from "./state/Account";
 import { AppState } from "./state/Store";
 import CacheBuster from "./components/util/CacheBuster";
-import DetailedItemStatistics from "./components/reports/statistics/DetailedItemStatistics";
-import ItemDemandReport from "./components/reports/demand/ItemDemandReport";
-import { USER_INFO } from "./components/util/graphql/Queries";
+import DetailedItemStatistics from "./components/admin/reports/statistics/DetailedItemStatistics";
+import ItemDemandReport from "./components/admin/reports/demand/ItemDemandReport";
+import { USER_INFO } from "./graphql/Queries";
 import LoadingSpinner from "./components/util/LoadingSpinner";
-import CreateItemWrapper from "./components/item/CreateItemWrapper";
-import EditItemWrapper from "./components/item/EditItemWrapper";
+import CreateItemWrapper from "./components/items/CreateItemWrapper";
+import EditItemWrapper from "./components/items/EditItemWrapper";
 
 interface OwnProps {}
 

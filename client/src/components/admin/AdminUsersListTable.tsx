@@ -7,8 +7,8 @@ import { withToastManager } from "react-toast-notifications";
 
 import { AppState } from "../../state/Store";
 import { FullUser, User } from "../../types/User";
-import { ALL_USERS } from "../util/graphql/Queries";
-import { UPDATE_USER } from "../util/graphql/Mutations";
+import { ALL_USERS } from "../../graphql/Queries";
+import { UPDATE_USER } from "../../graphql/Mutations";
 
 type UsersListProps = {
   users: FullUser[];

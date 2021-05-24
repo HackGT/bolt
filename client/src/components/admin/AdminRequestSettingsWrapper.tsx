@@ -4,8 +4,8 @@ import { Button, Checkbox, Grid, Header, Loader, Message } from "semantic-ui-rea
 import { Query, Mutation } from "@apollo/client/react/components";
 
 import { AppState } from "../../state/Store";
-import { GET_SETTING } from "../util/graphql/Queries";
-import { UPDATE_SETTING, CREATE_SETTING } from "../util/graphql/Mutations";
+import { GET_SETTING } from "../../graphql/Queries";
+import { UPDATE_SETTING, CREATE_SETTING } from "../../graphql/Mutations";
 
 const AdminRequestSettingsWrapper: React.FC = () => {
   const [requestsAllowed, setRequestsAllowed] = useState(false);

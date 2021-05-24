@@ -6,7 +6,7 @@ import { Query } from "@apollo/client/react/components";
 import { AppState } from "../../state/Store";
 import AdminUsersListTable from "./AdminUsersListTable";
 import { FullUser } from "../../types/User";
-import { ALL_USERS } from "../util/graphql/Queries";
+import { ALL_USERS } from "../../graphql/Queries";
 
 const AdminUsersListWrapper: React.FC = () => (
   <div>

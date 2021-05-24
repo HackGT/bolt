@@ -4,9 +4,9 @@ import { useMutation } from "@apollo/client";
 import { Query } from "@apollo/client/react/components";
 import { withToastManager } from "react-toast-notifications";
 
-import { CREATE_REQUEST } from "../util/graphql/Mutations";
+import { CREATE_REQUEST } from "../../graphql/Mutations";
 import { RequestedItem } from "../../types/Hardware";
-import { GET_SETTING, USER_REQUESTS } from "../util/graphql/Queries";
+import { GET_SETTING, USER_REQUESTS } from "../../graphql/Queries";
 import { User } from "../../types/User";
 
 interface Props {
