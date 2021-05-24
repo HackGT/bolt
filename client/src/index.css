@@ -1,6 +1,6 @@
 @import "~semantic-ui-css/semantic.min.css";
 @import "styles/hardware.css";
-@import "components/desk/Desk";
+@import "components/admin/desk/Desk";
 
 .flex-container {
   display: flex;

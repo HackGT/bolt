@@ -43,7 +43,7 @@ export class QuantityController {
 
     const itemQuantities: ItemAllQtys = {};
 
-    Object.keys(quantities).forEach(itemId => {
+    Object.keys(totalAvailable).forEach(itemId => {
       itemQuantities[itemId] = {
         qtyInStock: qtyInStock[itemId],
         qtyUnreserved: qtyUnreserved[itemId],
