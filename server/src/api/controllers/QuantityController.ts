@@ -1,7 +1,7 @@
 import { RequestStatus } from "../graphql.types";
 import { prisma } from "../../common";
 
-export interface ItemQuantities {
+export interface ItemStatusQuantities {
   [itemId: string]: Record<RequestStatus | "total", number>;
 }
 
@@ -19,7 +19,7 @@ export interface ItemAllQtys {
 
 export class QuantityController {
   public static async all(itemIds: number[] = []): Promise<ItemAllQtys> {
-    const quantities: ItemQuantities = await QuantityController.getQuantities(
+    const quantities: ItemStatusQuantities = await QuantityController.getQuantities(
       ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"],
       itemIds
     );
@@ -57,7 +57,7 @@ export class QuantityController {
   public static async getQuantities(
     statuses: RequestStatus[] = [],
     itemIds: number[] = []
-  ): Promise<ItemQuantities> {
+  ): Promise<ItemStatusQuantities> {
     let selectStatuses = statuses;
     if (selectStatuses.length === 0) {
       selectStatuses = [
@@ -112,11 +112,11 @@ export class QuantityController {
   }
 
   private static getTotalAvailableLessStatuses(
-    quantities: ItemQuantities,
+    quantities: ItemStatusQuantities,
     totalAvailable: ItemQtyAvailable,
     statuses: RequestStatus[] = []
   ): ItemQtyAvailable {
-    const result: any = {};
+    const result: ItemQtyAvailable = {};
 
     for (const id in totalAvailable) {
       if (Object.prototype.hasOwnProperty.call(totalAvailable, id)) {

@@ -58,15 +58,10 @@ export const Query: QueryResolvers = {
    * Access level: any signed in user
    */
   allItems: async (root, args, context) => {
-    const itemsSearchObj: any = {};
-    const locationsSearchObj: any = {};
-    if (!context.user.admin) {
-      itemsSearchObj.hidden = false;
-      locationsSearchObj.hidden = false;
-    }
-
     const items = await prisma.item.findMany({
-      where: itemsSearchObj,
+      where: {
+        hidden: context.user.admin ? undefined : false,
+      },
       include: {
         location: true,
         category: true,
@@ -74,7 +69,9 @@ export const Query: QueryResolvers = {
     });
 
     const locations = await prisma.location.findMany({
-      where: locationsSearchObj,
+      where: {
+        hidden: context.user.admin ? undefined : false,
+      },
     });
 
     const itemQuantities = await QuantityController.all();
