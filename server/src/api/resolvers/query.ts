@@ -2,9 +2,8 @@ import { GraphQLError } from "graphql";
 
 import { ItemsByCategory, ItemsByLocation, QueryResolvers, RequestStatus } from "../graphql.types";
 import { QuantityController } from "../controllers/QuantityController";
-import { getItem, getSetting, populateItem } from "./common";
+import { getItem, getSetting, populateItem, populateRequest } from "./common";
 import { prisma } from "../../common";
-import { localTimestamp } from "../util";
 
 export const Query: QueryResolvers = {
   /* Queries */
@@ -52,6 +51,23 @@ export const Query: QueryResolvers = {
    * Access level: any signed in user
    */
   item: async (root, args, context) => await getItem(args.id, context.user.admin),
+  items: async (root, args, context) => {
+    const items = await prisma.item.findMany({
+      where: {
+        hidden: context.user.admin ? undefined : false,
+        location: {
+          hidden: context.user.admin ? undefined : false,
+        },
+      },
+      include: {
+        location: true,
+        category: true,
+      },
+    });
+
+    const itemQuantities = await QuantityController.all();
+    return items.map(item => populateItem(item, context.user.admin, itemQuantities));
+  },
   /**
    * Bulk items API
    * TODO: pagination/returned quantity limit
@@ -143,6 +159,39 @@ export const Query: QueryResolvers = {
       };
     });
   },
+  request: async (root, args, context) => {
+    if (!context.user.admin) {
+      throw new GraphQLError("You do not have permission to access this endpoint");
+    }
+
+    if (args.id <= 0) {
+      throw new GraphQLError(
+        "Invalid request ID.  The request ID you provided was <= 0, but request IDs must be >= 1."
+      );
+    }
+
+    const request = await prisma.request.findFirst({
+      where: {
+        id: args.id,
+      },
+      include: {
+        item: {
+          include: {
+            location: true,
+            category: true,
+          },
+        },
+        user: true,
+      },
+    });
+
+    if (request === null) {
+      return null;
+    }
+
+    const itemQuantities = await QuantityController.all([request.item.id]);
+    return populateRequest(request, context.user.admin, itemQuantities);
+  },
   requests: async (root, args, context) => {
     const searchObj: any = {};
 
@@ -221,13 +270,7 @@ export const Query: QueryResolvers = {
     });
 
     const itemQuantities = await QuantityController.all(items);
-
-    return requests.map(request => ({
-      ...request,
-      item: populateItem(request.item, context.user.admin, itemQuantities),
-      createdAt: localTimestamp(request.createdAt),
-      updatedAt: localTimestamp(request.updatedAt),
-    }));
+    return requests.map(request => populateRequest(request, context.user.admin, itemQuantities));
   },
   setting: async (root, args) => await getSetting(args.name),
 };

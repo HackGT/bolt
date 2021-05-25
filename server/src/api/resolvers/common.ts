@@ -1,9 +1,9 @@
 import { GraphQLError } from "graphql";
 import { PubSub } from "graphql-subscriptions";
-import { Category, Setting, Location, Item, Request } from "@prisma/client";
+import { Category, Setting, Location, Item, Request, User } from "@prisma/client";
 
 import { localTimestamp, onlyIfAdmin } from "../util";
-import { Item as GraphQLItem } from "../graphql.types";
+import { Item as GraphQLItem, Request as GraphQLRequest } from "../graphql.types";
 import { ItemAllQtys, QuantityController } from "../controllers/QuantityController";
 import { prisma } from "../../common";
 
@@ -21,6 +21,25 @@ export function populateItem(
     ...itemQuantities[item.id],
     price: onlyIfAdmin(item.price, isAdmin),
     owner: onlyIfAdmin(item.owner, isAdmin),
+  };
+}
+
+export function populateRequest(
+  request: Request & {
+    item: Item & {
+      location: Location;
+      category: Category;
+    };
+    user: User;
+  },
+  isAdmin: boolean,
+  itemQuantities: ItemAllQtys
+): GraphQLRequest {
+  return {
+    ...request,
+    item: populateItem(request.item, isAdmin, itemQuantities),
+    createdAt: localTimestamp(request.createdAt),
+    updatedAt: localTimestamp(request.updatedAt),
   };
 }
 

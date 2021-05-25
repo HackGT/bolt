@@ -25,6 +25,9 @@ import { USER_INFO } from "./graphql/Queries";
 import LoadingSpinner from "./components/util/LoadingSpinner";
 import CreateItemWrapper from "./components/items/CreateItemWrapper";
 import EditItemWrapper from "./components/items/EditItemWrapper";
+import AdminRequestsWrapper from "./components/requests/AdminRequestsWrapper";
+import EditRequestWrapper from "./components/requests/EditRequestWrapper";
+import CreateRequestWrapper from "./components/requests/CreateRequestWrapper";
 
 interface OwnProps {}
 
@@ -81,6 +84,9 @@ const App: React.FC<Props> = props => {
             <PrivateRoute exact path="/admin/items/:itemId" component={EditItemWrapper} />
             <PrivateRoute exact path="/admin/csv" component={CSVWizard} />
             <PrivateRoute exact path="/admin/users" component={AdminUsersListWrapper} />
+            <PrivateRoute exact path="/admin/requests" component={AdminRequestsWrapper} />
+            <PrivateRoute exact path="/admin/requests/new" component={CreateRequestWrapper} />
+            <PrivateRoute exact path="/admin/requests/:requestId" component={EditRequestWrapper} />
             <PrivateRoute exact path="/admin/settings" component={AdminRequestSettingsWrapper} />
             <PrivateRoute
               exact

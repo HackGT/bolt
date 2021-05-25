@@ -15,7 +15,10 @@ export type AdminCardLink = {
 function adminCardLink(name: string, to = "#", external = false): AdminCardLink {
   return { name, to, external };
 }
-const hardwareDesk: AdminCardLink[] = [adminCardLink("Work hardware desk", "/admin/desk")];
+const hardwareDesk: AdminCardLink[] = [
+  adminCardLink("Work hardware desk", "/admin/desk"),
+  adminCardLink("Manage requests", "/admin/requests"),
+];
 
 const manage: AdminCardLink[] = [
   adminCardLink("Users", "/admin/users"),
