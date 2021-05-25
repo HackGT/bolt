@@ -226,10 +226,16 @@ export const Mutation: MutationResolvers = {
       args.newRequest.quantity = 1;
     }
 
-    const initialStatus: RequestStatus =
-      !item.approvalRequired && item.qtyUnreserved >= args.newRequest.quantity
-        ? "APPROVED"
-        : "SUBMITTED";
+    let initialStatus: RequestStatus;
+
+    if (context.user.admin === true && args.newRequest.status) {
+      initialStatus = args.newRequest.status;
+    } else {
+      initialStatus =
+        !item.approvalRequired && item.qtyUnreserved >= args.newRequest.quantity
+          ? "APPROVED"
+          : "SUBMITTED";
+    }
 
     const newRequest = await prisma.request.create({
       data: {

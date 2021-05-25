@@ -96,7 +96,7 @@ function getUpdateQuery() {
 }
 
 function DeskContainer() {
-  const { subscribeToMore, ...query } = useQuery(DESK_REQUESTS);
+  const { subscribeToMore, ...query } = useQuery(DESK_REQUESTS, { fetchPolicy: "network-only" });
   const randomPhrase = useState(
     `${pickRandomElement(starters)} ${Math.floor((Math.random() + 1) * 900)} ${pickRandomElement(
       funPhrases

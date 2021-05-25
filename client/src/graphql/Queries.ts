@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 
-import { ITEM_INFO_FRAGMENT, USER_INFO_FRAGMENT } from "./Fragments";
+import { ITEM_INFO_FRAGMENT, REQUEST_INFO_FRAGMENT, USER_INFO_FRAGMENT } from "./Fragments";
 
 export const ITEM_EDIT_GET_ITEM = gql`
   query getItem($itemId: Int!) {
@@ -68,6 +68,38 @@ export const ALL_USERS = gql`
     }
   }
   ${USER_INFO_FRAGMENT}
+`;
+
+export const ALL_REQUESTS = gql`
+  query requests {
+    requests(search: {}) {
+      ...RequestInfoFragment
+    }
+  }
+  ${REQUEST_INFO_FRAGMENT}
+`;
+
+export const GET_REQUEST = gql`
+  query request($requestId: Int!) {
+    request(id: $requestId) {
+      ...RequestInfoFragment
+    }
+  }
+  ${REQUEST_INFO_FRAGMENT}
+`;
+
+export const REQUEST_FORM_INFO = gql`
+  query requestForm {
+    users(search: {}) {
+      uuid
+      name
+      email
+    }
+    items {
+      ...ItemInfoFragment
+    }
+  }
+  ${ITEM_INFO_FRAGMENT}
 `;
 
 export const DESK_REQUESTS = gql`
