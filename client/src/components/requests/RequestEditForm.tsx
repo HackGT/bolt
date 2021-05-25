@@ -62,6 +62,7 @@ const RequestEditForm: React.FC<Props> = props => {
       : {
           id: props.preloadRequestId,
           userId: requestData.userId,
+          itemId: requestData.itemId,
           quantity: requestData.quantity,
         };
 
@@ -166,7 +167,9 @@ const RequestEditForm: React.FC<Props> = props => {
             loading={loading}
             required
             options={itemOptions}
-            disabled={!props.createRequest}
+            disabled={
+              ![SUBMITTED, APPROVED, READY_FOR_PICKUP].includes(props.preloadRequest.status)
+            }
             placeholder="Big rubber duck"
             value={requestData.itemId}
           />

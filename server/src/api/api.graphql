@@ -199,6 +199,7 @@ input RequestInput {
 input RequestUpdateInput {
   id: Int!
   userId: String
+  itemId: Int
   quantity: Int
   status: RequestStatus
   userHaveId: Boolean

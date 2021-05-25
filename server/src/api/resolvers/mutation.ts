@@ -313,6 +313,14 @@ export const Mutation: MutationResolvers = {
       updateObj.quantity = args.updatedRequest.quantity;
     }
 
+    if (args.updatedRequest.userId) {
+      updateObj.userId = args.updatedRequest.userId;
+    }
+
+    if (args.updatedRequest.itemId) {
+      updateObj.itemId = args.updatedRequest.itemId;
+    }
+
     let updatedUserHaveID = null;
     if (typeof args.updatedRequest.userHaveId !== "undefined") {
       updatedUserHaveID = args.updatedRequest.userHaveId;
