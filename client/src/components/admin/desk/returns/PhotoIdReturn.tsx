@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button, Card, Dropdown, Icon } from "semantic-ui-react";
 
 import { updateRequestStatus } from "../DeskUtil";
-import { DAMAGED, LOST, RETURNED } from "../../../../types/Hardware";
+import { DAMAGED, KEPT, LOST, RETURNED } from "../../../../types/Hardware";
 
 function toDropdownOptions(options: string[]) {
   return options.map(option => ({
@@ -12,7 +12,7 @@ function toDropdownOptions(options: string[]) {
   }));
 }
 
-function PhotoIdCheck({
+function PhotoIdReturn({
   userName,
   loading,
   updateRequest,
@@ -24,7 +24,7 @@ function PhotoIdCheck({
   optional,
   numReturnRequired,
 }: any) {
-  const [returnType, setReturnType] = useState(RETURNED);
+  const [returnType, setReturnType] = useState(returnRequired ? RETURNED : KEPT);
 
   const returnID = {
     title: (
@@ -79,7 +79,6 @@ function PhotoIdCheck({
     </Button>
   );
 
-  const dropdownOptions = [RETURNED, LOST, DAMAGED];
   const alreadyReturnedID = {
     title: (
       <span className="hw-positive">
@@ -163,19 +162,21 @@ function PhotoIdCheck({
         <strong>{card.title}</strong>
       </Card.Content>
       <Card.Content>{card.content}</Card.Content>
-      {returnRequired && (
-        <Card.Content>
-          New status:{" "}
-          <Dropdown
-            upward
-            floating
-            inline
-            value={returnType}
-            onChange={(event, { value }: any) => setReturnType(value)}
-            options={toDropdownOptions(dropdownOptions)}
-          />
-        </Card.Content>
-      )}
+      <Card.Content>
+        New status:{" "}
+        <Dropdown
+          upward
+          floating
+          inline
+          value={returnType}
+          onChange={(event, { value }: any) => setReturnType(value)}
+          options={
+            returnRequired
+              ? toDropdownOptions([RETURNED, LOST, DAMAGED])
+              : toDropdownOptions([KEPT, RETURNED])
+          }
+        />
+      </Card.Content>
       {error && (
         <Card.Content className="hw-negative">
           <Icon name="warning sign" />
@@ -187,4 +188,4 @@ function PhotoIdCheck({
   );
 }
 
-export default PhotoIdCheck;
+export default PhotoIdReturn;

@@ -11,7 +11,8 @@ export type RequestStatus =
   | "FULFILLED"
   | "RETURNED"
   | "LOST"
-  | "DAMAGED";
+  | "DAMAGED"
+  | "KEPT";
 
 export interface Request {
   id: number;

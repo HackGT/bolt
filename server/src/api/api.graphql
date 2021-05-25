@@ -166,6 +166,7 @@ enum RequestStatus {
   RETURNED
   LOST
   DAMAGED
+  KEPT
 }
 
 type Request {

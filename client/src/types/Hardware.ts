@@ -59,6 +59,7 @@ export const FULFILLED = "FULFILLED";
 export const RETURNED = "RETURNED";
 export const LOST = "LOST";
 export const DAMAGED = "DAMAGED";
+export const KEPT = "KEPT";
 
 export type DetailedItemQuantities = {
   [key: string]: number;

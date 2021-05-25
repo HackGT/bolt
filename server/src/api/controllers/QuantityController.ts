@@ -20,7 +20,7 @@ export interface ItemAllQtys {
 export class QuantityController {
   public static async all(itemIds: number[] = []): Promise<ItemAllQtys> {
     const quantities: ItemStatusQuantities = await QuantityController.getQuantities(
-      ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"],
+      ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED", "KEPT"],
       itemIds
     );
     const totalAvailable: ItemQtyAvailable = await this.getTotalAvailable(itemIds);
@@ -28,17 +28,17 @@ export class QuantityController {
     const qtyInStock: ItemQtyAvailable = this.getTotalAvailableLessStatuses(
       quantities,
       totalAvailable,
-      ["FULFILLED", "LOST", "DAMAGED"]
+      ["FULFILLED", "LOST", "DAMAGED", "KEPT"]
     );
     const qtyUnreserved: ItemQtyAvailable = this.getTotalAvailableLessStatuses(
       quantities,
       totalAvailable,
-      ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"]
+      ["SUBMITTED", "APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED", "KEPT"]
     );
     const qtyAvailableForApproval: ItemQtyAvailable = this.getTotalAvailableLessStatuses(
       quantities,
       totalAvailable,
-      ["APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED"]
+      ["APPROVED", "READY_FOR_PICKUP", "FULFILLED", "LOST", "DAMAGED", "KEPT"]
     );
 
     const itemQuantities: ItemAllQtys = {};
@@ -58,22 +58,6 @@ export class QuantityController {
     statuses: RequestStatus[] = [],
     itemIds: number[] = []
   ): Promise<ItemStatusQuantities> {
-    let selectStatuses = statuses;
-    if (selectStatuses.length === 0) {
-      selectStatuses = [
-        "SUBMITTED",
-        "APPROVED",
-        "DENIED",
-        "ABANDONED",
-        "CANCELLED",
-        "READY_FOR_PICKUP",
-        "FULFILLED",
-        "RETURNED",
-        "LOST",
-        "DAMAGED",
-      ];
-    }
-
     const quantities = await prisma.request.groupBy({
       by: ["itemId", "status"],
       sum: {
@@ -81,7 +65,7 @@ export class QuantityController {
       },
       where: {
         status: {
-          in: selectStatuses.length === 0 ? undefined : selectStatuses,
+          in: statuses.length === 0 ? undefined : statuses,
         },
         itemId: {
           in: itemIds.length === 0 ? undefined : itemIds,
@@ -90,8 +74,8 @@ export class QuantityController {
     });
 
     const baseObj: any = {};
-    for (let i = 0; i < selectStatuses.length; i++) {
-      baseObj[selectStatuses[i]] = 0;
+    for (let i = 0; i < statuses.length; i++) {
+      baseObj[statuses[i]] = 0;
     }
 
     const result: any = {};

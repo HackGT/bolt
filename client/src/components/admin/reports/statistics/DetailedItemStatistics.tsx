@@ -63,6 +63,12 @@ const columns = [
     center: true,
   },
   {
+    name: "Kept",
+    selector: "detailedQuantities.KEPT",
+    sortable: true,
+    center: true,
+  },
+  {
     name: "Lost",
     selector: "detailedQuantities.LOST",
     sortable: true,

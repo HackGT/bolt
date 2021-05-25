@@ -26,6 +26,7 @@ enum RequestStatus {
   RETURNED
   LOST
   DAMAGED
+  KEPT
 }
 
 model Item {

@@ -135,6 +135,7 @@ export const Query: QueryResolvers = {
         RETURNED: 0,
         LOST: 0,
         DAMAGED: 0,
+        KEPT: 0,
         total: 0,
       };
       return {
@@ -158,19 +159,7 @@ export const Query: QueryResolvers = {
       searchObj.userId = args.search.userId;
     }
 
-    let statuses: RequestStatus[] = [
-      "SUBMITTED",
-      "APPROVED",
-      "DENIED",
-      "ABANDONED",
-      "CANCELLED",
-      "READY_FOR_PICKUP",
-      "FULFILLED",
-      "RETURNED",
-      "LOST",
-      "DAMAGED",
-    ];
-
+    let statuses: RequestStatus[] = [];
     if (args.search.statuses && args.search.statuses.length) {
       statuses = args.search.statuses;
     }
