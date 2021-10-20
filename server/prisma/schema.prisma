@@ -89,15 +89,14 @@ model Setting {
 }
 
 model User {
-  uuid          String    @id @db.Uuid
-  token         String?   @db.VarChar(256)
-  name          String
-  email         String
-  phone         String
-  slackUsername String
-  haveID        Boolean   @default(false)
-  admin         Boolean   @default(false)
-  requests      Request[]
+  uuid     String    @id @db.Uuid
+  token    String?   @db.VarChar(256)
+  name     String
+  email    String
+  phone    String
+  haveID   Boolean   @default(false)
+  admin    Boolean   @default(false)
+  requests Request[]
 
   @@map("users")
 }

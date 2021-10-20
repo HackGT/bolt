@@ -147,7 +147,6 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
       user.name.toLowerCase().indexOf(query) !== -1 ||
       user.email.toLowerCase().indexOf(query) !== -1 ||
       user.phone.indexOf(query) !== -1 ||
-      user.slackUsername.indexOf(query) !== -1 ||
       user.uuid.indexOf(query) !== -1
     );
   }
@@ -157,7 +156,6 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
       "Name",
       "Email",
       "Phone",
-      "Slack Username",
       "Have ID",
       "Admin",
       "Actions",
@@ -178,7 +176,6 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
               <a href={`mailto:${user.email}`}>{user.email}</a>
             </Table.Cell>
             <Table.Cell>{user.phone}</Table.Cell>
-            <Table.Cell>{user.slackUsername}</Table.Cell>
             <Table.Cell>{AdminUsersListTable.checkOrX(user.haveID)}</Table.Cell>
             <Table.Cell>{AdminUsersListTable.checkOrX(user.admin)}</Table.Cell>
             <Table.Cell>

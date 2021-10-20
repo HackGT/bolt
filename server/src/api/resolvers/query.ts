@@ -17,7 +17,6 @@ export const Query: QueryResolvers = {
     name: context.user.name,
     email: context.user.email,
     phone: context.user.phone,
-    slackUsername: context.user.slackUsername,
     haveID: context.user.haveID,
     admin: context.user.admin,
   }),
@@ -38,7 +37,6 @@ export const Query: QueryResolvers = {
         haveID: searchObj.haveID ?? undefined,
         phone: searchObj.phone ?? undefined,
         email: searchObj.email ?? undefined,
-        slackUsername: searchObj.slackUsername ?? undefined,
         admin: searchObj.admin ?? undefined,
       },
       orderBy: {

@@ -72,10 +72,6 @@ function ReadyToPrepareCard({ card }: ReadyToFulfillCardProps) {
       <Card.Content>
         <Icon name="clock outline" /> <TimeAgo date={card.requests[0].updatedAt} />
       </Card.Content>
-      <Card.Content>
-        <Icon name="slack hash" />
-        {card.user.slackUsername}
-      </Card.Content>
       {error ? (
         <Card.Content className="hw-negative">
           <Icon name="warning sign" />

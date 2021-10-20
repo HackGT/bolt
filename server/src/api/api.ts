@@ -94,10 +94,6 @@ apiRoutes.post("/slack/feedback", express.json(), (req, res) => {
               value: user.email,
             },
             {
-              title: "Slack Username",
-              value: user.slackUsername,
-            },
-            {
               title: "Admin",
               value: user.admin ? "Yes" : "No",
             },

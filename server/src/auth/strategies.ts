@@ -35,7 +35,6 @@ interface IProfile {
   member?: boolean;
 }
 interface IProfileScopes {
-  slack: string;
   phone: string;
 }
 
@@ -86,7 +85,6 @@ export class GroundTruthStrategy extends OAuthStrategy {
           uuid: profile.uuid,
           email: profile.email,
           token: profile.token,
-          slackUsername: scopes.slack,
           phone: scopes.phone,
           admin: isAdmin,
         },
@@ -119,7 +117,7 @@ export class GroundTruthStrategy extends OAuthStrategy {
       tokenURL: new URL("/oauth/token", url).toString(),
       clientID: secrets.id,
       clientSecret: secrets.secret,
-      scope: ["phone", "slack"],
+      scope: ["phone"],
       passReqToCallback: true,
     };
     super(options, GroundTruthStrategy.passportCallback);

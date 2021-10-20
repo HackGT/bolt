@@ -406,7 +406,6 @@ export const Mutation: MutationResolvers = {
       data: {
         ...searchObj,
         phone: searchObj.phone ?? undefined,
-        slackUsername: searchObj.slackUsername ?? undefined,
         haveID: searchObj.haveID ?? undefined,
         admin: searchObj.admin ?? undefined,
       },
