@@ -18,3 +18,4 @@ WORKDIR /usr/src/bolt
 EXPOSE 3000
 WORKDIR /usr/src/bolt/server
 CMD ["yarn", "start-migrate"]
+
