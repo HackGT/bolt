@@ -37,7 +37,6 @@ function SubmittedCard({ request }: SubmittedCardProps) {
           <Icon name="user" />
           {request.user.name}
         </Label>
-        <Label attached="top right">
 
         <Header style={{ display: "inline-block" }} size="medium">
           <ItemAndQuantity itemName={request.item.name} quantity={request.quantity} />
