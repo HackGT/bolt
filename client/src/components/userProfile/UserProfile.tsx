@@ -88,7 +88,6 @@ class UserProfile extends Component<Props, UserProfileState> {
       uuid: this.state.user.uuid,
       updatedUser: {
         phone: this.state.user.phone.trim(),
-        slackUsername: this.state.user.slackUsername.trim(),
       },
     };
 
@@ -123,16 +122,12 @@ class UserProfile extends Component<Props, UserProfileState> {
       });
   }
 
-  private validateSlackUsername(): boolean {
-    return !this.state.submitClicked || this.state.user.slackUsername.length > 0;
-  }
-
   private validatePhone(): boolean {
     return !this.state.submitClicked || /^\((\d){3}\) (\d){3}-(\d){4}$/.test(this.state.user.phone);
   }
 
   private validateForm(): boolean {
-    return !this.state.submitClicked || (this.validatePhone() && this.validateSlackUsername());
+    return !this.state.submitClicked || this.validatePhone();
   }
 
   public render() {
@@ -218,15 +213,6 @@ class UserProfile extends Component<Props, UserProfileState> {
             >
               {data && !error ? <Redirect to={backUrl} /> : ""}
               <Header size="large">Contact Information</Header>
-              <Form.Field width={6} error={!this.validateSlackUsername()} required>
-                <label>Slack username</label>
-                <Form.Input
-                  type="text"
-                  value={this.state.user.slackUsername}
-                  name="slackUsername"
-                  error={!this.validateSlackUsername() ? "This field is required" : null}
-                />
-              </Form.Field>
               <Form.Field width={6} required error={!this.validatePhone()}>
                 <label>Phone number</label>
                 <Cleave

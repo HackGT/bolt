@@ -24,7 +24,6 @@ export function updateRequestStatus(
 export function requestSearch(r: Request, searchQuery: string): boolean {
   return (
     r.user.name.toLowerCase().includes(searchQuery) ||
-    r.user.slackUsername.toLowerCase().includes(searchQuery) ||
     r.user.email.toLowerCase().includes(searchQuery) ||
     r.user.phone.includes(searchQuery)
   );

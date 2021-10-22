@@ -37,10 +37,6 @@ function SubmittedCard({ request }: SubmittedCardProps) {
           <Icon name="user" />
           {request.user.name}
         </Label>
-        <Label attached="top right">
-          <Icon name="slack hash" />
-          {request.user.slackUsername}
-        </Label>
 
         <Header style={{ display: "inline-block" }} size="medium">
           <ItemAndQuantity itemName={request.item.name} quantity={request.quantity} />

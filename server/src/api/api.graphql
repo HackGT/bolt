@@ -48,7 +48,6 @@ type User {
   name: String!
   email: String!
   phone: String!
-  slackUsername: String!
   # Whether this user's ID has been collected or not
   haveID: Boolean!
   # Whether this user has admin permissions
@@ -211,13 +210,11 @@ input UserSearch {
   haveID: Boolean
   phone: String
   email: String
-  slackUsername: String
   admin: Boolean
 }
 
 input UserUpdateInput {
   phone: String
-  slackUsername: String
   haveID: Boolean
   admin: Boolean
 }

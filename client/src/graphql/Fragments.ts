@@ -34,7 +34,6 @@ export const USER_INFO_FRAGMENT = gql`
     name
     email
     phone
-    slackUsername
     haveID
     admin
   }
