@@ -38,3 +38,35 @@ export const USER_INFO_FRAGMENT = gql`
     admin
   }
 `;
+
+export const REQUEST_INFO_FRAGMENT = gql`
+  fragment RequestInfoFragment on Request {
+    id
+    user {
+      ...UserInfoFragment
+    }
+    item {
+      id
+      name
+      qtyUnreserved
+      qtyInStock
+      qtyAvailableForApproval
+      returnRequired
+      maxRequestQty
+      location {
+        id
+        name
+        hidden
+      }
+      category {
+        id
+        name
+      }
+    }
+    status
+    quantity
+    createdAt
+    updatedAt
+  }
+  ${USER_INFO_FRAGMENT}
+`;

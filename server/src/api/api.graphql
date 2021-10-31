@@ -5,12 +5,16 @@ type Query {
   users(search: UserSearch!): [User!]
   # Get information about a specific item, given its ID
   item(id: Int!): Item
+  # Gets all items
+  items: [Item!]
   # Get an array of every item in the database
   allItems: [ItemsByLocation!]
   # Get a list containing each category that is on at least one item
   categories: [Category!]
   # Get detailed statistics about all items
   itemStatistics: [ItemWithStatistics!]
+  # Get information about a specific request, given its ID
+  request(id: Int!): Request
   # Return request(s) matching the search query provided and that the user has permission to see
   requests(search: RequestSearch!): [Request!]
   # Return setting(s) with the name provided
@@ -188,10 +192,13 @@ input RequestInput {
   userId: String!
   itemId: Int!
   quantity: Int!
+  status: RequestStatus
 }
 
 input RequestUpdateInput {
   id: Int!
+  userId: String
+  itemId: Int
   quantity: Int
   status: RequestStatus
   userHaveId: Boolean
