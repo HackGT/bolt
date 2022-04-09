@@ -39,7 +39,7 @@
     "gulp-sourcemaps": "^3.0.0",
     "gulp-typescript": "^5.0.1",
     "isomorphic-fetch": "^3.0.0",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "morgan": "^1.10.0",
     "passport": "^0.4.1",
     "passport-oauth2": "^1.5.0",
