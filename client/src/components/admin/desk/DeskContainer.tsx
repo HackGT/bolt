@@ -97,7 +97,7 @@ function getUpdateQuery() {
 
 function DeskContainer() {
   const { subscribeToMore, ...query } = useQuery(DESK_REQUESTS);
-  const randomPhrase = useState(
+  const [randomPhrase, setRandomPhrase] = useState<string>(
     `${pickRandomElement(starters)} ${Math.floor((Math.random() + 1) * 900)} ${pickRandomElement(
       funPhrases
     )} ${pickRandomElement(endings)}`

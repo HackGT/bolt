@@ -11,7 +11,8 @@ export function loginUser(userToLogin: User) {
 }
 
 // Reducer
-export default function account(state: User | null = noAccountUser, action: any) {
+export default function account(action: any, state: User | null = noAccountUser) {
+  return state;
   switch (action.type) {
     case LOGIN_USER:
       return action.user;

@@ -151,15 +151,8 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
     );
   }
 
-  public render = () => {
-    const tableColNames = [
-      "Name",
-      "Email",
-      "Phone",
-      "Have ID",
-      "Admin",
-      "Actions",
-    ];
+  public render() {
+    const tableColNames = ["Name", "Email", "Phone", "Have ID", "Admin", "Actions"];
     const tableCols = tableColNames.map(col => (
       <TableHeaderCell key={col} textAlign="center">
         {col}
@@ -220,7 +213,7 @@ class AdminUsersListTable extends Component<Props, UsersListState> {
         )}
       </Mutation>
     );
-  };
+  }
 }
 
 function mapStateToProps(state: AppState) {

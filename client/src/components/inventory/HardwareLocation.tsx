@@ -1,14 +1,11 @@
+import { Box, Heading, Text } from "@chakra-ui/react";
 import React from "react";
-import { Header, Icon } from "semantic-ui-react";
 
 const HardwareLocation = ({ name }: any) => (
-  <div>
-    <Header size="large">
-      <Icon name="building" />
-      {name}
-    </Header>
-    <p>These items are available from {name}. Pick them up and return them there.</p>
-  </div>
+  <Box>
+    <Heading size="lg">{name}</Heading>
+    <Text mt={4}>These items are available from {name}. Pick them up and return them there.</Text>
+  </Box>
 );
 
 export default HardwareLocation;

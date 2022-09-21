@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import Bugsnag from "@bugsnag/js";
 import BugsnagPluginReact from "@bugsnag/plugin-react";
@@ -13,7 +13,11 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 import packageJson from "../package.json";
 import { store } from "./state/Store";
 import App from "./App";
+
 import "./index.css";
+import { ChakraProvider } from "@chakra-ui/react";
+import { BrowserRouter } from "react-router-dom";
+import { AuthContext } from "@hex-labs/core";
 
 const httpLink = new HttpLink({
   uri: "/api",
@@ -75,30 +79,44 @@ export const client = new ApolloClient({
 export const bugsnagEnabled = process.env.REACT_APP_ENABLE_BUGSNAG?.toLowerCase() === "true";
 // eslint-disable-next-line import/no-mutable-exports
 export let bugsnagClient: any;
-if (bugsnagEnabled) {
-  bugsnagClient = Bugsnag.start({
-    apiKey: process.env.REACT_APP_BUGSNAG_API_KEY as string,
-    appVersion: `${packageJson.version}`,
-  });
-  bugsnagClient.use(BugsnagPluginReact, React);
-  const ErrorBoundary = bugsnagClient.getPlugin("react");
-  ReactDOM.render(
-    <ErrorBoundary>
+
+const container = document.getElementById("root");
+const root = createRoot(container!);
+
+// if (bugsnagEnabled) {
+//   bugsnagClient = Bugsnag.start({
+//     apiKey: process.env.REACT_APP_BUGSNAG_API_KEY as string,
+//     appVersion: `${packageJson.version}`,
+//   });
+//   bugsnagClient.use(BugsnagPluginReact, React);
+//   const ErrorBoundary = bugsnagClient.getPlugin("react");
+//   root.render(
+//     <ErrorBoundary>
+//       <ApolloProvider client={client}>
+//         <Provider store={store}>
+//           <App />
+//         </Provider>
+//       </ApolloProvider>
+//     </ErrorBoundary>
+//   );
+// } else {
+//   root.render(
+//     <ApolloProvider client={client}>
+//       <Provider store={store}>
+//         <App />
+//       </Provider>
+//     </ApolloProvider>
+//   );
+// }
+console.log("running");
+root.render(
+  <ChakraProvider>
+    <Provider store={store}>
       <ApolloProvider client={client}>
-        <Provider store={store}>
+        <BrowserRouter>
           <App />
-        </Provider>
+        </BrowserRouter>
       </ApolloProvider>
-    </ErrorBoundary>,
-    document.getElementById("root")
-  );
-} else {
-  ReactDOM.render(
-    <ApolloProvider client={client}>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </ApolloProvider>,
-    document.getElementById("root")
-  );
-}
+    </Provider>
+  </ChakraProvider>
+);

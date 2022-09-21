@@ -29,11 +29,11 @@ const ReviewCard = (props: ReviewCardProps) => {
       <SMItem.Content>
         <SMItem.Header as="h4">{name}</SMItem.Header>
         <SMItem.Meta>
-          Request up to {maxRequestQty} at a time | {totalAvailable} available, Location: {location}
-          , Owner: {owner}, Unit Cost: ${price}
+          {`Request up to ${maxRequestQty} at a time | ${totalAvailable} available, Location: ${location}
+          , Owner: ${owner}, Unit Cost: ${price}`}
         </SMItem.Meta>
         <SMItem.Meta>
-          <Label>Category: {category}</Label>
+          <Label>{`Category: ${category}`}</Label>
           {hidden ? (
             <Label tag color="red">
               Hidden

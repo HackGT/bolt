@@ -1,25 +1,22 @@
 import React, { useState } from "react";
-import { Accordion, Divider, Header, Icon } from "semantic-ui-react";
 import { connect } from "react-redux";
+import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Divider,
+  Heading,
+} from "@chakra-ui/react";
+import _ from "lodash";
 
 import HardwareLocation from "./HardwareLocation";
 import { Item, ItemByCat, ItemByLocation } from "../../types/Hardware";
 import HardwareCategory from "./HardwareCategory";
 import NoItemsFound from "./NoItemsFound";
 import { AppState } from "../../state/Store";
-
-function handleClick(e: any, titleProps: any, accordionState: any, setAccordionState: any): void {
-  const { index } = titleProps;
-  const accordionStateClone = accordionState.slice(0);
-
-  if (accordionStateClone.indexOf(index) > -1) {
-    accordionStateClone.splice(accordionStateClone.indexOf(index), 1);
-  } else {
-    accordionStateClone.push(index);
-  }
-
-  setAccordionState(accordionStateClone);
-}
 
 function filteredItems(items: Item[], searchQuery: string): Item[] {
   return items.filter((item: Item) => item.name.toLowerCase().includes(searchQuery));
@@ -33,17 +30,20 @@ function combinedAndFilteredItemsByCategory(categories: any, searchQuery: string
 }
 
 interface HardwareListProps {
-  itemsByLocation: ItemByLocation;
+  itemsByLocation: Item[];
   searchQuery: string;
   requestsEnabled: boolean;
+  location: string;
 }
 
 const HardwareLocationContents = ({
   itemsByLocation,
   searchQuery,
   requestsEnabled,
+  location,
 }: HardwareListProps) => {
   const [accordionState, setAccordionState] = useState([0]);
+  console.log(itemsByLocation);
 
   return (
     <div
@@ -51,60 +51,31 @@ const HardwareLocationContents = ({
         marginTop: 10,
       }}
     >
-      <HardwareLocation
-        key={`${itemsByLocation.location.id}-hardware_loc`}
-        name={itemsByLocation.location.name}
-      />
-      <Accordion key={`${itemsByLocation.location.id}-accordion`}>
-        {itemsByLocation.categories.map((itemByCat: ItemByCat, index: number) => (
-          <>
-            {filteredItems(itemByCat.items, searchQuery).length ? (
-              <>
-                <Accordion.Title
-                  key={`${itemsByLocation.location.id}-title`}
-                  active={accordionState.includes(index) || searchQuery.length >= 3}
-                  index={index}
-                  onClick={(e: any, titleProps: any) => {
-                    handleClick(e, titleProps, accordionState, setAccordionState);
-                  }}
-                >
-                  <Header size="medium">
-                    <Icon name="dropdown" />
-                    {itemByCat.category.name}
-                  </Header>
-                </Accordion.Title>
-                <Accordion.Content
-                  key={`${itemsByLocation.location.id}-content`}
-                  active={accordionState.includes(index) || searchQuery.length >= 3}
-                  index={index}
-                >
-                  <HardwareCategory
-                    key={`${itemsByLocation.location.id}-${itemByCat.category.id}`}
-                    items={filteredItems(itemByCat.items, searchQuery)}
-                    requestsEnabled={requestsEnabled}
-                    name={itemByCat.category.name}
-                  />
-                </Accordion.Content>
-              </>
-            ) : (
-              ""
-            )}
-          </>
+      <HardwareLocation key={`${location}-hardware_loc`} name={location} />
+      <Accordion key={`${location}-accordion`} allowToggle mt={4}>
+        {Object.entries(_.groupBy(itemsByLocation, "category.name")).map(([category, items]) => (
+          <AccordionItem>
+            <AccordionButton>
+              <Heading size="md">{category}</Heading>
+              <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel>
+              <HardwareCategory
+                key={`${location}-${category}`}
+                items={filteredItems(items, searchQuery)}
+                requestsEnabled={requestsEnabled}
+                name={category}
+              />
+            </AccordionPanel>
+          </AccordionItem>
         ))}
-        {(!itemsByLocation.categories.length ||
-          !combinedAndFilteredItemsByCategory(itemsByLocation.categories, searchQuery).length) && (
+        {/* {(!itemsByLocation ||
+          !combinedAndFilteredItemsByCategory(itemsByLocation, searchQuery).length) && (
           <NoItemsFound key={`${itemsByLocation.location.id}-no_items`} searchQuery={searchQuery} />
-        )}
+        )} */}
       </Accordion>
-      <Divider />
     </div>
   );
 };
 
-function mapStateToProps(state: AppState) {
-  return {
-    user: state.account,
-  };
-}
-
-export default connect(mapStateToProps)(HardwareLocationContents);
+export default HardwareLocationContents;

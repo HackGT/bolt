@@ -57,7 +57,7 @@ export function pickRandomElement<T>(arr: T[]): T {
 }
 
 function AdminOverviewContainer() {
-  const randomPhrase = useState(pickRandomElement(funPhrases));
+  const [randomPhrase, setRandomPhrase] = useState(pickRandomElement(funPhrases));
   return (
     <Grid stackable columns={1}>
       <Grid.Row>

@@ -1,41 +1,25 @@
+import { ArrowBackIcon } from "@chakra-ui/icons";
+import { Button, Container, Heading } from "@chakra-ui/react";
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { match } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { Header } from "semantic-ui-react";
 
 import { AppState } from "../../state/Store";
 import ItemEditForm from "./ItemEditForm";
 
-interface CreateItemProps {
-  match: match & CreateItemParams;
-}
+const CreateItemWrapper = () => {
+  const navigate = useNavigate();
 
-interface CreateItemParams {
-  params: { itemId: string };
-}
+  return (
+    <Container p="8">
+      <Button variant="link" size="lg" onClick={() => navigate(-1)}>
+        <ArrowBackIcon mr={2} /> Back
+      </Button>
+      <Heading mt={2}>Create Item</Heading>
+      <ItemEditForm />
+    </Container>
+  );
+};
 
-interface CreateItemState {}
-
-class CreateItemWrapper extends Component<CreateItemProps, CreateItemState> {
-  constructor(props: CreateItemProps) {
-    super(props);
-    this.state = {};
-  }
-
-  public render() {
-    return (
-      <div>
-        <Header as="h1">Create Item</Header>
-        <ItemEditForm createItem />
-      </div>
-    );
-  }
-}
-
-function mapStateToProps(state: AppState) {
-  return {
-    user: state.account,
-  };
-}
-
-export default connect(mapStateToProps)(CreateItemWrapper);
+export default CreateItemWrapper;

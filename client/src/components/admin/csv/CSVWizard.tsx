@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Container, Dimmer, Header, Loader, Segment, Step } from "semantic-ui-react";
 import { withToastManager } from "react-toast-notifications";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { Mutation } from "@apollo/client/react/components";
 
 import UploadStep from "./CSVUpload";
@@ -118,7 +118,7 @@ class CSVWizard extends React.Component<CSVWizardProps, CSVWizardState> {
     const { wizardStep, inventory, isStepComplete, isSubmitting, isComplete } = this.state;
 
     if (isComplete) {
-      return <Redirect to="/" />;
+      return <Navigate to="/" replace />;
     }
 
     const nextButton = (

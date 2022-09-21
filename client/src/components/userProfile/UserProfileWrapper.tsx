@@ -1,19 +1,15 @@
 import React from "react";
-import { match, Route, Switch } from "react-router";
+import { Route, Routes } from "react-router-dom";
 
-import PrivateRoute from "../util/PrivateRoute";
 import EditUserProfileWrapper from "./EditUserProfileWrapper";
+import UserProfile from "./UserProfile";
 
-interface Props {
-  match: match;
-}
-
-const UserProfileWrapper: React.FC<Props> = props => (
+const UserProfileWrapper: React.FC = props => (
   <div>
-    <Switch>
-      <Route exact path={`${props.match.url}/me`} component={EditUserProfileWrapper} />
-      <PrivateRoute exact path={`${props.match.url}/:userId`} component={EditUserProfileWrapper} />
-    </Switch>
+    <Routes>
+      <Route path="/me" element={<UserProfile />} />
+      <Route path="/:userId" element={<EditUserProfileWrapper />} />
+    </Routes>
   </div>
 );
 
