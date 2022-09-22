@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { Card, Header, Label, List } from "semantic-ui-react";
 import { Link } from "react-router-dom";
+import { Badge, Box, Heading } from "@chakra-ui/react";
 
 import { AppState } from "../../state/Store";
 import { AdminCardLink } from "./AdminOverviewContainer";
@@ -31,14 +32,12 @@ const AdminLinksCard: React.FC<Props> = props => {
     </List>
   );
   return (
-    <Card>
-      <Card.Content>
-        <Header>
-          {props.title} {props.notice ? <Label color="blue">{props.notice}</Label> : ""}
-        </Header>
-        {content}
-      </Card.Content>
-    </Card>
+    <Box w="full" p={5} shadow="md" borderWidth="1px" rounded="md">
+      <Heading as="h5" size="lg">
+        {props.title} {props.notice ? <Badge colorScheme="blue">{props.notice}</Badge> : ""}
+      </Heading>
+      {content}
+    </Box>
   );
 };
 

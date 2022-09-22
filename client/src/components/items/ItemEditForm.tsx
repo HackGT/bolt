@@ -666,7 +666,7 @@ const ItemEditForm = () => {
           <Checkbox>Hidden</Checkbox>
         </Stack>
       </CheckboxGroup>
-      <Button colorScheme="twitter" type="submit">
+      <Button colorScheme="twitter" type="submit" isLoading={isSubmitting}>
         Create item
       </Button>
     </Flex>

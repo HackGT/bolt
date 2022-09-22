@@ -102,10 +102,10 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<HomeContainer />} />
             <Route path="user/*" element={<UserProfileWrapper />} />
-            {/* <PrivateRoute exact path="admin" element={<AdminOverviewContainer />} />
-            <PrivateRoute exact path="admin/desk" element={<DeskContainer />} /> */}
             <Route path="admin" element={<PrivateRoute />}>
+              <Route path="dashboard" element={<AdminOverviewContainer />} />
               <Route path="items/new" element={<CreateItemWrapper />} />
+              <Route path="desk" element={<DeskContainer />} />
             </Route>
             {/* <PrivateRoute exact path="admin/items/:itemId" element={<EditItemWrapper />} />
             <PrivateRoute exact path="admin/csv" element={<CSVWizard />} />

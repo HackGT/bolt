@@ -1,3 +1,4 @@
+import { Container, Flex, Heading } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { connect } from "react-redux";
 import { Grid, Header } from "semantic-ui-react";
@@ -59,22 +60,24 @@ export function pickRandomElement<T>(arr: T[]): T {
 function AdminOverviewContainer() {
   const [randomPhrase, setRandomPhrase] = useState(pickRandomElement(funPhrases));
   return (
-    <Grid stackable columns={1}>
-      <Grid.Row>
-        <Grid.Column>
-          <Header as="h1">
-            Administration
-            <Header.Subheader>{randomPhrase}</Header.Subheader>
-          </Header>
-          <div className="ui centered cards">
-            <AdminLinksCard title="Hardware Desk" links={hardwareDesk} />
-            <AdminLinksCard title="Manage..." links={manage} />
-            <AdminLinksCard title="Reports" links={reports} notice="NEW" />
-            <AdminLinksCard title="Utilities" links={utilities} />
-          </div>
-        </Grid.Column>
-      </Grid.Row>
-    </Grid>
+    <Container mt="8" maxW="container.lg">
+      <Heading as="h2" size="3xl">
+        Administration
+        <Heading as="h4" size="lg" color="gray.500" fontWeight={500}>
+          {randomPhrase}
+        </Heading>
+      </Heading>
+      <Flex mt="8" w="full" flexDir="column" gap="4">
+        <Flex flexDir="row" w="full" gap="4">
+          <AdminLinksCard title="Hardware Desk" links={hardwareDesk} />
+          <AdminLinksCard title="Manage..." links={manage} />
+        </Flex>
+        <Flex w="full" flexDir="row" gap="4">
+          <AdminLinksCard title="Reports" links={reports} notice="NEW" />
+          <AdminLinksCard title="Utilities" links={utilities} />
+        </Flex>
+      </Flex>
+    </Container>
   );
 }
 
