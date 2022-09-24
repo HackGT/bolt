@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useQuery } from "@apollo/client";
 import { Grid, Icon, Loader, Message } from "semantic-ui-react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
@@ -19,6 +18,7 @@ import { useAuth } from "@hex-labs/core";
 import useAxios from "axios-hooks";
 import axios from "axios";
 import _ from "lodash";
+import { useQuery } from "@tanstack/react-query";
 
 import { ALL_ITEMS, GET_SETTING } from "../../graphql/Queries";
 import { Item, ItemByLocation } from "../../types/Hardware";
@@ -27,25 +27,14 @@ import HardwareLocationContents from "../inventory/HardwareLocationContents";
 const NewHardwareList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { user, loading } = useAuth();
-  const [itemListingsByLocation, setItemListingsByLocation] = useState<Record<string, Item[]>>();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = await user?.getIdToken();
-      const requests = await axios.get(`http://localhost:8007/items/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const groupedItems = _.groupBy(requests.data, "location.name");
-      setItemListingsByLocation(groupedItems);
-    };
-    if (!loading) {
-      fetchData();
-    }
-  }, [loading]);
+  const { data, isLoading } = useQuery(["items"], async () => {
+    const items = await axios.get("/items");
+    const groupedItems = _.groupBy(items.data, "location.name");
+    return groupedItems;
+  });
 
-  if (loading) {
+  if (loading || isLoading) {
     return (
       <>
         <Heading size="huge">Inventory</Heading>
@@ -124,15 +113,15 @@ const NewHardwareList = () => {
             }}
           />
         </Flex>
-        {itemListingsByLocation ? (
-          Object.keys(itemListingsByLocation).map((location: string) => {
-            console.log(itemListingsByLocation[location]);
+        {data ? (
+          Object.keys(data).map((location: string) => {
+            console.log(data[location]);
             return (
               <HardwareLocationContents
                 key={location}
                 location={location}
                 requestsEnabled={requestsEnabled}
-                itemsByLocation={itemListingsByLocation[location]}
+                itemsByLocation={data[location]}
                 searchQuery={searchQuery}
               />
             );

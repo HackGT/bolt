@@ -16,6 +16,8 @@ import {
   useLogin,
 } from "@hex-labs/core";
 import { Container } from "@chakra-ui/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import Navigation from "./components/Navigation";
 import HomeContainer from "./components/home/HomeContainer";
@@ -37,6 +39,7 @@ import LoadingSpinner from "./components/util/LoadingSpinner";
 import CreateItemWrapper from "./components/items/CreateItemWrapper";
 import EditItemWrapper from "./components/items/EditItemWrapper";
 import PrivateRoute from "./components/util/PrivateRoute";
+import AxiosProvider from "./axios";
 
 // interface OwnProps {}
 
@@ -55,6 +58,8 @@ export const app = initializeApp({
 setPersistence(getAuth(app), inMemoryPersistence);
 
 axios.defaults.withCredentials = true;
+
+const queryClient = new QueryClient();
 
 const App: React.FC = () => {
   const [loading, error, loggedIn] = useLogin(app);
@@ -88,37 +93,39 @@ const App: React.FC = () => {
   // }
 
   return (
-    <AuthProvider app={app}>
-      <ToastProvider placement="top-center">
-        <Header>
-          <Link to="user/me">
-            <HeaderItem>Profile</HeaderItem>
-          </Link>
-          <Link to="logout">
-            <HeaderItem>Sign Out</HeaderItem>
-          </Link>
-        </Header>
-        <Container maxW="container.lg">
-          <Routes>
-            <Route path="/" element={<HomeContainer />} />
-            <Route path="user/*" element={<UserProfileWrapper />} />
-            <Route path="admin" element={<PrivateRoute />}>
-              <Route path="dashboard" element={<AdminOverviewContainer />} />
-              <Route path="items/new" element={<CreateItemWrapper />} />
-              <Route path="desk" element={<DeskContainer />} />
-            </Route>
-            {/* <PrivateRoute exact path="admin/items/:itemId" element={<EditItemWrapper />} />
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider app={app}>
+        <AxiosProvider>
+          <ToastProvider placement="top-center">
+            <Header>
+              <Link to="user/me">
+                <HeaderItem>Profile</HeaderItem>
+              </Link>
+              <Link to="logout">
+                <HeaderItem>Sign Out</HeaderItem>
+              </Link>
+            </Header>
+            <Container maxW="container.lg">
+              <Routes>
+                <Route path="/" element={<HomeContainer />} />
+                <Route path="user/*" element={<UserProfileWrapper />} />
+                <Route path="admin" element={<PrivateRoute />}>
+                  <Route path="dashboard" element={<AdminOverviewContainer />} />
+                  <Route path="items/new" element={<CreateItemWrapper />} />
+                  <Route path="desk" element={<DeskContainer />} />
+                </Route>
+                {/* <PrivateRoute exact path="admin/items/:itemId" element={<EditItemWrapper />} />
             <PrivateRoute exact path="admin/csv" element={<CSVWizard />} />
             <PrivateRoute exact path="admin/users" element={AdminUsersListWrapper} />
             <PrivateRoute exact path="admin/settings" element={AdminRequestSettingsWrapper} />
             <PrivateRoute exact path="admin/reports/statistics" element={DetailedItemStatistics} />
             <PrivateRoute exact path="admin/reports/demand" element={ItemDemandReport} />
             <Route element={HomeContainer} /> */}
-          </Routes>
-        </Container>
-        <Footer />
-      </ToastProvider>
-      {/* <CacheBuster>
+              </Routes>
+            </Container>
+            <Footer />
+          </ToastProvider>
+          {/* <CacheBuster>
           {({ loading: cacheLoading, isLatestVersion, refreshCacheAndReload }: any) => {
             if (!cacheLoading && !isLatestVersion) {
               // You can decide how and when you want to force reload
@@ -127,7 +134,10 @@ const App: React.FC = () => {
             return null;
           }}
         </CacheBuster> */}
-    </AuthProvider>
+          <ReactQueryDevtools />
+        </AxiosProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 };
 

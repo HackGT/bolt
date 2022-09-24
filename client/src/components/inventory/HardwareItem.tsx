@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { withToastManager } from "react-toast-notifications";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
@@ -15,10 +15,14 @@ import {
   NumberInputStepper,
   Text,
 } from "@chakra-ui/react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { LoadingScreen, useAuth } from "@hex-labs/core";
+import { User } from "firebase/auth";
 
 import { Item, RequestedItem, SUBMITTED } from "../../types/Hardware";
 import { AppState } from "../../state/Store";
-import { User } from "../../types/User";
+import { Request } from "../../types/Request";
 
 interface HardwareItemState {
   qtyRequested: number;
@@ -187,14 +191,44 @@ function itemImage(src: string | undefined, outOfStock = false) {
 
 // export default HardwareItem;
 
+interface IRequestMutation {
+  item: string;
+  quantity: number;
+  user: User;
+}
+
 const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareItemProps) => {
   const [requestedNum, setRequestedNum] = useState(1);
+
+  const { user, loading } = useAuth();
+
+  const { refetch } = useQuery(["requests"]);
+  const { refetch: itemRefetch } = useQuery(["items"]);
+
+  const mutation = useMutation(
+    async (newRequest: IRequestMutation): Promise<any> => await axios.post("/requests", newRequest),
+    {
+      onSuccess: () => {
+        refetch();
+        itemRefetch();
+      },
+    }
+  );
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <Flex flexDir="row">
       {itemImage(item.imageUrl)}
       <Flex flexDir="column" p="4" gap="1" w="100%">
-        <Heading size="md">{item.name}</Heading>
+        <Flex alignItems="center">
+          <Heading size="md">{item.name}</Heading>
+          <Heading size="sm" color="gray.400" ml={2}>
+            {`Available: ${item.totalAvailable}`}
+          </Heading>
+        </Flex>
         <Text>{item.description}</Text>
         <Flex flexDir="row" justifyContent="space-between">
           <NumberInput
@@ -213,7 +247,15 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
               <NumberDecrementStepper />
             </NumberInputStepper>
           </NumberInput>
-          <Button w="48%" colorScheme="twitter" disabled={outOfStock}>
+          <Button
+            w="48%"
+            colorScheme="twitter"
+            disabled={outOfStock}
+            onClick={() => {
+              const newRequest = { item: item.id, quantity: requestedNum, user: user as User };
+              mutation.mutate(newRequest);
+            }}
+          >
             {outOfStock ? "Out of stock" : `Request ${requestedNum} items`}
           </Button>
         </Flex>

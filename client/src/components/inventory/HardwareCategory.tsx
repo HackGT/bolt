@@ -14,7 +14,12 @@ const HardwareCategory = ({ name, items, requestsEnabled }: any) => (
             (b.qtyUnreserved > 0) - (a.qtyUnreserved > 0) || a.name.localeCompare(b.name)
         )
         .map((item: Item) => (
-          <HardwareItem key={item.id} item={item} requestsEnabled={requestsEnabled} outOfStock />
+          <HardwareItem
+            key={item.id}
+            item={item}
+            requestsEnabled={requestsEnabled}
+            outOfStock={item.totalAvailable <= 0}
+          />
         ))}
     </SMItem.Group>
   </div>

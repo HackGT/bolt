@@ -22,9 +22,10 @@ export function updateRequestStatus(
 }
 
 export function requestSearch(r: Request, searchQuery: string): boolean {
+  console.log(r);
   return (
-    r.user.name.toLowerCase().includes(searchQuery) ||
-    r.user.email.toLowerCase().includes(searchQuery) ||
-    r.user.phone.includes(searchQuery)
+    r.user.displayName!.toLowerCase().includes(searchQuery) ||
+    r.user.email!.toLowerCase().includes(searchQuery) ||
+    r.user.phoneNumber!.includes(searchQuery)
   );
 }

@@ -12,6 +12,8 @@
     "@emotion/styled": "^11",
     "@heroicons/react": "^2.0.11",
     "@hex-labs/core": "^1.0.41",
+    "@tanstack/react-query": "^4.3.9",
+    "@tanstack/react-query-devtools": "^4.3.9",
     "accounting": "^0.4.1",
     "axios": "^0.27.2",
     "axios-hooks": "^3.1.5",

@@ -170,15 +170,6 @@ interface RequestedListProps {
 }
 const RequestedList = ({ requests }: RequestedListProps) => {
   const [userRequests, setUserRequests] = useState(requests);
-  useEffect(() => {
-    console
-      .log
-      // requests.sort((a, b) => {
-      //   console.log(a, b);
-      //   return 3 - 2;
-      // })
-      ();
-  }, [requests]);
 
   const statuses = (status: RequestStatus): JSX.Element => {
     switch (status) {

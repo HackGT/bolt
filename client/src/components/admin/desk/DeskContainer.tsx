@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
-import { Checkbox, DropdownProps, Grid, Header, Loader, Message, Select } from "semantic-ui-react";
-import { useQuery } from "@apollo/client";
+import { Checkbox, DropdownProps, Grid, Header, Loader, Message } from "semantic-ui-react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { LoadingScreen, useAuth } from "@hex-labs/core";
+import { Container, Flex, FormLabel, Heading, Select, Switch } from "@chakra-ui/react";
+import { User } from "firebase/auth";
 
 import SubmittedList from "./submitted/SubmittedList";
 import { REQUEST_CHANGE } from "../../../graphql/Subscriptions";
 import ReadyToPrepareList from "./fulfillment/ReadyToPrepareList";
-import { DESK_REQUESTS } from "../../../graphql/Queries";
 import { Request, RequestStatus } from "../../../types/Request";
 import {
   APPROVED,
@@ -21,31 +24,32 @@ import { pickRandomElement } from "../AdminOverviewContainer";
 import ReadyForPickupList from "./pickup/ReadyForPickupList";
 import ReadyForReturnList from "./returns/ReadyForReturnList";
 
-function mapStateToProps(state: any) {
-  return {};
-}
-
-function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], id = 0) {
+function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], id: string) {
   return requests.filter(
     (r: Request) =>
-      (id === 0 || r.item.location.id === id) && statuses.some(status => r.status === status)
+      (id === "" || r.item.location.id === id) && statuses.some(status => r.status === status)
   );
 }
 
-function getConsolidatedRequestsWithStatus(requests: Request[], statuses: RequestStatus[], id = 0) {
+function getConsolidatedRequestsWithStatus(
+  requests: Request[],
+  statuses: RequestStatus[],
+  id: string,
+  user: User
+): { user: User; requests: Request[] }[] {
   const filteredRequests = getRequestsWithStatus(requests, statuses, id);
-  const requestsByUser: any = {};
+  const requestsByUser: Record<string, { user: User; requests: Request[] }> = {};
 
   for (let i = 0; i < filteredRequests.length; i++) {
     const req = filteredRequests[i];
-    if (!Object.prototype.hasOwnProperty.call(requestsByUser, req.user.uuid)) {
-      requestsByUser[req.user.uuid] = {
-        user: req.user,
+    if (!Object.prototype.hasOwnProperty.call(requestsByUser, user.uid)) {
+      requestsByUser[user.uid] = {
+        user,
         requests: [],
       };
     }
 
-    requestsByUser[req.user.uuid].requests.push(req);
+    requestsByUser[req.user.uid].requests.push(req);
   }
   return Object.values(requestsByUser);
 }
@@ -96,109 +100,129 @@ function getUpdateQuery() {
 }
 
 function DeskContainer() {
-  const { subscribeToMore, ...query } = useQuery(DESK_REQUESTS);
+  const requestQuery = useQuery(["deskRequests"], async () => {
+    const requests = await axios.get("/requests");
+    return requests.data;
+  });
+  const locationQuery = useQuery(["locations"], async () => {
+    const locations = await axios.get("/locations");
+    return locations.data;
+  });
+
+  const { user, loading } = useAuth();
+
   const [randomPhrase, setRandomPhrase] = useState<string>(
     `${pickRandomElement(starters)} ${Math.floor((Math.random() + 1) * 900)} ${pickRandomElement(
       funPhrases
     )} ${pickRandomElement(endings)}`
   );
   const [returnsMode, setReturnsMode] = useState(false);
-  const [location, setLocation] = useState<number>();
+  const [location, setLocation] = useState<string>();
 
-  if (query.loading) {
-    return <Loader active inline="centered" content="Loading requests..." />;
-  }
-  if (query.error) {
+  if (requestQuery.status === "error" || locationQuery.status === "error") {
     return (
       <Message
         error
         visible
         header="Can't fetch requests"
-        content={`Hmm, an error is preventing us from displaying the hardware desk UI.  The error was: ${query.error.message}`}
+        content={`Hmm, an error is preventing us from displaying the hardware desk UI.  The error was: ${
+          (requestQuery.error as Error).message || (locationQuery.error as Error).message
+        }`}
       />
     );
   }
 
+  if (requestQuery.isLoading || locationQuery.isLoading) {
+    return <LoadingScreen />;
+  }
+
   if (!location) {
     return (
-      <>
-        <Header size="huge">
-          Hardware Desk
-          <Header.Subheader>{randomPhrase}</Header.Subheader>
-        </Header>
-        <Header size="medium">Select a location to continue</Header>
+      <Container p="8" maxW="container.md">
+        <Heading size="2xl">Hardware Desk</Heading>
+        <Heading size="md" color="gray.400" mb="8" mt="2">
+          {randomPhrase}
+        </Heading>
+        <Heading size="md" mb={2}>
+          Select a location to continue
+        </Heading>
         <Select
           placeholder="Select a location"
-          options={query.data.locations.map((locationOption: Location) => ({
-            key: locationOption.id,
-            value: locationOption.id,
-            text: locationOption.name,
-          }))}
-          onChange={(event: React.SyntheticEvent<HTMLElement>, data: DropdownProps): void => {
-            const { value }: { value?: any } = data;
-            setLocation(value);
+          onChange={(e): void => {
+            setLocation(e.target.value);
           }}
-        />
-      </>
+        >
+          {locationQuery.data.map((locationOption: Location) => (
+            <option value={locationOption.id}>{locationOption.name}</option>
+          ))}
+        </Select>
+      </Container>
     );
   }
-  const { requests } = query.data;
+  const requests = requestQuery.data;
   const submitted = getRequestsWithStatus(requests, [SUBMITTED], location);
-  const approved = getConsolidatedRequestsWithStatus(requests, [APPROVED], location);
-  const readyForPickup = getConsolidatedRequestsWithStatus(requests, [READY_FOR_PICKUP], location);
-  const readyForReturn = getConsolidatedRequestsWithStatus(requests, [FULFILLED, LOST, DAMAGED]);
+  const approved = getConsolidatedRequestsWithStatus(requests, [APPROVED], location, user!);
+  const readyForPickup = getConsolidatedRequestsWithStatus(
+    requests,
+    [READY_FOR_PICKUP],
+    location,
+    user!
+  );
+  const readyForReturn = getConsolidatedRequestsWithStatus(
+    requests,
+    [FULFILLED, LOST, DAMAGED],
+    "",
+    user!
+  );
 
   return (
-    <div>
-      <Header size="huge">
-        Hardware Desk
-        <Header.Subheader>{randomPhrase}</Header.Subheader>
-      </Header>
+    <Container p="8" maxW="conatiner.md">
+      <Heading size="2xl">Hardware Desk</Heading>
+      <Heading size="md" color="gray.400" mt="2" mb="8">
+        {randomPhrase}
+      </Heading>
 
-      <Grid stackable>
-        <Grid.Row columns={2}>
-          <Grid.Column>
-            <Checkbox
-              toggle
-              label="Returns mode"
-              onChange={(event, { checked }): any => setReturnsMode(checked ?? false)}
-            />
-          </Grid.Column>
-          <Grid.Column>
-            <Select
-              placeholder="Select a location"
-              value={location}
-              options={query.data.locations.map((locationOption: Location) => ({
-                key: locationOption.id,
-                value: locationOption.id,
-                text: locationOption.name,
-              }))}
-              onChange={(event: React.SyntheticEvent<HTMLElement>, data: DropdownProps): void => {
-                const { value }: { value?: any } = data;
-                setLocation(value);
-              }}
-            />
-          </Grid.Column>
-        </Grid.Row>
+      <Flex>
+        <Flex w="50%">
+          <FormLabel htmlFor="returnMode" mb="0">
+            Return mode
+          </FormLabel>
+          <Switch id="returnMode" onChange={event => setReturnsMode(event.target.checked)} />
+        </Flex>
+        <Flex w="50%">
+          <Heading size="md" mb={2}>
+            Select a location to continue
+          </Heading>
+          <Select
+            placeholder="Select a location"
+            onChange={(e): void => {
+              setLocation(e.target.value);
+            }}
+          >
+            {locationQuery.data.map((locationOption: Location) => (
+              <option value={locationOption.id}>{locationOption.name}</option>
+            ))}
+          </Select>
+        </Flex>
         <Grid.Row columns={3}>
           <SubmittedList
             hidden={returnsMode}
-            loading={query.loading}
+            loading={requestQuery.isLoading}
             requests={submitted}
             subscribeToUpdatedRequests={() => {
-              subscribeToMore({
-                document: REQUEST_CHANGE,
-                updateQuery: getUpdateQuery(),
-              });
+              // subscribeToMore({
+              //   document: REQUEST_CHANGE,
+              //   updateQuery: getUpdateQuery(),
+              // });
             }}
           />
           {!returnsMode && <ReadyToPrepareList cards={approved} />}
           {!returnsMode && <ReadyForPickupList cards={readyForPickup} />}
           {returnsMode && <ReadyForReturnList cards={readyForReturn} />}
         </Grid.Row>
-      </Grid>
-    </div>
+      </Flex>
+    </Container>
   );
 }
 
-export default connect(mapStateToProps)(DeskContainer);
+export default DeskContainer;

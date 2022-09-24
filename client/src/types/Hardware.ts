@@ -1,5 +1,5 @@
 export type Item = {
-  id: number;
+  id: string;
   name: string;
   description: string;
   imageUrl?: string;
@@ -23,7 +23,7 @@ export type Category = {
 };
 
 export type Location = {
-  id: number;
+  id: string;
   name: string;
   hidden: boolean;
 };

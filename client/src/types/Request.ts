@@ -1,5 +1,7 @@
+import { User } from "firebase/auth";
+
 import { BaseUserWithID, FullUser } from "./User";
-import { Item } from "./Hardware";
+import { Item, Location } from "./Hardware";
 
 export type RequestStatus =
   | "SUBMITTED"
@@ -15,7 +17,7 @@ export type RequestStatus =
 
 export interface Request {
   id: number;
-  user: FullUser;
+  user: User;
   item: Item;
   status: RequestStatus;
   location: Location;

@@ -35,7 +35,7 @@ function SubmittedCard({ request }: SubmittedCardProps) {
       <Card.Content>
         <Label attached="top left">
           <Icon name="user" />
-          {request.user.name}
+          {request.user.displayName}
         </Label>
 
         <Header style={{ display: "inline-block" }} size="medium">
