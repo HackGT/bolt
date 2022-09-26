@@ -2,7 +2,7 @@ import { Request } from "../../../types/Request";
 
 export function updateRequestStatus(
   updateRequest: any,
-  id: number,
+  id: string,
   newStatus: any,
   updatedHaveID: boolean | null = null
 ) {

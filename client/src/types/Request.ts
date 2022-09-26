@@ -16,7 +16,7 @@ export type RequestStatus =
   | "DAMAGED";
 
 export interface Request {
-  id: number;
+  id: string;
   user: User;
   item: Item;
   status: RequestStatus;

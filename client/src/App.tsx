@@ -15,11 +15,10 @@ import {
   LoadingScreen,
   useLogin,
 } from "@hex-labs/core";
-import { Container } from "@chakra-ui/react";
+import { Box, Container } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-import Navigation from "./components/Navigation";
 import HomeContainer from "./components/home/HomeContainer";
 import CSVWizard from "./components/admin/csv/CSVWizard";
 import AdminOverviewContainer from "./components/admin/AdminOverviewContainer";
@@ -40,6 +39,7 @@ import CreateItemWrapper from "./components/items/CreateItemWrapper";
 import EditItemWrapper from "./components/items/EditItemWrapper";
 import PrivateRoute from "./components/util/PrivateRoute";
 import AxiosProvider from "./axios";
+import Cart from "./components/cart/Cart";
 
 // interface OwnProps {}
 
@@ -105,15 +105,11 @@ const App: React.FC = () => {
                 <HeaderItem>Sign Out</HeaderItem>
               </Link>
             </Header>
-            <Container maxW="container.lg">
+            <Container p="8" maxW="container.lg">
               <Routes>
+                <Route path="cart" element={<Cart />} />
                 <Route path="/" element={<HomeContainer />} />
                 <Route path="user/*" element={<UserProfileWrapper />} />
-                <Route path="admin" element={<PrivateRoute />}>
-                  <Route path="dashboard" element={<AdminOverviewContainer />} />
-                  <Route path="items/new" element={<CreateItemWrapper />} />
-                  <Route path="desk" element={<DeskContainer />} />
-                </Route>
                 {/* <PrivateRoute exact path="admin/items/:itemId" element={<EditItemWrapper />} />
             <PrivateRoute exact path="admin/csv" element={<CSVWizard />} />
             <PrivateRoute exact path="admin/users" element={AdminUsersListWrapper} />
@@ -123,6 +119,15 @@ const App: React.FC = () => {
             <Route element={HomeContainer} /> */}
               </Routes>
             </Container>
+            <Box>
+              <Routes>
+                <Route path="admin" element={<PrivateRoute />}>
+                  <Route path="dashboard" element={<AdminOverviewContainer />} />
+                  <Route path="items/new" element={<CreateItemWrapper />} />
+                  <Route path="desk" element={<DeskContainer />} />
+                </Route>
+              </Routes>
+            </Box>
             <Footer />
           </ToastProvider>
           {/* <CacheBuster>

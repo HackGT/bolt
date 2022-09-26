@@ -3,7 +3,7 @@ import { Grid, Segment } from "semantic-ui-react";
 import { connect } from "react-redux";
 import axios from "axios";
 import { LoadingScreen, useAuth } from "@hex-labs/core";
-import { Flex } from "@chakra-ui/react";
+import { Container, Flex } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 
 import RequestedList from "./RequestedList";
@@ -36,7 +36,7 @@ const HomeContainer: React.FC = props => {
   }
 
   return (
-    <Flex dir="row" gap={6} p="8">
+    <Flex dir="row" gap={6} p="8" justify="space-around">
       <NewHardwareList />
       {user && <RequestedList requests={requestQuery.data} />}
     </Flex>

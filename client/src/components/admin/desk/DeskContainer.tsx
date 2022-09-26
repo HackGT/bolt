@@ -4,7 +4,20 @@ import { Checkbox, DropdownProps, Grid, Header, Loader, Message } from "semantic
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { LoadingScreen, useAuth } from "@hex-labs/core";
-import { Container, Flex, FormLabel, Heading, Select, Switch } from "@chakra-ui/react";
+import {
+  Box,
+  Container,
+  Flex,
+  FormLabel,
+  Heading,
+  Select,
+  Switch,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+} from "@chakra-ui/react";
 import { User } from "firebase/auth";
 
 import SubmittedList from "./submitted/SubmittedList";
@@ -21,8 +34,8 @@ import {
   SUBMITTED,
 } from "../../../types/Hardware";
 import { pickRandomElement } from "../AdminOverviewContainer";
-import ReadyForPickupList from "./pickup/ReadyForPickupList";
-import ReadyForReturnList from "./returns/ReadyForReturnList";
+import SubmittedTable from "./submitted/SubmittedTable";
+import SubmittedCards from "./submitted/SubmittedCards";
 
 function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], id: string) {
   return requests.filter(
@@ -176,14 +189,14 @@ function DeskContainer() {
   );
 
   return (
-    <Container p="8" maxW="conatiner.md">
+    <Box p="8" w="w-screen">
       <Heading size="2xl">Hardware Desk</Heading>
       <Heading size="md" color="gray.400" mt="2" mb="8">
         {randomPhrase}
       </Heading>
 
-      <Flex>
-        <Flex w="50%">
+      <Flex flexDir="column">
+        <Flex w="full">
           <FormLabel htmlFor="returnMode" mb="0">
             Return mode
           </FormLabel>
@@ -204,24 +217,38 @@ function DeskContainer() {
             ))}
           </Select>
         </Flex>
-        <Grid.Row columns={3}>
-          <SubmittedList
-            hidden={returnsMode}
-            loading={requestQuery.isLoading}
-            requests={submitted}
-            subscribeToUpdatedRequests={() => {
-              // subscribeToMore({
-              //   document: REQUEST_CHANGE,
-              //   updateQuery: getUpdateQuery(),
-              // });
-            }}
-          />
-          {!returnsMode && <ReadyToPrepareList cards={approved} />}
-          {!returnsMode && <ReadyForPickupList cards={readyForPickup} />}
-          {returnsMode && <ReadyForReturnList cards={readyForReturn} />}
-        </Grid.Row>
+        <Flex flexDir="column">
+          <Tabs variant="enclosed">
+            <TabList>
+              <Tab>Card view</Tab>
+              <Tab>Table view</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                <SubmittedCards requests={submitted} />
+                {/* <SubmittedList
+                  hidden={returnsMode}
+                  loading={requestQuery.isLoading}
+                  requests={submitted}
+                  subscribeToUpdatedRequests={() => {
+                    // subscribeToMore({
+                    //   document: REQUEST_CHANGE,
+                    //   updateQuery: getUpdateQuery(),
+                    // });
+                  }}
+                /> */}
+                {/* {!returnsMode && <ReadyToPrepareList cards={approved} />}
+                {!returnsMode && <ReadyForPickupList cards={readyForPickup} />}
+                {returnsMode && <ReadyForReturnList cards={readyForReturn} />} */}
+              </TabPanel>
+              <TabPanel>
+                <SubmittedTable />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </Flex>
       </Flex>
-    </Container>
+    </Box>
   );
 }
 

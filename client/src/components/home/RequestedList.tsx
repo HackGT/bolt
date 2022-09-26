@@ -271,7 +271,7 @@ const RequestedList = ({ requests }: RequestedListProps) => {
               (a: Request, b: Request) =>
                 a.item.location.name.localeCompare(b.item.location.name) ||
                 a.item.name.localeCompare(b.item.name) ||
-                a.id - b.id
+                a.id.localeCompare(b.id)
             )
             .map(r => (
               <Box p="4" backgroundColor="white" borderRadius="8px" boxShadow="md">
