@@ -19,6 +19,7 @@ import {
   Tabs,
 } from "@chakra-ui/react";
 import { User } from "firebase/auth";
+import { useNavigate, useParams } from "react-router-dom";
 
 import SubmittedList from "./submitted/SubmittedList";
 import { REQUEST_CHANGE } from "../../../graphql/Subscriptions";
@@ -123,6 +124,7 @@ function DeskContainer() {
   });
 
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
 
   const [randomPhrase, setRandomPhrase] = useState<string>(
     `${pickRandomElement(starters)} ${Math.floor((Math.random() + 1) * 900)} ${pickRandomElement(
@@ -130,7 +132,7 @@ function DeskContainer() {
     )} ${pickRandomElement(endings)}`
   );
   const [returnsMode, setReturnsMode] = useState(false);
-  const [location, setLocation] = useState<string>();
+  const { location } = useParams();
 
   if (requestQuery.status === "error" || locationQuery.status === "error") {
     return (
@@ -162,8 +164,9 @@ function DeskContainer() {
         <Select
           placeholder="Select a location"
           onChange={(e): void => {
-            setLocation(e.target.value);
+            navigate(`./${e.target.value}`);
           }}
+          value={location}
         >
           {locationQuery.data.map((locationOption: Location) => (
             <option value={locationOption.id}>{locationOption.name}</option>
@@ -196,21 +199,22 @@ function DeskContainer() {
       </Heading>
 
       <Flex flexDir="column">
-        <Flex w="full">
+        {/* <Flex w="full">
           <FormLabel htmlFor="returnMode" mb="0">
             Return mode
           </FormLabel>
           <Switch id="returnMode" onChange={event => setReturnsMode(event.target.checked)} />
-        </Flex>
-        <Flex w="50%">
-          <Heading size="md" mb={2}>
-            Select a location to continue
+        </Flex> */}
+        <Flex w="50%" gap="4" alignItems="center" mb="4">
+          <Heading size="md" mb={2} whiteSpace="nowrap">
+            Location:
           </Heading>
           <Select
             placeholder="Select a location"
             onChange={(e): void => {
-              setLocation(e.target.value);
+              navigate(`./${e.target.value}`);
             }}
+            value={location}
           >
             {locationQuery.data.map((locationOption: Location) => (
               <option value={locationOption.id}>{locationOption.name}</option>
@@ -225,7 +229,7 @@ function DeskContainer() {
             </TabList>
             <TabPanels>
               <TabPanel>
-                <SubmittedCards requests={submitted} />
+                <SubmittedCards requests={requests} />
                 {/* <SubmittedList
                   hidden={returnsMode}
                   loading={requestQuery.isLoading}

@@ -171,6 +171,8 @@ interface RequestedListProps {
 const RequestedList = ({ requests }: RequestedListProps) => {
   const [userRequests, setUserRequests] = useState(requests);
 
+  console.log(requests);
+
   const statuses = (status: RequestStatus): JSX.Element => {
     switch (status) {
       case SUBMITTED:
@@ -285,39 +287,15 @@ const RequestedList = ({ requests }: RequestedListProps) => {
                     <Text>{r.item.location.name}</Text>
                   </Flex>
                 </Flex>
-                {statuses("APPROVED")}
+                {statuses(r.status)}
               </Box>
             ))
         ) : (
           // .map((r: Request) => <Box>Hello</Box>)
-          <Box>Checkout hardware for a request to show up!</Box>
+          <Box my="auto" mx="auto" fontWeight="semibold" color="gray.600">
+            Requests you make will appear here!
+          </Box>
         )}
-        <Box p="4" backgroundColor="white" borderRadius="8px" boxShadow="md">
-          <Flex dir="row" alignItems="center" gap="8px" mb="8px">
-            <Heading as="h4" size="md">
-              Raspberry Pi
-            </Heading>
-            <Text color="gray.500">{`Qty: ${3}`}</Text>
-            <Flex dir="row" color="black">
-              <MapPinIcon />
-              <Text>Culc</Text>
-            </Flex>
-          </Flex>
-          {statuses("SUBMITTED")}
-        </Box>
-        <Box p="4" backgroundColor="white" borderRadius="8px" boxShadow="md">
-          <Flex dir="row" alignItems="center" gap="8px" mb="8px">
-            <Heading as="h4" size="md">
-              Raspberry Pi
-            </Heading>
-            <Text color="gray.500">{`Qty: ${3}`}</Text>
-            <Flex dir="row" color="black">
-              <MapPinIcon />
-              <Text>Culc</Text>
-            </Flex>
-          </Flex>
-          {statuses("READY_FOR_PICKUP")}
-        </Box>
       </Flex>
     </Box>
   );

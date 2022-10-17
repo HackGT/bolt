@@ -29,7 +29,7 @@ import {
 import axios from "axios";
 import React, { useMemo } from "react";
 
-import { APPROVED, SUBMITTED } from "../../../../types/Hardware";
+import { APPROVED, READY_FOR_PICKUP, SUBMITTED } from "../../../../types/Hardware";
 import { Request, RequestStatus } from "../../../../types/Request";
 
 const columnHelper = createColumnHelper<Request>();
@@ -40,6 +40,12 @@ export const generateBadge = (status: RequestStatus) => {
       return <Badge colorScheme="purple">Submitted</Badge>;
     case APPROVED:
       return <Badge colorScheme="green">Approved</Badge>;
+    case READY_FOR_PICKUP:
+      return (
+        <Badge bgGradient="linear(to-r, cyan.400, purple.500)" color="white">
+          Ready For Pickup
+        </Badge>
+      );
     default:
       return <Badge colorScheme="gray">{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
   }

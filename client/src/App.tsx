@@ -123,7 +123,9 @@ const App: React.FC = () => {
               <Routes>
                 <Route path="admin">
                   <Route path="items/new" element={<CreateItemWrapper />} />
-                  <Route path="desk" element={<DeskContainer />} />
+                  <Route path="desk" element={<DeskContainer />}>
+                    <Route path=":location" element={<DeskContainer />} />
+                  </Route>
                   <Route index element={<AdminOverviewContainer />} />
                 </Route>
               </Routes>

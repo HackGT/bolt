@@ -9,8 +9,10 @@ import {
 } from "react-beautiful-dnd";
 import ReactTimeago from "react-timeago";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 
-import { Request } from "../../../../types/Request";
+import { Request, RequestStatus } from "../../../../types/Request";
 import SubmittedCard from "./SubmittedCard";
 import { APPROVED, READY_FOR_PICKUP, SUBMITTED } from "../../../../types/Hardware";
 import { generateBadge } from "./SubmittedTable";
@@ -27,31 +29,43 @@ const reorder = (list: Request[], startIndex: number, endIndex: number) => {
   return result;
 };
 
-const move = (
-  source: Request[],
-  destination: Request[],
-  droppableSource: DraggableLocation,
-  droppableDestination: DraggableLocation
-) => {
-  const sourceClone = Array.from(source);
-  const destClone = Array.from(destination);
-  const [removed] = sourceClone.splice(droppableSource.index, 1);
-
-  destClone.splice(droppableDestination.index, 0, removed);
-
-  const result: Record<string, Request[]> = {};
-  result[droppableSource.droppableId] = sourceClone;
-  result[droppableDestination.droppableId] = destClone;
-
-  return result;
-};
-
 const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
+  console.log(requests);
   const [items, setItems] = useState<Record<string, Request[]>>({
     SUBMITTED: [...requests.filter(request => request.status === "SUBMITTED")],
-    APPROVED: [...requests.filter(requests => requests.status === "APPROVED")],
-    READY_FOR_PICKUP: [...requests.filter(requests => requests.status === "READY_FOR_PICKUP")],
+    APPROVED: [...requests.filter(request => request.status === "APPROVED")],
+    READY_FOR_PICKUP: [...requests.filter(request => request.status === "READY_FOR_PICKUP")],
   });
+
+  const updateStatus = useMutation((newRequest: any) =>
+    axios.patch(`/requests/${newRequest.id}`, newRequest)
+  );
+
+  const move = (
+    source: Request[],
+    destination: Request[],
+    droppableSource: DraggableLocation,
+    droppableDestination: DraggableLocation
+  ) => {
+    const sourceClone = Array.from(source);
+    const destClone = Array.from(destination);
+    const [removed] = sourceClone.splice(droppableSource.index, 1);
+    removed.status = droppableDestination.droppableId as RequestStatus;
+    updateStatus.mutate({
+      id: removed.id,
+      status: droppableDestination.droppableId as RequestStatus,
+    });
+
+    console.log(removed);
+
+    destClone.splice(droppableDestination.index, 0, removed);
+
+    const result: Record<string, Request[]> = {};
+    result[droppableSource.droppableId] = sourceClone;
+    result[droppableDestination.droppableId] = destClone;
+
+    return result;
+  };
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
