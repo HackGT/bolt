@@ -80,6 +80,7 @@ const columns = [
         <Tooltip label="Deny request">
           <IconButton aria-label="deny" icon={<CloseIcon />} variant="ghost" colorScheme="red" />
         </Tooltip>
+        <Button variant="ghost">Edit</Button>
       </Flex>
     ),
     header: () => <span>Actions</span>,
@@ -112,35 +113,7 @@ const SubmittedTable = () => {
   return (
     <TableContainer>
       <Heading size="lg" mt={2} mb={4}>
-        Submitted Requests
-      </Heading>
-      {/* <Input type="text" /> */}
-      <Table variant="simple">
-        <Thead>
-          {table.getHeaderGroups().map(headerGroup => (
-            <Tr key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
-                <Th key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                </Th>
-              ))}
-            </Tr>
-          ))}
-        </Thead>
-        <Tbody>
-          {table.getRowModel().rows.map(row => (
-            <Tr key={row.id}>
-              {row.getVisibleCells().map(cell => (
-                <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
-              ))}
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
-      <Heading size="lg" mt={8} mb={4}>
-        Approved Requests
+        All Requests
       </Heading>
       {/* <Input type="text" /> */}
       <Table variant="simple">
