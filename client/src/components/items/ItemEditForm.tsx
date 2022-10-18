@@ -12,7 +12,7 @@ import {
 import { withToastManager } from "react-toast-notifications";
 import { Navigate } from "react-router";
 import { Mutation, Query } from "@apollo/client/react/components";
-import { useForm } from "react-hook-form";
+import { TriggerConfig, useForm } from "react-hook-form";
 import {
   Box,
   Button,
@@ -21,6 +21,7 @@ import {
   Container,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Heading,
   Input,
@@ -39,8 +40,13 @@ import {
   StatHelpText,
   StatLabel,
   StatNumber,
+  Text,
   Textarea,
+  chakra,
 } from "@chakra-ui/react";
+import axios from "axios";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { apiUrl, LoadingScreen } from "@hex-labs/core";
 
 import AddOptionDropdown from "../util/AddOptionDropdown";
 import HardwareItem from "../inventory/HardwareItem";
@@ -564,79 +570,146 @@ const ItemEditForm = () => {
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm<FormItem>();
+
+  const itemMutation = useMutation(newItem => axios.post("/items", newItem));
+  const locationQuery = useQuery(["locations"], () => axios.get("/locations"));
+  const categoryQuery = useQuery(["categories"], () => axios.get("/categories"));
+
+  if (locationQuery.isLoading || categoryQuery.isLoading) {
+    return <LoadingScreen />;
+  }
 
   function onSubmit(values: any) {
-    return new Promise<void>(resolve => {
-      setTimeout(() => {
-        alert(JSON.stringify(values, null, 2));
-        resolve();
-      }, 3000);
-    });
+    itemMutation.mutate(values);
   }
 
   return (
-    <Flex as="form" flexDir="column" gap="4" mt="4" onSubmit={handleSubmit(onSubmit)}>
-      <FormControl>
-        <FormLabel htmlFor="itemName">Item name</FormLabel>
-        <Input id="itemName" placeholder="Ray Gun" />
+    <Flex as="form" gap={4} flexDir="column" onSubmit={handleSubmit(onSubmit)}>
+      <FormControl isInvalid={Boolean(errors.name)}>
+        <FormLabel htmlFor="itemName">
+          Item name <chakra.span color="red.400">*</chakra.span>
+        </FormLabel>
+        <Input
+          id="name"
+          placeholder="Ray Gun"
+          {...register("name", { required: "Please provide an item name!" })}
+        />
+        <FormErrorMessage>{errors.name && errors.name.message}</FormErrorMessage>
       </FormControl>
-      <FormControl>
-        <FormLabel htmlFor="description">Description</FormLabel>
+      <FormControl isInvalid={Boolean(errors.description)}>
+        <FormLabel htmlFor="description">
+          Description <chakra.span color="red.400">*</chakra.span>
+        </FormLabel>
         <Textarea
           id="description"
           placeholder="Intended for bugs. Be sure not to point at other people."
+          {...register("description", { required: "Please provide a description!" })}
         />
+        <FormErrorMessage>{errors.description && errors.description.message}</FormErrorMessage>
       </FormControl>
-      <FormControl>
-        <FormLabel htmlFor="category">Category</FormLabel>
-        <Select id="category" placeholder="Select a category">
-          <option value="cable">Cable</option>
+      <FormControl isInvalid={Boolean(errors.category)}>
+        <FormLabel htmlFor="category">
+          Category <chakra.span color="red.400">*</chakra.span>
+        </FormLabel>
+        <Select
+          id="category"
+          placeholder="Select a category"
+          {...register("category", { required: "Please provide a category!" })}
+        >
+          {categoryQuery.data?.data.map((category: Category) => (
+            <option value={category.id}>{category.name}</option>
+          ))}
         </Select>
+        <FormErrorMessage>{errors.category && errors.category.message}</FormErrorMessage>
       </FormControl>
       <Flex gap="4">
-        <FormControl>
-          <FormLabel>Item value</FormLabel>
+        <FormControl isInvalid={Boolean(errors.price)}>
+          <FormLabel>
+            Item value <chakra.span color="red.400">*</chakra.span>
+          </FormLabel>
           <InputGroup>
             <InputLeftElement pointerEvents="none" color="gray.300" fontSize="1.2em">
               $
             </InputLeftElement>
-            <Input placeholder="Enter amount" type="number" min={0} />
+            <Input
+              placeholder="Enter amount"
+              type="number"
+              min={0}
+              {...register("price", { required: "Please provide an item value!" })}
+            />
           </InputGroup>
+          <FormErrorMessage>{errors.price && errors.price.message}</FormErrorMessage>
         </FormControl>
-        <FormControl>
-          <FormLabel htmlFor="owner">Owner</FormLabel>
-          <Select id="owner" placeholder="Select an owner">
+        <FormControl isInvalid={Boolean(errors.owner)}>
+          <FormLabel htmlFor="owner">
+            Owner <chakra.span color="red.400">*</chakra.span>
+          </FormLabel>
+          <Select
+            id="owner"
+            placeholder="Select an owner"
+            {...register("owner", { required: "Please provide an owner!" })}
+          >
             <option value="Captain Kirk">Captain Kirk</option>
           </Select>
+          <FormErrorMessage>{errors.owner && errors.owner.message}</FormErrorMessage>
         </FormControl>
       </Flex>
-      <FormControl>
-        <FormLabel htmlFor="location">Location</FormLabel>
-        <Select id="location" placeholder="Select a location">
-          <option value="cable">Skiles</option>
+      <FormControl isInvalid={Boolean(errors.location)}>
+        <FormLabel htmlFor="location">
+          Location <chakra.span color="red.400">*</chakra.span>
+        </FormLabel>
+        <Select
+          id="location"
+          placeholder="Select a location"
+          {...register("location", { required: "Please provide a location!" })}
+        >
+          {locationQuery.data?.data.map((location: Location) => (
+            <option value={location.id}>{location.name}</option>
+          ))}
         </Select>
+        <FormErrorMessage>{errors.location && errors.location.message}</FormErrorMessage>
       </FormControl>
       <Flex flexDir="row" gap="4">
-        <FormControl>
-          <FormLabel>Quantity in stock</FormLabel>
+        <FormControl isInvalid={Boolean(errors.totalAvailable)}>
+          <FormLabel>
+            Quantity in stock <chakra.span color="red.400">*</chakra.span>
+          </FormLabel>
           <NumberInput max={99} min={1}>
-            <NumberInputField placeholder="Enter amount" />
+            <NumberInputField
+              placeholder="Enter amount"
+              {...register("totalAvailable", {
+                required: "Please provide a quantity for the stock!",
+              })}
+            />
             <NumberInputStepper>
               <NumberIncrementStepper />
               <NumberDecrementStepper />
             </NumberInputStepper>
           </NumberInput>
+          <FormErrorMessage>
+            {errors.totalAvailable && errors.totalAvailable.message}
+          </FormErrorMessage>
         </FormControl>
-        <FormControl>
-          <FormLabel>Quantity allowed per request</FormLabel>
+        <FormControl isInvalid={Boolean(errors.maxRequestQty)}>
+          <FormLabel>
+            Quantity allowed per request <chakra.span color="red.400">*</chakra.span>
+          </FormLabel>
           <NumberInput max={99} min={1}>
-            <NumberInputField placeholder="Enter amount" />
+            <NumberInputField
+              placeholder="Enter amount"
+              {...register("maxRequestQty", {
+                required: "Please provide a quantity allowed!",
+              })}
+            />
             <NumberInputStepper>
               <NumberIncrementStepper />
               <NumberDecrementStepper />
             </NumberInputStepper>
           </NumberInput>
+          <FormErrorMessage>
+            {errors.maxRequestQty && errors.maxRequestQty.message}
+          </FormErrorMessage>
         </FormControl>
       </Flex>
       {/* <Heading as="h3" size="md">
@@ -661,9 +734,13 @@ const ItemEditForm = () => {
       </Heading> */}
       <CheckboxGroup colorScheme="twitter">
         <Stack spacing={5} direction="row">
-          <Checkbox>Return required</Checkbox>
-          <Checkbox>Approval required</Checkbox>
-          <Checkbox>Hidden</Checkbox>
+          <Checkbox defaultChecked {...register("returnRequired")}>
+            Return required
+          </Checkbox>
+          <Checkbox defaultChecked {...register("approvalRequired")}>
+            Approval required
+          </Checkbox>
+          <Checkbox {...register("hidden")}>Hidden</Checkbox>
         </Stack>
       </CheckboxGroup>
       <Button colorScheme="twitter" type="submit" isLoading={isSubmitting}>
