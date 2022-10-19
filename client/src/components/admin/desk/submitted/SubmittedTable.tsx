@@ -1,6 +1,7 @@
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Badge,
+  Box,
   Button,
   Flex,
   Heading,
@@ -53,11 +54,49 @@ export const generateBadge = (status: RequestStatus) => {
 
 const columns = [
   columnHelper.accessor("user.displayName", {
-    cell: info => info.getValue(),
+    cell: info => (
+      <Flex
+        bgColor="gray.200"
+        maxW="fit-content"
+        rounded="full"
+        pl={0.5}
+        gap={1}
+        pr={3}
+        py={0.5}
+        fontSize={14}
+        alignItems="center"
+      >
+        <Flex
+          bgColor="blue.400"
+          color="white"
+          fontSize={12}
+          rounded="full"
+          w={5}
+          h={5}
+          justify="center"
+          alignItems="center"
+        >
+          {(info.getValue() as string)[0]}
+        </Flex>
+        {info.getValue()}
+      </Flex>
+    ),
     header: () => <span>Recipient</span>,
   }),
+  columnHelper.accessor("user.email", {
+    cell: info => (
+      <Flex px={3} py={0.5} bgColor="gray.200" rounded="full" maxW="fit-content">
+        {info.getValue()}
+      </Flex>
+    ),
+    header: () => <span>Email</span>,
+  }),
   columnHelper.accessor("item.name", {
-    cell: info => info.getValue(),
+    cell: info => (
+      <Flex px={3} py={0.5} bgColor="gray.200" rounded="full" maxW="fit-content">
+        {info.getValue()}
+      </Flex>
+    ),
     header: () => <span>Item</span>,
   }),
   columnHelper.accessor("item.totalAvailable", {
@@ -121,6 +160,7 @@ const SubmittedTable = () => {
       <Heading size="lg" mt={2} mb={4}>
         All Requests
       </Heading>
+      <Button colorScheme="twitter">Add Request</Button>
       {/* <Input type="text" /> */}
       <Table variant="simple">
         <Thead>

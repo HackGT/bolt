@@ -1,14 +1,15 @@
 import React from "react";
 import { Button, Card, Header, Icon, Label, Popup } from "semantic-ui-react";
-import TimeAgo from "react-timeago";
-import { useMutation } from "@apollo/client";
+import { Box, Flex, Heading, IconButton, Text, Tooltip } from "@chakra-ui/react";
+import ReactTimeago from "react-timeago";
+import { DraggableProvided } from "react-beautiful-dnd";
+import { CheckIcon, DeleteIcon } from "@chakra-ui/icons";
 
 import { Request } from "../../../../types/Request";
-import ItemAndQuantity from "../ItemAndQuantity";
-import { UPDATE_REQUEST } from "../../../../graphql/Mutations";
-import { APPROVED, DENIED } from "../../../../types/Hardware";
+import { generateBadge } from "./SubmittedTable";
 
 interface SubmittedCardProps {
+  provided: DraggableProvided;
   request: Request;
 }
 
@@ -21,100 +22,44 @@ function noStockWarning(remaining: number) {
   );
 }
 
-function SubmittedCard({ request }: SubmittedCardProps) {
-  const [updateRequest, { loading, error }] = useMutation(UPDATE_REQUEST);
+const noIssues = (
+  <Flex align="center" gap={2}>
+    <CheckIcon color="green" /> <Text color="green">No issues found</Text>
+  </Flex>
+);
 
-  const noIssues = (
-    <Card.Content className="hw-positive">
-      <Icon name="check circle" /> No issues found
-    </Card.Content>
-  );
-
-  return (
-    <Card className="hw-card">
-      <Card.Content>
-        <Label attached="top left">
-          <Icon name="user" />
-          {request.user.displayName}
-        </Label>
-
-        <Header style={{ display: "inline-block" }} size="medium">
-          <ItemAndQuantity itemName={request.item.name} quantity={request.quantity} />
-          &nbsp;
-          <span style={{ color: "gray", fontSize: 14, fontWeight: "normal" }}>#{request.id}</span>
-        </Header>
-      </Card.Content>
-      {request.item.qtyAvailableForApproval >= request.quantity
+const SubmittedCard = ({ provided, request }: SubmittedCardProps) => (
+  <Flex
+    ref={provided.innerRef}
+    {...provided.draggableProps}
+    {...provided.dragHandleProps}
+    rounded={8}
+    p={4}
+    shadow="md"
+    minH={32}
+    bgColor="white"
+    mb={4}
+    justify="space-between"
+    alignItems="center"
+  >
+    <Flex gap={1} flexDir="column">
+      <Flex gap={2}>
+        <Heading as="h4" size="md">
+          {request.item.name}
+        </Heading>
+        <Text color="gray.500">{`Qty: ${request.quantity}`}</Text>
+      </Flex>
+      <Text color="gray.500">{request.item.description}</Text>
+      {request.item.totalAvailable >= request.quantity
         ? noIssues
-        : noStockWarning(request.item.qtyAvailableForApproval)}
-      <Card.Content>
-        <Icon name="clock outline" /> <TimeAgo date={request.createdAt} />
-      </Card.Content>
-      {error ? (
-        <Card.Content className="hw-negative">
-          <Icon name="warning sign" />
-          Unable to change request status: {error.message}
-        </Card.Content>
-      ) : (
-        ""
-      )}
-      <Card.Content extra>
-        <div className="ui two buttons right aligned">
-          <Button.Group floated="right">
-            <Popup
-              inverted
-              trigger={
-                <Button
-                  icon
-                  loading={loading}
-                  disabled={loading}
-                  onClick={event =>
-                    updateRequest({
-                      variables: {
-                        updatedRequest: {
-                          id: request.id,
-                          status: DENIED,
-                        },
-                      },
-                    })
-                  }
-                >
-                  <Icon className="hw-negative" name="times circle" />
-                </Button>
-              }
-              content="Deny request"
-            />
-            <Popup
-              inverted
-              trigger={
-                <Button
-                  icon
-                  labelPosition="right"
-                  color="green"
-                  loading={loading}
-                  disabled={loading}
-                  onClick={event =>
-                    updateRequest({
-                      variables: {
-                        updatedRequest: {
-                          id: request.id,
-                          status: APPROVED,
-                        },
-                      },
-                    })
-                  }
-                >
-                  <Icon name="checkmark" />
-                  Approve
-                </Button>
-              }
-              content="Approve request"
-            />
-          </Button.Group>
-        </div>
-      </Card.Content>
-    </Card>
-  );
-}
+        : noStockWarning(request.item.totalAvailable)}
+      <ReactTimeago date={request.createdAt} />
+      <Box>{generateBadge(request.status)}</Box>
+    </Flex>
+    <Tooltip label="Delete Request">
+      <IconButton aria-label="delete" icon={<DeleteIcon />} color="red.400" variant="ghost" />
+    </Tooltip>
+  </Flex>
+);
 
 export default SubmittedCard;

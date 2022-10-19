@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Badge, Box, Flex, Heading, Icon, Text } from "@chakra-ui/react";
+import { Badge, Box, Flex, Heading, Icon, IconButton, Text } from "@chakra-ui/react";
 import {
   DragDropContext,
   Draggable,
@@ -8,7 +8,7 @@ import {
   DropResult,
 } from "react-beautiful-dnd";
 import ReactTimeago from "react-timeago";
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import { CheckIcon, CloseIcon, DeleteIcon } from "@chakra-ui/icons";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
@@ -130,32 +130,7 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
                 {items.SUBMITTED.map((request, index) => (
                   <Draggable key={request.id} draggableId={request.id} index={index}>
                     {(provided, snapshot) => (
-                      <Flex
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        rounded={8}
-                        p={4}
-                        shadow="md"
-                        minH={32}
-                        bgColor="white"
-                        gap={1}
-                        flexDir="column"
-                        mb={4}
-                      >
-                        <Flex gap={2}>
-                          <Heading as="h4" size="md">
-                            {request.item.name}
-                          </Heading>
-                          <Text color="gray.500">{`Qty: ${request.quantity}`}</Text>
-                        </Flex>
-                        <Text color="gray.500">{request.item.description}</Text>
-                        {request.item.totalAvailable >= request.quantity
-                          ? noIssues
-                          : noStockWarning(request.item.totalAvailable)}
-                        <ReactTimeago date={request.createdAt} />
-                        <Box>{generateBadge(request.status)}</Box>
-                      </Flex>
+                      <SubmittedCard provided={provided} request={request} />
                     )}
                   </Draggable>
                 ))}
@@ -186,32 +161,7 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
                 {items.APPROVED.map((request, index) => (
                   <Draggable key={request.id} draggableId={request.id} index={index}>
                     {(provided, snapshot) => (
-                      <Flex
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        rounded={8}
-                        p={4}
-                        shadow="md"
-                        minH={32}
-                        bgColor="white"
-                        gap={1}
-                        flexDir="column"
-                        mb={4}
-                      >
-                        <Flex gap={2}>
-                          <Heading as="h4" size="md">
-                            {request.item.name}
-                          </Heading>
-                          <Text color="gray.500">{`Qty: ${request.quantity}`}</Text>
-                        </Flex>
-                        <Text color="gray.500">{request.item.description}</Text>
-                        {request.item.totalAvailable >= request.quantity
-                          ? noIssues
-                          : noStockWarning(request.item.totalAvailable)}
-                        <ReactTimeago date={request.createdAt} />
-                        <Box>{generateBadge(request.status)}</Box>
-                      </Flex>
+                      <SubmittedCard provided={provided} request={request} />
                     )}
                   </Draggable>
                 ))}
@@ -241,32 +191,7 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
                 {items.READY_FOR_PICKUP.map((request, index) => (
                   <Draggable key={request.id} draggableId={request.id} index={index}>
                     {(provided, snapshot) => (
-                      <Flex
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        rounded={8}
-                        p={4}
-                        shadow="md"
-                        minH={32}
-                        bgColor="white"
-                        gap={1}
-                        flexDir="column"
-                        mb={4}
-                      >
-                        <Flex gap={2}>
-                          <Heading as="h4" size="md">
-                            {request.item.name}
-                          </Heading>
-                          <Text color="gray.500">{`Qty: ${request.quantity}`}</Text>
-                        </Flex>
-                        <Text color="gray.500">{request.item.description}</Text>
-                        {request.item.totalAvailable >= request.quantity
-                          ? noIssues
-                          : noStockWarning(request.item.totalAvailable)}
-                        <ReactTimeago date={request.createdAt} />
-                        <Box>{generateBadge(request.status)}</Box>
-                      </Flex>
+                      <SubmittedCard provided={provided} request={request} />
                     )}
                   </Draggable>
                 ))}

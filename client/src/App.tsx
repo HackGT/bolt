@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ToastProvider } from "react-toast-notifications";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import { connect } from "react-redux";
@@ -40,6 +40,8 @@ import EditItemWrapper from "./components/items/EditItemWrapper";
 import PrivateRoute from "./components/util/PrivateRoute";
 import AxiosProvider from "./axios";
 import Cart from "./components/cart/Cart";
+import HardwareHeader from "./components/home/HardwareHeader";
+import EditRequest from "./components/admin/desk/submitted/EditRequest";
 
 // interface OwnProps {}
 
@@ -62,49 +64,24 @@ axios.defaults.withCredentials = true;
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
-  const [loading, error, loggedIn] = useLogin(app);
-
-  // const { loading, data, error } = useQuery(USER_INFO);
+  const [loading, loggedIn] = useLogin(app);
 
   if (loading) {
     return <LoadingScreen />;
   }
 
-  // If error, show error
-  if (error) {
-    return <ErrorScreen error={error} />;
-  }
-
   if (!loggedIn) {
+    console.log(loggedIn);
     window.location.href = `https://login.hexlabs.org?redirect=${window.location.href}`;
+    return <LoadingScreen />;
   }
-
-  // const user = {
-  //   uuid: "239847234",
-  //   name: "edmund xin",
-  //   email: "edmund@gatech.edu",
-  //   phone: "9136170133",
-  //   haveID: true,
-  //   admin: true,
-  // };
-  // props.loginUser(user);
-  // if (bugsnagEnabled) {
-  //   bugsnagClient.user = user;
-  // }
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider app={app}>
         <AxiosProvider>
           <ToastProvider placement="top-center">
-            <Header>
-              <Link to="user/me">
-                <HeaderItem>Profile</HeaderItem>
-              </Link>
-              <Link to="logout">
-                <HeaderItem>Sign Out</HeaderItem>
-              </Link>
-            </Header>
+            <HardwareHeader />
             <Container p="8" maxW="container.lg">
               <Routes>
                 <Route path="cart" element={<Cart />} />
@@ -122,7 +99,10 @@ const App: React.FC = () => {
             <Box>
               <Routes>
                 <Route path="admin">
-                  <Route path="items/new" element={<CreateItemWrapper />} />
+                  <Route path="items">
+                    <Route path=":id" element={<EditRequest />} />
+                    <Route path="new" element={<CreateItemWrapper />} />
+                  </Route>
                   <Route path="desk" element={<DeskContainer />}>
                     <Route path=":location" element={<DeskContainer />} />
                   </Route>

@@ -33,14 +33,15 @@ class SubmittedList extends Component<SubmittedListProps> {
     );
 
     return (
-      <CardList
-        title="Submitted"
-        length={this.props.requests.length}
-        filter={requestSearch}
-        cards={this.props.requests}
-        render={(request: any) => <SubmittedCard key={request.id} request={request} />}
-        empty={empty}
-      />
+      // <CardList
+      //   title="Submitted"
+      //   length={this.props.requests.length}
+      //   filter={requestSearch}
+      //   cards={this.props.requests}
+      //   render={(request: any) => <SubmittedCard key={request.id} request={request} />}
+      //   empty={empty}
+      // />
+      <div>Card</div>
     );
   }
 }

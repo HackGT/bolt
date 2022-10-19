@@ -577,7 +577,7 @@ const ItemEditForm = () => {
 
   return (
     <Flex as="form" flexDir="column" gap="4" mt="4" onSubmit={handleSubmit(onSubmit)}>
-      <FormControl>
+      <FormControl isRequired>
         <FormLabel htmlFor="itemName">Item name</FormLabel>
         <Input id="itemName" placeholder="Ray Gun" />
       </FormControl>
@@ -588,7 +588,7 @@ const ItemEditForm = () => {
           placeholder="Intended for bugs. Be sure not to point at other people."
         />
       </FormControl>
-      <FormControl>
+      <FormControl isRequired>
         <FormLabel htmlFor="category">Category</FormLabel>
         <Select id="category" placeholder="Select a category">
           <option value="cable">Cable</option>
@@ -611,14 +611,14 @@ const ItemEditForm = () => {
           </Select>
         </FormControl>
       </Flex>
-      <FormControl>
+      <FormControl isRequired>
         <FormLabel htmlFor="location">Location</FormLabel>
         <Select id="location" placeholder="Select a location">
           <option value="cable">Skiles</option>
         </Select>
       </FormControl>
       <Flex flexDir="row" gap="4">
-        <FormControl>
+        <FormControl isRequired>
           <FormLabel>Quantity in stock</FormLabel>
           <NumberInput max={99} min={1}>
             <NumberInputField placeholder="Enter amount" />
@@ -628,7 +628,7 @@ const ItemEditForm = () => {
             </NumberInputStepper>
           </NumberInput>
         </FormControl>
-        <FormControl>
+        <FormControl isRequired>
           <FormLabel>Quantity allowed per request</FormLabel>
           <NumberInput max={99} min={1}>
             <NumberInputField placeholder="Enter amount" />
@@ -661,7 +661,7 @@ const ItemEditForm = () => {
       </Heading> */}
       <CheckboxGroup colorScheme="twitter">
         <Stack spacing={5} direction="row">
-          <Checkbox>Return required</Checkbox>
+          <Checkbox defaultChecked>Return required</Checkbox>
           <Checkbox>Approval required</Checkbox>
           <Checkbox>Hidden</Checkbox>
         </Stack>
