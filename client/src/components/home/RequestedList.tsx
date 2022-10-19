@@ -280,7 +280,7 @@ const RequestedList = ({ requests }: RequestedListProps) => {
                     {r.item.name}
                   </Heading>
                   <Text color="gray.500">{`Qty: ${r.quantity}`}</Text>
-                  <Flex dir="row" color="gray.500">
+                  <Flex dir="row" color="gray.500" alignItems="center">
                     <Box w={6} h={6}>
                       <MapPinIcon />
                     </Box>

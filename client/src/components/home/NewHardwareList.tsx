@@ -1,27 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Grid, Icon, Loader, Message } from "semantic-ui-react";
-import { connect } from "react-redux";
+import { Grid, Loader, Message } from "semantic-ui-react";
 import { Link } from "react-router-dom";
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Input,
-  Text,
-} from "@chakra-ui/react";
-import { useAuth } from "@hex-labs/core";
-import useAxios from "axios-hooks";
+import { Box, Button, Flex, Heading, Input, Text } from "@chakra-ui/react";
+import { apiUrl, Service, useAuth } from "@hex-labs/core";
 import axios from "axios";
 import _ from "lodash";
 import { useQuery } from "@tanstack/react-query";
 
-import { ALL_ITEMS, GET_SETTING } from "../../graphql/Queries";
-import { Item, ItemByLocation } from "../../types/Hardware";
 import HardwareLocationContents from "../inventory/HardwareLocationContents";
 
 const NewHardwareList = () => {
@@ -29,10 +14,27 @@ const NewHardwareList = () => {
   const { user, loading } = useAuth();
 
   const { data, isLoading } = useQuery(["items"], async () => {
-    const items = await axios.get("/items");
+    const items = await axios.get(apiUrl(Service.HARDWARE, "/items"));
     const groupedItems = _.groupBy(items.data, "location.name");
     return groupedItems;
   });
+
+  const [role, setRoles] = useState<any>({
+    member: false,
+    exec: false,
+    admin: false,
+  });
+
+  useEffect(() => {
+    const getRoles = async () => {
+      if (user?.uid) {
+        const response = await axios.get(apiUrl(Service.USERS, `/users/${user?.uid}`));
+        setRoles({ ...response.data.roles });
+      }
+    };
+
+    getRoles();
+  }, [user?.uid]);
 
   if (loading || isLoading) {
     return (
@@ -92,7 +94,7 @@ const NewHardwareList = () => {
       <Heading mb={4}>Inventory</Heading>
       <Flex gap="10px" flexDir="column">
         <Flex flexDir="row" gap={2}>
-          {user ? (
+          {role.admin || role.exec || role.member ? (
             <Link to="/admin/items/new">
               <Button px={6} colorScheme="twitter" color="white">
                 Create item

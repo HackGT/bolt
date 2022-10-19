@@ -16,7 +16,7 @@ import {
   Tooltip,
   Tr,
 } from "@chakra-ui/react";
-import { LoadingScreen } from "@hex-labs/core";
+import { apiUrl, LoadingScreen, Service } from "@hex-labs/core";
 import { useQuery } from "@tanstack/react-query";
 import {
   ColumnDef,
@@ -134,7 +134,7 @@ const columns = [
 
 const SubmittedTable = () => {
   const { data, isLoading } = useQuery(["requests"], async () => {
-    const response = await axios.get("/requests");
+    const response = await axios.get(apiUrl(Service.HARDWARE, "/requests"));
     return response.data;
   });
 

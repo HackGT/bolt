@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Checkbox, DropdownProps, Grid, Header, Loader, Message } from "semantic-ui-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { LoadingScreen, useAuth } from "@hex-labs/core";
+import { apiUrl, LoadingScreen, Service, useAuth } from "@hex-labs/core";
 import {
   Box,
   Container,
@@ -115,11 +115,11 @@ function getUpdateQuery() {
 
 function DeskContainer() {
   const requestQuery = useQuery(["deskRequests"], async () => {
-    const requests = await axios.get("/requests");
+    const requests = await axios.get(apiUrl(Service.HARDWARE, "/requests"));
     return requests.data;
   });
   const locationQuery = useQuery(["locations"], async () => {
-    const locations = await axios.get("/locations");
+    const locations = await axios.get(apiUrl(Service.HARDWARE, "/locations"));
     return locations.data;
   });
 

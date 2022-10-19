@@ -46,7 +46,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiUrl, LoadingScreen } from "@hex-labs/core";
+import { apiUrl, LoadingScreen, Service } from "@hex-labs/core";
 
 import AddOptionDropdown from "../util/AddOptionDropdown";
 import HardwareItem from "../inventory/HardwareItem";
@@ -573,8 +573,12 @@ const ItemEditForm = () => {
   } = useForm<FormItem>();
 
   const itemMutation = useMutation(newItem => axios.post("/items", newItem));
-  const locationQuery = useQuery(["locations"], () => axios.get("/locations"));
-  const categoryQuery = useQuery(["categories"], () => axios.get("/categories"));
+  const locationQuery = useQuery(["locations"], () =>
+    axios.get(apiUrl(Service.HARDWARE, "/locations"))
+  );
+  const categoryQuery = useQuery(["categories"], () =>
+    axios.get(apiUrl(Service.HARDWARE, "/categories"))
+  );
 
   if (locationQuery.isLoading || categoryQuery.isLoading) {
     return <LoadingScreen />;

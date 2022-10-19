@@ -43,7 +43,6 @@ const HardwareLocationContents = ({
   location,
 }: HardwareListProps) => {
   const [accordionState, setAccordionState] = useState([0]);
-  console.log(itemsByLocation);
 
   return (
     <div

@@ -5,9 +5,7 @@ import axios from "axios";
 import React, { useEffect } from "react";
 
 const EditRequest = () => {
-  //   const userQuery = useQuery(["users"], () => axios.get(apiUrl(Service.USERS, `/users/${}`)));
-
-  const itemQuery = useQuery(["items"], () => axios.get("/items"));
+  const itemQuery = useQuery(["items"], () => axios.get(apiUrl(Service.HARDWARE, "items")));
 
   if (itemQuery.isLoading) {
     return <LoadingScreen />;

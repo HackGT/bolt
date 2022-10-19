@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Grid, Segment } from "semantic-ui-react";
 import { connect } from "react-redux";
 import axios from "axios";
-import { LoadingScreen, useAuth } from "@hex-labs/core";
+import { apiUrl, LoadingScreen, Service, useAuth } from "@hex-labs/core";
 import { Container, Flex } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -17,13 +17,13 @@ const HomeContainer: React.FC = props => {
   const { user, loading } = useAuth();
 
   const requestQuery = useQuery(["requests"], async () => {
-    const requests = await axios.get("/requests");
+    const requests = await axios.get(apiUrl(Service.HARDWARE, "/requests"));
     return requests.data;
   });
 
   useEffect(() => {
     const fetchData = async () => {
-      const requests = await axios.get(`/requests/${user!.uid}`);
+      const requests = await axios.get(apiUrl(Service.HARDWARE, `/requests/${user!.uid}`));
       setUserRequests(requests.data);
     };
     if (!loading) {
