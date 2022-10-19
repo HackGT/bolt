@@ -42,6 +42,7 @@ import AxiosProvider from "./axios";
 import Cart from "./components/cart/Cart";
 import HardwareHeader from "./components/home/HardwareHeader";
 import EditRequest from "./components/admin/desk/submitted/EditRequest";
+import ProtectedRoute from "./components/util/ProtectedRoute";
 
 // interface OwnProps {}
 
@@ -98,7 +99,7 @@ const App: React.FC = () => {
             </Container>
             <Box>
               <Routes>
-                <Route path="admin">
+                <Route path="admin" element={<ProtectedRoute />}>
                   <Route path="items">
                     <Route path=":id" element={<EditRequest />} />
                     <Route path="new" element={<CreateItemWrapper />} />

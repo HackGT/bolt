@@ -30,7 +30,6 @@ const reorder = (list: Request[], startIndex: number, endIndex: number) => {
 };
 
 const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
-  console.log(requests);
   const [items, setItems] = useState<Record<string, Request[]>>({
     SUBMITTED: [...requests.filter(request => request.status === "SUBMITTED")],
     APPROVED: [...requests.filter(request => request.status === "APPROVED")],
@@ -55,8 +54,6 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
       id: removed.id,
       status: droppableDestination.droppableId as RequestStatus,
     });
-
-    console.log(removed);
 
     destClone.splice(droppableDestination.index, 0, removed);
 

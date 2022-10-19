@@ -22,26 +22,31 @@ const HardwareHeader = () => {
     getRoles();
   }, [user?.uid]);
 
+  const logOut = async () => {
+    await axios.post(apiUrl(Service.AUTH, "/auth/logout"));
+    window.location.href = `https://login.hexlabs.org/login?redirect=${window.location.href}`;
+  };
+
   return (
     <Header
       rightItem={
         <>
-          <Link to="/profile">
+          <Link to="/user/me">
             <HeaderItem>Profile</HeaderItem>
           </Link>
-          <Link to="/logout">
+          <a onClick={logOut}>
             <HeaderItem>Sign Out</HeaderItem>
-          </Link>
+          </a>
         </>
       }
       rightItemMobile={
         <>
-          <Link to="/profile">
+          <Link to="/user/me">
             <HeaderItem>Profile</HeaderItem>
           </Link>
-          <Link to="/logout">
+          <a onClick={logOut}>
             <HeaderItem>Sign Out</HeaderItem>
-          </Link>
+          </a>
         </>
       }
     >

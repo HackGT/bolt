@@ -20,7 +20,6 @@ const EditUserProfileWrapper: React.FC = props => {
   if (userId === undefined && user) {
     return <Loader show />;
   }
-  console.log(user);
 
   if (!userId && user) {
     userId = user.uid;

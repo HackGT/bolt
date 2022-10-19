@@ -114,18 +114,15 @@ const NewHardwareList = () => {
           />
         </Flex>
         {data ? (
-          Object.keys(data).map((location: string) => {
-            console.log(data[location]);
-            return (
-              <HardwareLocationContents
-                key={location}
-                location={location}
-                requestsEnabled={requestsEnabled}
-                itemsByLocation={data[location]}
-                searchQuery={searchQuery}
-              />
-            );
-          })
+          Object.keys(data).map((location: string) => (
+            <HardwareLocationContents
+              key={location}
+              location={location}
+              requestsEnabled={requestsEnabled}
+              itemsByLocation={data[location]}
+              searchQuery={searchQuery}
+            />
+          ))
         ) : (
           <Box>
             <Text>No hardware available right now!</Text>

@@ -171,8 +171,6 @@ interface RequestedListProps {
 const RequestedList = ({ requests }: RequestedListProps) => {
   const [userRequests, setUserRequests] = useState(requests);
 
-  console.log(requests);
-
   const statuses = (status: RequestStatus): JSX.Element => {
     switch (status) {
       case SUBMITTED:
