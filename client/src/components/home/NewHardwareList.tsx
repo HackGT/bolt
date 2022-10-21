@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Grid, Loader, Message } from "semantic-ui-react";
 import { Link } from "react-router-dom";
-import { Box, Button, Flex, Heading, Input, Text } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, Heading, Input, Text } from "@chakra-ui/react";
 import { apiUrl, Service, useAuth } from "@hex-labs/core";
 import axios from "axios";
 import _ from "lodash";
@@ -115,7 +115,7 @@ const NewHardwareList = () => {
             }}
           />
         </Flex>
-        {data ? (
+        {data && Object.keys(data).length > 0 ? (
           Object.keys(data).map((location: string) => (
             <HardwareLocationContents
               key={location}
@@ -126,9 +126,9 @@ const NewHardwareList = () => {
             />
           ))
         ) : (
-          <Box>
-            <Text>No hardware available right now!</Text>
-          </Box>
+          <Center h="110px">
+            <Text fontWeight="semibold">No hardware available right now!</Text>
+          </Center>
         )}
       </Flex>
     </Flex>
