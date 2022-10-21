@@ -1,9 +1,8 @@
-import { Box, Button, Flex, Heading, Image, Tag, Text } from "@chakra-ui/react";
+import { Box, Button, Container, Flex, Heading, Image, Tag, Text } from "@chakra-ui/react";
 import { apiUrl, Service } from "@hex-labs/core";
 import { MutationKey, useMutation } from "@tanstack/react-query";
 import axios, { AxiosResponse } from "axios";
 import React from "react";
-import { Container, Item as SMItem, Label } from "semantic-ui-react";
 
 import { Item } from "../../../types/Hardware";
 
@@ -30,7 +29,7 @@ const ReviewCard = (props: ReviewCardProps) => {
   return (
     <Flex gap={4} alignItems="center">
       <Image boxSize="120px" src={imageUrl} />
-      <SMItem.Content>
+      <Flex flexDir="column">
         <Heading size="md">{name}</Heading>
         <Text color="gray.500">
           {`Request up to ${maxRequestQty} at a time | ${totalAvailable} available, Location: ${location}
@@ -43,7 +42,7 @@ const ReviewCard = (props: ReviewCardProps) => {
           {!returnRequired ? <Tag colorScheme="red">No Return Required</Tag> : null}
         </Flex>
         <Text>{description}</Text>
-      </SMItem.Content>
+      </Flex>
     </Flex>
   );
 };
@@ -62,10 +61,11 @@ const ReviewSetup = (props: ReviewSetupProps) => {
 
   const submitInventory = () => {
     inventory.map(item => inventoryMutation.mutate(item));
+    setStep(2);
   };
 
   return (
-    <Container>
+    <Container maxW="container.lg">
       <Flex my="20px" maxW="fit-content" mx="auto" gap={2}>
         <Button variant="ghost" colorScheme="blue" onClick={() => setStep(0)}>
           Previous

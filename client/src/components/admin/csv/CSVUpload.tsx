@@ -252,6 +252,7 @@ Object.keys(fieldInfo).forEach(field => {
 
 const UploadStep = ({ setInventory, setStep, step }: UploadStepProps) => {
   const [logs, setLogs] = useState<string[]>([]);
+  const [innerItems, setInnerItems] = useState<Item[]>([]);
 
   const addLog = (msg: string) => {
     setLogs(old => [...old, msg]);
@@ -316,6 +317,7 @@ const UploadStep = ({ setInventory, setStep, step }: UploadStepProps) => {
           addLog(`${newItem.name} added: Quantity ${newItem.totalAvailable}`);
           items.push(newItem as Item);
         }
+        setInnerItems(items);
         setInventory(items);
       };
 
@@ -325,17 +327,10 @@ const UploadStep = ({ setInventory, setStep, step }: UploadStepProps) => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
-  const onCSVSelect = (e: any) => {
-    if (!e.target.files || !e.target.files[0]) {
-      return;
-    }
-    const file = e.target.files[0];
-  };
-
   return (
     <Container maxW="container.lg">
       <Flex my="20px" maxW="fit-content" mx="auto" gap={2}>
-        <Button variant="ghost" colorScheme='blue' onClick={() => setStep(1)}>
+        <Button colorScheme="twitter" onClick={() => setStep(1)} disabled={innerItems.length === 0}>
           Next
         </Button>
       </Flex>
