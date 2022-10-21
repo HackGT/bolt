@@ -206,7 +206,8 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
   const { refetch: itemRefetch } = useQuery(["items"]);
 
   const mutation = useMutation(
-    async (newRequest: IRequestMutation): Promise<any> => await axios.post("/requests", newRequest),
+    async (newRequest: IRequestMutation): Promise<any> =>
+      await axios.post("/hardware-requests", newRequest),
     {
       onSuccess: () => {
         refetch();

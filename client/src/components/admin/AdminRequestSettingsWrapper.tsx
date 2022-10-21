@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { connect } from "react-redux";
 import { Button, Checkbox, Grid, Header, Loader, Message } from "semantic-ui-react";
 import { Query, Mutation } from "@apollo/client/react/components";
+import { Container, FormControl, FormLabel, Heading, Switch } from "@chakra-ui/react";
+import { useQuery } from "@tanstack/react-query";
 
 import { AppState } from "../../state/Store";
 import { GET_SETTING } from "../../graphql/Queries";
@@ -10,9 +12,11 @@ import { UPDATE_SETTING, CREATE_SETTING } from "../../graphql/Mutations";
 const AdminRequestSettingsWrapper: React.FC = () => {
   const [requestsAllowed, setRequestsAllowed] = useState(false);
 
+  const { data, isLoading } = useQuery(["settings"]);
+
   return (
-    <div>
-      <Header as="h1">Settings</Header>
+    <Container maxW="container.lg">
+      <Heading size="xl">Settings</Heading>
       <Query query={GET_SETTING} variables={{ settingName: "requests_allowed" }}>
         {({ loading, error, data }: any) => {
           if (loading) {
@@ -51,41 +55,26 @@ const AdminRequestSettingsWrapper: React.FC = () => {
             <Grid stackable>
               <Grid.Row columns={1}>
                 <Grid.Column>
-                  <Mutation mutation={UPDATE_SETTING}>
-                    {(updateSetting: any) => (
-                      <Checkbox
-                        toggle
-                        checked={requestsAllowed}
-                        label="Requests allowed"
-                        onChange={(event, { checked }): any => {
-                          updateSetting({
-                            variables: {
-                              settingName: "requests_allowed",
-                              updatedSetting: {
-                                name: "requests_allowed",
-                                value: checked ? "true" : "false",
-                              },
-                            },
-                          });
-                          setRequestsAllowed(!requestsAllowed);
-                        }}
-                      />
-                    )}
-                  </Mutation>
+                  <FormControl display="flex" alignItems="center">
+                    <FormLabel htmlFor="email-alerts" mb="0">
+                      Enable requests?
+                    </FormLabel>
+                    <Switch
+                      id="email-alerts"
+                      isChecked={requestsAllowed}
+                      onChange={e => {
+                        setRequestsAllowed(e.target.value === "true");
+                      }}
+                    />
+                  </FormControl>
                 </Grid.Column>
               </Grid.Row>
             </Grid>
           );
         }}
       </Query>
-    </div>
+    </Container>
   );
 };
 
-function mapStateToProps(state: AppState) {
-  return {
-    user: state.account,
-  };
-}
-
-export default connect(mapStateToProps)(AdminRequestSettingsWrapper);
+export default AdminRequestSettingsWrapper;

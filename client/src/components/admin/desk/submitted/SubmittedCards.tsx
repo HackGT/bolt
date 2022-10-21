@@ -11,6 +11,7 @@ import ReactTimeago from "react-timeago";
 import { CheckIcon, CloseIcon, DeleteIcon } from "@chakra-ui/icons";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { apiUrl, Service } from "@hex-labs/core";
 
 import { Request, RequestStatus } from "../../../../types/Request";
 import SubmittedCard from "./SubmittedCard";
@@ -37,7 +38,7 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
   });
 
   const updateStatus = useMutation((newRequest: any) =>
-    axios.patch(`/requests/${newRequest.id}`, newRequest)
+    axios.patch(apiUrl(Service.HARDWARE, `/hardware-requests/${newRequest.id}`), newRequest)
   );
 
   const move = (

@@ -17,13 +17,13 @@ const HomeContainer: React.FC = props => {
   const { user, loading } = useAuth();
 
   const requestQuery = useQuery(["requests"], async () => {
-    const requests = await axios.get(apiUrl(Service.HARDWARE, "/requests"));
+    const requests = await axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"));
     return requests.data;
   });
 
   useEffect(() => {
     const fetchData = async () => {
-      const requests = await axios.get(apiUrl(Service.HARDWARE, `/requests/${user!.uid}`));
+      const requests = await axios.get(apiUrl(Service.HARDWARE, `/hardware-requests/${user!.uid}`));
       setUserRequests(requests.data);
     };
     if (!loading) {

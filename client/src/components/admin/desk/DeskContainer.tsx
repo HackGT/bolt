@@ -115,7 +115,7 @@ function getUpdateQuery() {
 
 function DeskContainer() {
   const requestQuery = useQuery(["deskRequests"], async () => {
-    const requests = await axios.get(apiUrl(Service.HARDWARE, "/requests"));
+    const requests = await axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"));
     return requests.data;
   });
   const locationQuery = useQuery(["locations"], async () => {

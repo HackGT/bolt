@@ -134,7 +134,7 @@ const columns = [
 
 const SubmittedTable = () => {
   const { data, isLoading } = useQuery(["requests"], async () => {
-    const response = await axios.get(apiUrl(Service.HARDWARE, "/requests"));
+    const response = await axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"));
     return response.data;
   });
 

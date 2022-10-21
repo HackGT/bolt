@@ -74,7 +74,6 @@ const App: React.FC = () => {
   if (!loggedIn) {
     console.log(loggedIn);
     window.location.href = `https://login.hexlabs.org?redirect=${window.location.href}`;
-    return <LoadingScreen />;
   }
 
   return (
@@ -100,6 +99,9 @@ const App: React.FC = () => {
             <Box>
               <Routes>
                 <Route path="admin" element={<ProtectedRoute />}>
+                  <Route path="csv" element={<CSVWizard />} />
+                  <Route path="users" element={<AdminUsersListWrapper />} />
+                  <Route path="settings" element={<AdminRequestSettingsWrapper />} />
                   <Route path="items">
                     <Route path=":id" element={<EditRequest />} />
                     <Route path="new" element={<CreateItemWrapper />} />
