@@ -1,3 +1,7 @@
+import { Box, Button, Flex, Heading, Image, Tag, Text } from "@chakra-ui/react";
+import { apiUrl, Service } from "@hex-labs/core";
+import { MutationKey, useMutation } from "@tanstack/react-query";
+import axios, { AxiosResponse } from "axios";
 import React from "react";
 import { Container, Item as SMItem, Label } from "semantic-ui-react";
 
@@ -24,52 +28,61 @@ const ReviewCard = (props: ReviewCardProps) => {
     location,
   } = item;
   return (
-    <SMItem>
-      <SMItem.Image size="tiny" src={imageUrl} />
+    <Flex gap={4} alignItems="center">
+      <Image boxSize="120px" src={imageUrl} />
       <SMItem.Content>
-        <SMItem.Header as="h4">{name}</SMItem.Header>
-        <SMItem.Meta>
+        <Heading size="md">{name}</Heading>
+        <Text color="gray.500">
           {`Request up to ${maxRequestQty} at a time | ${totalAvailable} available, Location: ${location}
           , Owner: ${owner}, Unit Cost: ${price}`}
-        </SMItem.Meta>
-        <SMItem.Meta>
-          <Label>{`Category: ${category}`}</Label>
-          {hidden ? (
-            <Label tag color="red">
-              Hidden
-            </Label>
-          ) : null}
-          {!approvalRequired ? (
-            <Label tag color="red">
-              No Approval Required
-            </Label>
-          ) : null}
-          {!returnRequired ? (
-            <Label tag color="red">
-              No Return Required
-            </Label>
-          ) : null}
-        </SMItem.Meta>
-        <SMItem.Description>{description}</SMItem.Description>
+        </Text>
+        <Flex gap={2} mb={2}>
+          <Tag>{`Category: ${category}`}</Tag>
+          {hidden ? <Tag colorScheme="red">Hidden</Tag> : null}
+          {!approvalRequired ? <Tag colorScheme="red">No Approval Required</Tag> : null}
+          {!returnRequired ? <Tag colorScheme="red">No Return Required</Tag> : null}
+        </Flex>
+        <Text>{description}</Text>
       </SMItem.Content>
-    </SMItem>
+    </Flex>
   );
 };
 
 interface ReviewSetupProps {
   inventory: Item[];
+  setStep: (step: number) => any;
 }
 
 const ReviewSetup = (props: ReviewSetupProps) => {
-  const { inventory } = props;
+  const { inventory, setStep } = props;
+
+  const inventoryMutation = useMutation((newItem: Item): any =>
+    axios.post(apiUrl(Service.HARDWARE, "/items"), newItem)
+  );
+
+  const submitInventory = () => {
+    inventory.map(item => inventoryMutation.mutate(item));
+  };
 
   return (
     <Container>
-      <SMItem.Group>
+      <Flex my="20px" maxW="fit-content" mx="auto" gap={2}>
+        <Button variant="ghost" colorScheme="blue" onClick={() => setStep(0)}>
+          Previous
+        </Button>
+        <Button
+          colorScheme="whatsapp"
+          onClick={() => submitInventory()}
+          isLoading={inventoryMutation.isLoading}
+        >
+          Submit
+        </Button>
+      </Flex>
+      <Flex flexDir="column" gap={8}>
         {inventory.map(item => (
           <ReviewCard key={item.name} item={item} />
         ))}
-      </SMItem.Group>
+      </Flex>
     </Container>
   );
 };

@@ -210,7 +210,7 @@ import React, { useState } from "react";
 
 import { Item } from "../../../types/Hardware";
 import ReviewSetup from "./CSVReview";
-// import UploadStep from "./CSVUpload";
+import UploadStep from "./CSVUpload";
 
 const CSVWizard = () => {
   const [inventory, setInventory] = useState<Item[]>([]);
@@ -227,6 +227,7 @@ const CSVWizard = () => {
           bgColor="blue.300"
           position="relative"
           boxSizing="border-box"
+          onClick={() => setStep(0)}
         >
           <Center
             bgColor={step === 0 ? "white" : "transparent"}
@@ -246,11 +247,37 @@ const CSVWizard = () => {
             Upload
           </Text>
         </Center>
-        <Box h={1} w="300px" bgColor="gray.200" />
-        <Box rounded="full" width={8} height={8} bgColor="blue.300" />
+        <Box h={1} w="300px" bgColor={step === 0 ? "gray.200" : "blue.300"} />
+        <Center
+          rounded="full"
+          width="32px"
+          height="32px"
+          bgColor={step === 0 ? "gray.200" : "blue.300"}
+          position="relative"
+          boxSizing="border-box"
+          onClick={() => setStep(1)}
+        >
+          <Center
+            bgColor={step === 1 || step === 0 ? "white" : "transparent"}
+            width="26px"
+            height="26px"
+            rounded="full"
+          >
+            <CheckIcon color="white" />
+          </Center>
+          <Text
+            position="absolute"
+            top={9}
+            transform="translateX(-50%)"
+            left="50%"
+            fontWeight="semibold"
+          >
+            Review
+          </Text>
+        </Center>
       </Flex>
-      {/* {step === 0 && <UploadStep setInventory={setInventory} />} */}
-      {step === 1 && <ReviewSetup inventory={inventory} />}
+      {step === 0 && <UploadStep step={step} setInventory={setInventory} setStep={setStep} />}
+      {step === 1 && <ReviewSetup setStep={setStep} inventory={inventory} />}
     </Container>
   );
 };
