@@ -82,7 +82,7 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
         <Flex alignItems="center">
           <Heading size="md">{item.name}</Heading>
           <Heading size="sm" color="gray.400" ml={2}>
-            {`Available: ${item.totalAvailable}`}
+            {`Available: ${item.totalAvailable >= 0 ? item.totalAvailable : 0}`}
           </Heading>
         </Flex>
         <Text>{item.description}</Text>
