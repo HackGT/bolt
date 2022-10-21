@@ -7,6 +7,9 @@
 import React from "react";
 import { Button, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon, DeleteIcon } from "@chakra-ui/icons";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { apiUrl, LoadingScreen, Service, useAuth } from "@hex-labs/core";
 
 import { User } from "../../types/User";
 
@@ -228,49 +231,88 @@ interface AdminUsersListTableProps {
   permissions: any[];
 }
 
-const AdminUsersListTable = ({ users, permissions }: AdminUsersListTableProps) => (
-  <TableContainer>
-    <Table variant="simple">
-      <Thead>
-        <Tr>
-          <Th>Name</Th>
-          <Th>Email</Th>
-          <Th>Phone</Th>
-          <Th>Admin</Th>
-          <Th>Actions</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {users.map(user => {
-          const permissionsOfUser = permissions.find(
-            permission => permission.userId === user.userId
-          );
+const AdminUsersListTable = ({ users, permissions }: AdminUsersListTableProps) => {
+  const { user: userObj, loading } = useAuth();
+  const permissionMutation = useMutation((newPermissions: any) =>
+    axios.post(apiUrl(Service.AUTH, `/permissions/${newPermissions.userId}`), newPermissions)
+  );
 
-          return (
-            <Tr>
-              <Td>{`${user.name.first} ${user.name.last}`}</Td>
-              <Td>{user.email}</Td>
-              <Td>{user.phoneNumber}</Td>
-              <Td>
-                {permissionsOfUser && permissionsOfUser.roles.admin ? (
-                  <CheckIcon color="green" />
-                ) : (
-                  <CloseIcon color="red" />
-                )}
-              </Td>
-              <Td>
-                <Button colorScheme="twitter">
-                  {permissionsOfUser && permissionsOfUser.roles.admin
-                    ? "Remove Admin"
-                    : "Make Admin"}
-                </Button>
-              </Td>
-            </Tr>
-          );
-        })}
-      </Tbody>
-    </Table>
-  </TableContainer>
-);
+  const addAdmin = (userId: string) => {
+    permissionMutation.mutate({ userId, roles: { admin: true } });
+  };
+
+  const removeAdmin = (userId: string) => {
+    permissionMutation.mutate({ userId, roles: { admin: false } });
+  };
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  return (
+    <TableContainer>
+      <Table variant="simple">
+        <Thead>
+          <Tr>
+            <Th>Name</Th>
+            <Th>Email</Th>
+            <Th>Phone</Th>
+            <Th>Admin</Th>
+            <Th>Actions</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {users.map(user => {
+            const permissionsOfUser = permissions.find(
+              permission => permission.userId === user.userId
+            );
+
+            return (
+              <Tr>
+                <Td>{`${user.name.first} ${user.name.last}`}</Td>
+                <Td>{user.email}</Td>
+                <Td>{user.phoneNumber}</Td>
+                <Td>
+                  {permissionsOfUser && permissionsOfUser.roles.admin ? (
+                    <CheckIcon color="green" />
+                  ) : (
+                    <CloseIcon color="red" />
+                  )}
+                </Td>
+                <Td>
+                  {permissionsOfUser &&
+                    permissionsOfUser.roles.admin &&
+                    user.userId !== userObj?.uid && (
+                      <Button
+                        colorScheme="twitter"
+                        onClick={() => {
+                          removeAdmin(user.userId);
+                          permissionsOfUser.roles.admin = false;
+                        }}
+                      >
+                        Remove Admin
+                      </Button>
+                    )}
+                  {!permissionsOfUser ||
+                    (!permissionsOfUser.roles.admin && user.userId !== userObj?.uid && (
+                      <Button
+                        colorScheme="twitter"
+                        onClick={() => {
+                          addAdmin(user.userId);
+                          permissionsOfUser.roles.admin = true;
+                        }}
+                      >
+                        Make Admin
+                      </Button>
+                    ))}
+                </Td>
+              </Tr>
+            );
+          })}
+        </Tbody>
+      </Table>
+    </TableContainer>
+  );
+};
 
 export default AdminUsersListTable;
