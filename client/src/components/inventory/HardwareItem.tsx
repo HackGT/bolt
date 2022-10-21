@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { LoadingScreen, useAuth } from "@hex-labs/core";
+import { apiUrl, LoadingScreen, Service, useAuth } from "@hex-labs/core";
 import { User } from "firebase/auth";
 
 import { Item, RequestedItem, SUBMITTED } from "../../types/Hardware";
@@ -207,7 +207,7 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
 
   const mutation = useMutation(
     async (newRequest: IRequestMutation): Promise<any> =>
-      await axios.post("/hardware-requests", newRequest),
+      await axios.post(apiUrl(Service.HARDWARE, "/hardware-requests"), newRequest),
     {
       onSuccess: () => {
         refetch();
