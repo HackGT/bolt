@@ -668,8 +668,8 @@ const ItemEditForm = () => {
           placeholder="Select a location"
           {...register("location", { required: "Please provide a location!" })}
         >
-          {locationQuery.data?.data.map((location: Location) => (
-            <option value={location.id}>{location.name}</option>
+          {locationQuery.data?.data.map((location: string) => (
+            <option value={location}>{location}</option>
           ))}
         </Select>
         <FormErrorMessage>{errors.location && errors.location.message}</FormErrorMessage>

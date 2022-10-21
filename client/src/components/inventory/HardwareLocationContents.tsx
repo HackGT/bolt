@@ -52,7 +52,7 @@ const HardwareLocationContents = ({
     >
       <HardwareLocation key={`${location}-hardware_loc`} name={location} />
       <Accordion key={`${location}-accordion`} allowToggle mt={4}>
-        {Object.entries(_.groupBy(itemsByLocation, "category.name")).map(([category, items]) => (
+        {Object.entries(_.groupBy(itemsByLocation, "category")).map(([category, items]) => (
           <AccordionItem>
             <AccordionButton>
               <Heading size="md">{category}</Heading>
