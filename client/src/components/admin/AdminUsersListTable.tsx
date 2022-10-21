@@ -293,8 +293,8 @@ const AdminUsersListTable = ({ users, permissions }: AdminUsersListTableProps) =
                         Remove Admin
                       </Button>
                     )}
-                  {!permissionsOfUser ||
-                    (!permissionsOfUser.roles.admin && user.userId !== userObj?.uid && (
+                  {(!permissionsOfUser || !permissionsOfUser.roles.admin) &&
+                    user.userId !== userObj?.uid && (
                       <Button
                         colorScheme="twitter"
                         onClick={() => {
@@ -304,7 +304,7 @@ const AdminUsersListTable = ({ users, permissions }: AdminUsersListTableProps) =
                       >
                         Make Admin
                       </Button>
-                    ))}
+                    )}
                 </Td>
               </Tr>
             );
