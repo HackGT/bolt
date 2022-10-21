@@ -39,10 +39,7 @@ import SubmittedTable from "./submitted/SubmittedTable";
 import SubmittedCards from "./submitted/SubmittedCards";
 
 function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], id: string) {
-  return requests.filter(
-    (r: Request) =>
-      (id === "" || r.item.location.id === id) && statuses.some(status => r.status === status)
-  );
+  return requests.filter((r: Request) => id === "" && statuses.some(status => r.status === status));
 }
 
 function getConsolidatedRequestsWithStatus(

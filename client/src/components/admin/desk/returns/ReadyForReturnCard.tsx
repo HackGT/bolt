@@ -114,7 +114,7 @@ function ReadyForReturnCard({ card }: ReadyForReturnCardProps) {
           </div>
           <Card.Content>
             <Icon name="map marker alternate" />
-            {request.item.location.name}
+            {request.item.location}
           </Card.Content>
         </Card.Content>
       ))}

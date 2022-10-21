@@ -111,8 +111,7 @@ const columnDefs = [
   },
   {
     column: "Qty Not Fulfilled",
-    def:
-      "The total quantity of this item that was requested but not given out, indicated by a request status of abandoned, cancelled, or declined",
+    def: "The total quantity of this item that was requested but not given out, indicated by a request status of abandoned, cancelled, or declined",
   },
   {
     column: "Qty Returned",
@@ -120,8 +119,7 @@ const columnDefs = [
   },
   {
     column: "Qty Lost/Damaged",
-    def:
-      "The total quantity of this item in requests with status lost or damaged.  The value in parentheses is this number divided by the item's Total Available value.",
+    def: "The total quantity of this item in requests with status lost or damaged.  The value in parentheses is this number divided by the item's Total Available value.",
   },
 ];
 

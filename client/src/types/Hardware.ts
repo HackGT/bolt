@@ -11,7 +11,7 @@ export type Item = {
   returnRequired: boolean;
   approvalRequired: boolean;
   owner: string;
-  location: Location;
+  location: string;
   qtyUnreserved: number;
   qtyInStock: number;
   qtyAvailableForApproval: number;
