@@ -81,10 +81,4 @@ function AdminOverviewContainer() {
   );
 }
 
-function mapStateToProps(state: AppState) {
-  return {
-    user: state.account,
-  };
-}
-
-export default connect(mapStateToProps)(AdminOverviewContainer);
+export default AdminOverviewContainer;

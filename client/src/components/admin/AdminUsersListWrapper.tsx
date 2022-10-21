@@ -2,42 +2,32 @@ import React from "react";
 import { connect } from "react-redux";
 import { Header, Loader, Message } from "semantic-ui-react";
 import { Query } from "@apollo/client/react/components";
+import { Container, Heading } from "@chakra-ui/react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { apiUrl, LoadingScreen, Service } from "@hex-labs/core";
 
 import { AppState } from "../../state/Store";
 import AdminUsersListTable from "./AdminUsersListTable";
 import { FullUser } from "../../types/User";
 import { ALL_USERS } from "../../graphql/Queries";
 
-const AdminUsersListWrapper: React.FC = () => (
-  <div>
-    <Header as="h1">Users</Header>
-    <Query query={ALL_USERS} fetchPolicy="cache-and-network">
-      {({ loading, error, data }: any) => {
-        if (loading) {
-          return <Loader active inline="centered" content="Just a sec!" />;
-        }
-        if (error) {
-          return (
-            <Message
-              error
-              visible
-              header="Can't fetch users"
-              content={`Hmm, an error is preventing us from displaying the list of users.  The error was: ${error.message}`}
-            />
-          );
-        }
-        const { users }: { users: FullUser[] } = data;
+const AdminUsersListWrapper: React.FC = () => {
+  const { data, isLoading } = useQuery(["users"], () => axios.get(apiUrl(Service.USERS, "/users")));
+  const { data: permissionsData, isLoading: permissionsIsLoading } = useQuery(["permissions"], () =>
+    axios.get(apiUrl(Service.AUTH, "/permissions/actions/retrieve"))
+  );
 
-        return <AdminUsersListTable users={users} />;
-      }}
-    </Query>
-  </div>
-);
+  if (isLoading || permissionsIsLoading) {
+    return <LoadingScreen />;
+  }
 
-function mapStateToProps(state: AppState) {
-  return {
-    user: state.account,
-  };
-}
+  return (
+    <Container maxW="container.lg">
+      <Heading size="xl">Users</Heading>
+      <AdminUsersListTable users={data?.data.profiles} permissions={permissionsData?.data} />;
+    </Container>
+  );
+};
 
-export default connect(mapStateToProps)(AdminUsersListWrapper);
+export default AdminUsersListWrapper;
