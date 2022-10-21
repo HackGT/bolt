@@ -1,6 +1,6 @@
 # bolt
 
-Simple and efficient hardware checkout system
+Simple and efficient hardware checkout system.
 
 # Server setup
 
