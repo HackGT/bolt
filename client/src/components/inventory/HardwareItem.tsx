@@ -24,11 +24,6 @@ import { Item, RequestedItem, SUBMITTED } from "../../types/Hardware";
 import { AppState } from "../../state/Store";
 import { Request } from "../../types/Request";
 
-interface HardwareItemState {
-  qtyRequested: number;
-  loading: boolean;
-}
-
 interface HardwareItemProps {
   item: Item;
   // toastManager: any;
@@ -49,7 +44,7 @@ function itemImage(src: string | undefined, outOfStock = false) {
 interface IRequestMutation {
   item: string;
   quantity: number;
-  user: User;
+  user: string;
 }
 
 const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareItemProps) => {
@@ -108,7 +103,11 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
             colorScheme="twitter"
             disabled={outOfStock}
             onClick={() => {
-              const newRequest = { item: item.id, quantity: requestedNum, user: user as User };
+              const newRequest = {
+                item: item.id,
+                quantity: requestedNum,
+                user: user?.uid as string,
+              };
               mutation.mutate(newRequest);
             }}
           >

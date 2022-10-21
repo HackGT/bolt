@@ -572,7 +572,9 @@ const ItemEditForm = () => {
     formState: { errors, isSubmitting },
   } = useForm<FormItem>();
 
-  const itemMutation = useMutation(newItem => axios.post("/items", newItem));
+  const itemMutation = useMutation(newItem =>
+    axios.post(apiUrl(Service.HARDWARE, "/items"), newItem)
+  );
   const locationQuery = useQuery(["locations"], () =>
     axios.get(apiUrl(Service.HARDWARE, "/locations"))
   );

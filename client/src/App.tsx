@@ -43,6 +43,7 @@ import Cart from "./components/cart/Cart";
 import HardwareHeader from "./components/home/HardwareHeader";
 import EditRequest from "./components/admin/desk/submitted/EditRequest";
 import ProtectedRoute from "./components/util/ProtectedRoute";
+import LandingPage from "./components/home/LandingPage";
 
 // interface OwnProps {}
 
@@ -72,7 +73,6 @@ const App: React.FC = () => {
   }
 
   if (!loggedIn) {
-    console.log(loggedIn);
     window.location.href = `https://login.hexlabs.org?redirect=${window.location.href}`;
   }
 
@@ -80,12 +80,14 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider app={app}>
         <AxiosProvider>
+          <Routes>
+            <Route index element={<LandingPage />} />
+          </Routes>
           <ToastProvider placement="top-center">
             <HardwareHeader />
             <Container p="8" maxW="container.lg">
               <Routes>
-                <Route path="cart" element={<Cart />} />
-                <Route path="/" element={<HomeContainer />} />
+                <Route path="home" element={<HomeContainer />} />
                 <Route path="user/*" element={<UserProfileWrapper />} />
                 {/* <PrivateRoute exact path="admin/items/:itemId" element={<EditItemWrapper />} />
             <PrivateRoute exact path="admin/csv" element={<CSVWizard />} />
@@ -130,19 +132,5 @@ const App: React.FC = () => {
     </QueryClientProvider>
   );
 };
-
-// function mapStateToProps(state: AppState) {
-//   return {
-//     user: state.account,
-//   };
-// }
-
-// const mapDispatchToProps = (dispatch: any) => ({
-//   loginUser: (user: User) => {
-//     dispatch(loginUser(user));
-//   },
-// });
-
-// export default connect(mapStateToProps, mapDispatchToProps)(App);
 
 export default App;

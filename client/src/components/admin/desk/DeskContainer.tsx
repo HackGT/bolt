@@ -224,8 +224,9 @@ function DeskContainer() {
         <Flex flexDir="column">
           <Tabs variant="enclosed">
             <TabList>
-              <Tab>Card view</Tab>
-              <Tab>Table view</Tab>
+              <Tab>Overview</Tab>
+              <Tab>Detailed View</Tab>
+              <Tab>Returns Mode</Tab>
             </TabList>
             <TabPanels>
               <TabPanel>

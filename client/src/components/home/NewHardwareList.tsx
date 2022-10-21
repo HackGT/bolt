@@ -16,6 +16,7 @@ const NewHardwareList = () => {
   const { data, isLoading } = useQuery(["items"], async () => {
     const items = await axios.get(apiUrl(Service.HARDWARE, "/items"));
     const groupedItems = _.groupBy(items.data, "location");
+    console.log(groupedItems);
     return groupedItems;
   });
 

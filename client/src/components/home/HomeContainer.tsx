@@ -5,6 +5,7 @@ import axios from "axios";
 import { apiUrl, LoadingScreen, Service, useAuth } from "@hex-labs/core";
 import { Container, Flex } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
+import { Navigate } from "react-router-dom";
 
 import RequestedList from "./RequestedList";
 import { User } from "../../types/User";
@@ -33,6 +34,10 @@ const HomeContainer: React.FC = props => {
 
   if (loading || requestQuery.isLoading) {
     return <LoadingScreen />;
+  }
+
+  if (!user) {
+    return <Navigate to="/" />;
   }
 
   return (
