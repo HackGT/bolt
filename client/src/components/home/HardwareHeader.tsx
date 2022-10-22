@@ -24,7 +24,7 @@ const HardwareHeader = () => {
 
   const logOut = async () => {
     await axios.post(apiUrl(Service.AUTH, "/auth/logout"));
-    window.location.href = `https://login.hexlabs.org/login`;
+    window.location.href = `https://login.hexlabs.org/login?redirect=${window.location.origin}`;
   };
 
   return (
@@ -53,7 +53,7 @@ const HardwareHeader = () => {
       <Link to="/">
         <HeaderItem>Home</HeaderItem>
       </Link>
-      {role.member && (
+      {(role.admin || role.exec) && (
         <Link to="/admin">
           <HeaderItem>Admin</HeaderItem>
         </Link>
