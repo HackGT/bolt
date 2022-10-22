@@ -120,6 +120,8 @@ function DeskContainer() {
     return locations.data;
   });
 
+  const itemQuery = useQuery(["items"], () => axios.get(apiUrl(Service.HARDWARE, "/items")));
+
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -145,7 +147,7 @@ function DeskContainer() {
     );
   }
 
-  if (requestQuery.isLoading || locationQuery.isLoading) {
+  if (requestQuery.isLoading || locationQuery.isLoading || itemQuery.isLoading) {
     return <LoadingScreen />;
   }
 
@@ -166,9 +168,11 @@ function DeskContainer() {
           }}
           value={workingLocation}
         >
-          {locationQuery.data.map((locationOption: string) => (
-            <option value={locationOption}>{locationOption}</option>
-          ))}
+          {Array.from(new Set(itemQuery.data?.data.map((item: any) => item.location))).map(
+            (locationOption: any) => (
+              <option value={locationOption}>{locationOption}</option>
+            )
+          )}
         </Select>
       </Container>
     );
@@ -188,8 +192,6 @@ function DeskContainer() {
     "",
     user!
   );
-
-  console.log(requests);
 
   return (
     <Box p="8" w="w-screen">
