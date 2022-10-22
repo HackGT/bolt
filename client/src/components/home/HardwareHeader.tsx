@@ -53,7 +53,7 @@ const HardwareHeader = () => {
       <Link to="/">
         <HeaderItem>Home</HeaderItem>
       </Link>
-      {(role.admin || role.exec) && (
+      {role.member && (
         <Link to="/admin">
           <HeaderItem>Admin</HeaderItem>
         </Link>
