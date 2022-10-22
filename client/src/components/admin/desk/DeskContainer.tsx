@@ -129,6 +129,7 @@ function DeskContainer() {
     )} ${pickRandomElement(endings)}`
   );
   const [returnsMode, setReturnsMode] = useState(false);
+  const [workingLocation, setWorkingLocation] = useState("");
   const { location } = useParams();
 
   if (requestQuery.status === "error" || locationQuery.status === "error") {
@@ -148,7 +149,7 @@ function DeskContainer() {
     return <LoadingScreen />;
   }
 
-  if (!location) {
+  if (!workingLocation) {
     return (
       <Container p="8" maxW="container.md">
         <Heading size="2xl">Hardware Desk</Heading>
@@ -161,9 +162,9 @@ function DeskContainer() {
         <Select
           placeholder="Select a location"
           onChange={(e): void => {
-            navigate(`./${e.target.value}`);
+            setWorkingLocation(`${e.target.value}`);
           }}
-          value={location}
+          value={workingLocation}
         >
           {locationQuery.data.map((locationOption: string) => (
             <option value={locationOption}>{locationOption}</option>
@@ -173,12 +174,12 @@ function DeskContainer() {
     );
   }
   const requests = requestQuery.data;
-  const submitted = getRequestsWithStatus(requests, [SUBMITTED], location);
-  const approved = getConsolidatedRequestsWithStatus(requests, [APPROVED], location, user!);
+  const submitted = getRequestsWithStatus(requests, [SUBMITTED], workingLocation);
+  const approved = getConsolidatedRequestsWithStatus(requests, [APPROVED], workingLocation, user!);
   const readyForPickup = getConsolidatedRequestsWithStatus(
     requests,
     [READY_FOR_PICKUP],
-    location,
+    workingLocation,
     user!
   );
   const readyForReturn = getConsolidatedRequestsWithStatus(
@@ -187,6 +188,8 @@ function DeskContainer() {
     "",
     user!
   );
+
+  console.log(requests);
 
   return (
     <Box p="8" w="w-screen">
@@ -209,12 +212,12 @@ function DeskContainer() {
           <Select
             placeholder="Select a location"
             onChange={(e): void => {
-              navigate(`./${e.target.value}`);
+              setWorkingLocation(e.target.value);
             }}
-            value={location}
+            value={workingLocation}
           >
-            {locationQuery.data.map((locationOption: Location) => (
-              <option value={locationOption.id}>{locationOption.name}</option>
+            {locationQuery.data.map((locationOption: string) => (
+              <option value={locationOption}>{locationOption}</option>
             ))}
           </Select>
         </Flex>
@@ -222,12 +225,16 @@ function DeskContainer() {
           <Tabs variant="enclosed">
             <TabList>
               <Tab>Overview</Tab>
-              <Tab>Detailed View</Tab>
-              <Tab>Returns Mode</Tab>
+              {/* <Tab>Detailed View</Tab>
+              <Tab>Returns Mode</Tab> */}
             </TabList>
             <TabPanels>
               <TabPanel>
-                <SubmittedCards requests={requests} />
+                <SubmittedCards
+                  requests={requests.filter(
+                    (request: Request) => request.item.location === workingLocation
+                  )}
+                />
                 {/* <SubmittedList
                   hidden={returnsMode}
                   loading={requestQuery.isLoading}
@@ -243,9 +250,9 @@ function DeskContainer() {
                 {!returnsMode && <ReadyForPickupList cards={readyForPickup} />}
                 {returnsMode && <ReadyForReturnList cards={readyForReturn} />} */}
               </TabPanel>
-              <TabPanel>
+              {/* <TabPanel>
                 <SubmittedTable />
-              </TabPanel>
+              </TabPanel> */}
             </TabPanels>
           </Tabs>
         </Flex>

@@ -133,15 +133,14 @@ const columns = [
 ];
 
 const SubmittedTable = () => {
-  const { data, isLoading } = useQuery(["requests"], async () => {
-    const response = await axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"));
-    return response.data;
-  });
+  const { data, isLoading } = useQuery(["requests"], async () =>
+    axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"))
+  );
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const table = useReactTable({
-    data,
+    data: data?.data,
     columns,
     state: {
       sorting,
