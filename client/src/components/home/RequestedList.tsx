@@ -4,7 +4,8 @@ import { MapPinIcon } from "@heroicons/react/24/solid";
 import { DeleteIcon } from "@chakra-ui/icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { apiUrl, Service } from "@hex-labs/core";
+import { apiUrl, LoadingScreen, Service } from "@hex-labs/core";
+import { useLazyQuery } from "@apollo/client";
 
 import { Request, RequestStatus } from "../../types/Request";
 import { APPROVED, DENIED, READY_FOR_PICKUP, SUBMITTED } from "../../types/Hardware";
@@ -12,6 +13,47 @@ import { APPROVED, DENIED, READY_FOR_PICKUP, SUBMITTED } from "../../types/Hardw
 interface RequestedListProps {
   requests: Request[];
 }
+
+const RequestCard = ({ r, statuses, requestDeleteMutation }: any) => {
+  const { data, isLoading } = useQuery(["item"], () =>
+    axios.get(apiUrl(Service.HARDWARE, `/items/${r.item}`))
+  );
+
+  return (
+    <Box p="4" backgroundColor="white" borderRadius="8px" boxShadow="md">
+      {!isLoading && (
+        <>
+          <Flex alignItems="center" justifyContent="space-between">
+            <Flex flexDir="column" gap="4px" mb="8px">
+              <Heading as="h4" size="md">
+                {data!.data.name}
+              </Heading>
+              <Text color="gray.500">{`Qty: ${r.quantity}`}</Text>
+              <Flex dir="row" color="gray.500" alignItems="center">
+                <Box w={6} h={6} mr={2}>
+                  <MapPinIcon />
+                </Box>
+                <Text>{data!.data.location}</Text>
+              </Flex>
+            </Flex>
+            <Tooltip label="Cancel request">
+              <IconButton
+                aria-label="delete"
+                variant="ghost"
+                colorScheme="red"
+                onClick={() => requestDeleteMutation.mutate(r.id)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </Flex>
+          {statuses(r.status)}
+        </>
+      )}
+    </Box>
+  );
+};
+
 const RequestedList = ({ requests }: RequestedListProps) => {
   const { refetch } = useQuery(["requests"]);
   const { refetch: itemRefetch } = useQuery(["items"]);
@@ -130,33 +172,11 @@ const RequestedList = ({ requests }: RequestedListProps) => {
                 a.id.localeCompare(b.id)
             )
             .map(r => (
-              <Box p="4" backgroundColor="white" borderRadius="8px" boxShadow="md">
-                <Flex alignItems="center" justifyContent="space-between">
-                  <Flex flexDir="column" gap="4px" mb="8px">
-                    <Heading as="h4" size="md">
-                      {r.item.name}
-                    </Heading>
-                    <Text color="gray.500">{`Qty: ${r.quantity}`}</Text>
-                    <Flex dir="row" color="gray.500" alignItems="center">
-                      <Box w={6} h={6} mr={2}>
-                        <MapPinIcon />
-                      </Box>
-                      <Text>{r.item.location}</Text>
-                    </Flex>
-                  </Flex>
-                  <Tooltip label="Cancel request">
-                    <IconButton
-                      aria-label="delete"
-                      variant="ghost"
-                      colorScheme="red"
-                      onClick={() => requestDeleteMutation.mutate(r.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Flex>
-                {statuses(r.status)}
-              </Box>
+              <RequestCard
+                r={r}
+                requestDeleteMutation={requestDeleteMutation}
+                statuses={statuses}
+              />
             ))
         ) : (
           // .map((r: Request) => <Box>Hello</Box>)

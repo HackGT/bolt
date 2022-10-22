@@ -24,7 +24,7 @@ const HardwareHeader = () => {
 
   const logOut = async () => {
     await axios.post(apiUrl(Service.AUTH, "/auth/logout"));
-    window.location.href = `https://login.hexlabs.org/login?redirect=${window.location.origin}`;
+    window.location.href = `https://login.hexlabs.org/login`;
   };
 
   return (

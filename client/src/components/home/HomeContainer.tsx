@@ -17,20 +17,18 @@ const HomeContainer: React.FC = props => {
   const [userRequests, setUserRequests] = useState<Request[]>([]);
   const { user, loading } = useAuth();
 
-  const requestQuery = useQuery(["requests"], async () => {
-    const requests = await axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"));
-    return requests.data;
-  });
+  const requestQuery = useQuery(["requests"], async () =>
+    axios.get(apiUrl(Service.HARDWARE, `/hardware-requests/${user!.uid}`))
+  );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const requests = await axios.get(apiUrl(Service.HARDWARE, `/hardware-requests/${user!.uid}`));
-      setUserRequests(requests.data);
-    };
-    if (!loading) {
-      fetchData();
-    }
-  }, [loading]);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const requests = await axios.get(apiUrl(Service.HARDWARE, `/hardware-requests/${user!.uid}`));
+  //     console.log(requests);
+  //     setUserRequests(requests.data);
+  //   };
+  //   if (!loading) {
+  //     fetchData();
 
   if (loading || requestQuery.isLoading) {
     return <LoadingScreen />;
@@ -40,10 +38,12 @@ const HomeContainer: React.FC = props => {
     return <Navigate to="/" />;
   }
 
+  console.log(requestQuery.data?.data);
+
   return (
     <Flex dir="row" gap={6} p="8" justify="space-around">
       <NewHardwareList />
-      {user && <RequestedList requests={requestQuery.data} />}
+      {user && <RequestedList requests={requestQuery.data?.data} />}
     </Flex>
   );
 };
