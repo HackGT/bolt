@@ -165,8 +165,8 @@ function DeskContainer() {
           }}
           value={location}
         >
-          {locationQuery.data.map((locationOption: Location) => (
-            <option value={locationOption.id}>{locationOption.name}</option>
+          {locationQuery.data.map((locationOption: string) => (
+            <option value={locationOption}>{locationOption}</option>
           ))}
         </Select>
       </Container>
