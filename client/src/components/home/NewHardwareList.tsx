@@ -13,12 +13,9 @@ const NewHardwareList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { user, loading } = useAuth();
 
-  const { data, isLoading } = useQuery(["items"], async () => {
-    const items = await axios.get(apiUrl(Service.HARDWARE, "/items"));
-    const groupedItems = _.groupBy(items.data, "location");
-    console.log(groupedItems);
-    return groupedItems;
-  });
+  const { data, isLoading } = useQuery(["items"], async () =>
+    axios.get(apiUrl(Service.HARDWARE, "/items"))
+  );
 
   const [role, setRoles] = useState<any>({
     member: false,
@@ -117,15 +114,18 @@ const NewHardwareList = () => {
           />
         </Flex>
         {data && Object.keys(data).length > 0 ? (
-          Object.keys(data).map((location: string) => (
-            <HardwareLocationContents
-              key={location}
-              location={location}
-              requestsEnabled={requestsEnabled}
-              itemsByLocation={data[location]}
-              searchQuery={searchQuery}
-            />
-          ))
+          Object.keys(_.groupBy(data.data, "location")).map((location: string) => {
+            console.log(data.data);
+            return (
+              <HardwareLocationContents
+                key={location}
+                location={location}
+                requestsEnabled={requestsEnabled}
+                itemsByLocation={_.groupBy(data.data, "location")[location]}
+                searchQuery={searchQuery}
+              />
+            );
+          })
         ) : (
           <Center h="110px">
             <Text fontWeight="semibold">No hardware available right now!</Text>

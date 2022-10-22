@@ -52,22 +52,25 @@ const HardwareLocationContents = ({
     >
       <HardwareLocation key={`${location}-hardware_loc`} name={location} />
       <Accordion key={`${location}-accordion`} allowToggle mt={4}>
-        {Object.entries(_.groupBy(itemsByLocation, "category")).map(([category, items]) => (
-          <AccordionItem>
-            <AccordionButton>
-              <Heading size="md">{category}</Heading>
-              <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel>
-              <HardwareCategory
-                key={`${location}-${category}`}
-                items={filteredItems(items, searchQuery)}
-                requestsEnabled={requestsEnabled}
-                name={category}
-              />
-            </AccordionPanel>
-          </AccordionItem>
-        ))}
+        {Object.entries(_.groupBy(itemsByLocation, "category")).map(([category, items]) => {
+          console.log(items);
+          return (
+            <AccordionItem>
+              <AccordionButton>
+                <Heading size="md">{category}</Heading>
+                <AccordionIcon />
+              </AccordionButton>
+              <AccordionPanel>
+                <HardwareCategory
+                  key={`${location}-${category}`}
+                  items={filteredItems(items, searchQuery)}
+                  requestsEnabled={requestsEnabled}
+                  name={category}
+                />
+              </AccordionPanel>
+            </AccordionItem>
+          );
+        })}
         {/* {(!itemsByLocation ||
           !combinedAndFilteredItemsByCategory(itemsByLocation, searchQuery).length) && (
           <NoItemsFound key={`${itemsByLocation.location.id}-no_items`} searchQuery={searchQuery} />

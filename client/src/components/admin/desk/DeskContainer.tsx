@@ -120,7 +120,9 @@ function DeskContainer() {
     return locations.data;
   });
 
-  const itemQuery = useQuery(["items"], () => axios.get(apiUrl(Service.HARDWARE, "/items")));
+  const itemQuery = useQuery(["items"], () => axios.get(apiUrl(Service.HARDWARE, "/items")), {
+    cacheTime: 0,
+  });
 
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -168,11 +170,10 @@ function DeskContainer() {
           }}
           value={workingLocation}
         >
-          {Array.from(new Set(itemQuery.data?.data.map((item: any) => item.location))).map(
-            (locationOption: any) => (
-              <option value={locationOption}>{locationOption}</option>
-            )
-          )}
+          {itemQuery.data?.data &&
+            Array.from(new Set(itemQuery.data?.data.map((item: any) => item.location))).map(
+              (locationOption: any) => <option value={locationOption}>{locationOption}</option>
+            )}
         </Select>
       </Container>
     );
@@ -218,9 +219,10 @@ function DeskContainer() {
             }}
             value={workingLocation}
           >
-            {locationQuery.data.map((locationOption: string) => (
-              <option value={locationOption}>{locationOption}</option>
-            ))}
+            {itemQuery.data?.data &&
+              Array.from(new Set(itemQuery.data?.data.map((item: any) => item.location))).map(
+                (locationOption: any) => <option value={locationOption}>{locationOption}</option>
+              )}
           </Select>
         </Flex>
         <Flex flexDir="column">
