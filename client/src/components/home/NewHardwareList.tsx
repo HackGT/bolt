@@ -3,38 +3,22 @@ import { Grid, Loader, Message } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 import { Box, Button, Center, Flex, Heading, Input, Text } from "@chakra-ui/react";
 import { apiUrl, Service, useAuth } from "@hex-labs/core";
-import axios from "axios";
 import _ from "lodash";
-import { useQuery } from "@tanstack/react-query";
+import useAxios from "axios-hooks";
 
 import HardwareLocationContents from "../inventory/HardwareLocationContents";
 
 const NewHardwareList = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
 
-  const { data, isLoading } = useQuery(["items"], async () =>
-    axios.get(apiUrl(Service.HARDWARE, "/items"))
+  const [{ data, loading, error }] = useAxios(apiUrl(Service.HARDWARE, "/items"));
+
+  const [{ data: profile, loading: profileLoading, error: profileError }] = useAxios(
+    apiUrl(Service.USERS, `/users/${user?.uid}`)
   );
 
-  const [role, setRoles] = useState<any>({
-    member: false,
-    exec: false,
-    admin: false,
-  });
-
-  useEffect(() => {
-    const getRoles = async () => {
-      if (user?.uid) {
-        const response = await axios.get(apiUrl(Service.USERS, `/users/${user?.uid}`));
-        setRoles({ ...response.data.roles });
-      }
-    };
-
-    getRoles();
-  }, [user?.uid]);
-
-  if (loading || isLoading) {
+  if (loading || profileLoading) {
     return (
       <>
         <Heading size="huge">Inventory</Heading>
@@ -42,6 +26,8 @@ const NewHardwareList = () => {
       </>
     );
   }
+
+  const groupedItems = _.groupBy(data?.items, "location");
 
   // if (error) {
   //   return (
@@ -92,7 +78,7 @@ const NewHardwareList = () => {
       <Heading mb={4}>Inventory</Heading>
       <Flex gap="10px" flexDir="column">
         <Flex flexDir="row" gap={2}>
-          {role.member ? (
+          {profile.roles.admin ? (
             <Link to="/admin/items/new">
               <Button px={6} colorScheme="twitter" color="white">
                 Create item
