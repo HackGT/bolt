@@ -23,7 +23,7 @@ export type Category = {
 };
 
 export type Location = {
-  id: string;
+  id: number;
   name: string;
   hidden: boolean;
 };

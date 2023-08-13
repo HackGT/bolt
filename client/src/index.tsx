@@ -109,6 +109,7 @@ const root = createRoot(container!);
 //   );
 // }
 console.log("running");
+
 root.render(
   <ChakraProvider>
     <Provider store={store}>
@@ -120,3 +121,16 @@ root.render(
     </Provider>
   </ChakraProvider>
 );
+
+
+/*
+root.render(
+  <ChakraProvider>
+    <Provider store={store}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+    </Provider>
+  </ChakraProvider>
+);
+*/

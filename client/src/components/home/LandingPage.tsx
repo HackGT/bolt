@@ -12,9 +12,9 @@ const LandingPage = () => {
     return <LoadingScreen />;
   }
 
-  if (user) {
+ if (user) {
     return <Navigate to="home" />;
-  }
+  } 
 
   return (
     <Flex h="100vh" flexDir="column">
