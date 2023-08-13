@@ -26,9 +26,7 @@ const NewHardwareList = () => {
     );
   }
   const groupedItems = _.groupBy(data?.items, "location");
-  console.log("gr", data)
   const grouped = _.groupBy(data, "location")
-  console.log("jaja", grouped)
   // if (error) {
   //   return (
   //     <Flex flexDir="column" w="45%">
@@ -100,7 +98,7 @@ const NewHardwareList = () => {
           />
         </Flex>
         {data && Object.keys(data).length > 0 ? (
-          Object.keys(_.groupBy(data, "location")).map((location: string) => {
+          Object.keys(_.groupBy(data.data, "location")).map((location: string) => {
             console.log(location);
             return (
               <HardwareLocationContents
