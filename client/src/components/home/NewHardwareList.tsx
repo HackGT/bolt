@@ -17,6 +17,8 @@ const NewHardwareList = () => {
   const [{ data: profile, loading: profileLoading, error: profileError }] = useAxios(
     apiUrl(Service.USERS, `/users/${user?.uid}`)
   );
+
+
   if (loading || profileLoading) {
     return (
       <>
@@ -25,8 +27,7 @@ const NewHardwareList = () => {
       </>
     );
   }
-  const groupedItems = _.groupBy(data?.items, "location");
-  const grouped = _.groupBy(data, "location")
+
   // if (error) {
   //   return (
   //     <Flex flexDir="column" w="45%">
@@ -97,8 +98,20 @@ const NewHardwareList = () => {
             }}
           />
         </Flex>
-        {data && Object.keys(data).length > 0 ? (
-          Object.keys(_.groupBy(data.data, "location")).map((location: string) => {
+        {data && data.length > 0 ? (
+          data?.map((locGroup:any) => {
+              const locationname = locGroup.location.name
+              return (
+                <HardwareLocationContents
+                  location={locationname}
+                  requestsEnabled={requestsEnabled}
+                  itemsByLocation={locGroup.categories}
+                  searchQuery={searchQuery}
+                />
+              );
+              
+          })
+          /* Object.keys(data).map((location: string) => {
             console.log(location);
             return (
               <HardwareLocationContents
@@ -109,7 +122,7 @@ const NewHardwareList = () => {
                 searchQuery={searchQuery}
               />
             );
-          })
+          }) */
         ) : (
           <Center h="110px">
             <Text fontWeight="semibold">No hardware available right now!</Text>

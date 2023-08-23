@@ -30,7 +30,7 @@ function combinedAndFilteredItemsByCategory(categories: any, searchQuery: string
 }
 
 interface HardwareListProps {
-  itemsByLocation: Item[];
+  itemsByLocation: any;
   searchQuery: string;
   requestsEnabled: boolean;
   location: string;
@@ -43,7 +43,6 @@ const HardwareLocationContents = ({
   location,
 }: HardwareListProps) => {
   const [accordionState, setAccordionState] = useState([0]);
-
   return (
     <div
       style={{
@@ -52,8 +51,11 @@ const HardwareLocationContents = ({
     >
       <HardwareLocation key={`${location}-hardware_loc`} name={location} />
       <Accordion key={`${location}-accordion`} allowToggle mt={4}>
-        {Object.entries(_.groupBy(itemsByLocation, "category")).map(([category, items]) => {
-          console.log(items);
+        {
+        itemsByLocation.map((element:any) => {
+          const category = element.category.name
+          const it = element.items
+          
           return (
             <AccordionItem>
               <AccordionButton>
@@ -63,7 +65,7 @@ const HardwareLocationContents = ({
               <AccordionPanel>
                 <HardwareCategory
                   key={`${location}-${category}`}
-                  items={filteredItems(items, searchQuery)}
+                  items={filteredItems(it, searchQuery)}
                   requestsEnabled={requestsEnabled}
                   name={category}
                 />
