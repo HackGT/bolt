@@ -18,6 +18,7 @@ const NewHardwareList = () => {
     apiUrl(Service.USERS, `/users/${user?.uid}`)
   );
 
+
   if (loading || profileLoading) {
     return (
       <>
@@ -26,8 +27,6 @@ const NewHardwareList = () => {
       </>
     );
   }
-
-  const groupedItems = _.groupBy(data?.items, "location");
 
   // if (error) {
   //   return (
@@ -99,9 +98,21 @@ const NewHardwareList = () => {
             }}
           />
         </Flex>
-        {data && Object.keys(data).length > 0 ? (
-          Object.keys(_.groupBy(data.data, "location")).map((location: string) => {
-            console.log(data.data);
+        {data && data.length > 0 ? (
+          data?.map((locGroup:any) => {
+              const locationname = locGroup.location.name
+              return (
+                <HardwareLocationContents
+                  location={locationname}
+                  requestsEnabled={requestsEnabled}
+                  itemsByLocation={locGroup.categories}
+                  searchQuery={searchQuery}
+                />
+              );
+              
+          })
+          /* Object.keys(data).map((location: string) => {
+            console.log(location);
             return (
               <HardwareLocationContents
                 key={location}
@@ -111,7 +122,7 @@ const NewHardwareList = () => {
                 searchQuery={searchQuery}
               />
             );
-          })
+          }) */
         ) : (
           <Center h="110px">
             <Text fontWeight="semibold">No hardware available right now!</Text>
