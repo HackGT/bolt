@@ -10,7 +10,7 @@ import {
   Popup,
 } from "semantic-ui-react";
 import { withToastManager } from "react-toast-notifications";
-import { Navigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { Mutation, Query } from "@apollo/client/react/components";
 import { TriggerConfig, useForm } from "react-hook-form";
 import {
@@ -88,21 +88,23 @@ const ItemEditForm = () => {
     formState: { errors, isSubmitting },
   } = useForm<FormItem>();
 
-  const itemMutation = useMutation(newItem =>
-    axios.post(apiUrl(Service.HARDWARE, "/items"), newItem)
-  );
+  const navigate = useNavigate();
+
   const locationQuery = useQuery(["locations"], () =>
     axios.get(apiUrl(Service.HARDWARE, "/locations"))
   );
+
   const categoryQuery = useQuery(["categories"], () =>
     axios.get(apiUrl(Service.HARDWARE, "/categories"))
   );
+
   if (locationQuery.isLoading || categoryQuery.isLoading) {
     return <LoadingScreen />;
   }
 
-  function onSubmit(values: any) {
-    itemMutation.mutate(values);
+  async function onSubmit(values: any) {
+    await axios.post(apiUrl(Service.HARDWARE, "/items"), values);
+    navigate("/");
   }
 
   return (
