@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Checkbox, DropdownProps, Grid, Header, Loader, Message } from "semantic-ui-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { apiUrl, LoadingScreen, Service, useAuth } from "@hex-labs/core";
+import { apiUrl, ErrorScreen, LoadingScreen, Service, useAuth } from "@hex-labs/core";
 import {
   Box,
   Container,
@@ -120,6 +120,28 @@ function DeskContainer() {
     return locations.data;
   });
 
+  const ChooseLocation = ({ locations }: { locations: Location[] }) => (
+    <>
+      <Heading size="md" mb={2}>
+        Select a location to continue
+      </Heading>
+      <Select
+        placeholder="Select a location"
+        onChange={(e): void => {
+          setWorkingLocation(`${e.target.value}`);
+        }}
+        value={workingLocation}
+      >
+        {locations &&
+          locations.map((locationOption: any) => (
+            <option key={locationOption.id} value={locationOption.name}>
+              {locationOption.name}
+            </option>
+          ))}
+      </Select>
+    </>
+  );
+
   const itemQuery = useQuery(["items"], () => axios.get(apiUrl(Service.HARDWARE, "/items")), {
     cacheTime: 0,
   });
@@ -137,21 +159,16 @@ function DeskContainer() {
   const { location } = useParams();
 
   if (requestQuery.status === "error" || locationQuery.status === "error") {
-    return (
-      <Message
-        error
-        visible
-        header="Can't fetch requests"
-        content={`Hmm, an error is preventing us from displaying the hardware desk UI.  The error was: ${
-          (requestQuery.error as Error).message || (locationQuery.error as Error).message
-        }`}
-      />
-    );
+    return <ErrorScreen error={(requestQuery.error || locationQuery.error) as Error} />;
   }
 
   if (requestQuery.isLoading || locationQuery.isLoading || itemQuery.isLoading || loading) {
     return <LoadingScreen />;
   }
+
+  const locations: Location[] = Array.from(
+    new Set(itemQuery.data?.data.map((item: any) => item.location))
+  );
 
   if (!workingLocation) {
     return (
@@ -160,21 +177,7 @@ function DeskContainer() {
         <Heading size="md" color="gray.400" mb="8" mt="2">
           {randomPhrase}
         </Heading>
-        <Heading size="md" mb={2}>
-          Select a location to continue
-        </Heading>
-        <Select
-          placeholder="Select a location"
-          onChange={(e): void => {
-            setWorkingLocation(`${e.target.value}`);
-          }}
-          value={workingLocation}
-        >
-          {itemQuery.data?.data &&
-            Array.from(new Set(itemQuery.data?.data.map((item: any) => item.location))).map(
-              (locationOption: any) => <option value={locationOption}>{locationOption}</option>
-            )}
-        </Select>
+        <ChooseLocation locations={locations} />
       </Container>
     );
   }
@@ -209,21 +212,7 @@ function DeskContainer() {
           <Switch id="returnMode" onChange={event => setReturnsMode(event.target.checked)} />
         </Flex> */}
         <Flex w="50%" gap="4" alignItems="center" mb="4">
-          <Heading size="md" mb={2} whiteSpace="nowrap">
-            Location:
-          </Heading>
-          <Select
-            placeholder="Select a location"
-            onChange={(e): void => {
-              setWorkingLocation(e.target.value);
-            }}
-            value={workingLocation}
-          >
-            {itemQuery.data?.data &&
-              Array.from(new Set(itemQuery.data?.data.map((item: any) => item.location))).map(
-                (locationOption: any) => <option value={locationOption}>{locationOption}</option>
-              )}
-          </Select>
+          <ChooseLocation locations={locations} />
         </Flex>
         <Flex flexDir="column">
           <Tabs variant="enclosed">

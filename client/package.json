@@ -94,5 +94,7 @@
     "redux-devtools": "^3.5.0",
     "stylelint": "^13.12.0"
   },
-  "proxy": "http://localhost:3000"
+  "options": {
+    "proxy": "http://localhost:3000"
+  }
 }
