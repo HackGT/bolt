@@ -54,7 +54,6 @@ import { CREATE_ITEM, UPDATE_ITEM } from "../../graphql/Mutations";
 import { ALL_CATEGORIES, ALL_ITEMS, ALL_LOCATIONS } from "../../graphql/Queries";
 import { Item, Location, Category } from "../../types/Hardware";
 
-
 interface ItemEditProps {
   preloadItemId: number;
   preloadItem: Item;

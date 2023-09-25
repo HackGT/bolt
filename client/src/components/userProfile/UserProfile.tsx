@@ -4,7 +4,7 @@ import Cleave from "cleave.js/react";
 import { Navigate } from "react-router-dom";
 import { withToastManager } from "react-toast-notifications";
 import { Mutation } from "@apollo/client/react/components";
-import { Header, LoadingScreen, useAuth } from "@hex-labs/core";
+import { ErrorScreen, Header, LoadingScreen, Service, apiUrl, useAuth } from "@hex-labs/core";
 import {
   Alert,
   AlertIcon,
@@ -21,12 +21,24 @@ import {
 import { FullUser, User } from "../../types/User";
 import { AppState } from "../../state/Store";
 import { UPDATE_USER } from "../../graphql/Mutations";
+import useAxios from "axios-hooks";
 
 const UserProfile = () => {
   const [submitClicked, setSubmitClicked] = useState(false);
   const { user } = useAuth();
+  const [{ data: userData, loading: userLoading, error: userError }, userRefetch] = useAxios({
+    method: "GET",
+    url: apiUrl(Service.USERS, `/users/${user?.uid}`),
+    params: {
+      hexathon: process.env.REACT_APP_HEXATHON_ID,
+    },
+  });
 
-  if (!user) {
+  if (userError) {
+    return <ErrorScreen error={userError} />;
+  }
+
+  if (!user || userLoading) {
     return <LoadingScreen />;
   }
 
@@ -194,13 +206,12 @@ const UserProfile = () => {
             </Link>{" "}
             to edit your information.
           </Text>
-          {/* )} */}
         </Alert>
         <Box>
           <Heading as="h6" size="md">
             Phone Number
           </Heading>
-          <Text fontSize="lg">{user.phoneNumber || "Not Found"}</Text>
+          <Text fontSize="lg">{userData.phoneNumber || "Not Found"}</Text>
         </Box>
         <Box my="4">
           <Heading as="h6" size="md">
@@ -214,30 +225,6 @@ const UserProfile = () => {
           </Heading>
           <Text fontSize="lg">{user.email}</Text>
         </Box>
-        {/* {adminUuid}
-              <Form.Field width={6}>
-                <label>Full name</label>
-                <p>{this.state.user.name}</p>
-              </Form.Field>
-              <Form.Field width={6}>
-                <label>Email address</label>
-                <p>{this.state.user.email}</p>
-              </Form.Field>
-
-              {adminHeader}
-              {haveId}
-              {userIsAdmin}
-              <Message
-                error
-                content="To save your changes, you must correct the errors in the fields highlighted in red above."
-              />
-              <Button primary disabled={!this.validateForm()} type="submit">
-                Save profile
-              </Button>
-              <Button as={Link} to={backUrl} basic>
-                Cancel
-              </Button>
-            </Form> */}
       </Box>
     </Flex>
   );
