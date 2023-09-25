@@ -26,7 +26,6 @@ const HomeContainer: React.FC = props => {
     return <ErrorScreen error={error} />;
   }
 
-
   return (
     <Flex dir="row" gap={6} p="8" justify="space-around">
       <NewHardwareList />

@@ -58,20 +58,18 @@ const NewHardwareList = () => {
       <Heading mb={4}>Inventory</Heading>
       <Flex gap="10px" flexDir="column">
         <Flex flexDir="row" gap={2}>
-          {profile.roles.admin ? (
+          {profile.roles.admin && (
             <Link to="/admin/items/new">
               <Button px={6} colorScheme="twitter" color="white">
                 Create item
               </Button>
             </Link>
-          ) : (
-            ""
           )}
           {noRequestsMessage}
           <Input
             placeholder="Search for item"
             onChange={(e: any) => {
-              if (e.target.value.length >= 3) {
+              if (e.target.value.length > 1) {
                 setSearchQuery(e.target.value.trim().toLowerCase());
               } else {
                 setSearchQuery("");
@@ -79,7 +77,7 @@ const NewHardwareList = () => {
             }}
           />
         </Flex>
-        {data && data.length > 0 ? (
+        {(data && data.length > 0) ? (
           data?.map((locGroup: any) => {
             const locationname = locGroup.location.name;
             return (

@@ -41,7 +41,7 @@ export default class CacheBuster extends React.Component<{ children: any }, Stat
           });
         }
         // delete browser cache and hard reload
-        window.location.reload(true);
+        window.location.reload();
       },
     };
   }

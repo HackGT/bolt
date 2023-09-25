@@ -3,9 +3,9 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router } from "react-router-dom";
 import "./index.css";
 import { ChakraProvider } from "@chakra-ui/react";
+import { createRoot } from "react-dom/client";
 
 import { App } from "./App";
-import { createRoot } from "react-dom/client";
 // import React from "react";
 // import { createRoot } from "react-dom/client";
 // import { Provider } from "react-redux";
@@ -127,5 +127,5 @@ root.render(
         <App />
       </Router>
     </ChakraProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

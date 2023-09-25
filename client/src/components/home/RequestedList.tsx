@@ -55,15 +55,19 @@ const RequestCard = ({ r, statuses, requestDeleteMutation }: any) => {
 };
 
 const RequestedList = ({ requests }: RequestedListProps) => {
-  const { refetch } = useQuery(["requests"]);
-  const { refetch: itemRefetch } = useQuery(["items"]);
+  const { refetch: requestRefetch } = useQuery(["requests"], () =>
+    axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"))
+  );
+  const { refetch: itemRefetch } = useQuery(["items"], () =>
+    axios.get(apiUrl(Service.HARDWARE, "/items"))
+  );
   const [userRequests, setUserRequests] = useState(requests);
   const requestDeleteMutation = useMutation(
     (requestId: string) =>
       axios.delete(apiUrl(Service.HARDWARE, `/hardware-requests/${requestId}`)),
     {
       onSuccess: () => {
-        refetch();
+        requestRefetch();
         itemRefetch();
       },
     }

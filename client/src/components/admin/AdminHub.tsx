@@ -79,6 +79,6 @@ const AdminHub: React.FC = () => {
       </Flex>
     </Container>
   );
-}
+};
 
 export default AdminHub;

@@ -17,11 +17,11 @@ import {
   Text,
   Link,
 } from "@chakra-ui/react";
+import useAxios from "axios-hooks";
 
 import { FullUser, User } from "../../types/User";
 import { AppState } from "../../state/Store";
 import { UPDATE_USER } from "../../graphql/Mutations";
-import useAxios from "axios-hooks";
 
 const UserProfile = () => {
   const [submitClicked, setSubmitClicked] = useState(false);

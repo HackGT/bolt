@@ -9,6 +9,7 @@ import {
   Box,
   Divider,
   Heading,
+  Text,
 } from "@chakra-ui/react";
 import _ from "lodash";
 
@@ -51,15 +52,14 @@ const HardwareLocationContents = ({
     >
       <HardwareLocation key={`${location}-hardware_loc`} name={location} />
       <Accordion key={`${location}-accordion`} allowToggle mt={4}>
-        {
-        itemsByLocation.map((element:any) => {
-          const category = element.category.name
-          const it = element.items
-          
+        {itemsByLocation.map((element: any) => {
+          const category = element.category.name;
+          const it = element.items;
+
           return (
             <AccordionItem key={category}>
-              <AccordionButton>
-                <Heading size="md">{category}</Heading>
+              <AccordionButton style={{ justifyContent: "space-between" }}>
+                <Text as="h3">{category}</Text>
                 <AccordionIcon />
               </AccordionButton>
               <AccordionPanel>

@@ -52,15 +52,19 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
 
   const { user, loading } = useAuth();
 
-  const { refetch } = useQuery(["requests"]);
-  const { refetch: itemRefetch } = useQuery(["items"]);
+  const { refetch: requestRefetch } = useQuery(["requests"], () =>
+    axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"))
+  );
+  const { refetch: itemRefetch } = useQuery(["items"], () =>
+    axios.get(apiUrl(Service.HARDWARE, "/items"))
+  );
 
   const mutation = useMutation(
     async (newRequest: IRequestMutation): Promise<any> =>
       await axios.post(apiUrl(Service.HARDWARE, "/hardware-requests"), newRequest),
     {
       onSuccess: () => {
-        refetch();
+        requestRefetch();
         itemRefetch();
       },
     }
