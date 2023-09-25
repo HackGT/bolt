@@ -1,5 +1,5 @@
 import React from "react";
-import { apiUrl, LoadingScreen, Service, useAuth } from "@hex-labs/core";
+import { apiUrl, ErrorScreen, LoadingScreen, Service, useAuth } from "@hex-labs/core";
 import { Flex } from "@chakra-ui/react";
 import { Navigate } from "react-router-dom";
 import useAxios from "axios-hooks";
@@ -16,13 +16,18 @@ const HomeContainer: React.FC = props => {
     apiUrl(Service.HARDWARE, `/hardware-requests?userId=${user?.uid}`)
   );
 
+  if (!user) {
+    return <Navigate to="/" />;
+  }
+
   if (loading) {
     return <LoadingScreen />;
   }
 
-  if (!user) {
-    return <Navigate to="/" />;
+  if (error) {
+    return <ErrorScreen error={error} />;
   }
+
 
   return (
     <Flex dir="row" gap={6} p="8" justify="space-around">

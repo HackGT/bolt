@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Grid, Loader, Message } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 import { Box, Button, Center, Flex, Heading, Input, Text } from "@chakra-ui/react";
-import { apiUrl, Service, useAuth } from "@hex-labs/core";
+import { apiUrl, ErrorScreen, LoadingScreen, Service, useAuth } from "@hex-labs/core";
 import _ from "lodash";
 import useAxios from "axios-hooks";
 
@@ -18,33 +18,13 @@ const NewHardwareList = () => {
     apiUrl(Service.USERS, `/users/${user?.uid}`)
   );
 
-
-  if (loading || profileLoading) {
-    return (
-      <>
-        <Heading size="huge">Inventory</Heading>
-        <Loader active inline="centered" content="Loading items..." />
-      </>
-    );
+  if (error || profileError) {
+    return <ErrorScreen error={(error || profileError) as Error} />;
   }
 
-  // if (error) {
-  //   return (
-  //     <Flex flexDir="column" w="45%">
-  //       <Heading mb="4">Inventory</Heading>
-  //       <Alert status="error">
-  //         <AlertIcon />
-  //         <Box>
-  //           <AlertTitle>Error displaying hardware inventory</AlertTitle>
-  //           <AlertDescription>
-  //             Try refreshing the page. If that doesn't work, contact a member of the HexLabs Team
-  //             for assistance.
-  //           </AlertDescription>
-  //         </Box>
-  //       </Alert>
-  //     </Flex>
-  //   );
-  // }
+  if (loading || profileLoading) {
+    return <LoadingScreen />;
+  }
 
   const requestsEnabled = true;
   // if (!setting.error && setting.data.setting !== undefined) {
@@ -99,30 +79,17 @@ const NewHardwareList = () => {
           />
         </Flex>
         {data && data.length > 0 ? (
-          data?.map((locGroup:any) => {
-              const locationname = locGroup.location.name
-              return (
-                <HardwareLocationContents
-                  location={locationname}
-                  requestsEnabled={requestsEnabled}
-                  itemsByLocation={locGroup.categories}
-                  searchQuery={searchQuery}
-                />
-              );
-              
-          })
-          /* Object.keys(data).map((location: string) => {
-            console.log(location);
+          data?.map((locGroup: any) => {
+            const locationname = locGroup.location.name;
             return (
               <HardwareLocationContents
-                key={location}
-                location={location}
+                location={locationname}
                 requestsEnabled={requestsEnabled}
-                itemsByLocation={_.groupBy(data.data, "location")[location]}
+                itemsByLocation={locGroup.categories}
                 searchQuery={searchQuery}
               />
             );
-          }) */
+          })
         ) : (
           <Center h="110px">
             <Text fontWeight="semibold">No hardware available right now!</Text>
