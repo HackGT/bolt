@@ -44,7 +44,8 @@
     "semantic-ui-react": "^2.1.3",
     "stuff-with-good-eyesight": "^1.2.0",
     "styled-components": "^5.2.3",
-    "subscriptions-transport-ws": "^0.9.18"
+    "subscriptions-transport-ws": "^0.9.18",
+    "typescript": "4.2.4"
   },
   "scripts": {
     "generate-build-version": "node generate-build-version",
@@ -91,8 +92,7 @@
     "eslint": "^8.23.1",
     "prettier": "^2.2.1",
     "redux-devtools": "^3.5.0",
-    "stylelint": "^13.12.0",
-    "typescript": "^5.1.3"
+    "stylelint": "^13.12.0"
   },
   "options": {
     "proxy": "http://localhost:3000"
