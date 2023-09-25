@@ -149,7 +149,7 @@ function DeskContainer() {
     );
   }
 
-  if (requestQuery.isLoading || locationQuery.isLoading || itemQuery.isLoading) {
+  if (requestQuery.isLoading || locationQuery.isLoading || itemQuery.isLoading || loading) {
     return <LoadingScreen />;
   }
 

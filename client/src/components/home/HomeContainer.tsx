@@ -10,8 +10,6 @@ import NewHardwareList from "./NewHardwareList";
 const HomeContainer: React.FC = props => {
   const { user } = useAuth();
 
-  console.log(user);
-
   const [{ data, loading, error }] = useAxios(
     apiUrl(Service.HARDWARE, `/hardware-requests?userId=${user?.uid}`)
   );

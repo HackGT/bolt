@@ -22,7 +22,6 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import HomeContainer from "./components/home/HomeContainer";
 import CSVWizard from "./components/admin/csv/CSVWizard";
 import AdminOverviewContainer from "./components/admin/AdminOverviewContainer";
-import { bugsnagClient, bugsnagEnabled } from "./index";
 import AdminUsersListWrapper from "./components/admin/AdminUsersListWrapper";
 import AdminRequestSettingsWrapper from "./components/admin/AdminRequestSettingsWrapper";
 import UserProfileWrapper from "./components/userProfile/UserProfileWrapper";
@@ -44,15 +43,7 @@ import HardwareHeader from "./components/home/HardwareHeader";
 import EditRequest from "./components/admin/desk/submitted/EditRequest";
 import ProtectedRoute from "./components/util/ProtectedRoute";
 import LandingPage from "./components/home/LandingPage";
-
-// interface OwnProps {}
-
-// interface StateProps {
-//   user: User | null;
-//   loginUser: (user: User) => void;
-// }
-
-// type Props = StateProps & OwnProps;
+import UserProfile from "./components/userProfile/UserProfile";
 
 export const app = initializeApp({
   apiKey: "AIzaSyCsukUZtMkI5FD_etGfefO4Sr7fHkZM7Rg",
@@ -65,7 +56,7 @@ axios.defaults.withCredentials = true;
 
 const queryClient = new QueryClient();
 
-const App: React.FC = () => {
+export const App: React.FC = () => {
   const [loading, loggedIn] = useLogin(app);
 
   if (loading) {
@@ -78,7 +69,7 @@ const App: React.FC = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider app={app}>
+      {/* <AuthProvider app={app}>
         <AxiosProvider>
           <Routes>
             <Route index element={<LandingPage />} />
@@ -95,7 +86,7 @@ const App: React.FC = () => {
             <PrivateRoute exact path="admin/settings" element={AdminRequestSettingsWrapper} />
             <PrivateRoute exact path="admin/reports/statistics" element={DetailedItemStatistics} />
             <PrivateRoute exact path="admin/reports/demand" element={ItemDemandReport} />
-            <Route element={HomeContainer} /> */}
+            <Route element={HomeContainer} />
               </Routes>
             </Container>
             <Box>
@@ -125,9 +116,31 @@ const App: React.FC = () => {
             }
             return null;
           }}
-        </CacheBuster> */}
+        </CacheBuster>
           <ReactQueryDevtools />
         </AxiosProvider>
+      </AuthProvider> */}
+      <AuthProvider app={app}>
+        <HardwareHeader />
+        <Routes>
+          <Route index element={<LandingPage />} />
+          <Route path="/home" element={<HomeContainer />} />
+          <Route path="/user" element={<UserProfile />} />
+          <Route path="/admin" element={<ProtectedRoute />}>
+            <Route path="/admin/csv" element={<CSVWizard />} />
+            <Route path="/admin/users" element={<AdminUsersListWrapper />} />
+            <Route path="/admin/settings" element={<AdminRequestSettingsWrapper />} />
+            <Route path="/admin/items">
+              <Route path="/admin/items/:id" element={<EditRequest />} />
+              <Route path="/admin/items/new" element={<CreateItemWrapper />} />
+            </Route>
+            <Route path="/admin/desk" element={<DeskContainer />}>
+              <Route path="/admin/desk/:location" element={<DeskContainer />} />
+            </Route>
+            <Route index element={<AdminOverviewContainer />} />
+          </Route>
+        </Routes>
+        <Footer />
       </AuthProvider>
     </QueryClientProvider>
   );

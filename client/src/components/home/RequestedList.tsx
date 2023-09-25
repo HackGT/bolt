@@ -173,6 +173,7 @@ const RequestedList = ({ requests }: RequestedListProps) => {
             )
             .map(r => (
               <RequestCard
+                key={r.id}
                 r={r}
                 requestDeleteMutation={requestDeleteMutation}
                 statuses={statuses}

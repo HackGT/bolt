@@ -57,7 +57,7 @@ const HardwareLocationContents = ({
           const it = element.items
           
           return (
-            <AccordionItem>
+            <AccordionItem key={category}>
               <AccordionButton>
                 <Heading size="md">{category}</Heading>
                 <AccordionIcon />

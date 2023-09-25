@@ -26,6 +26,7 @@ const NewHardwareList = () => {
     return <LoadingScreen />;
   }
 
+  // TODO: Use the settings to determine if requests are enabled
   const requestsEnabled = true;
   // if (!setting.error && setting.data.setting !== undefined) {
   //   requestsEnabled = setting.data.setting.value === "true";
@@ -83,6 +84,7 @@ const NewHardwareList = () => {
             const locationname = locGroup.location.name;
             return (
               <HardwareLocationContents
+                key={locationname}
                 location={locationname}
                 requestsEnabled={requestsEnabled}
                 itemsByLocation={locGroup.categories}
