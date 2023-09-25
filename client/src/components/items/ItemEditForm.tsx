@@ -139,7 +139,7 @@ const ItemEditForm = () => {
           placeholder="Select a category"
           {...register("category", { required: "Please provide a category!" })}
         >
-          {categoryQuery.data?.data.map((category: Category) => (
+          {categoryQuery.data?.data?.map((category: Category) => (
             <option value={category.id}>{category.name}</option>
           ))}
         </Select>
@@ -186,7 +186,7 @@ const ItemEditForm = () => {
           placeholder="Select a location"
           {...register("location", { required: "Please provide a location!" })}
         >
-          {locationQuery.data?.data.map((location: Location) => (
+          {locationQuery.data?.data?.map((location: Location) => (
             <option value={location.id}>{location.name}</option>
           ))}
         </Select>
