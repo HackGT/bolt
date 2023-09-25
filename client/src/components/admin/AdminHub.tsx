@@ -19,7 +19,7 @@ function adminCardLink(name: string, to = "#", external = false): AdminCardLink 
 const hardwareDesk: AdminCardLink[] = [adminCardLink("Work hardware desk", "/admin/desk")];
 
 const manage: AdminCardLink[] = [
-  adminCardLink("Users", "/admin/users"),
+  // adminCardLink("Users", "/admin/users"),
   adminCardLink("Request settings", "/admin/settings"),
 ];
 
@@ -32,7 +32,7 @@ const baseUrl = process.env.NODE_ENV === "production" ? "" : "http://localhost:3
 
 const utilities: AdminCardLink[] = [
   adminCardLink("Import items", "/admin/csv"),
-  adminCardLink("GraphiQL", `${baseUrl}/api/graphiql`, true),
+  // adminCardLink("GraphiQL", `${baseUrl}/api/graphiql`, true),
 ];
 
 const funPhrases: string[] = [
