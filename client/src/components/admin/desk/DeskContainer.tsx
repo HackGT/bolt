@@ -34,7 +34,7 @@ import {
   READY_FOR_PICKUP,
   SUBMITTED,
 } from "../../../types/Hardware";
-import { pickRandomElement } from "../AdminOverviewContainer";
+import { pickRandomElement } from "../AdminHub";
 import SubmittedTable from "./submitted/SubmittedTable";
 import SubmittedCards from "./submitted/SubmittedCards";
 

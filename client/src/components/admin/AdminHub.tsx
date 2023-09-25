@@ -57,7 +57,7 @@ export function pickRandomElement<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function AdminOverviewContainer() {
+const AdminHub: React.FC = () => {
   const [randomPhrase, setRandomPhrase] = useState(pickRandomElement(funPhrases));
   return (
     <Container mt="8" maxW="container.lg">
@@ -81,4 +81,4 @@ function AdminOverviewContainer() {
   );
 }
 
-export default AdminOverviewContainer;
+export default AdminHub;

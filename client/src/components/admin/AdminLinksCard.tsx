@@ -5,17 +5,13 @@ import { Link } from "react-router-dom";
 import { Badge, Box, Heading } from "@chakra-ui/react";
 
 import { AppState } from "../../state/Store";
-import { AdminCardLink } from "./AdminOverviewContainer";
+import { AdminCardLink } from "./AdminHub";
 
-interface OwnProps {
+interface Props {
   title: string;
   links: AdminCardLink[];
   notice?: string;
 }
-
-interface StateProps {}
-
-type Props = StateProps & OwnProps;
 
 const AdminLinksCard: React.FC<Props> = props => {
   const content = (
@@ -41,10 +37,4 @@ const AdminLinksCard: React.FC<Props> = props => {
   );
 };
 
-function mapStateToProps(state: AppState) {
-  return {
-    user: state.account,
-  };
-}
-
-export default connect(mapStateToProps)(AdminLinksCard);
+export default AdminLinksCard;

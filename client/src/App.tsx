@@ -21,7 +21,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import HomeContainer from "./components/home/HomeContainer";
 import CSVWizard from "./components/admin/csv/CSVWizard";
-import AdminOverviewContainer from "./components/admin/AdminOverviewContainer";
+import AdminOverviewContainer from "./components/admin/AdminHub";
 import AdminUsersListWrapper from "./components/admin/AdminUsersListWrapper";
 import AdminRequestSettingsWrapper from "./components/admin/AdminRequestSettingsWrapper";
 import UserProfileWrapper from "./components/userProfile/UserProfileWrapper";
