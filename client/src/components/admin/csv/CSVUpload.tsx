@@ -219,7 +219,7 @@ interface UploadStepProps {
 const typeString = (field: string | null) => (field ? field.trim() : "");
 const typeNumber = (field: string) => {
   const val = parseFloat(field);
-  return isNaN(val) ? 0 : val;
+  return Number.isNaN(val) ? 0 : val;
 };
 const typeMoney = (field: string) => unformat(field);
 const typeBool = (field: string) => field === "1";
@@ -323,7 +323,7 @@ const UploadStep = ({ setInventory, setStep, step }: UploadStepProps) => {
 
       reader.readAsBinaryString(file);
     });
-  }, []);
+  }, [setInventory]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 

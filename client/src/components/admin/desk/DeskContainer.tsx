@@ -119,28 +119,7 @@ function DeskContainer() {
     const locations = await axios.get(apiUrl(Service.HARDWARE, "/locations"));
     return locations.data;
   });
-
-  const ChooseLocation = ({ locations }: { locations: Location[] }) => (
-    <>
-      <Heading size="md" mb={2}>
-        Select a location to continue
-      </Heading>
-      <Select
-        placeholder="Select a location"
-        onChange={(e): void => {
-          setWorkingLocation(`${e.target.value}`);
-        }}
-        value={workingLocation}
-      >
-        {locations &&
-          locations.map((locationOption: any) => (
-            <option key={locationOption.id} value={locationOption.name}>
-              {locationOption.name}
-            </option>
-          ))}
-      </Select>
-    </>
-  );
+  const [workingLocation, setWorkingLocation] = useState("");
 
   const itemQuery = useQuery(["items"], () => axios.get(apiUrl(Service.HARDWARE, "/items")), {
     cacheTime: 0,
@@ -155,7 +134,6 @@ function DeskContainer() {
     )} ${pickRandomElement(endings)}`
   );
   const [returnsMode, setReturnsMode] = useState(false);
-  const [workingLocation, setWorkingLocation] = useState("");
   const { location } = useParams();
 
   if (requestQuery.status === "error" || locationQuery.status === "error") {
@@ -177,7 +155,23 @@ function DeskContainer() {
         <Heading size="md" color="gray.400" mb="8" mt="2">
           {randomPhrase}
         </Heading>
-        <ChooseLocation locations={locations} />
+        <Heading size="md" mb={2}>
+          Select a location to continue
+        </Heading>
+        <Select
+          placeholder="Select a location"
+          onChange={(e): void => {
+            setWorkingLocation(`${e.target.value}`);
+          }}
+          value={workingLocation}
+        >
+          {locations &&
+            locations.map((locationOption: any) => (
+              <option key={locationOption.id} value={locationOption.name}>
+                {locationOption.name}
+              </option>
+            ))}
+        </Select>
       </Container>
     );
   }
@@ -212,7 +206,23 @@ function DeskContainer() {
           <Switch id="returnMode" onChange={event => setReturnsMode(event.target.checked)} />
         </Flex> */}
         <Flex w="50%" gap="4" alignItems="center" mb="4">
-          <ChooseLocation locations={locations} />
+          <Heading size="md" mb={2}>
+            Select a location to continue
+          </Heading>
+          <Select
+            placeholder="Select a location"
+            onChange={(e): void => {
+              setWorkingLocation(`${e.target.value}`);
+            }}
+            value={workingLocation}
+          >
+            {locations &&
+              locations.map((locationOption: any) => (
+                <option key={locationOption.id} value={locationOption.name}>
+                  {locationOption.name}
+                </option>
+              ))}
+          </Select>
         </Flex>
         <Flex flexDir="column">
           <Tabs variant="enclosed">
