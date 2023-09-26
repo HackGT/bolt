@@ -16,6 +16,7 @@ import {
   Input,
   Text,
   Link,
+  Center,
 } from "@chakra-ui/react";
 import useAxios from "axios-hooks";
 
@@ -191,42 +192,43 @@ const UserProfile = () => {
   //   ""
   // );
 
-  // const backUrl = isAdmin ? "/admin/users" : "";
-
+  // const backUrl = isAdmin ? "/admin/users"
   return (
-    <Flex direction="column" py="24px">
-      <Heading size="xl">Profile</Heading>
-      <Box>
-        <Alert status="info" my="4">
-          <AlertIcon />
-          <Text>
-            Please visit the{" "}
-            <Link href="https://login.hexlabs.org" isExternal color="blue.600">
-              Hexlabs Login Service
-            </Link>{" "}
-            to edit your information.
-          </Text>
-        </Alert>
+    <Center>
+      <Flex direction="column" py="24px">
+        <Heading size="xl">Profile</Heading>
         <Box>
-          <Heading as="h6" size="md">
-            Phone Number
-          </Heading>
-          <Text fontSize="lg">{userData.phoneNumber || "Not Found"}</Text>
+          <Alert status="info" my="4">
+            <AlertIcon />
+            <Text>
+              Please visit the{" "}
+              <Link href="https://login.hexlabs.org" isExternal color="blue.600">
+                Hexlabs Login Service
+              </Link>{" "}
+              to edit your information.
+            </Text>
+          </Alert>
+          <Box>
+            <Heading as="h6" size="md">
+              Phone Number
+            </Heading>
+            <Text fontSize="lg">{userData.phoneNumber || "Not Found"}</Text>
+          </Box>
+          <Box my="4">
+            <Heading as="h6" size="md">
+              Full Name
+            </Heading>
+            <Text fontSize="lg">{user.displayName}</Text>
+          </Box>
+          <Box>
+            <Heading as="h6" size="md">
+              Email
+            </Heading>
+            <Text fontSize="lg">{user.email}</Text>
+          </Box>
         </Box>
-        <Box my="4">
-          <Heading as="h6" size="md">
-            Full Name
-          </Heading>
-          <Text fontSize="lg">{user.displayName}</Text>
-        </Box>
-        <Box>
-          <Heading as="h6" size="md">
-            Email
-          </Heading>
-          <Text fontSize="lg">{user.email}</Text>
-        </Box>
-      </Box>
-    </Flex>
+      </Flex>
+    </Center>
   );
 };
 

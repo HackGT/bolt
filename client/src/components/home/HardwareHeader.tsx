@@ -31,7 +31,7 @@ const HardwareHeader = () => {
     <Header
       rightItem={
         <>
-          <Link to="/user/me">
+          <Link to="/user">
             <HeaderItem>Profile</HeaderItem>
           </Link>
           <a onClick={logOut}>
