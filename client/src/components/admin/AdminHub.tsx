@@ -19,7 +19,7 @@ function adminCardLink(name: string, to = "#", external = false): AdminCardLink 
 const hardwareDesk: AdminCardLink[] = [adminCardLink("Work hardware desk", "/admin/desk")];
 
 const manage: AdminCardLink[] = [
-  // adminCardLink("Users", "/admin/users"),
+  adminCardLink("Users", "/admin/users"),
   adminCardLink("Request settings", "/admin/settings"),
 ];
 
