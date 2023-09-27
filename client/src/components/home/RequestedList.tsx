@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Icon, IconButton, Text, Tooltip } from "@chakra-ui/react";
+import { Box, Flex, Heading, Icon, IconButton, Text, Tooltip, useToast } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { MapPinIcon } from "@heroicons/react/24/solid";
 import { DeleteIcon } from "@chakra-ui/icons";
@@ -16,7 +16,7 @@ interface RequestedListProps {
 
 const RequestCard = ({ r, statuses, requestDeleteMutation }: any) => {
   const { data, isLoading } = useQuery(["item"], () =>
-    axios.get(apiUrl(Service.HARDWARE, `/items/${r.item}`))
+    axios.get(apiUrl(Service.HARDWARE, `/items/${r.item.id}`))
   );
 
   return (
@@ -55,20 +55,30 @@ const RequestCard = ({ r, statuses, requestDeleteMutation }: any) => {
 };
 
 const RequestedList = ({ requests }: RequestedListProps) => {
-  const { refetch: requestRefetch } = useQuery(["requests"], () =>
+  const { data: requestData, refetch: requestRefetch } = useQuery(["requests"], () =>
     axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"))
   );
   const { refetch: itemRefetch } = useQuery(["items"], () =>
     axios.get(apiUrl(Service.HARDWARE, "/items"))
   );
   const [userRequests, setUserRequests] = useState(requests);
+  const toast = useToast();
   const requestDeleteMutation = useMutation(
     (requestId: string) =>
-      axios.delete(apiUrl(Service.HARDWARE, `/hardware-requests/${requestId}`)),
+      axios.delete(apiUrl(Service.HARDWARE, `/hardware-requests/${requestId}`))
+    ,
     {
       onSuccess: () => {
         requestRefetch();
         itemRefetch();
+        setUserRequests(requestData!.data as Request[])
+        toast({
+          title: "Request deleted",
+          description: "Your request has been deleted!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
       },
     }
   );
@@ -167,13 +177,13 @@ const RequestedList = ({ requests }: RequestedListProps) => {
         gap="4"
         flexDir="column"
       >
-        {requests && requests.length > 0 ? (
-          requests
+        {userRequests && userRequests.length > 0 ? (
+          userRequests
             .sort(
               (a: Request, b: Request) =>
-                a.item.location.localeCompare(b.item.location) ||
+                a.item.location.id.toString().localeCompare(b.item.location.id.toString()) ||
                 a.item.name.localeCompare(b.item.name) ||
-                a.id.localeCompare(b.id)
+                a.id.toString().localeCompare(b.id.toString())
             )
             .map(r => (
               <RequestCard

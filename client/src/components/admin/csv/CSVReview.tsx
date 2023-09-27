@@ -20,7 +20,6 @@ const ReviewCard = (props: ReviewCardProps) => {
     imageUrl,
     category,
     price,
-    owner,
     approvalRequired,
     returnRequired,
     hidden,
@@ -33,7 +32,7 @@ const ReviewCard = (props: ReviewCardProps) => {
         <Heading size="md">{name}</Heading>
         <Text color="gray.500">
           {`Request up to ${maxRequestQty} at a time | ${totalAvailable} available, Location: ${location}
-          , Owner: ${owner}, Unit Cost: ${price}`}
+          , Unit Cost: ${price}`}
         </Text>
         <Flex gap={2} mb={2}>
           <Tag>{`Category: ${category}`}</Tag>

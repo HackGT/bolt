@@ -20,9 +20,9 @@ export interface Request {
   user: User;
   item: Item;
   status: RequestStatus;
-  location: string;
+  location: Location;
   quantity: number;
-  createdAt: string;
+  createdAt: number;
   updatedAt: string;
 }
 

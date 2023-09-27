@@ -235,7 +235,7 @@ function DeskContainer() {
               <TabPanel>
                 <SubmittedCards
                   requests={requests.filter(
-                    (request: Request) => request.item.location === workingLocation
+                    (request: Request) => request.item.location.id === workingLocation
                   )}
                 />
                 {/* <SubmittedList

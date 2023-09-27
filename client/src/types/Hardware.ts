@@ -10,20 +10,19 @@ export type Item = {
   hidden: boolean;
   returnRequired: boolean;
   approvalRequired: boolean;
-  owner: string;
-  location: string;
+  location: Location;
   qtyUnreserved: number;
   qtyInStock: number;
   qtyAvailableForApproval: number;
 };
 
 export type Category = {
-  id: number;
+  id: string;
   name: string;
 };
 
 export type Location = {
-  id: number;
+  id: string;
   name: string;
   hidden: boolean;
 };

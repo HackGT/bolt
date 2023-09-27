@@ -14,6 +14,7 @@ import {
   NumberInputField,
   NumberInputStepper,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -49,6 +50,7 @@ interface IRequestMutation {
 
 const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareItemProps) => {
   const [requestedNum, setRequestedNum] = useState(1);
+  const toast = useToast();
 
   const { user, loading } = useAuth();
 
@@ -66,6 +68,23 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
       onSuccess: () => {
         requestRefetch();
         itemRefetch();
+
+        toast({
+          title: "Request submitted",
+          description: "Your request has been submitted.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "There was an error submitting your request.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
       },
     }
   );

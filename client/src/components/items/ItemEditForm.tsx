@@ -73,7 +73,6 @@ export type FormItem = {
   hidden: boolean;
   returnRequired: boolean;
   approvalRequired: boolean;
-  owner: string;
   location: string;
   qtyUnreserved: number;
   qtyInStock: number;
@@ -102,6 +101,7 @@ const ItemEditForm = () => {
   }
 
   async function onSubmit(values: any) {
+    console.log(values);
     await axios.post(apiUrl(Service.HARDWARE, "/items"), values);
     navigate("/");
   }
@@ -162,19 +162,6 @@ const ItemEditForm = () => {
             />
           </InputGroup>
           <FormErrorMessage>{errors.price && errors.price.message}</FormErrorMessage>
-        </FormControl>
-        <FormControl isInvalid={Boolean(errors.owner)}>
-          <FormLabel htmlFor="owner">
-            Owner <chakra.span color="red.400">*</chakra.span>
-          </FormLabel>
-          <Select
-            id="owner"
-            placeholder="Select an owner"
-            {...register("owner", { required: "Please provide an owner!" })}
-          >
-            <option value="Captain Kirk">Captain Kirk</option>
-          </Select>
-          <FormErrorMessage>{errors.owner && errors.owner.message}</FormErrorMessage>
         </FormControl>
       </Flex>
       <FormControl isInvalid={Boolean(errors.location)}>
