@@ -233,11 +233,14 @@ function DeskContainer() {
             </TabList>
             <TabPanels>
               <TabPanel>
+                {requests &&
                 <SubmittedCards
-                  requests={requests.filter(
-                    (request: Request) => request.item.location.id === workingLocation
-                  )}
+                  requests={requests.filter((request: Request) => {
+                    const locationName = request.item.location.name;
+                    return locationName === workingLocation;
+                })}
                 />
+                }
                 {/* <SubmittedList
                   hidden={returnsMode}
                   loading={requestQuery.isLoading}
