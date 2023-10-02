@@ -35,11 +35,12 @@ const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
   const { data, isLoading } = useQuery(["user"], () =>
     axios.get(apiUrl(Service.USERS, `/users/${request.user}`))
   );
-
+  
   if (isLoading) {
     return <LoadingScreen />;
   }
-
+  console.log(apiUrl(Service.USERS, `/users/${request.user}`))
+  console.log(request.user.uid)
   return (
     <Flex
       ref={provided.innerRef}
@@ -55,7 +56,7 @@ const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
       alignItems="center"
     >
       <Flex gap={1} flexDir="column">
-        <Heading size="lg">{`${data?.data.name.first} ${data?.data.name.last}`}</Heading>
+        {/* <Heading size="lg">{`${data?.data.name.first} ${data?.data.name.last}`}</Heading> */}
         <Flex gap={2}>
           <Heading as="h4" size="md">
             {request.item.name}
