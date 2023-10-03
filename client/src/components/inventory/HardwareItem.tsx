@@ -130,6 +130,7 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
                 item: item.id,
                 quantity: requestedNum,
                 user: user?.uid as string,
+                name: user?.displayName as string,
               };
               mutation.mutate(newRequest);
             }}
