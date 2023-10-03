@@ -33,14 +33,13 @@ const noIssues = (
 
 const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
   const { data, isLoading } = useQuery(["user"], () =>
-    axios.get(apiUrl(Service.USERS, `/users/${request.user}`))
+    axios.get(apiUrl(Service.USERS, `/users/${request.user?.uid}`))
   );
   
   if (isLoading) {
     return <LoadingScreen />;
   }
-  console.log(apiUrl(Service.USERS, `/users/${request.user}`))
-  console.log(request.user.uid)
+  console.log(data)
   return (
     <Flex
       ref={provided.innerRef}

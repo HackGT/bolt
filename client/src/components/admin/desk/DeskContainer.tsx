@@ -237,6 +237,7 @@ function DeskContainer() {
                 <SubmittedCards
                   requests={requests.filter((request: Request) => {
                     const locationName = request.item.location.name;
+                    request.id = locationName
                     return locationName === workingLocation;
                 })}
                 />
