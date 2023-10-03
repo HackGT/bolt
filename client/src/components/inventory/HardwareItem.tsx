@@ -46,6 +46,7 @@ interface IRequestMutation {
   item: string;
   quantity: number;
   user: string;
+  name: string;
 }
 
 const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareItemProps) => {
