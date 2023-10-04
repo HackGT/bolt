@@ -1,5 +1,5 @@
 export interface BaseUser {
-  uuid: string;
+  userId: string;
   name: string;
 }
 

@@ -1,10 +1,10 @@
 import React from "react";
 import { Button, Card, Header, Icon, Label, Popup } from "semantic-ui-react";
-import { Box, Flex, Heading, IconButton, Text, Tooltip } from "@chakra-ui/react";
+import { Box, Flex, Heading, IconButton, Text, Tooltip, useToast } from "@chakra-ui/react";
 import ReactTimeago from "react-timeago";
 import { DraggableProvided } from "react-beautiful-dnd";
 import { CheckIcon, DeleteIcon } from "@chakra-ui/icons";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { apiUrl, LoadingScreen, Service } from "@hex-labs/core";
 
@@ -33,13 +33,28 @@ const noIssues = (
 
 const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
   const { data, isLoading } = useQuery(["user"], () =>
-    axios.get(apiUrl(Service.USERS, `/users/${request.user?.uid}`))
+    axios.get(apiUrl(Service.USERS, `/users/${request.user.userId}`))
   );
-  
+  const toast = useToast();
+  const requestDeleteMutation = useMutation(
+    (requestId: string) =>
+      axios.delete(apiUrl(Service.HARDWARE, `/hardware-requests/${requestId}`))
+    ,
+    {
+      onSuccess: () => {
+        toast({
+          title: "Request deleted",
+          description: "The request has been deleted!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      },
+    }
+  );
   if (isLoading) {
     return <LoadingScreen />;
   }
-  console.log(data)
   return (
     <Flex
       ref={provided.innerRef}
@@ -55,7 +70,7 @@ const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
       alignItems="center"
     >
       <Flex gap={1} flexDir="column">
-        {/* <Heading size="lg">{`${data?.data.name.first} ${data?.data.name.last}`}</Heading> */}
+        <Heading size="lg">{`${data?.data.name.first} ${data?.data.name.last}`}</Heading>
         <Flex gap={2}>
           <Heading as="h4" size="md">
             {request.item.name}
@@ -70,7 +85,13 @@ const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
         <Box>{generateBadge(request.status)}</Box>
       </Flex>
       <Tooltip label="Delete Request">
-        <IconButton aria-label="delete" icon={<DeleteIcon />} color="red.400" variant="ghost" />
+        <IconButton
+            aria-label="delete"
+            icon={<DeleteIcon />} 
+            color="red.400" 
+            variant="ghost" 
+            onClick={() => requestDeleteMutation.mutate(request.id)}
+            />
       </Tooltip>
     </Flex>
   );

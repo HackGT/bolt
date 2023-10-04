@@ -53,7 +53,7 @@ export const generateBadge = (status: RequestStatus) => {
 };
 
 const columns = [
-  columnHelper.accessor("user.displayName", {
+  columnHelper.accessor("user.name", {
     cell: info => (
       <Flex
         bgColor="gray.200"
@@ -83,14 +83,14 @@ const columns = [
     ),
     header: () => <span>Recipient</span>,
   }),
-  columnHelper.accessor("user.email", {
-    cell: info => (
-      <Flex px={3} py={0.5} bgColor="gray.200" rounded="full" maxW="fit-content">
-        {info.getValue()}
-      </Flex>
-    ),
-    header: () => <span>Email</span>,
-  }),
+  // columnHelper.accessor("user.email", {
+  //   cell: info => (
+  //     <Flex px={3} py={0.5} bgColor="gray.200" rounded="full" maxW="fit-content">
+  //       {info.getValue()}
+  //     </Flex>
+  //   ),
+  //   header: () => <span>Email</span>,
+  // }),
   columnHelper.accessor("item.name", {
     cell: info => (
       <Flex px={3} py={0.5} bgColor="gray.200" rounded="full" maxW="fit-content">

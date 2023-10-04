@@ -21,7 +21,7 @@ const RequestButton: React.FC<Props> = ({ requestedItem, user, toastManager }) =
       {
         query: USER_REQUESTS,
         variables: {
-          uuid: user.uuid,
+          uuid: user.userId,
         },
       },
     ],

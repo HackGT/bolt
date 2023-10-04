@@ -60,7 +60,7 @@ function getConsolidatedRequestsWithStatus(
       };
     }
 
-    requestsByUser[req.user.uid].requests.push(req);
+    requestsByUser[req.user.userId].requests.push(req);
   }
   return Object.values(requestsByUser);
 }
@@ -237,7 +237,6 @@ function DeskContainer() {
                 <SubmittedCards
                   requests={requests.filter((request: Request) => {
                     const locationName = request.item.location.name;
-                    request.id = locationName
                     return locationName === workingLocation;
                 })}
                 />
