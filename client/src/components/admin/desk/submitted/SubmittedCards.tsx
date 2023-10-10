@@ -38,7 +38,7 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
   });
 
   const updateStatus = useMutation((newRequest: any) =>
-    axios.patch(apiUrl(Service.HARDWARE, `/hardware-requests/${newRequest.id}`), newRequest)
+    axios.put(apiUrl(Service.HARDWARE, `/hardware-requests/${newRequest.id}`), newRequest)
   );
 
   const move = (

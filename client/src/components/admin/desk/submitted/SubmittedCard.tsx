@@ -32,9 +32,6 @@ const noIssues = (
 );
 
 const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
-  const { data, isLoading } = useQuery(["user"], () =>
-    axios.get(apiUrl(Service.USERS, `/users/${request.user.userId}`))
-  );
   const toast = useToast();
   const requestDeleteMutation = useMutation(
     (requestId: string) =>
@@ -51,9 +48,9 @@ const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
       },
     }
   );
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
+
+  console.log(request.user)
+
   return (
     <Flex
       ref={provided.innerRef}
@@ -69,7 +66,7 @@ const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
       alignItems="center"
     >
       <Flex gap={1} flexDir="column">
-        <Heading size="lg">{`${data?.data.name.first} ${data?.data.name.last}`}</Heading>
+        <Heading size="lg">{`${request.user.name}`}</Heading>
         <Flex gap={2}>
           <Heading as="h4" size="md">
             {request.item.name}
