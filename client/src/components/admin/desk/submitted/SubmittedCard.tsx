@@ -38,8 +38,7 @@ const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
   const toast = useToast();
   const requestDeleteMutation = useMutation(
     (requestId: string) =>
-      axios.delete(apiUrl(Service.HARDWARE, `/hardware-requests/${requestId}`))
-    ,
+      axios.delete(apiUrl(Service.HARDWARE, `/hardware-requests/${requestId}`)),
     {
       onSuccess: () => {
         toast({
@@ -86,12 +85,12 @@ const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
       </Flex>
       <Tooltip label="Delete Request">
         <IconButton
-            aria-label="delete"
-            icon={<DeleteIcon />} 
-            color="red.400" 
-            variant="ghost" 
-            onClick={() => requestDeleteMutation.mutate(request.id)}
-            />
+          aria-label="delete"
+          icon={<DeleteIcon />}
+          color="red.400"
+          variant="ghost"
+          onClick={() => requestDeleteMutation.mutate(request.id)}
+        />
       </Tooltip>
     </Flex>
   );

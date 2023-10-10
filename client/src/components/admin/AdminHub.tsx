@@ -1,10 +1,7 @@
-import { Container, Flex, Heading } from "@chakra-ui/react";
+import { Container, Flex, Heading, Text } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { connect } from "react-redux";
-import { Grid, Header } from "semantic-ui-react";
 import { randomItemString } from "stuff-with-good-eyesight";
 
-import { AppState } from "../../state/Store";
 import AdminLinksCard from "./AdminLinksCard";
 
 export type AdminCardLink = {
@@ -63,9 +60,9 @@ const AdminHub: React.FC = () => {
     <Container mt="8" maxW="container.lg">
       <Heading as="h2" size="3xl">
         Administration
-        <Heading as="h4" size="lg" color="gray.500" fontWeight={500}>
+        <Text color="gray.500" fontWeight={500} fontSize="22px">
           {randomPhrase}
-        </Heading>
+        </Text>
       </Heading>
       <Flex mt="8" w="full" flexDir="column" gap="4">
         <Flex flexDir="row" w="full" gap="4">

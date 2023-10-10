@@ -146,11 +146,16 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
           </Flex>
           <Droppable droppableId={APPROVED}>
             {(provided, snapshot) => (
-             <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              style={{ flexDirection: "column", width: "100%", minHeight: "256px", borderRadius: "4px" }}
-            >
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                style={{
+                  flexDirection: "column",
+                  width: "100%",
+                  minHeight: "256px",
+                  borderRadius: "4px",
+                }}
+              >
                 {items.APPROVED.map((request, index) => (
                   <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
                     {(provided, snapshot) => (
