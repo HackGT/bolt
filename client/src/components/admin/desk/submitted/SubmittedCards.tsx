@@ -38,7 +38,7 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
   });
 
   const updateStatus = useMutation((newRequest: any) =>
-    axios.patch(apiUrl(Service.HARDWARE, `/hardware-requests/${newRequest.id}`), newRequest)
+    axios.put(apiUrl(Service.HARDWARE, `/hardware-requests/${newRequest.id}`), newRequest)
   );
 
   const move = (
@@ -118,22 +118,20 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
           </Flex>
           <Droppable droppableId={SUBMITTED}>
             {(provided, snapshot) => (
-              <Flex
+              <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                flexDir="column"
-                w="full"
-                minH="256px"
+                style={{ flexDirection: "column", width: "100%", minHeight: "256px" }}
               >
                 {items.SUBMITTED.map((request, index) => (
-                  <Draggable key={request.id} draggableId={request.id} index={index}>
+                  <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
                     {(provided, snapshot) => (
                       <SubmittedCard provided={provided} request={request} />
                     )}
                   </Draggable>
                 ))}
                 {provided.placeholder}
-              </Flex>
+              </div>
             )}
           </Droppable>
         </Box>
@@ -148,23 +146,25 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
           </Flex>
           <Droppable droppableId={APPROVED}>
             {(provided, snapshot) => (
-              <Flex
+              <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                flexDir="column"
-                w="full"
-                minH="256px"
-                rounded={4}
+                style={{
+                  flexDirection: "column",
+                  width: "100%",
+                  minHeight: "256px",
+                  borderRadius: "4px",
+                }}
               >
                 {items.APPROVED.map((request, index) => (
-                  <Draggable key={request.id} draggableId={request.id} index={index}>
+                  <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
                     {(provided, snapshot) => (
                       <SubmittedCard provided={provided} request={request} />
                     )}
                   </Draggable>
                 ))}
                 {provided.placeholder}
-              </Flex>
+              </div>
             )}
           </Droppable>
         </Box>
@@ -179,22 +179,20 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
           </Flex>
           <Droppable droppableId={READY_FOR_PICKUP}>
             {(provided, snapshot) => (
-              <Flex
+              <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                flexDir="column"
-                w="full"
-                minH="256px"
+                style={{ flexDirection: "column", width: "100%", minHeight: "256px" }}
               >
                 {items.READY_FOR_PICKUP.map((request, index) => (
-                  <Draggable key={request.id} draggableId={request.id} index={index}>
+                  <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
                     {(provided, snapshot) => (
                       <SubmittedCard provided={provided} request={request} />
                     )}
                   </Draggable>
                 ))}
                 {provided.placeholder}
-              </Flex>
+              </div>
             )}
           </Droppable>
         </Box>

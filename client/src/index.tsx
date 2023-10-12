@@ -120,11 +120,11 @@ const container = document.getElementById("root");
 const root = createRoot(container!);
 
 root.render(
-  <React.StrictMode>
-    <ChakraProvider>
-      <Router>
-        <App />
-      </Router>
-    </ChakraProvider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <ChakraProvider>
+    <Router>
+      <App />
+    </Router>
+  </ChakraProvider>
+  // </React.StrictMode>
 );

@@ -60,7 +60,7 @@ function getConsolidatedRequestsWithStatus(
       };
     }
 
-    requestsByUser[req.user.uid].requests.push(req);
+    requestsByUser[req.user.userId].requests.push(req);
   }
   return Object.values(requestsByUser);
 }
@@ -233,11 +233,14 @@ function DeskContainer() {
             </TabList>
             <TabPanels>
               <TabPanel>
+                {requests &&
                 <SubmittedCards
-                  requests={requests.filter(
-                    (request: Request) => request.item.location.id === workingLocation
-                  )}
+                  requests={requests.filter((request: Request) => {
+                    const locationName = request.item.location.name;
+                    return locationName === workingLocation;
+                })}
                 />
+                }
                 {/* <SubmittedList
                   hidden={returnsMode}
                   loading={requestQuery.isLoading}

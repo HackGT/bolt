@@ -63,8 +63,9 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
   );
 
   const mutation = useMutation(
-    async (newRequest: IRequestMutation): Promise<any> =>
-      await axios.post(apiUrl(Service.HARDWARE, "/hardware-requests"), newRequest),
+    async (newRequest: IRequestMutation): Promise<any> => {
+      await axios.post(apiUrl(Service.HARDWARE, "/hardware-requests"), newRequest);
+    },
     {
       onSuccess: () => {
         requestRefetch();

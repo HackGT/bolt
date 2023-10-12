@@ -17,7 +17,7 @@ export type RequestStatus =
 
 export interface Request {
   id: string;
-  user: User;
+  user: BaseUserWithID;
   item: Item;
   status: RequestStatus;
   location: Location;
