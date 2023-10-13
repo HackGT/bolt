@@ -59,6 +59,13 @@ const NewHardwareList = () => {
       <Flex gap="10px" flexDir="column">
         <Flex flexDir="row" gap={2}>
           {profile.roles.admin && (
+            <Link to="/admin/categories/new">
+              <Button px={6} colorScheme="twitter" color="white">
+                Create category
+              </Button>
+            </Link>
+          )}
+          {profile.roles.admin && (
             <Link to="/admin/items/new">
               <Button px={6} colorScheme="twitter" color="white">
                 Create item
@@ -77,7 +84,7 @@ const NewHardwareList = () => {
             }}
           />
         </Flex>
-        {(data && data.length > 0) ? (
+        {data && data.length > 0 ? (
           data?.map((locGroup: any) => {
             const locationname = locGroup.location.name;
             return (
