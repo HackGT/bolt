@@ -44,6 +44,7 @@ import EditRequest from "./components/admin/desk/submitted/EditRequest";
 import ProtectedRoute from "./components/util/ProtectedRoute";
 import LandingPage from "./components/home/LandingPage";
 import UserProfile from "./components/userProfile/UserProfile";
+import CreateCategoryWrapper from "./components/categories/CreateCategoryWrapper";
 
 export const app = initializeApp({
   apiKey: "AIzaSyCsukUZtMkI5FD_etGfefO4Sr7fHkZM7Rg",
@@ -133,6 +134,9 @@ export const App: React.FC = () => {
             <Route path="/admin/items">
               <Route path="/admin/items/:id" element={<EditRequest />} />
               <Route path="/admin/items/new" element={<CreateItemWrapper />} />
+            </Route>
+            <Route path="/admin/categories">
+              <Route path="/admin/categories/new" element={<CreateCategoryWrapper />} />
             </Route>
             <Route path="/admin/desk" element={<DeskContainer />}>
               <Route path="/admin/desk/:location" element={<DeskContainer />} />
