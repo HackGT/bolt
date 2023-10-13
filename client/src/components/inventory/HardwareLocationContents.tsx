@@ -50,7 +50,7 @@ const HardwareLocationContents = ({
         marginTop: 10,
       }}
     >
-      <HardwareLocation key={`${location}-hardware_loc`} name={location} />
+      {/* <HardwareLocation key={`${location}-hardware_loc`} name={location} /> */}
       <Accordion key={`${location}-accordion`} allowToggle mt={4}>
         {itemsByLocation.map((element: any) => {
           const category = element.category.name;
