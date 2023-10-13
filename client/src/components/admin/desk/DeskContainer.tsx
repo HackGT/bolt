@@ -29,8 +29,6 @@ import {
 } from "../../../types/Hardware";
 import { pickRandomElement } from "../AdminHub";
 import SubmittedCards from "./submitted/SubmittedCards";
-import FulfilledCards from "./fulfillment/FulfilledCards";
-import ReturnedCards from "./returns/ReturnedCards";
 import LoadingSpinner from "../../util/LoadingSpinner";
 import { useQuery } from "@tanstack/react-query";
 import { BaseUserWithID } from "../../../types/User";
@@ -210,8 +208,6 @@ function DeskContainer() {
             <Tabs variant="enclosed">
               <TabList>
                 <Tab>Submissions</Tab>
-                <Tab>Checkout</Tab>
-                <Tab>Returns</Tab>
               </TabList>
               <TabPanels>
                 <TabPanel>
@@ -223,36 +219,6 @@ function DeskContainer() {
                         return (
                           locationName === workingLocation &&
                           [SUBMITTED, DENIED, READY_FOR_PICKUP].includes(status)
-                        );
-                      })}
-                      refetch={requestRefetch}
-                    />
-                  )}
-                </TabPanel>
-                <TabPanel>
-                  {requests && (
-                    <FulfilledCards
-                      requests={requests.filter((request: Request) => {
-                        const locationName = request.item.location.name;
-                        const { status } = request;
-                        return (
-                          locationName === workingLocation &&
-                          [READY_FOR_PICKUP, FULFILLED].includes(status)
-                        );
-                      })}
-                      refetch={requestRefetch}
-                    />
-                  )}
-                </TabPanel>
-                <TabPanel>
-                  {requests && (
-                    <ReturnedCards
-                      requests={requests.filter((request: Request) => {
-                        const locationName = request.item.location.name;
-                        const { status } = request;
-                        return (
-                          locationName === workingLocation &&
-                          [FULFILLED, RETURNED, DAMAGED_LOST].includes(status)
                         );
                       })}
                       refetch={requestRefetch}

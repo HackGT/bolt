@@ -1,6 +1,22 @@
 import React from "react";
-import { Button, Card, Header, Icon, Label, Popup } from "semantic-ui-react";
-import { Box, Flex, Heading, IconButton, Text, Tooltip, useToast } from "@chakra-ui/react";
+import { Button, Card, Header, Icon, Label } from "semantic-ui-react";
+import {
+  Box,
+  Flex,
+  Heading,
+  IconButton,
+  Text,
+  Tooltip,
+  useToast,
+  Modal,
+  useDisclosure,
+  ModalHeader,
+  ModalOverlay,
+  ModalContent,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+} from "@chakra-ui/react";
 import ReactTimeago from "react-timeago";
 import { DraggableProvided } from "react-beautiful-dnd";
 import { CheckIcon, DeleteIcon } from "@chakra-ui/icons";
@@ -14,6 +30,9 @@ import { Request } from "../../../../types/Request";
 interface SubmittedCardProps {
   provided: DraggableProvided;
   request: Request;
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
 }
 
 function noStockWarning(remaining: number) {
@@ -31,7 +50,7 @@ const noIssues = (
   </Flex>
 );
 
-const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
+const SubmittedCard = ({ provided, request, isOpen, onOpen, onClose }: SubmittedCardProps) => {
   const toast = useToast();
   const requestDeleteMutation = useMutation(
     (requestId: string) =>
@@ -49,47 +68,62 @@ const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
     }
   );
 
-  // console.log(request.user)
-
   return (
-    <Flex
-      ref={provided.innerRef}
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
-      rounded={8}
-      p={4}
-      shadow="md"
-      minH={32}
-      bgColor="white"
-      mb={4}
-      justify="space-between"
-      alignItems="center"
-    >
-      <Flex gap={1} flexDir="column">
-        <Heading size="lg">{`${request.user.name}`}</Heading>
-        <Flex gap={2}>
-          <Heading as="h4" size="md">
-            {request.item.name}
-          </Heading>
-          <Text color="gray.500">{`Qty: ${request.quantity}`}</Text>
+    <>
+      <Flex
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        rounded={8}
+        p={4}
+        shadow="md"
+        minH={32}
+        bgColor="white"
+        mb={4}
+        justify="space-between"
+        alignItems="center"
+      >
+        <Flex gap={1} flexDir="column">
+          <Heading size="lg">{`${request.user.name}`}</Heading>
+          <Flex gap={2}>
+            <Heading as="h4" size="md">
+              {request.item.name}
+            </Heading>
+            <Text color="gray.500">{`Qty: ${request.quantity}`}</Text>
+          </Flex>
+          <Text color="gray.500">{request.item.description}</Text>
+          {request.item.totalAvailable >= request.quantity
+            ? noIssues
+            : noStockWarning(request.item.totalAvailable)}
+          <ReactTimeago date={request.createdAt} />
+          <Box>{generateBadge(request.status)}</Box>
         </Flex>
-        <Text color="gray.500">{request.item.description}</Text>
-        {request.item.totalAvailable >= request.quantity
-          ? noIssues
-          : noStockWarning(request.item.totalAvailable)}
-        <ReactTimeago date={request.createdAt} />
-        <Box>{generateBadge(request.status)}</Box>
+        <Tooltip label="Delete Request">
+          <IconButton
+            aria-label="delete"
+            icon={<DeleteIcon />}
+            color="red.400"
+            variant="ghost"
+            onClick={() => requestDeleteMutation.mutate(request.id)}
+          />
+        </Tooltip>
       </Flex>
-      <Tooltip label="Delete Request">
-        <IconButton
-          aria-label="delete"
-          icon={<DeleteIcon />}
-          color="red.400"
-          variant="ghost"
-          onClick={() => requestDeleteMutation.mutate(request.id)}
-        />
-      </Tooltip>
-    </Flex>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Confirmation!</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Have you checked the participant's ID?</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 
