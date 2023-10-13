@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button, Card, Dropdown, Icon } from "semantic-ui-react";
 
 import { updateRequestStatus } from "../DeskUtil";
-import { DAMAGED, LOST, RETURNED } from "../../../../types/Hardware";
+import { DAMAGED_LOST, RETURNED } from "../../../../types/Hardware";
 
 function toDropdownOptions(options: string[]) {
   return options.map(option => ({
@@ -79,7 +79,7 @@ function PhotoIdCheck({
     </Button>
   );
 
-  const dropdownOptions = [RETURNED, LOST, DAMAGED];
+  const dropdownOptions = [RETURNED, DAMAGED_LOST];
   const alreadyReturnedID = {
     title: (
       <span className="hw-positive">

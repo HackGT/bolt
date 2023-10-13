@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Badge, Box, Flex, Heading, Icon, IconButton, Text } from "@chakra-ui/react";
+import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 import {
   DragDropContext,
   Draggable,
@@ -7,8 +7,6 @@ import {
   Droppable,
   DropResult,
 } from "react-beautiful-dnd";
-import ReactTimeago from "react-timeago";
-import { CheckIcon, CloseIcon, DeleteIcon } from "@chakra-ui/icons";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { apiUrl, Service } from "@hex-labs/core";
@@ -16,17 +14,13 @@ import { apiUrl, Service } from "@hex-labs/core";
 import { Request, RequestStatus } from "../../../../types/Request";
 import SubmittedCard from "../submitted/SubmittedCard";
 import {
-  APPROVED,
-  AxiosRefetch,
   FULFILLED,
   READY_FOR_PICKUP,
-  SUBMITTED,
 } from "../../../../types/Hardware";
-import { generateBadge } from "../submitted/SubmittedTable";
 
 interface FullfilledCardsProps {
   requests: Request[];
-  refetch: AxiosRefetch;
+  refetch: any;
 }
 
 const reorder = (list: Request[], startIndex: number, endIndex: number) => {
@@ -63,7 +57,10 @@ const FulfilledCards = ({ requests, refetch }: FullfilledCardsProps) => {
     };
     await axios.put(apiUrl(Service.HARDWARE, `/hardware-requests/${newRequest.id}`), newRequest);
 
-    // updateStatus.mutate();
+    updateStatus.mutate({
+      id: removed.id,
+      status: droppableDestination.droppableId as RequestStatus,
+    });
 
     destClone.splice(droppableDestination.index, 0, removed);
 
@@ -95,6 +92,7 @@ const FulfilledCards = ({ requests, refetch }: FullfilledCardsProps) => {
       newItems[dInd] = result[dInd];
 
       setItems(newItems);
+      refetch();
     }
   };
 

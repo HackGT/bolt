@@ -24,7 +24,7 @@ import {
 
 interface SubmittedCardsProps {
   requests: Request[];
-  refetch: AxiosRefetch;
+  refetch: any;
 }
 
 const reorder = (list: Request[], startIndex: number, endIndex: number) => {
@@ -42,9 +42,9 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
     READY_FOR_PICKUP: [...requests.filter(request => request.status === "READY_FOR_PICKUP")],
   });
 
-  const updateStatus = useMutation((newRequest: any) =>
-    axios.put(apiUrl(Service.HARDWARE, `/hardware-requests/${newRequest.id}`), newRequest)
-  );
+  const updateStatus = useMutation( async (newRequest: any) => (
+    await axios.put(apiUrl(Service.HARDWARE, `/hardware-requests/${newRequest.id}`), newRequest)
+  ));
 
   const move = (
     source: Request[],
@@ -91,6 +91,7 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
       newItems[dInd] = result[dInd];
 
       setItems(newItems);
+      refetch();
     }
   };
 
@@ -125,6 +126,34 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
             )}
           </Droppable>
         </Box>
+        <Box w="full" p={4} rounded={8} bgColor="gray.100" h="fit-content">
+          <Flex gap={2} alignContent="center">
+            <Heading mb={2} size="md">
+              Ready for Pickup
+            </Heading>
+            <Box rounded="5px" bg="gray.300" py="1px" h="fit-content" px="5px">
+              <Text fontWeight={700}>{items.READY_FOR_PICKUP.length}</Text>
+            </Box>
+          </Flex>
+          <Droppable droppableId={READY_FOR_PICKUP}>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                style={{ flexDirection: "column", width: "100%", minHeight: "256px" }}
+              >
+                {items.READY_FOR_PICKUP.map((request, index) => (
+                  <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
+                    {(provided, snapshot) => (
+                      <SubmittedCard provided={provided} request={request} />
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </Box>
         <Box w="full" bg="gray.100" p={4} rounded={8} h="fit-content">
           <Flex gap={2} alignContent="center">
             <Heading mb={2} size="md">
@@ -147,34 +176,6 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
                 }}
               >
                 {items.DENIED.map((request, index) => (
-                  <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
-                    {(provided, snapshot) => (
-                      <SubmittedCard provided={provided} request={request} />
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </Box>
-        <Box w="full" p={4} rounded={8} bgColor="gray.100" h="fit-content">
-          <Flex gap={2} alignContent="center">
-            <Heading mb={2} size="md">
-              Ready for Pickup
-            </Heading>
-            <Box rounded="5px" bg="gray.300" py="1px" h="fit-content" px="5px">
-              <Text fontWeight={700}>{items.READY_FOR_PICKUP.length}</Text>
-            </Box>
-          </Flex>
-          <Droppable droppableId={READY_FOR_PICKUP}>
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                style={{ flexDirection: "column", width: "100%", minHeight: "256px" }}
-              >
-                {items.READY_FOR_PICKUP.map((request, index) => (
                   <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
                     {(provided, snapshot) => (
                       <SubmittedCard provided={provided} request={request} />

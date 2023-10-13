@@ -51,8 +51,7 @@ const RequestStatus = {
   READY_FOR_PICKUP: "#4FD1C5",
   FULFILLED: "#F687B3",
   RETURNED: "#B794F4",
-  LOST: "#C05621",
-  DAMAGED: "#F6E05E",
+  "DAMAGED/LOST": "#C05621",
 };
 
 const UserRequestsModal: React.FC<Props> = props => (

@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
-import { Checkbox, DropdownProps, Grid, Header, Loader, Message } from "semantic-ui-react";
-import { useQuery } from "@tanstack/react-query";
+import { apiUrl, LoadingScreen, Service } from "@hex-labs/core";
 import axios from "axios";
-import { apiUrl, ErrorScreen, LoadingScreen, Service, useAuth } from "@hex-labs/core";
 import {
   Box,
   Container,
@@ -18,29 +15,25 @@ import {
   TabPanels,
   Tabs,
 } from "@chakra-ui/react";
-import { User } from "firebase/auth";
-import { useNavigate, useParams } from "react-router-dom";
-
-import SubmittedList from "./submitted/SubmittedList";
-import { REQUEST_CHANGE } from "../../../graphql/Subscriptions";
-import ReadyToPrepareList from "./fulfillment/ReadyToPrepareList";
+import { useNavigate } from "react-router-dom";
 import { Request, RequestStatus } from "../../../types/Request";
 import {
   DENIED,
-  DAMAGED,
   FULFILLED,
   Location,
-  LOST,
+  DAMAGED_LOST,
   READY_FOR_PICKUP,
   SUBMITTED,
+  Item,
+  RETURNED,
 } from "../../../types/Hardware";
 import { pickRandomElement } from "../AdminHub";
-import SubmittedTable from "./submitted/SubmittedTable";
 import SubmittedCards from "./submitted/SubmittedCards";
 import FulfilledCards from "./fulfillment/FulfilledCards";
 import ReturnedCards from "./returns/ReturnedCards";
-import useAxios from "axios-hooks";
 import LoadingSpinner from "../../util/LoadingSpinner";
+import { useQuery } from "@tanstack/react-query";
+import { BaseUserWithID } from "../../../types/User";
 
 function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], id: string) {
   return requests.filter((r: Request) => id === "" && statuses.some(status => r.status === status));
@@ -49,23 +42,22 @@ function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], i
 function getConsolidatedRequestsWithStatus(
   requests: Request[],
   statuses: RequestStatus[],
-  id: string,
-  user: User
-): { user: User; requests: Request[] }[] {
+  id: string
+): { user: BaseUserWithID; requests: Request[] }[] {
   const filteredRequests = getRequestsWithStatus(requests, statuses, id);
-  const requestsByUser: Record<string, { user: User; requests: Request[] }> = {};
+  const requestsByUser: Record<string, { user: BaseUserWithID; requests: Request[] }> = {};
 
-  for (let i = 0; i < filteredRequests.length; i++) {
-    const req = filteredRequests[i];
-    if (!Object.prototype.hasOwnProperty.call(requestsByUser, user.uid)) {
-      requestsByUser[user.uid] = {
-        user,
+  filteredRequests.forEach((req: Request) => {
+    if (!Object.prototype.hasOwnProperty.call(requestsByUser, req.user.userId)) {
+      requestsByUser[req.user.userId] = {
+        user: req.user,
         requests: [],
       };
     }
 
     requestsByUser[req.user.userId].requests.push(req);
-  }
+  });
+
   return Object.values(requestsByUser);
 }
 
@@ -115,38 +107,28 @@ function getUpdateQuery() {
 }
 
 function DeskContainer() {
-  const [{ data: requestQuery, loading: reqloading, error: reqError }, reqRefetch] = useAxios({
-    url: apiUrl(Service.HARDWARE, "/hardware-requests"),
-    method: "GET",
-  });
+  const {
+    data: requestsData,
+    isLoading: requestsLoading,
+    refetch: requestRefetch,
+  } = useQuery(["requests"], async () => axios.get(apiUrl(Service.HARDWARE, "/hardware-requests")));
+  const [requests, setRequests] = useState<Request[]>([]);
 
-  // const requestQuery = useQuery(["deskRequests"], async () => {
-  //   const requests = await axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"));
-  //   return requests.data;
-  // });
-  const [{ data: locationQuery, loading: locationLoading, error: locationError }] = useAxios({
-    url: apiUrl(Service.HARDWARE, "/locations"),
-    method: "GET",
-  });
+  useEffect(() => {
+    if (requestsData) {
+      setRequests(requestsData.data);
+    }
+  }, [requestsData]);
 
-  // useQuery(["locations"], async () => {
-  //   const locations = await
-  //   return locations.data;
-  // });
+  const { data: locationData, isLoading: locationLoading } = useQuery(["locations"], async () =>
+    axios.get(apiUrl(Service.HARDWARE, "/locations"))
+  );
   const [workingLocation, setWorkingLocation] = useState("");
 
-  const [{ data: itemQuery, loading: itemLoading, error: itemError }] = useAxios({
-    url: apiUrl(Service.HARDWARE, "/items"),
-    method: "GET",
-    params: {
-      cacheTime: 0,
-    },
-  });
-  // const itemQuery = useQuery(["items"], () => axios.get(), {
-  //   cacheTime: 0,
-  // });
+  const { data: itemsData, isLoading: itemsLoading } = useQuery(["items"], async () =>
+    axios.get(apiUrl(Service.HARDWARE, "/items"))
+  );
 
-  const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   const [randomPhrase, setRandomPhrase] = useState<string>(
@@ -154,30 +136,15 @@ function DeskContainer() {
       funPhrases
     )} ${pickRandomElement(endings)}`
   );
-  const [returnsMode, setReturnsMode] = useState(false);
-  const { location } = useParams();
 
-  const [requests, setRequests] = useState<Request[]>([]);
-
+  const [items, setItems] = useState<Item[]>([]);
   useEffect(() => {
-    if (requestQuery) {
-      setRequests(requestQuery);
+    if (itemsData) {
+      setItems(itemsData.data);
     }
-  }, [requestQuery]);
+  }, [itemsData]);
 
-  const [items, setItems] = useState<Request[]>([]);
-
-  useEffect(() => {
-    if (itemQuery) {
-      setItems(itemQuery);
-    }
-  }, [itemQuery]);
-
-  if (reqError || locationError) {
-    return <ErrorScreen error={(reqError || locationError) as Error} />;
-  }
-
-  if (reqloading || locationLoading || itemLoading || loading) {
+  if (requestsLoading || locationLoading || itemsLoading) {
     return <LoadingScreen />;
   }
 
@@ -200,8 +167,8 @@ function DeskContainer() {
           }}
           value={workingLocation}
         >
-          {locations &&
-            locations.map((locationOption: any) => (
+          {locationData &&
+            locationData.data.map((locationOption: any) => (
               <option key={locationOption.id} value={locationOption.name}>
                 {locationOption.name}
               </option>
@@ -210,21 +177,6 @@ function DeskContainer() {
       </Container>
     );
   }
-
-  const submitted = getRequestsWithStatus(requests, [SUBMITTED], workingLocation);
-  const denied = getConsolidatedRequestsWithStatus(requests, [DENIED], workingLocation, user!);
-  const readyForPickup = getConsolidatedRequestsWithStatus(
-    requests,
-    [READY_FOR_PICKUP],
-    workingLocation,
-    user!
-  );
-  const readyForReturn = getConsolidatedRequestsWithStatus(
-    requests,
-    [FULFILLED, LOST, DAMAGED],
-    "",
-    user!
-  );
 
   return (
     <Box p="8" w="w-screen">
@@ -253,7 +205,7 @@ function DeskContainer() {
               ))}
           </Select>
         </Flex>
-        {!reqloading ? (
+        {!requestsLoading ? (
           <Flex flexDir="column">
             <Tabs variant="enclosed">
               <TabList>
@@ -267,9 +219,13 @@ function DeskContainer() {
                     <SubmittedCards
                       requests={requests.filter((request: Request) => {
                         const locationName = request.item.location.name;
-                        return locationName === workingLocation;
+                        const { status } = request;
+                        return (
+                          locationName === workingLocation &&
+                          [SUBMITTED, DENIED, READY_FOR_PICKUP].includes(status)
+                        );
                       })}
-                      refetch={reqRefetch}
+                      refetch={requestRefetch}
                     />
                   )}
                 </TabPanel>
@@ -278,9 +234,13 @@ function DeskContainer() {
                     <FulfilledCards
                       requests={requests.filter((request: Request) => {
                         const locationName = request.item.location.name;
-                        return locationName === workingLocation;
+                        const { status } = request;
+                        return (
+                          locationName === workingLocation &&
+                          [READY_FOR_PICKUP, FULFILLED].includes(status)
+                        );
                       })}
-                      refetch={reqRefetch}
+                      refetch={requestRefetch}
                     />
                   )}
                 </TabPanel>
@@ -289,8 +249,13 @@ function DeskContainer() {
                     <ReturnedCards
                       requests={requests.filter((request: Request) => {
                         const locationName = request.item.location.name;
-                        return locationName === workingLocation;
+                        const { status } = request;
+                        return (
+                          locationName === workingLocation &&
+                          [FULFILLED, RETURNED, DAMAGED_LOST].includes(status)
+                        );
                       })}
+                      refetch={requestRefetch}
                     />
                   )}
                 </TabPanel>

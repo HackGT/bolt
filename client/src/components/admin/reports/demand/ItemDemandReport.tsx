@@ -9,11 +9,10 @@ import {
   ABANDONED,
   APPROVED,
   CANCELLED,
-  DAMAGED,
+  DAMAGED_LOST,
   DENIED,
   FULFILLED,
   ItemWithStatistics,
-  LOST,
   RETURNED,
 } from "../../../../types/Hardware";
 import { ReportError } from "../ReportError";
@@ -173,7 +172,7 @@ const ItemDemandReport: React.FC = () => {
             totalFulfilled: calculatePartial(itemData, [FULFILLED, RETURNED], totalAvailable),
             totalNotFulfilled: sumQtys(itemData, [ABANDONED, CANCELLED, DENIED]),
             totalReturned: sumQtys(itemData, [RETURNED]),
-            totalLostDamaged: calculatePartial(itemData, [LOST, DAMAGED], totalAvailable),
+            totalLostDamaged: calculatePartial(itemData, [DAMAGED_LOST], totalAvailable),
           };
         });
 
