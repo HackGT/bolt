@@ -19,7 +19,14 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import useAxios from "axios-hooks";
-import { apiUrl, LoadingScreen, ErrorScreen, Service, useAuth, handleAxiosError } from "@hex-labs/core";
+import {
+  apiUrl,
+  LoadingScreen,
+  ErrorScreen,
+  Service,
+  useAuth,
+  handleAxiosError,
+} from "@hex-labs/core";
 
 interface HardwareItemProps {
   item: Item;
@@ -33,7 +40,14 @@ interface HardwareItemProps {
 function itemImage(src: string | undefined, outOfStock = false) {
   return (
     <Box boxSize="48">
-      <Image draggable={false} src={src || "http://placekitten.com/300/300"} borderRadius="6" />
+      <Image
+        draggable={false}
+        src={
+          src ||
+          "https://st2.depositphotos.com/2586633/46477/v/450/depositphotos_464771766-stock-illustration-no-photo-or-blank-image.jpg"
+        }
+        borderRadius="6"
+      />
     </Box>
   );
 }
@@ -50,8 +64,11 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
   const toast = useToast();
 
   const { user, loading } = useAuth();
-  const [{ data: requestData, loading: requestLoading, error: requestError}, requestRefetch] = useAxios(apiUrl(Service.HARDWARE, "/hardware-requests"));
-  const [{ data: itemData, loading: itemLoading, error: itemError}, itemRefetch] = useAxios(apiUrl(Service.HARDWARE, "/items"));
+  const [{ data: requestData, loading: requestLoading, error: requestError }, requestRefetch] =
+    useAxios(apiUrl(Service.HARDWARE, "/hardware-requests"));
+  const [{ data: itemData, loading: itemLoading, error: itemError }, itemRefetch] = useAxios(
+    apiUrl(Service.HARDWARE, "/items")
+  );
   if (loading) {
     return <LoadingScreen />;
   }
@@ -80,8 +97,7 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
         isClosable: true,
       });
       handleAxiosError(e);
-    }
-    finally {
+    } finally {
       requestRefetch();
       // itemRefetch();
     }
