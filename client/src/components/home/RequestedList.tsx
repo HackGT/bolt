@@ -4,8 +4,8 @@ import { MapPinIcon } from "@heroicons/react/24/solid";
 import { DeleteIcon } from "@chakra-ui/icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { apiUrl, LoadingScreen, Service } from "@hex-labs/core";
-import { useLazyQuery } from "@apollo/client";
+import useAxios from "axios-hooks";
+import { apiUrl, LoadingScreen, ErrorScreen, Service, handleAxiosError } from "@hex-labs/core";
 
 import { Request, RequestStatus } from "../../types/Request";
 import { APPROVED, DENIED, READY_FOR_PICKUP, SUBMITTED } from "../../types/Hardware";
@@ -41,7 +41,7 @@ const RequestCard = ({ r, statuses, requestDeleteMutation }: any) => {
                 aria-label="delete"
                 variant="ghost"
                 colorScheme="red"
-                onClick={() => requestDeleteMutation.mutate(r.id)}
+                onClick={() => requestDeleteMutation(r.id)}
               >
                 <DeleteIcon />
               </IconButton>
@@ -55,34 +55,35 @@ const RequestCard = ({ r, statuses, requestDeleteMutation }: any) => {
 };
 
 const RequestedList = ({ requests }: RequestedListProps) => {
-  const { data: requestData, refetch: requestRefetch } = useQuery(["requests"], () =>
-    axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"))
-  );
-  const { refetch: itemRefetch } = useQuery(["items"], () =>
-    axios.get(apiUrl(Service.HARDWARE, "/items"))
-  );
+  const [{ data: requestData, loading, error}, requestRefetch] = useAxios(apiUrl(Service.HARDWARE, "/hardware-requests"));
+  const [{ data: itemData, loading: itemLoading, error: itemError}, itemRefetch] = useAxios(apiUrl(Service.HARDWARE, "/items"));
   const [userRequests, setUserRequests] = useState(requests);
   const toast = useToast();
-  const requestDeleteMutation = useMutation(
-    (requestId: string) =>
-      axios.delete(apiUrl(Service.HARDWARE, `/hardware-requests/${requestId}`))
-    ,
-    {
-      onSuccess: () => {
-        requestRefetch();
-        itemRefetch();
-        setUserRequests(requestData!.data as Request[])
-        toast({
-          title: "Request deleted",
-          description: "Your request has been deleted!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
-      },
+  if (loading) {
+    return <LoadingScreen />;
+  }
+  if (error) {
+    return <ErrorScreen error={error} />;
+  }
+  const handleRequestDelete = async (requestId: string) => {
+    try {
+      await axios.delete(apiUrl(Service.HARDWARE, `/hardware-requests/${requestId}`));
+      toast({
+        title: "Request deleted",
+        description: "Your request has been deleted!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (e: any) {
+      handleAxiosError(e);
     }
-  );
-
+    finally {
+      requestRefetch();
+      itemRefetch();
+      setUserRequests(requestData!.data as Request[])
+    }
+  };
   const statuses = (status: RequestStatus): JSX.Element => {
     switch (status) {
       case SUBMITTED:
@@ -166,10 +167,6 @@ const RequestedList = ({ requests }: RequestedListProps) => {
       <Heading mb="4">My Requests</Heading>
       <Flex
         borderRadius="4px"
-        // borderColor="gray.200"
-        // borderStyle="solid"
-        // borderWidth="1px"
-        // boxShadow="md"
         backgroundColor="gray.200"
         w="full"
         p="4"
@@ -189,12 +186,11 @@ const RequestedList = ({ requests }: RequestedListProps) => {
               <RequestCard
                 key={r.id}
                 r={r}
-                requestDeleteMutation={requestDeleteMutation}
+                requestDeleteMutation={handleRequestDelete}
                 statuses={statuses}
               />
             ))
         ) : (
-          // .map((r: Request) => <Box>Hello</Box>)
           <Box my="auto" mx="auto" fontWeight="semibold" color="gray.600">
             Requests you make will appear here!
           </Box>
