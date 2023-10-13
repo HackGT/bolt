@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { Checkbox, DropdownProps, Grid, Header, Loader, Message } from "semantic-ui-react";
 import { useQuery } from "@tanstack/react-query";
@@ -26,7 +26,7 @@ import { REQUEST_CHANGE } from "../../../graphql/Subscriptions";
 import ReadyToPrepareList from "./fulfillment/ReadyToPrepareList";
 import { Request, RequestStatus } from "../../../types/Request";
 import {
-  APPROVED,
+  DENIED,
   DAMAGED,
   FULFILLED,
   Location,
@@ -37,6 +37,10 @@ import {
 import { pickRandomElement } from "../AdminHub";
 import SubmittedTable from "./submitted/SubmittedTable";
 import SubmittedCards from "./submitted/SubmittedCards";
+import FulfilledCards from "./fulfillment/FulfilledCards";
+import ReturnedCards from "./returns/ReturnedCards";
+import useAxios from "axios-hooks";
+import LoadingSpinner from "../../util/LoadingSpinner";
 
 function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], id: string) {
   return requests.filter((r: Request) => id === "" && statuses.some(status => r.status === status));
@@ -111,19 +115,36 @@ function getUpdateQuery() {
 }
 
 function DeskContainer() {
-  const requestQuery = useQuery(["deskRequests"], async () => {
-    const requests = await axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"));
-    return requests.data;
+  const [{ data: requestQuery, loading: reqloading, error: reqError }, reqRefetch] = useAxios({
+    url: apiUrl(Service.HARDWARE, "/hardware-requests"),
+    method: "GET",
   });
-  const locationQuery = useQuery(["locations"], async () => {
-    const locations = await axios.get(apiUrl(Service.HARDWARE, "/locations"));
-    return locations.data;
+
+  // const requestQuery = useQuery(["deskRequests"], async () => {
+  //   const requests = await axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"));
+  //   return requests.data;
+  // });
+  const [{ data: locationQuery, loading: locationLoading, error: locationError }] = useAxios({
+    url: apiUrl(Service.HARDWARE, "/locations"),
+    method: "GET",
   });
+
+  // useQuery(["locations"], async () => {
+  //   const locations = await
+  //   return locations.data;
+  // });
   const [workingLocation, setWorkingLocation] = useState("");
 
-  const itemQuery = useQuery(["items"], () => axios.get(apiUrl(Service.HARDWARE, "/items")), {
-    cacheTime: 0,
+  const [{ data: itemQuery, loading: itemLoading, error: itemError }] = useAxios({
+    url: apiUrl(Service.HARDWARE, "/items"),
+    method: "GET",
+    params: {
+      cacheTime: 0,
+    },
   });
+  // const itemQuery = useQuery(["items"], () => axios.get(), {
+  //   cacheTime: 0,
+  // });
 
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -136,17 +157,31 @@ function DeskContainer() {
   const [returnsMode, setReturnsMode] = useState(false);
   const { location } = useParams();
 
-  if (requestQuery.status === "error" || locationQuery.status === "error") {
-    return <ErrorScreen error={(requestQuery.error || locationQuery.error) as Error} />;
+  const [requests, setRequests] = useState<Request[]>([]);
+
+  useEffect(() => {
+    if (requestQuery) {
+      setRequests(requestQuery);
+    }
+  }, [requestQuery]);
+
+  const [items, setItems] = useState<Request[]>([]);
+
+  useEffect(() => {
+    if (itemQuery) {
+      setItems(itemQuery);
+    }
+  }, [itemQuery]);
+
+  if (reqError || locationError) {
+    return <ErrorScreen error={(reqError || locationError) as Error} />;
   }
 
-  if (requestQuery.isLoading || locationQuery.isLoading || itemQuery.isLoading || loading) {
+  if (reqloading || locationLoading || itemLoading || loading) {
     return <LoadingScreen />;
   }
 
-  const locations: Location[] = Array.from(
-    new Set(itemQuery.data?.data.map((item: any) => item.location))
-  );
+  const locations: Location[] = Array.from(new Set(items.map((item: any) => item.location)));
 
   if (!workingLocation) {
     return (
@@ -175,9 +210,9 @@ function DeskContainer() {
       </Container>
     );
   }
-  const requests = requestQuery.data;
+
   const submitted = getRequestsWithStatus(requests, [SUBMITTED], workingLocation);
-  const approved = getConsolidatedRequestsWithStatus(requests, [APPROVED], workingLocation, user!);
+  const denied = getConsolidatedRequestsWithStatus(requests, [DENIED], workingLocation, user!);
   const readyForPickup = getConsolidatedRequestsWithStatus(
     requests,
     [READY_FOR_PICKUP],
@@ -199,12 +234,6 @@ function DeskContainer() {
       </Heading>
 
       <Flex flexDir="column">
-        {/* <Flex w="full">
-          <FormLabel htmlFor="returnMode" mb="0">
-            Return mode
-          </FormLabel>
-          <Switch id="returnMode" onChange={event => setReturnsMode(event.target.checked)} />
-        </Flex> */}
         <Flex w="50%" gap="4" alignItems="center" mb="4">
           <Heading size="md" mb={2}>
             Select a location to continue
@@ -224,44 +253,53 @@ function DeskContainer() {
               ))}
           </Select>
         </Flex>
-        <Flex flexDir="column">
-          <Tabs variant="enclosed">
-            <TabList>
-              <Tab>Overview</Tab>
-              {/* <Tab>Detailed View</Tab>
-              <Tab>Returns Mode</Tab> */}
-            </TabList>
-            <TabPanels>
-              <TabPanel>
-                {requests &&
-                <SubmittedCards
-                  requests={requests.filter((request: Request) => {
-                    const locationName = request.item.location.name;
-                    return locationName === workingLocation;
-                })}
-                />
-                }
-                {/* <SubmittedList
-                  hidden={returnsMode}
-                  loading={requestQuery.isLoading}
-                  requests={submitted}
-                  subscribeToUpdatedRequests={() => {
-                    // subscribeToMore({
-                    //   document: REQUEST_CHANGE,
-                    //   updateQuery: getUpdateQuery(),
-                    // });
-                  }}
-                /> */}
-                {/* {!returnsMode && <ReadyToPrepareList cards={approved} />}
-                {!returnsMode && <ReadyForPickupList cards={readyForPickup} />}
-                {returnsMode && <ReadyForReturnList cards={readyForReturn} />} */}
-              </TabPanel>
-              {/* <TabPanel>
-                <SubmittedTable />
-              </TabPanel> */}
-            </TabPanels>
-          </Tabs>
-        </Flex>
+        {!reqloading ? (
+          <Flex flexDir="column">
+            <Tabs variant="enclosed">
+              <TabList>
+                <Tab>Submissions</Tab>
+                <Tab>Checkout</Tab>
+                <Tab>Returns</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  {requests && (
+                    <SubmittedCards
+                      requests={requests.filter((request: Request) => {
+                        const locationName = request.item.location.name;
+                        return locationName === workingLocation;
+                      })}
+                      refetch={reqRefetch}
+                    />
+                  )}
+                </TabPanel>
+                <TabPanel>
+                  {requests && (
+                    <FulfilledCards
+                      requests={requests.filter((request: Request) => {
+                        const locationName = request.item.location.name;
+                        return locationName === workingLocation;
+                      })}
+                      refetch={reqRefetch}
+                    />
+                  )}
+                </TabPanel>
+                <TabPanel>
+                  {requests && (
+                    <ReturnedCards
+                      requests={requests.filter((request: Request) => {
+                        const locationName = request.item.location.name;
+                        return locationName === workingLocation;
+                      })}
+                    />
+                  )}
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </Flex>
+        ) : (
+          <LoadingSpinner />
+        )}
       </Flex>
     </Box>
   );

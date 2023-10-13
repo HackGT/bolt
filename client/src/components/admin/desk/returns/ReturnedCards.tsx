@@ -7,24 +7,25 @@ import {
   Droppable,
   DropResult,
 } from "react-beautiful-dnd";
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import ReactTimeago from "react-timeago";
+import { CheckIcon, CloseIcon, DeleteIcon } from "@chakra-ui/icons";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { apiUrl, Service } from "@hex-labs/core";
 
 import { Request, RequestStatus } from "../../../../types/Request";
-import SubmittedCard from "./SubmittedCard";
+import SubmittedCard from "../submitted/SubmittedCard";
 import {
   APPROVED,
-  AxiosRefetch,
-  DENIED,
+  FULFILLED,
   READY_FOR_PICKUP,
+  RETURNED,
   SUBMITTED,
 } from "../../../../types/Hardware";
+import { generateBadge } from "../submitted/SubmittedTable";
 
-interface SubmittedCardsProps {
+interface ReturnedCardsProps {
   requests: Request[];
-  refetch: AxiosRefetch;
 }
 
 const reorder = (list: Request[], startIndex: number, endIndex: number) => {
@@ -35,11 +36,10 @@ const reorder = (list: Request[], startIndex: number, endIndex: number) => {
   return result;
 };
 
-const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
+const ReturnedCards = ({ requests }: ReturnedCardsProps) => {
   const [items, setItems] = useState<Record<string, Request[]>>({
-    SUBMITTED: [...requests.filter(request => request.status === "SUBMITTED")],
-    DENIED: [...requests.filter(request => request.status === "DENIED")],
-    READY_FOR_PICKUP: [...requests.filter(request => request.status === "READY_FOR_PICKUP")],
+    FULFILLED: [...requests.filter(request => request.status === "FULFILLED")],
+    RETURNED: [...requests.filter(request => request.status === "RETURNED")],
   });
 
   const updateStatus = useMutation((newRequest: any) =>
@@ -100,53 +100,20 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
         <Box w="full" bgColor="gray.100" p={4} rounded={8} h="fit-content">
           <Flex gap={2} alignContent="center">
             <Heading mb={2} size="md">
-              Submitted
+              Fulfilled
             </Heading>
             <Box rounded="5px" bg="gray.300" py="1px" h="fit-content" px="5px">
-              <Text fontWeight={700}>{items.SUBMITTED.length}</Text>
+              <Text fontWeight={700}>{items.FULFILLED.length}</Text>
             </Box>
           </Flex>
-          <Droppable droppableId={SUBMITTED}>
+          <Droppable droppableId={FULFILLED}>
             {(provided, snapshot) => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
                 style={{ flexDirection: "column", width: "100%", minHeight: "256px" }}
               >
-                {items.SUBMITTED.map((request, index) => (
-                  <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
-                    {(provided, snapshot) => (
-                      <SubmittedCard provided={provided} request={request} />
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </Box>
-        <Box w="full" bg="gray.100" p={4} rounded={8} h="fit-content">
-          <Flex gap={2} alignContent="center">
-            <Heading mb={2} size="md">
-              Denied
-            </Heading>
-            <Box rounded="5px" bg="gray.300" py="1px" h="fit-content" px="5px">
-              <Text fontWeight={700}>{items.DENIED.length}</Text>
-            </Box>
-          </Flex>
-          <Droppable droppableId={DENIED}>
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                style={{
-                  flexDirection: "column",
-                  width: "100%",
-                  minHeight: "256px",
-                  borderRadius: "4px",
-                }}
-              >
-                {items.DENIED.map((request, index) => (
+                {items.FULFILLED.map((request, index) => (
                   <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
                     {(provided, snapshot) => (
                       <SubmittedCard provided={provided} request={request} />
@@ -161,20 +128,20 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
         <Box w="full" p={4} rounded={8} bgColor="gray.100" h="fit-content">
           <Flex gap={2} alignContent="center">
             <Heading mb={2} size="md">
-              Ready for Pickup
+              Returned
             </Heading>
             <Box rounded="5px" bg="gray.300" py="1px" h="fit-content" px="5px">
-              <Text fontWeight={700}>{items.READY_FOR_PICKUP.length}</Text>
+              <Text fontWeight={700}>{items.RETURNED.length}</Text>
             </Box>
           </Flex>
-          <Droppable droppableId={READY_FOR_PICKUP}>
+          <Droppable droppableId={RETURNED}>
             {(provided, snapshot) => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
                 style={{ flexDirection: "column", width: "100%", minHeight: "256px" }}
               >
-                {items.READY_FOR_PICKUP.map((request, index) => (
+                {items.RETURNED.map((request, index) => (
                   <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
                     {(provided, snapshot) => (
                       <SubmittedCard provided={provided} request={request} />
@@ -191,4 +158,4 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
   );
 };
 
-export default SubmittedCards;
+export default ReturnedCards;

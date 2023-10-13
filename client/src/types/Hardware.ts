@@ -1,3 +1,6 @@
+import { AxiosPromise, AxiosRequestConfig } from "axios";
+import { RefetchOptions } from "axios-hooks";
+
 export type Item = {
   id: string;
   name: string;
@@ -69,3 +72,8 @@ export type ItemWithStatistics = {
   item: Item;
   detailedQuantities: DetailedItemQuantities;
 };
+
+export type AxiosRefetch = (
+  config?: AxiosRequestConfig<any> | undefined,
+  options?: RefetchOptions | undefined
+) => AxiosPromise<any>;

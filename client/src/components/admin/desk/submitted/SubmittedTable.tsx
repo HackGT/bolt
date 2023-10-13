@@ -30,7 +30,14 @@ import {
 import axios from "axios";
 import React, { useMemo } from "react";
 
-import { APPROVED, READY_FOR_PICKUP, SUBMITTED } from "../../../../types/Hardware";
+import {
+  APPROVED,
+  DENIED,
+  FULFILLED,
+  READY_FOR_PICKUP,
+  RETURNED,
+  SUBMITTED,
+} from "../../../../types/Hardware";
 import { Request, RequestStatus } from "../../../../types/Request";
 
 const columnHelper = createColumnHelper<Request>();
@@ -39,14 +46,18 @@ export const generateBadge = (status: RequestStatus) => {
   switch (status) {
     case SUBMITTED:
       return <Badge colorScheme="purple">Submitted</Badge>;
-    case APPROVED:
-      return <Badge colorScheme="green">Approved</Badge>;
+    case DENIED:
+      return <Badge colorScheme="red">Denied</Badge>;
     case READY_FOR_PICKUP:
       return (
         <Badge bgGradient="linear(to-r, cyan.400, purple.500)" color="white">
           Ready For Pickup
         </Badge>
       );
+    case FULFILLED:
+      return <Badge colorScheme="blue">Fulfilled</Badge>;
+    case RETURNED:
+      return <Badge colorScheme="gray">Returned</Badge>;
     default:
       return <Badge colorScheme="gray">{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
   }

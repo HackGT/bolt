@@ -49,7 +49,7 @@ const SubmittedCard = ({ provided, request }: SubmittedCardProps) => {
     }
   );
 
-  console.log(request.user)
+  // console.log(request.user)
 
   return (
     <Flex
