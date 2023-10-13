@@ -86,10 +86,12 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
           isClosable: true,
         });
       },
-      onError: () => {
+      onError: (error: any) => {
+        const description =
+          error.response?.data?.message || "There was an error submitting your request.";
         toast({
           title: "Error",
-          description: "There was an error submitting your request.",
+          description,
           status: "error",
           duration: 5000,
           isClosable: true,
