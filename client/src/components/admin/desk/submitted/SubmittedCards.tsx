@@ -45,9 +45,16 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
     RETURNED: [...requests.filter(request => request.status === "RETURNED")],
   });
 
+  const [removedItem, setRemovedItem] = useState<Request>();
+
   const updateStatus = useMutation(
     async (newRequest: any) =>
       await axios.put(apiUrl(Service.HARDWARE, `/hardware-requests/${newRequest.id}`), newRequest)
+  );
+
+  const updateQuantity = useMutation(
+    async (updatedItem: any) =>
+      await axios.put(apiUrl(Service.HARDWARE, `/items/${updatedItem.id}`), updatedItem)
   );
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -62,6 +69,8 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
     const destClone = Array.from(destination);
     const [removed] = sourceClone.splice(droppableSource.index, 1);
     removed.status = droppableDestination.droppableId as RequestStatus;
+    setRemovedItem(removed);
+    console.log(removed);
     updateStatus.mutate({
       id: removed.id,
       status: droppableDestination.droppableId as RequestStatus,
@@ -76,7 +85,7 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
     return result;
   };
 
-  const onDragEnd = (result: DropResult) => {
+  const onDragEnd = async (result: DropResult) => {
     const { source, destination } = result;
     if (!destination) {
       return;
@@ -100,6 +109,37 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
 
       if (dInd === "FULFILLED" || dInd === "RETURNED") {
         onOpen();
+      }
+
+      if (dInd === "READY_FOR_PICKUP" && removedItem !== undefined) {
+        // updateQuantity.mutate({
+        //   id: removedItem.item.id,
+        //   name: removedItem.item.name,
+        //   category: removedItem.item.category.name,
+        //   location: removedItem.item.location.name,
+        //   totalAvailable: removedItem.item.totalAvailable - removedItem.quantity,
+        //   maxRequestQty: removedItem.item.maxRequestQty,
+        // });
+        await axios.put(apiUrl(Service.HARDWARE, `/items/${removedItem.id}`), {
+          id: removedItem.item.id,
+          name: removedItem.item.name,
+          category: removedItem.item.category.name,
+          location: removedItem.item.location.name,
+          totalAvailable: removedItem.item.totalAvailable + removedItem.quantity,
+          maxRequestQty: removedItem.item.maxRequestQty,
+        });
+        setRemovedItem(undefined);
+      } else if (dInd === "RETURNED" && removedItem !== undefined) {
+        await axios.put(apiUrl(Service.HARDWARE, `/items/${removedItem.id}`), {
+          id: removedItem.item.id,
+          name: removedItem.item.name,
+          category: removedItem.item.category.name,
+          location: removedItem.item.location.name,
+          totalAvailable: removedItem.item.totalAvailable + removedItem.quantity,
+          maxRequestQty: removedItem.item.maxRequestQty,
+        });
+        // updateQuantity.mutate();
+        setRemovedItem(undefined);
       }
       refetch();
     }

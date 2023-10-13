@@ -218,7 +218,9 @@ function DeskContainer() {
                         const { status } = request;
                         return (
                           locationName === workingLocation &&
-                          [SUBMITTED, DENIED, READY_FOR_PICKUP].includes(status)
+                          [SUBMITTED, DENIED, READY_FOR_PICKUP, FULFILLED, RETURNED].includes(
+                            status
+                          )
                         );
                       })}
                       refetch={requestRefetch}
