@@ -2,6 +2,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { withToastManager } from "react-toast-notifications";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
+import { Item, RequestedItem, SUBMITTED } from "../../types/Hardware";
 import {
   Box,
   Button,
@@ -16,14 +17,9 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { apiUrl, LoadingScreen, Service, useAuth } from "@hex-labs/core";
-import { User } from "firebase/auth";
-
-import { Item, RequestedItem, SUBMITTED } from "../../types/Hardware";
-import { AppState } from "../../state/Store";
-import { Request } from "../../types/Request";
+import useAxios from "axios-hooks";
+import { apiUrl, LoadingScreen, ErrorScreen, Service, useAuth, handleAxiosError } from "@hex-labs/core";
 
 interface HardwareItemProps {
   item: Item;
@@ -37,14 +33,7 @@ interface HardwareItemProps {
 function itemImage(src: string | undefined, outOfStock = false) {
   return (
     <Box boxSize="48">
-      <Image
-        draggable={false}
-        src={
-          src ||
-          "https://st2.depositphotos.com/2586633/46477/v/450/depositphotos_464771766-stock-illustration-no-photo-or-blank-image.jpg"
-        }
-        borderRadius="6"
-      />
+      <Image draggable={false} src={src || "http://placekitten.com/300/300"} borderRadius="6" />
     </Box>
   );
 }
@@ -61,48 +50,42 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
   const toast = useToast();
 
   const { user, loading } = useAuth();
-
-  const { refetch: requestRefetch } = useQuery(["requests"], () =>
-    axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"))
-  );
-  const { refetch: itemRefetch } = useQuery(["items"], () =>
-    axios.get(apiUrl(Service.HARDWARE, "/items"))
-  );
-
-  const mutation = useMutation(
-    async (newRequest: IRequestMutation): Promise<any> => {
-      await axios.post(apiUrl(Service.HARDWARE, "/hardware-requests"), newRequest);
-    },
-    {
-      onSuccess: () => {
-        requestRefetch();
-        itemRefetch();
-
-        toast({
-          title: "Request submitted",
-          description: "Your request has been submitted.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
-      },
-      onError: (error: any) => {
-        const description =
-          error.response?.data?.message || "There was an error submitting your request.";
-        toast({
-          title: "Error",
-          description,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      },
-    }
-  );
-
+  const [{ data: requestData, loading: requestLoading, error: requestError}, requestRefetch] = useAxios(apiUrl(Service.HARDWARE, "/hardware-requests"));
+  const [{ data: itemData, loading: itemLoading, error: itemError}, itemRefetch] = useAxios(apiUrl(Service.HARDWARE, "/items"));
   if (loading) {
     return <LoadingScreen />;
   }
+  if (requestError) {
+    return <ErrorScreen error={requestError} />;
+  }
+  if (itemError) {
+    return <ErrorScreen error={itemError} />;
+  }
+  const handleRequestAdd = async (newRequest: IRequestMutation) => {
+    try {
+      await axios.post(apiUrl(Service.HARDWARE, "/hardware-requests"), newRequest);
+      toast({
+        title: "Request submitted",
+        description: "Your request has been submitted.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (e: any) {
+      toast({
+        title: "Error",
+        description: "There was an error submitting your request.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      handleAxiosError(e);
+    }
+    finally {
+      requestRefetch();
+      // itemRefetch();
+    }
+  };
 
   return (
     <Flex flexDir="row">
@@ -143,7 +126,7 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
                 user: user?.uid as string,
                 name: user?.displayName as string,
               };
-              mutation.mutate(newRequest);
+              handleRequestAdd(newRequest);
             }}
           >
             {outOfStock ? "Out of stock" : `Request ${requestedNum} items`}
