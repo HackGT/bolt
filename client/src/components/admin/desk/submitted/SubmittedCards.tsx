@@ -70,7 +70,6 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
     const [removed] = sourceClone.splice(droppableSource.index, 1);
     removed.status = droppableDestination.droppableId as RequestStatus;
     setRemovedItem(removed);
-    console.log(removed);
     updateStatus.mutate({
       id: removed.id,
       status: droppableDestination.droppableId as RequestStatus,
@@ -109,36 +108,28 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
 
       if (dInd === "FULFILLED" || dInd === "RETURNED") {
         onOpen();
+        if (dInd === "RETURNED" && removedItem !== undefined && isOpen) {
+          await axios.put(apiUrl(Service.HARDWARE, `/items/${removedItem.item.id}`), {
+            name: removedItem.item.name,
+            category: removedItem.item.category,
+            location: removedItem.item.location,
+            totalAvailable: removedItem.item.totalAvailable + removedItem.quantity,
+            maxRequestQty: removedItem.item.maxRequestQty,
+          });
+          console.log(removedItem);
+          setRemovedItem(undefined);
+        }
       }
 
       if (dInd === "READY_FOR_PICKUP" && removedItem !== undefined) {
-        // updateQuantity.mutate({
-        //   id: removedItem.item.id,
-        //   name: removedItem.item.name,
-        //   category: removedItem.item.category.name,
-        //   location: removedItem.item.location.name,
-        //   totalAvailable: removedItem.item.totalAvailable - removedItem.quantity,
-        //   maxRequestQty: removedItem.item.maxRequestQty,
-        // });
-        await axios.put(apiUrl(Service.HARDWARE, `/items/${removedItem.id}`), {
-          id: removedItem.item.id,
+        await axios.put(apiUrl(Service.HARDWARE, `/items/${removedItem.item.id}`), {
           name: removedItem.item.name,
-          category: removedItem.item.category.name,
-          location: removedItem.item.location.name,
-          totalAvailable: removedItem.item.totalAvailable + removedItem.quantity,
+          category: removedItem.item.category,
+          location: removedItem.item.location,
+          totalAvailable: removedItem.item.totalAvailable - removedItem.quantity,
           maxRequestQty: removedItem.item.maxRequestQty,
         });
-        setRemovedItem(undefined);
-      } else if (dInd === "RETURNED" && removedItem !== undefined) {
-        await axios.put(apiUrl(Service.HARDWARE, `/items/${removedItem.id}`), {
-          id: removedItem.item.id,
-          name: removedItem.item.name,
-          category: removedItem.item.category.name,
-          location: removedItem.item.location.name,
-          totalAvailable: removedItem.item.totalAvailable + removedItem.quantity,
-          maxRequestQty: removedItem.item.maxRequestQty,
-        });
-        // updateQuantity.mutate();
+        console.log(removedItem);
         setRemovedItem(undefined);
       }
       refetch();
