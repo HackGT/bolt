@@ -81,7 +81,7 @@
     "@types/firebase": "^3.2.1",
     "@types/jest": "26.0.22",
     "@types/lodash": "^4.14.168",
-    "@types/react": "18",
+    "@types/react": "*",
     "@types/react-beautiful-dnd": "^13.1.2",
     "@types/react-dom": "18",
     "@types/react-redux": "^7.1.16",

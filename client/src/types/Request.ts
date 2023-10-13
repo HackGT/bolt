@@ -12,8 +12,7 @@ export type RequestStatus =
   | "READY_FOR_PICKUP"
   | "FULFILLED"
   | "RETURNED"
-  | "LOST"
-  | "DAMAGED";
+  | "DAMAGED/LOST"
 
 export interface Request {
   id: string;

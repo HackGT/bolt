@@ -1,3 +1,6 @@
+import { AxiosPromise, AxiosRequestConfig } from "axios";
+import { RefetchOptions } from "axios-hooks";
+
 export type Item = {
   id: string;
   name: string;
@@ -56,8 +59,7 @@ export const CANCELLED = "CANCELLED";
 export const READY_FOR_PICKUP = "READY_FOR_PICKUP";
 export const FULFILLED = "FULFILLED";
 export const RETURNED = "RETURNED";
-export const LOST = "LOST";
-export const DAMAGED = "DAMAGED";
+export const DAMAGED_LOST = "DAMAGED/LOST";
 
 export type DetailedItemQuantities = {
   [key: string]: number;
@@ -69,3 +71,8 @@ export type ItemWithStatistics = {
   item: Item;
   detailedQuantities: DetailedItemQuantities;
 };
+
+export type AxiosRefetch = (
+  config?: AxiosRequestConfig<any> | undefined,
+  options?: RefetchOptions | undefined
+) => AxiosPromise<any>;

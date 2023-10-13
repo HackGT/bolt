@@ -1,9 +1,6 @@
-import React, { useState } from "react";
-import { connect } from "react-redux";
-import { Checkbox, DropdownProps, Grid, Header, Loader, Message } from "semantic-ui-react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useEffect, useState } from "react";
+import { apiUrl, LoadingScreen, Service } from "@hex-labs/core";
 import axios from "axios";
-import { apiUrl, ErrorScreen, LoadingScreen, Service, useAuth } from "@hex-labs/core";
 import {
   Box,
   Container,
@@ -18,25 +15,23 @@ import {
   TabPanels,
   Tabs,
 } from "@chakra-ui/react";
-import { User } from "firebase/auth";
-import { useNavigate, useParams } from "react-router-dom";
-
-import SubmittedList from "./submitted/SubmittedList";
-import { REQUEST_CHANGE } from "../../../graphql/Subscriptions";
-import ReadyToPrepareList from "./fulfillment/ReadyToPrepareList";
+import { useNavigate } from "react-router-dom";
 import { Request, RequestStatus } from "../../../types/Request";
 import {
-  APPROVED,
-  DAMAGED,
+  DENIED,
   FULFILLED,
   Location,
-  LOST,
+  DAMAGED_LOST,
   READY_FOR_PICKUP,
   SUBMITTED,
+  Item,
+  RETURNED,
 } from "../../../types/Hardware";
 import { pickRandomElement } from "../AdminHub";
-import SubmittedTable from "./submitted/SubmittedTable";
 import SubmittedCards from "./submitted/SubmittedCards";
+import LoadingSpinner from "../../util/LoadingSpinner";
+import { useQuery } from "@tanstack/react-query";
+import { BaseUserWithID } from "../../../types/User";
 
 function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], id: string) {
   return requests.filter((r: Request) => id === "" && statuses.some(status => r.status === status));
@@ -45,23 +40,22 @@ function getRequestsWithStatus(requests: Request[], statuses: RequestStatus[], i
 function getConsolidatedRequestsWithStatus(
   requests: Request[],
   statuses: RequestStatus[],
-  id: string,
-  user: User
-): { user: User; requests: Request[] }[] {
+  id: string
+): { user: BaseUserWithID; requests: Request[] }[] {
   const filteredRequests = getRequestsWithStatus(requests, statuses, id);
-  const requestsByUser: Record<string, { user: User; requests: Request[] }> = {};
+  const requestsByUser: Record<string, { user: BaseUserWithID; requests: Request[] }> = {};
 
-  for (let i = 0; i < filteredRequests.length; i++) {
-    const req = filteredRequests[i];
-    if (!Object.prototype.hasOwnProperty.call(requestsByUser, user.uid)) {
-      requestsByUser[user.uid] = {
-        user,
+  filteredRequests.forEach((req: Request) => {
+    if (!Object.prototype.hasOwnProperty.call(requestsByUser, req.user.userId)) {
+      requestsByUser[req.user.userId] = {
+        user: req.user,
         requests: [],
       };
     }
 
     requestsByUser[req.user.userId].requests.push(req);
-  }
+  });
+
   return Object.values(requestsByUser);
 }
 
@@ -111,21 +105,28 @@ function getUpdateQuery() {
 }
 
 function DeskContainer() {
-  const requestQuery = useQuery(["deskRequests"], async () => {
-    const requests = await axios.get(apiUrl(Service.HARDWARE, "/hardware-requests"));
-    return requests.data;
-  });
-  const locationQuery = useQuery(["locations"], async () => {
-    const locations = await axios.get(apiUrl(Service.HARDWARE, "/locations"));
-    return locations.data;
-  });
+  const {
+    data: requestsData,
+    isLoading: requestsLoading,
+    refetch: requestRefetch,
+  } = useQuery(["requests"], async () => axios.get(apiUrl(Service.HARDWARE, "/hardware-requests")));
+  const [requests, setRequests] = useState<Request[]>([]);
+
+  useEffect(() => {
+    if (requestsData) {
+      setRequests(requestsData.data);
+    }
+  }, [requestsData]);
+
+  const { data: locationData, isLoading: locationLoading } = useQuery(["locations"], async () =>
+    axios.get(apiUrl(Service.HARDWARE, "/locations"))
+  );
   const [workingLocation, setWorkingLocation] = useState("");
 
-  const itemQuery = useQuery(["items"], () => axios.get(apiUrl(Service.HARDWARE, "/items")), {
-    cacheTime: 0,
-  });
+  const { data: itemsData, isLoading: itemsLoading } = useQuery(["items"], async () =>
+    axios.get(apiUrl(Service.HARDWARE, "/items"))
+  );
 
-  const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   const [randomPhrase, setRandomPhrase] = useState<string>(
@@ -133,20 +134,19 @@ function DeskContainer() {
       funPhrases
     )} ${pickRandomElement(endings)}`
   );
-  const [returnsMode, setReturnsMode] = useState(false);
-  const { location } = useParams();
 
-  if (requestQuery.status === "error" || locationQuery.status === "error") {
-    return <ErrorScreen error={(requestQuery.error || locationQuery.error) as Error} />;
-  }
+  const [items, setItems] = useState<Item[]>([]);
+  useEffect(() => {
+    if (itemsData) {
+      setItems(itemsData.data);
+    }
+  }, [itemsData]);
 
-  if (requestQuery.isLoading || locationQuery.isLoading || itemQuery.isLoading || loading) {
+  if (requestsLoading || locationLoading || itemsLoading) {
     return <LoadingScreen />;
   }
 
-  const locations: Location[] = Array.from(
-    new Set(itemQuery.data?.data.map((item: any) => item.location))
-  );
+  const locations: Location[] = Array.from(new Set(items.map((item: any) => item.location)));
 
   if (!workingLocation) {
     return (
@@ -165,8 +165,8 @@ function DeskContainer() {
           }}
           value={workingLocation}
         >
-          {locations &&
-            locations.map((locationOption: any) => (
+          {locationData &&
+            locationData.data.map((locationOption: any) => (
               <option key={locationOption.id} value={locationOption.name}>
                 {locationOption.name}
               </option>
@@ -175,21 +175,6 @@ function DeskContainer() {
       </Container>
     );
   }
-  const requests = requestQuery.data;
-  const submitted = getRequestsWithStatus(requests, [SUBMITTED], workingLocation);
-  const approved = getConsolidatedRequestsWithStatus(requests, [APPROVED], workingLocation, user!);
-  const readyForPickup = getConsolidatedRequestsWithStatus(
-    requests,
-    [READY_FOR_PICKUP],
-    workingLocation,
-    user!
-  );
-  const readyForReturn = getConsolidatedRequestsWithStatus(
-    requests,
-    [FULFILLED, LOST, DAMAGED],
-    "",
-    user!
-  );
 
   return (
     <Box p="8" w="w-screen">
@@ -199,12 +184,6 @@ function DeskContainer() {
       </Heading>
 
       <Flex flexDir="column">
-        {/* <Flex w="full">
-          <FormLabel htmlFor="returnMode" mb="0">
-            Return mode
-          </FormLabel>
-          <Switch id="returnMode" onChange={event => setReturnsMode(event.target.checked)} />
-        </Flex> */}
         <Flex w="50%" gap="4" alignItems="center" mb="4">
           <Heading size="md" mb={2}>
             Select a location to continue
@@ -224,44 +203,34 @@ function DeskContainer() {
               ))}
           </Select>
         </Flex>
-        <Flex flexDir="column">
-          <Tabs variant="enclosed">
-            <TabList>
-              <Tab>Overview</Tab>
-              {/* <Tab>Detailed View</Tab>
-              <Tab>Returns Mode</Tab> */}
-            </TabList>
-            <TabPanels>
-              <TabPanel>
-                {requests &&
-                <SubmittedCards
-                  requests={requests.filter((request: Request) => {
-                    const locationName = request.item.location.name;
-                    return locationName === workingLocation;
-                })}
-                />
-                }
-                {/* <SubmittedList
-                  hidden={returnsMode}
-                  loading={requestQuery.isLoading}
-                  requests={submitted}
-                  subscribeToUpdatedRequests={() => {
-                    // subscribeToMore({
-                    //   document: REQUEST_CHANGE,
-                    //   updateQuery: getUpdateQuery(),
-                    // });
-                  }}
-                /> */}
-                {/* {!returnsMode && <ReadyToPrepareList cards={approved} />}
-                {!returnsMode && <ReadyForPickupList cards={readyForPickup} />}
-                {returnsMode && <ReadyForReturnList cards={readyForReturn} />} */}
-              </TabPanel>
-              {/* <TabPanel>
-                <SubmittedTable />
-              </TabPanel> */}
-            </TabPanels>
-          </Tabs>
-        </Flex>
+        {!requestsLoading ? (
+          <Flex flexDir="column">
+            <Tabs variant="enclosed">
+              <TabList>
+                <Tab>Submissions</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  {requests && (
+                    <SubmittedCards
+                      requests={requests.filter((request: Request) => {
+                        const locationName = request.item.location.name;
+                        const { status } = request;
+                        return (
+                          locationName === workingLocation &&
+                          [SUBMITTED, DENIED, READY_FOR_PICKUP].includes(status)
+                        );
+                      })}
+                      refetch={requestRefetch}
+                    />
+                  )}
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </Flex>
+        ) : (
+          <LoadingSpinner />
+        )}
       </Flex>
     </Box>
   );

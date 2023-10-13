@@ -5,7 +5,7 @@ import { useMutation } from "@apollo/client";
 
 import { Request, UserAndRequests } from "../../../../types/Request";
 import ItemAndQuantity from "../ItemAndQuantity";
-import { DAMAGED, FULFILLED, LOST, READY_FOR_PICKUP } from "../../../../types/Hardware";
+import { DAMAGED_LOST, FULFILLED, READY_FOR_PICKUP } from "../../../../types/Hardware";
 import { UPDATE_REQUEST } from "../../../../graphql/Mutations";
 import { updateRequestStatus } from "../DeskUtil";
 import PhotoIdReturn from "./PhotoIdReturn";
@@ -83,8 +83,7 @@ function ReadyForReturnCard({ card }: ReadyForReturnCardProps) {
           &nbsp;
           <span style={{ color: "gray" }}>#{request.id}</span>
           <div style={{ display: "inline", float: "right" }}>
-            {request.status === LOST && <WarningLabel text="LOST" />}
-            {request.status === DAMAGED && <WarningLabel text="DAMAGED" />}
+            {request.status === DAMAGED_LOST && <WarningLabel text="DAMAGED/LOST" />}
             {request.status === FULFILLED && !request.item.returnRequired && (
               <Popup
                 inverted

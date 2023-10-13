@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Badge, Box, Flex, Heading, Icon, IconButton, Text } from "@chakra-ui/react";
+import { Badge, Box, Flex, Heading, Icon, IconButton, Text, useDisclosure } from "@chakra-ui/react";
 import {
   DragDropContext,
   Draggable,
@@ -7,19 +7,25 @@ import {
   Droppable,
   DropResult,
 } from "react-beautiful-dnd";
-import ReactTimeago from "react-timeago";
-import { CheckIcon, CloseIcon, DeleteIcon } from "@chakra-ui/icons";
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { apiUrl, Service } from "@hex-labs/core";
 
 import { Request, RequestStatus } from "../../../../types/Request";
 import SubmittedCard from "./SubmittedCard";
-import { APPROVED, READY_FOR_PICKUP, SUBMITTED } from "../../../../types/Hardware";
-import { generateBadge } from "./SubmittedTable";
+import {
+  APPROVED,
+  DENIED,
+  FULFILLED,
+  READY_FOR_PICKUP,
+  RETURNED,
+  SUBMITTED,
+} from "../../../../types/Hardware";
 
 interface SubmittedCardsProps {
   requests: Request[];
+  refetch: any;
 }
 
 const reorder = (list: Request[], startIndex: number, endIndex: number) => {
@@ -30,16 +36,21 @@ const reorder = (list: Request[], startIndex: number, endIndex: number) => {
   return result;
 };
 
-const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
+const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
   const [items, setItems] = useState<Record<string, Request[]>>({
     SUBMITTED: [...requests.filter(request => request.status === "SUBMITTED")],
-    APPROVED: [...requests.filter(request => request.status === "APPROVED")],
+    DENIED: [...requests.filter(request => request.status === "DENIED")],
     READY_FOR_PICKUP: [...requests.filter(request => request.status === "READY_FOR_PICKUP")],
+    FULFILLED: [...requests.filter(request => request.status === "FULFILLED")],
+    RETURNED: [...requests.filter(request => request.status === "RETURNED")],
   });
 
-  const updateStatus = useMutation((newRequest: any) =>
-    axios.put(apiUrl(Service.HARDWARE, `/hardware-requests/${newRequest.id}`), newRequest)
+  const updateStatus = useMutation(
+    async (newRequest: any) =>
+      await axios.put(apiUrl(Service.HARDWARE, `/hardware-requests/${newRequest.id}`), newRequest)
   );
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const move = (
     source: Request[],
@@ -86,23 +97,13 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
       newItems[dInd] = result[dInd];
 
       setItems(newItems);
+
+      if (dInd === "FULFILLED" || dInd === "RETURNED") {
+        onOpen();
+      }
+      refetch();
     }
   };
-
-  const noIssues = (
-    <Flex align="center" gap={2}>
-      <CheckIcon color="green" /> <Text color="green">No issues found</Text>
-    </Flex>
-  );
-
-  function noStockWarning(remaining: number) {
-    return (
-      <Flex align="center" gap={2}>
-        <CloseIcon color="red" />
-        <Text color="red">{`Insufficient stock (${remaining} available for approval)`}</Text>
-      </Flex>
-    );
-  }
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -126,40 +127,13 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
                 {items.SUBMITTED.map((request, index) => (
                   <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
                     {(provided, snapshot) => (
-                      <SubmittedCard provided={provided} request={request} />
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </Box>
-        <Box w="full" bg="gray.100" p={4} rounded={8} h="fit-content">
-          <Flex gap={2} alignContent="center">
-            <Heading mb={2} size="md">
-              Approved
-            </Heading>
-            <Box rounded="5px" bg="gray.300" py="1px" h="fit-content" px="5px">
-              <Text fontWeight={700}>{items.APPROVED.length}</Text>
-            </Box>
-          </Flex>
-          <Droppable droppableId={APPROVED}>
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                style={{
-                  flexDirection: "column",
-                  width: "100%",
-                  minHeight: "256px",
-                  borderRadius: "4px",
-                }}
-              >
-                {items.APPROVED.map((request, index) => (
-                  <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
-                    {(provided, snapshot) => (
-                      <SubmittedCard provided={provided} request={request} />
+                      <SubmittedCard
+                        provided={provided}
+                        request={request}
+                        isOpen={isOpen}
+                        onOpen={onOpen}
+                        onClose={onClose}
+                      />
                     )}
                   </Draggable>
                 ))}
@@ -187,7 +161,120 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
                 {items.READY_FOR_PICKUP.map((request, index) => (
                   <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
                     {(provided, snapshot) => (
-                      <SubmittedCard provided={provided} request={request} />
+                      <SubmittedCard
+                        provided={provided}
+                        request={request}
+                        isOpen={isOpen}
+                        onOpen={onOpen}
+                        onClose={onClose}
+                      />
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </Box>
+        <Box w="full" bg="gray.100" p={4} rounded={8} h="fit-content">
+          <Flex gap={2} alignContent="center">
+            <Heading mb={2} size="md">
+              Denied
+            </Heading>
+            <Box rounded="5px" bg="gray.300" py="1px" h="fit-content" px="5px">
+              <Text fontWeight={700}>{items.DENIED.length}</Text>
+            </Box>
+          </Flex>
+          <Droppable droppableId={DENIED}>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                style={{
+                  flexDirection: "column",
+                  width: "100%",
+                  minHeight: "256px",
+                  borderRadius: "4px",
+                }}
+              >
+                {items.DENIED.map((request, index) => (
+                  <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
+                    {(provided, snapshot) => (
+                      <SubmittedCard
+                        provided={provided}
+                        request={request}
+                        isOpen={isOpen}
+                        onOpen={onOpen}
+                        onClose={onClose}
+                      />
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </Box>
+        <Box w="full" p={4} rounded={8} bgColor="gray.100" h="fit-content">
+          <Flex gap={2} alignContent="center">
+            <Heading mb={2} size="md">
+              Fulfilled
+            </Heading>
+            <Box rounded="5px" bg="gray.300" py="1px" h="fit-content" px="5px">
+              <Text fontWeight={700}>{items.FULFILLED.length}</Text>
+            </Box>
+          </Flex>
+          <Droppable droppableId={FULFILLED}>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                style={{ flexDirection: "column", width: "100%", minHeight: "256px" }}
+              >
+                {items.FULFILLED.map((request, index) => (
+                  <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
+                    {(provided, snapshot) => (
+                      <SubmittedCard
+                        provided={provided}
+                        request={request}
+                        isOpen={isOpen}
+                        onOpen={onOpen}
+                        onClose={onClose}
+                      />
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </Box>
+        <Box w="full" p={4} rounded={8} bgColor="gray.100" h="fit-content">
+          <Flex gap={2} alignContent="center">
+            <Heading mb={2} size="md">
+              Returned
+            </Heading>
+            <Box rounded="5px" bg="gray.300" py="1px" h="fit-content" px="5px">
+              <Text fontWeight={700}>{items.RETURNED.length}</Text>
+            </Box>
+          </Flex>
+          <Droppable droppableId={RETURNED}>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                style={{ flexDirection: "column", width: "100%", minHeight: "256px" }}
+              >
+                {items.RETURNED.map((request, index) => (
+                  <Draggable key={request.id} draggableId={request.id.toString()} index={index}>
+                    {(provided, snapshot) => (
+                      <SubmittedCard
+                        provided={provided}
+                        request={request}
+                        isOpen={isOpen}
+                        onOpen={onOpen}
+                        onClose={onClose}
+                      />
                     )}
                   </Draggable>
                 ))}
@@ -197,17 +284,6 @@ const SubmittedCards = ({ requests }: SubmittedCardsProps) => {
           </Droppable>
         </Box>
       </Flex>
-      {/* <SubmittedCard request={requests[0]} /> */}
-      {/* <Flex>
-        <Flex flexDir="column">
-        </Flex>
-        <Flex flexDir="column">
-          <SubmittedCard request={requests[0]} />
-        </Flex>
-        <Flex flexDir="column">
-          <SubmittedCard request={requests[0]} />
-        </Flex>
-      </Flex> */}
     </DragDropContext>
   );
 };
