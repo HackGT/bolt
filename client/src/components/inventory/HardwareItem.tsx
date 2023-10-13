@@ -37,7 +37,14 @@ interface HardwareItemProps {
 function itemImage(src: string | undefined, outOfStock = false) {
   return (
     <Box boxSize="48">
-      <Image draggable={false} src={src || "http://placekitten.com/300/300"} borderRadius="6" />
+      <Image
+        draggable={false}
+        src={
+          src ||
+          "https://st2.depositphotos.com/2586633/46477/v/450/depositphotos_464771766-stock-illustration-no-photo-or-blank-image.jpg"
+        }
+        borderRadius="6"
+      />
     </Box>
   );
 }
