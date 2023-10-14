@@ -72,15 +72,11 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
     const sourceClone = Array.from(source);
     const destClone = Array.from(destination);
     const [removed] = sourceClone.splice(droppableSource.index, 1);
-    console.log(removed);
     removed.status = droppableDestination.droppableId as RequestStatus;
     updateStatus.mutate({
       id: removed.id,
       status: droppableDestination.droppableId as RequestStatus,
     });
-
-    console.log(droppableSource.droppableId);
-    console.log(droppableDestination.droppableId);
 
     await updateItem(removed.item.id, {
       name: removed.item.name,
@@ -98,8 +94,6 @@ const SubmittedCards = ({ requests, refetch }: SubmittedCardsProps) => {
 
       maxRequestQty: removed.item.maxRequestQty,
     });
-
-    console.log(removed.item.totalAvailable);
 
     destClone.splice(droppableDestination.index, 0, removed);
 
