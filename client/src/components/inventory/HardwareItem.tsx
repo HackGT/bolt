@@ -53,7 +53,7 @@ function itemImage(src: string | undefined, outOfStock = false) {
 }
 
 interface IRequestMutation {
-  item: string;
+  itemId: string;
   quantity: number;
   user: string;
   name: string;
@@ -143,7 +143,7 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
             disabled={outOfStock}
             onClick={() => {
               const newRequest = {
-                item: item.id,
+                itemId: item.id,
                 quantity: requestedNum,
                 user: user?.uid as string,
                 name: fullName,
