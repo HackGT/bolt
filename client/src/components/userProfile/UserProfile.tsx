@@ -35,7 +35,6 @@ const UserProfile = () => {
       hexathon: process.env.REACT_APP_HEXATHON_ID,
     },
   });
-  console.log(userData);
 
   if (userError) {
     return <ErrorScreen error={userError} />;
