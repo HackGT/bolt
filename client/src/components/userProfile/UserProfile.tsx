@@ -193,6 +193,7 @@ const UserProfile = () => {
   // );
 
   // const backUrl = isAdmin ? "/admin/users"
+  const fullName = `${userData.firstName} ${userData.lastName}`;
   return (
     <Center>
       <Flex direction="column" py="24px">
@@ -218,7 +219,7 @@ const UserProfile = () => {
             <Heading as="h6" size="md">
               Full Name
             </Heading>
-            <Text fontSize="lg">{user.displayName}</Text>
+            <Text fontSize="lg">{fullName}</Text>
           </Box>
           <Box>
             <Heading as="h6" size="md">

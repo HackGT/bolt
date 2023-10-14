@@ -69,14 +69,18 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
   const [{ data: itemData, loading: itemLoading, error: itemError }, itemRefetch] = useAxios(
     apiUrl(Service.HARDWARE, "/items")
   );
-  if (loading) {
+  const [{ data: userData, loading: userLoading, error: userError }, userRefetch] = useAxios({
+    method: "GET",
+    url: apiUrl(Service.USERS, `/users/${user?.uid}`),
+    params: {
+      hexathon: process.env.REACT_APP_HEXATHON_ID,
+    },
+  });
+  if (loading || requestLoading || itemLoading || userLoading) {
     return <LoadingScreen />;
   }
-  if (requestError) {
-    return <ErrorScreen error={requestError} />;
-  }
-  if (itemError) {
-    return <ErrorScreen error={itemError} />;
+  if (requestError || itemError || userError) {
+    return <ErrorScreen error={requestError || itemError || userError as Error} />;
   }
   const handleRequestAdd = async (newRequest: IRequestMutation) => {
     try {
@@ -102,6 +106,8 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
       // itemRefetch();
     }
   };
+
+  const fullName = `${userData?.firstName} ${userData?.lastName}`;
 
   return (
     <Flex flexDir="row">
@@ -140,7 +146,7 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
                 item: item.id,
                 quantity: requestedNum,
                 user: user?.uid as string,
-                name: user?.displayName as string,
+                name: fullName,
               };
               handleRequestAdd(newRequest);
             }}
