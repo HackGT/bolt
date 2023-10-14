@@ -107,7 +107,7 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
     }
   };
 
-  const fullName = `${userData?.firstName} ${userData?.lastName}`;
+  const fullName = `${userData?.name.first} ${userData?.name.last}`;
 
   return (
     <Flex flexDir="row">

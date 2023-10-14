@@ -27,6 +27,7 @@ import { UPDATE_USER } from "../../graphql/Mutations";
 const UserProfile = () => {
   const [submitClicked, setSubmitClicked] = useState(false);
   const { user } = useAuth();
+  // console.log(user);
   const [{ data: userData, loading: userLoading, error: userError }, userRefetch] = useAxios({
     method: "GET",
     url: apiUrl(Service.USERS, `/users/${user?.uid}`),
@@ -34,6 +35,7 @@ const UserProfile = () => {
       hexathon: process.env.REACT_APP_HEXATHON_ID,
     },
   });
+  console.log(userData);
 
   if (userError) {
     return <ErrorScreen error={userError} />;
@@ -193,7 +195,7 @@ const UserProfile = () => {
   // );
 
   // const backUrl = isAdmin ? "/admin/users"
-  const fullName = `${userData.firstName} ${userData.lastName}`;
+  const fullName = `${userData.name.first} ${userData.name.last}`;
   return (
     <Center>
       <Flex direction="column" py="24px">
