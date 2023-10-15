@@ -54,9 +54,9 @@ const NewHardwareList = () => {
     );
 
   return (
-    <Flex w="45%" flexDir="column">
+    <Flex flexDir="column">
       <Heading mb={4}>Inventory</Heading>
-      <Flex gap="10px" flexDir="column">
+      <Flex gap="10px" flexDir={{ base: "column", sm: "row" }}>
         <Flex flexDir="row" gap={2}>
           {profile.roles.admin && (
             <Link to="/admin/categories/new">

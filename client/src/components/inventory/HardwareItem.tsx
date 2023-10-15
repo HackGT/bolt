@@ -151,7 +151,7 @@ const HardwareItem = ({ item, requestsEnabled, preview, outOfStock }: HardwareIt
               handleRequestAdd(newRequest);
             }}
           >
-            {outOfStock ? "Out of stock" : `Request ${requestedNum} items`}
+            {outOfStock ? "Out of stock" : `Request ${requestedNum}`}
           </Button>
         </Flex>
       </Flex>

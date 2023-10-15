@@ -1,6 +1,6 @@
 import React from "react";
 import { apiUrl, ErrorScreen, LoadingScreen, Service, useAuth } from "@hex-labs/core";
-import { Flex } from "@chakra-ui/react";
+import { Flex, Stack } from "@chakra-ui/react";
 import { Navigate } from "react-router-dom";
 import useAxios from "axios-hooks";
 
@@ -27,10 +27,10 @@ const HomeContainer: React.FC = props => {
   }
 
   return (
-    <Flex dir="row" gap={6} p="8" justify="space-around">
+    <Stack direction={{ base: "column", sm: "row" }} gap={6} p="8" justify="space-around">
       <NewHardwareList />
       {user && <RequestedList requests={data} />}
-    </Flex>
+    </Stack>
   );
 };
 

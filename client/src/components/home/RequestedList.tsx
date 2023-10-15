@@ -55,8 +55,12 @@ const RequestCard = ({ r, statuses, requestDeleteMutation }: any) => {
 };
 
 const RequestedList = ({ requests }: RequestedListProps) => {
-  const [{ data: requestData, loading, error}, requestRefetch] = useAxios(apiUrl(Service.HARDWARE, "/hardware-requests"));
-  const [{ data: itemData, loading: itemLoading, error: itemError}, itemRefetch] = useAxios(apiUrl(Service.HARDWARE, "/items"));
+  const [{ data: requestData, loading, error }, requestRefetch] = useAxios(
+    apiUrl(Service.HARDWARE, "/hardware-requests")
+  );
+  const [{ data: itemData, loading: itemLoading, error: itemError }, itemRefetch] = useAxios(
+    apiUrl(Service.HARDWARE, "/items")
+  );
   const [userRequests, setUserRequests] = useState(requests);
   const toast = useToast();
   if (loading) {
@@ -77,11 +81,10 @@ const RequestedList = ({ requests }: RequestedListProps) => {
       });
     } catch (e: any) {
       handleAxiosError(e);
-    }
-    finally {
+    } finally {
       requestRefetch();
       itemRefetch();
-      setUserRequests(requestData!.data as Request[])
+      setUserRequests(requestData!.data as Request[]);
     }
   };
   const statuses = (status: RequestStatus): JSX.Element => {
@@ -163,7 +166,7 @@ const RequestedList = ({ requests }: RequestedListProps) => {
   };
 
   return (
-    <Box w="45%">
+    <Box>
       <Heading mb="4">My Requests</Heading>
       <Flex
         borderRadius="4px"
