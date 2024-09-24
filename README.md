@@ -2,27 +2,6 @@
 
 Simple and efficient hardware checkout system
 
-# Server setup
-
-Required items:
-
-- A postrgesql server and database
-- Install dependencies: `yarn install`
-- Configure the required environment variables in `configs/config.json`. You can copy and rename `configs/configs.json.example`.
-- Run the database migrations using `yarn migrate:dev`.
-- Start the server for development with `yarn dev`
-
-# Client setup
-
-Note: the hardware desk page (/admin/desk) relies on a WebSocket connection to the server. The client assumes that you are
-running the server on port 3000. If this isn't right, then you'll need to update the port in
-
-1. The `proxy` property in the **client's** package.json file
-2. The local development WebSocket URL in `client/index.tsx`
-3. `baseUrl` in `client/src/components/admin/AdminOverviewContainer.tsx`
-
-to use the correct server port. Make sure you don't commit the files with the changed port!
-
 ## Required environment variables
 
 ### Backend
@@ -47,16 +26,12 @@ variables, or define them as temporary environment variables in your shell.
 
 | Variable                  | Description                                                                                                                               |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| REACT_APP_ENABLE_BUGSNAG  | "true" or "false" whether to enable the Bugsnag integration. Keep disabled for local development unless testing Bugsnag-specific features |
-| REACT_APP_BUGSNAG_API_KEY | Required if REACT_APP_ENABLE_BUGSNAG is enabled. Value should be the Notifier API Key for the Bugsnag project                             |
+| REACT_APP_API_ENVIRONMENT  | "production" or "development" depending on the environment you want to connect to (local development should be "development") |
 
 # Development
 
-- For local development:
-  - Access server endpoints, such as authentication, using the development server.
-  - For frontend development, run `yarn start` inside the `/client` directory.
-- You can find GraphiQL at `/api/graphiql`, but note that this endpoint is restricted to admin users. For local development,
-  promote your account to an admin in order to access GraphiQL.
+`yarn start` to run the frontend
+`yarn build` to build the app for production
 
 ## Code Style
 
