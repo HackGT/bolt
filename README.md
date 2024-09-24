@@ -14,7 +14,3 @@ Simple and efficient hardware checkout system
 
 `yarn start` to run the frontend
 `yarn build` to build the app for production
-
-## Code Style
-
-Code style is enforced by eslint, prettier, and stylelint via config.
